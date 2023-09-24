@@ -18,9 +18,9 @@ Learn about [the latest improvements](CHANGELOG.md).
 
 * [Visual studio 2022](https://visualstudio.microsoft.com/)
 * [vcpkg](https://github.com/microsoft/vcpkg) (Required to use this project)
-1) vcpkg integrate install (required for using vcpkg with visual studio)
-2) vcpkg install dxsdk-d3dx:x86-windows
-3) vcpkg install spdlog:x86-windows
+1) `vcpkg integrate install` (required for using vcpkg with visual studio)
+2) `vcpkg install dxsdk-d3dx:x86-windows`
+3) `vcpkg install spdlog:x86-windows`
 
 ## Authors
 
