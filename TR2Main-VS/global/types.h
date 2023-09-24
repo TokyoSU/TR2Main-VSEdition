@@ -1721,7 +1721,7 @@ typedef struct ItemInfo_t {
 	UINT16 active : 1;
 	UINT16 status : 2; // see ITEM_STATUS enum
 	UINT16 gravity : 1;
-	UINT16 hit_status : 1;
+	UINT16 hitStatus : 1;
 	UINT16 collidable : 1;
 	UINT16 looked_at : 1;
 	UINT16 dynamic_light : 1;
@@ -2239,6 +2239,13 @@ typedef struct AIInfo_t {
 	__int16 angle;
 	__int16 enemy_facing;
 } AI_INFO;
+
+typedef struct Sphere_t {
+	int x;
+	int y;
+	int z;
+	int radius;
+} SPHERE;
 
 typedef struct WeaponInfo_t {
 	__int16 lockAngles[4];

@@ -35,9 +35,7 @@ void RifleHandler(int weaponType); // 0x0042BD70
 void FireShotgun(); // 0x0042BE70
 void FireM16(BOOL isRunning); // 0x0042BF70
 void FireHarpoon(); // 0x0042BFF0
-
-//	0x0042C180:		ControlHarpoonBolt
-
+void ControlHarpoonBolt(__int16 itemID); // 0x0042C180
 void FireRocket(); // 0x0042C4D0
 void ControlRocket(__int16 itemID); // 0x0042C5C0
 

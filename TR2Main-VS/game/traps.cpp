@@ -128,7 +128,7 @@ void ControlSpikeWall(__int16 itemID) {
 	}
 	if (item->touchBits) {
 		LaraItem->hitPoints -= 20;
-		LaraItem->hit_status = 1;
+		LaraItem->hitStatus = 1;
 		DoLotsOfBlood(LaraItem->pos.x, LaraItem->pos.y - 512, LaraItem->pos.z, 1, item->pos.rotY, LaraItem->roomNumber, 3);
 		item->touchBits = 0;
 		PlaySoundEffect(205, &item->pos, 0);
@@ -156,7 +156,7 @@ void ControlCeilingSpikes(__int16 itemID) {
 	}
 	if (item->touchBits) {
 		LaraItem->hitPoints -= 20;
-		LaraItem->hit_status = 1;
+		LaraItem->hitStatus = 1;
 		DoLotsOfBlood(LaraItem->pos.x, LaraItem->pos.y + 768, LaraItem->pos.z, 1, item->pos.rotY, LaraItem->roomNumber, 3);
 		item->touchBits = 0;
 		PlaySoundEffect(205, &item->pos, 0);
@@ -170,7 +170,7 @@ void HookControl(__int16 itemID) {
 	item = &Items[itemID];
 	if (item->touchBits && !IsHookHit) {
 		LaraItem->hitPoints -= 50;
-		LaraItem->hit_status = 1;
+		LaraItem->hitStatus = 1;
 		DoLotsOfBlood(LaraItem->pos.x, LaraItem->pos.y - 512, LaraItem->pos.z, LaraItem->speed, LaraItem->pos.rotY, LaraItem->roomNumber, 3);
 	}
 	else {
@@ -196,7 +196,7 @@ void SpinningBlade(__int16 itemID) {
 		}
 		reverse = TRUE;
 		if (item->touchBits) {
-			LaraItem->hit_status = 1;
+			LaraItem->hitStatus = 1;
 			LaraItem->hitPoints -= 100;
 			DoLotsOfBlood(LaraItem->pos.x, LaraItem->pos.y - 512, LaraItem->pos.z, 2 * item->speed, LaraItem->pos.rotY, LaraItem->roomNumber, 2);
 		}
@@ -234,7 +234,7 @@ void IcicleControl(__int16 itemID) {
 		}
 		if (item->touchBits) {
 			LaraItem->hitPoints -= 200;
-			LaraItem->hit_status = 1;
+			LaraItem->hitStatus = 1;
 		}
 		break;
 	case 3:
@@ -281,7 +281,7 @@ void BladeControl(__int16 itemID) {
 		item->goalAnimState = 1;
 	}
 	if (CHK_ANY(item->touchBits, 2) && item->currentAnimState == 2) {
-		LaraItem->hit_status = 1;
+		LaraItem->hitStatus = 1;
 		LaraItem->hitPoints -= 100;
 		DoLotsOfBlood(LaraItem->pos.x, item->pos.y - 256, LaraItem->pos.z, LaraItem->speed, LaraItem->pos.rotY, LaraItem->roomNumber, 2);
 	}
@@ -308,7 +308,7 @@ void KillerStatueControl(__int16 itemID) {
 		item->goalAnimState = 1;
 	}
 	if (CHK_ANY(item->touchBits, 0x80) && item->currentAnimState == 2) {
-		LaraItem->hit_status = 1;
+		LaraItem->hitStatus = 1;
 		LaraItem->hitPoints -= 20;
 		DoBloodSplat(LaraItem->pos.x + (GetRandomControl() - 16384) / 256,
 			LaraItem->pos.y - GetRandomControl() / 44,
@@ -326,7 +326,7 @@ void Pendulum(__int16 itemID) {
 	item = &Items[itemID];
 	if (item->touchBits) {
 		LaraItem->hitPoints -= 50;
-		LaraItem->hit_status = 1;
+		LaraItem->hitStatus = 1;
 		DoBloodSplat(LaraItem->pos.x + (GetRandomControl() - 16384) / 256,
 			LaraItem->pos.y - GetRandomControl() / 44,
 			LaraItem->pos.z + (GetRandomControl() - 16384) / 256,
@@ -351,7 +351,7 @@ void TeethTrap(__int16 itemID) {
 		item->goalAnimState = 1;
 		if (item->touchBits && item->currentAnimState == 1) {
 			LaraItem->hitPoints -= 400;
-			LaraItem->hit_status = 1;
+			LaraItem->hitStatus = 1;
 			BaddieBiteEffect(item, &Teeth[0][0]);
 			BaddieBiteEffect(item, &Teeth[0][1]);
 			BaddieBiteEffect(item, &Teeth[1][0]);
@@ -378,7 +378,7 @@ void FallingCeiling(__int16 itemID) {
 	else {
 		if (item->currentAnimState == 1 && item->touchBits) {
 			LaraItem->hitPoints -= 300;
-			LaraItem->hit_status = 1;
+			LaraItem->hitStatus = 1;
 		}
 	}
 	AnimateItem(item);
@@ -462,7 +462,7 @@ void DartsControl(__int16 itemID) {
 	item = &Items[itemID];
 	if (item->touchBits) {
 		LaraItem->hitPoints -= 50;
-		LaraItem->hit_status = 1;
+		LaraItem->hitStatus = 1;
 		DoBloodSplat(item->pos.x, item->pos.y, item->pos.z, LaraItem->speed, LaraItem->pos.rotY, LaraItem->roomNumber);
 	}
 	AnimateItem(item);
@@ -559,7 +559,7 @@ void FlameControl(__int16 fx_id) {
 		else {
 			PlaySoundEffect(150, &fx->pos, 0);
 			LaraItem->hitPoints -= 7;
-			LaraItem->hit_status = 1;
+			LaraItem->hitStatus = 1;
 		}
 	}
 	else {
@@ -569,7 +569,7 @@ void FlameControl(__int16 fx_id) {
 		}
 		else if (ItemNearLara(&fx->pos, 600)) {
 			LaraItem->hitPoints -= 5;
-			LaraItem->hit_status = 1;
+			LaraItem->hitStatus = 1;
 			int dx = LaraItem->pos.x - fx->pos.x;
 			int dz = LaraItem->pos.z - fx->pos.z;
 			if (SQR(dx) + SQR(dz) < SQR(450)) {
@@ -617,7 +617,7 @@ void LavaBurn(ITEM_INFO* item) {
 		return;
 	}
 
-	item->hit_status = 1;
+	item->hitStatus = 1;
 	item->hitPoints = -1;
 	for (int i = 0; i < 10; ++i) {
 		__int16 fx_id = CreateEffect(item->roomNumber);

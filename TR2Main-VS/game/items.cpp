@@ -61,7 +61,7 @@ void InitialiseItem(__int16 itemIndex) {
 	item->active = 0;
 	item->status = ITEM_INACTIVE;
 	item->gravity = 0;
-	item->hit_status = 0;
+	item->hitStatus = 0;
 	item->collidable = 1;
 	item->looked_at = 0;
 	item->clear_body = 0;

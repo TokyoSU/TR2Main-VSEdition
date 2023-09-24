@@ -106,7 +106,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExceptionHandling>Async</ExceptionHandling>
-      <DisableSpecificWarnings>4200</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4200;6269</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -117,9 +117,8 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y "$(TargetDir)$(TargetName).dll" "C:\GOG Games\Tomb Raider 2"
-xcopy /y "$(TargetDir)fmtd.dll" "C:\GOG Games\Tomb Raider 2"
-xcopy /y "$(TargetDir)d3dx9d_43.dll" "C:\GOG Games\Tomb Raider 2"</Command>
+      <Command>xcopy /y "$(TargetDir)$(TargetName).dll" "$(LocalDebuggerWorkingDirectory)"
+xcopy /y "$(TargetDir)fmtd.dll" "$(LocalDebuggerWorkingDirectory)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DX9|Win32'">
@@ -134,7 +133,7 @@ xcopy /y "$(TargetDir)d3dx9d_43.dll" "C:\GOG Games\Tomb Raider 2"</Command>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExceptionHandling>Async</ExceptionHandling>
-      <DisableSpecificWarnings>4200</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4200;6269</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -144,9 +143,9 @@ xcopy /y "$(TargetDir)d3dx9d_43.dll" "C:\GOG Games\Tomb Raider 2"</Command>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y "$(TargetDir)$(TargetName).dll" "C:\GOG Games\Tomb Raider 2"
-xcopy /y "$(TargetDir)fmtd.dll" "C:\GOG Games\Tomb Raider 2"
-xcopy /y "$(TargetDir)d3dx9d_43.dll" "C:\GOG Games\Tomb Raider 2"</Command>
+      <Command>xcopy /y "$(TargetDir)$(TargetName).dll" "$(LocalDebuggerWorkingDirectory)"
+xcopy /y "$(TargetDir)fmtd.dll" "$(LocalDebuggerWorkingDirectory)"
+xcopy /y "$(TargetDir)d3dx9d_43.dll" "$(LocalDebuggerWorkingDirectory)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -163,7 +162,7 @@ xcopy /y "$(TargetDir)d3dx9d_43.dll" "C:\GOG Games\Tomb Raider 2"</Command>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExceptionHandling>Async</ExceptionHandling>
-      <DisableSpecificWarnings>4200</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4200;6269</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -176,9 +175,8 @@ xcopy /y "$(TargetDir)d3dx9d_43.dll" "C:\GOG Games\Tomb Raider 2"</Command>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y "$(TargetDir)$(TargetName).dll" "C:\GOG Games\Tomb Raider 2"
-xcopy /y "$(TargetDir)fmt.dll" "C:\GOG Games\Tomb Raider 2"
-xcopy /y "$(TargetDir)d3dx9_43.dll" "C:\GOG Games\Tomb Raider 2"</Command>
+      <Command>xcopy /y "$(TargetDir)$(TargetName).dll" "$(LocalDebuggerWorkingDirectory)"
+xcopy /y "$(TargetDir)fmt.dll" "$(LocalDebuggerWorkingDirectory)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_DX9|Win32'">
@@ -195,7 +193,7 @@ xcopy /y "$(TargetDir)d3dx9_43.dll" "C:\GOG Games\Tomb Raider 2"</Command>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExceptionHandling>Async</ExceptionHandling>
-      <DisableSpecificWarnings>4200</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4200;6269</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -207,9 +205,9 @@ xcopy /y "$(TargetDir)d3dx9_43.dll" "C:\GOG Games\Tomb Raider 2"</Command>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y "$(TargetDir)$(TargetName).dll" "C:\GOG Games\Tomb Raider 2" 
-xcopy /y "$(TargetDir)fmt.dll" "C:\GOG Games\Tomb Raider 2" 
-xcopy /y "$(TargetDir)d3dx9_43.dll" "C:\GOG Games\Tomb Raider 2"</Command>
+      <Command>xcopy /y "$(TargetDir)$(TargetName).dll" "$(LocalDebuggerWorkingDirectory)"
+xcopy /y "$(TargetDir)fmt.dll" "$(LocalDebuggerWorkingDirectory)"
+xcopy /y "$(TargetDir)d3dx9_43.dll" "$(LocalDebuggerWorkingDirectory)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -99,10 +99,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		SetGold(UT_FindArg("gold") != NULL);
 #endif
 
-#if _DEBUG
-		SetGold(true);
-#endif
-
 		initStatus = Init(isSetupRequested);
 		if (initStatus == 0) {
 #if (DIRECT3D_VERSION > 0x500)
@@ -117,7 +113,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			goto EXIT;
 
 		appSettingsStatus = SE_ReadAppSettings(&SavedAppSettings);
-
 		if (appSettingsStatus == 0)
 			goto EXIT;
 

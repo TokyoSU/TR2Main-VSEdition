@@ -83,7 +83,7 @@ void BearControl(__int16 itemID) {
 		case BEAR_DEATH:
 			if (bear->flags && CHK_ANY(item->touchBits, BEAR_TOUCH)) {
 				LaraItem->hitPoints -= 200;
-				LaraItem->hit_status = 1;
+				LaraItem->hitStatus = 1;
 				bear->flags = 0;
 			}
 			break;
@@ -109,7 +109,7 @@ void BearControl(__int16 itemID) {
 		angle = CreatureTurn(item, bear->maximum_turn);
 		isLaraDead = (LaraItem->hitPoints < 0);
 
-		if (item->hit_status) {
+		if (item->hitStatus) {
 			bear->flags = 1;
 		}
 
@@ -155,7 +155,7 @@ void BearControl(__int16 itemID) {
 			bear->maximum_turn = 910;
 			if (CHK_ANY(item->touchBits, BEAR_TOUCH)) {
 				LaraItem->hitPoints -= 3;
-				LaraItem->hit_status = 1;
+				LaraItem->hitStatus = 1;
 			}
 
 			if (bear->mood == MOOD_BORED || isLaraDead) {
@@ -216,7 +216,7 @@ void BearControl(__int16 itemID) {
 		case BEAR_ATTACK2:
 			if (item->requiredAnimState == BEAR_STROLL && CHK_ANY(item->touchBits, BEAR_TOUCH)) {
 				LaraItem->hitPoints -= 400;
-				LaraItem->hit_status = 1;
+				LaraItem->hitStatus = 1;
 				item->requiredAnimState = BEAR_REAR;
 			}
 			break;
@@ -226,7 +226,7 @@ void BearControl(__int16 itemID) {
 			{
 				CreatureEffect(item, &BearBite, DoBloodSplat);
 				LaraItem->hitPoints -= 200;
-				LaraItem->hit_status = 1;
+				LaraItem->hitStatus = 1;
 				item->requiredAnimState = BEAR_STOP;
 			}
 			break;

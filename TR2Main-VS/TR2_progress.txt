@@ -227,7 +227,7 @@ x function is unused / included in another function
 0x00415C50:		zLOS
 0x00415F40:		xLOS
 0x00416230:		ClipTarget
-0x00416310:		ObjectOnLOS
+0x00416310:	 *	ObjectOnLOS
 0x00416610:	 *	FlipMap
 0x004166D0:		RemoveRoomFlipItems
 0x00416770:		AddRoomFlipItems
@@ -626,7 +626,7 @@ x function is unused / included in another function
 0x0042BE70:	+	FireShotgun
 0x0042BF70:	+	FireM16
 0x0042BFF0:	+	FireHarpoon
-0x0042C180:		ControlHarpoonBolt
+0x0042C180:	+	ControlHarpoonBolt
 0x0042C4D0:	+	FireRocket
 0x0042C5C0:	+	ControlRocket
 0x0042C9D0:		draw_shotgun
@@ -671,8 +671,8 @@ x function is unused / included in another function
 0x0042EFD0:	 *	LaraGetNewTarget
 0x0042F1F0:	 *	find_target_point
 0x0042F2A0:	 *	AimWeapon
-0x0042F370:	 *	FireWeapon
-0x0042F6E0:	 *	HitTarget
+0x0042F370:	+	FireWeapon
+0x0042F6E0:	+	HitTarget
 0x0042F780:	 *	SmashItem
 0x0042F7E0:	 *	WeaponObject
 
@@ -895,7 +895,7 @@ x function is unused / included in another function
 
 	game/sphere.cpp
 0x0043FA60:		TestCollision
-0x0043FB90:		GetSpheres
+0x0043FB90:	 *	GetSpheres
 0x0043FE70:	 *	GetJointAbsPosition
 0x00440010:	 *	BaddieBiteEffect
 

@@ -70,13 +70,13 @@ void ControlMissile(__int16 fxID) {
 	if (fx->object_number == ID_MISSILE_FLAME) {
 		if (ItemNearLara(&fx->pos, 350)) {
 			LaraItem->hitPoints -= 3;
-			LaraItem->hit_status = 1;
+			LaraItem->hitStatus = 1;
 			LaraBurn();
 			return;
 		}
 	}
 	else if (ItemNearLara(&fx->pos, 200)) {
-		LaraItem->hit_status = 1;
+		LaraItem->hitStatus = 1;
 		fx->pos.rotY = LaraItem->pos.rotY;
 		fx->counter = 0;
 		fx->speed = LaraItem->speed;

@@ -202,7 +202,7 @@ void WolfControl(__int16 itemID) {
 			{
 				CreatureEffect(item, &WolfBite, DoBloodSplat);
 				LaraItem->hitPoints -= 50;
-				LaraItem->hit_status = 1;
+				LaraItem->hitStatus = 1;
 				item->requiredAnimState = WOLF_RUN;
 			}
 			item->goalAnimState = WOLF_RUN;
@@ -215,7 +215,7 @@ void WolfControl(__int16 itemID) {
 			{
 				CreatureEffect(item, &WolfBite, DoBloodSplat);
 				LaraItem->hitPoints -= 100;
-				LaraItem->hit_status = 1;
+				LaraItem->hitStatus = 1;
 				item->requiredAnimState = WOLF_CROUCH;
 			}
 			break;

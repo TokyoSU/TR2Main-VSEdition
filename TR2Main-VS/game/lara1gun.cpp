@@ -27,6 +27,7 @@
 #include "game/control.h"
 #include "game/draw.h"
 #include "game/items.h"
+#include "game/effects.h"
 #include "game/lara.h"
 #include "game/larafire.h"
 #include "game/objects.h"
@@ -162,6 +163,87 @@ void FireHarpoon() {
 #endif // FEATURE_INPUT_IMPROVED
 }
 
+void ControlHarpoonBolt(__int16 itemID)
+{
+	FLOOR_INFO* floor = NULL;
+	ITEM_INFO* item = NULL, *target = NULL;
+	PHD_VECTOR pos{}, pos2{}, oldPos{};
+	int sin = 0, cos = 0, rX = 0, rY = 0, sX = 0, rZ = 0, sZ = 0;
+	short* bounds = NULL;
+	short roomNumber = 0, targetID = 0;
+
+	item = &Items[itemID];
+	oldPos.x = item->pos.x;
+	oldPos.y = item->pos.y;
+	oldPos.z = item->pos.z;
+	
+	if (!CHK_ANY(RoomInfo[item->roomNumber].flags, ROOM_UNDERWATER))
+		item->fallSpeed += 3;
+
+	item->pos.x += item->speed * phd_sin(item->pos.rotY) >> W2V_SHIFT;
+	item->pos.y += item->fallSpeed;
+	item->pos.z += item->speed * phd_cos(item->pos.rotY) >> W2V_SHIFT;
+
+	roomNumber = item->roomNumber;
+	floor = GetFloor(item->pos.x, item->pos.y, item->pos.z, &roomNumber);
+	item->floor = GetHeight(floor, item->pos.x, item->pos.y, item->pos.z);
+	if (item->roomNumber != roomNumber)
+		ItemNewRoom(itemID, roomNumber);
+	if (CHK_ANY(RoomInfo[item->roomNumber].flags, ROOM_UNDERWATER))
+		CreateBubble(&item->pos, item->roomNumber);
+
+	// Hit wall, ceiling or floor !
+	if (item->pos.y >= item->floor || item->pos.y <= GetCeiling(floor, item->pos.x, item->pos.y, item->pos.z))
+	{
+		KillItem(itemID);
+		return;
+	}
+
+	for (targetID = RoomInfo[item->roomNumber].itemNumber; targetID != -1; targetID = target->nextItem)
+	{
+		target = &Items[targetID];
+
+		if (target == LaraItem)
+			continue;
+
+		if (target->objectID == ID_WINDOW1 || (item->status != ITEM_INVISIBLE && Objects[target->objectID].collision != NULL)) {
+			bounds = GetBestFrame(target);
+			if (item->pos.y < (target->pos.y + bounds[2]) || item->pos.y > (target->pos.y + bounds[3]))
+				continue;
+
+			sin = phd_sin(target->pos.rotY);
+			cos = phd_cos(target->pos.rotY);
+			pos.x = item->pos.x - target->pos.x;
+			pos.z = item->pos.z - target->pos.z;
+			pos2.x = oldPos.x - target->pos.x;
+			pos2.z = oldPos.z - target->pos.z;
+
+			rX = ((cos * pos.x) - (sin * pos.z)) >> W2V_SHIFT;
+			sX = ((cos * pos2.x) - (sin * pos2.z)) >> W2V_SHIFT;
+			if ((rX < bounds[0] && sX < bounds[0]) || (rX > bounds[1] && sX > bounds[1]))
+				continue;
+
+			rZ = ((cos * pos.z) + (sin * pos.x)) >> W2V_SHIFT;
+			sZ = ((cos * pos2.z) + (sin * pos2.x)) >> W2V_SHIFT;
+			if ((rZ < bounds[4] && sZ < bounds[4]) || (rZ > bounds[5] && sZ > bounds[5]))
+				continue;
+
+			if (target->objectID == ID_WINDOW1) {
+				SmashWindow(targetID);
+			}
+			else {
+				if (Objects[target->objectID].intelligent) {
+					DoLotsOfBlood(item->pos.x, item->pos.y, item->pos.z, 0, 0, item->roomNumber, CHK_ANY(RoomInfo[item->roomNumber].flags, ROOM_UNDERWATER) ? 5 : 1);
+					HitTarget(target, 0, Weapons[LGT_Harpoon].damage);
+					++SaveGame.statistics.hits;
+				}
+				KillItem(itemID);
+				return;
+			}
+		}
+	}
+}
+
 void FireRocket() {
 	__int16 itemID;
 	ITEM_INFO* item;
@@ -243,10 +325,8 @@ void ControlRocket(__int16 itemID) {
 				s = phd_sin(link->pos.rotY);
 				r = (c * (item->pos.x - link->pos.x) - s * (item->pos.z - link->pos.z)) >> W2V_SHIFT;
 				oldR = (c * (oldX - link->pos.x) - s * (oldZ - link->pos.z)) >> W2V_SHIFT;
-				if ((r + displacement >= frame[0] ||
-					oldR + displacement >= frame[0]) &&
-					(r - displacement <= frame[1] ||
-						oldR - displacement <= frame[1]))
+				if ((r + displacement >= frame[0] || oldR + displacement >= frame[0]) &&
+					(r - displacement <= frame[1] || oldR - displacement <= frame[1]))
 				{
 					r = (s * (item->pos.x - link->pos.x) + c * (item->pos.z - link->pos.z)) >> W2V_SHIFT;
 					oldR = (s * (oldX - link->pos.x) + c * (oldZ - link->pos.z)) >> W2V_SHIFT;
@@ -307,9 +387,7 @@ void Inject_Lara1Gun() {
 	INJECT(0x0042BE70, FireShotgun);
 	INJECT(0x0042BF70, FireM16);
 	INJECT(0x0042BFF0, FireHarpoon);
-
-	//	INJECT(0x0042C180, ControlHarpoonBolt);
-
+	INJECT(0x0042C180, ControlHarpoonBolt);
 	INJECT(0x0042C4D0, FireRocket);
 	INJECT(0x0042C5C0, ControlRocket);
 
