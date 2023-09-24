@@ -16,15 +16,13 @@ Learn about [the latest improvements](CHANGELOG.md).
 
 ## Built With
 
-* [Code::Blocks](http://www.codeblocks.org) - C/C++ IDE used
-* [GCC](https://gcc.gnu.org) - C/C++ compiler
-* [Doxygen](http://www.doxygen.org) - documentation
+* [Visual studio 2022](https://visualstudio.microsoft.com/fr/)
 
 ## Authors
 
 * **Michael Chaban** \([Arsunt](https://github.com/Arsunt)\). Author of the project. E-mail: <arsunt@gmail.com>
 * [**ChocolateFan**](https://github.com/asasas9500). Decompilation.
-* [**TokyoSU**](https://github.com/TokyoSU). Decompilation and features development.
+* [**TokyoSU**](https://github.com/TokyoSU). Decompilation and features development and also the Visual studio edition.
 * **PaulD**. Author of [CD audio solution](modding/cd_pauld.cpp) used now by Steam.
 * [**Lito Perezito**](https://litoperezito.com). The artist who created loading screens for The Golden Mask.
 
