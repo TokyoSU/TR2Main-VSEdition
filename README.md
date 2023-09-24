@@ -17,6 +17,9 @@ Learn about [the latest improvements](CHANGELOG.md).
 ## Built With
 
 * [Visual studio 2022](https://visualstudio.microsoft.com/fr/)
+* [vcpkg](https://github.com/microsoft/vcpkg) Required to use this project.
+- [vcpkg] Using dxsdk-d3dx library. (More recent than DX7_SDK)
+- [vcpkg] Using spdlog library. (For logging)
 
 ## Authors
 
