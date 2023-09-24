@@ -23,7 +23,7 @@ Learn about [the latest improvements](CHANGELOG.md).
 3) `vcpkg install spdlog:x86-windows`
 
 * Next you need to download [DX7_SDK](https://archive.org/details/dx7sdk-7001) (if your planning to use the DirectX5)
-1) then extract it to somewhere you want. (you can rename the folder to DX7_SDK)
+1) then extract it to somewhere you want. (you can rename the folder to DX7_SDK after extraction)
 2) go to visual studio (open the project if it's not already opened).
 3) go to the project properties, linker -> general then look for "Additional library directories".
 4) change the configuration to "Debug" then copy the path from DX7_SDK\lib to "Additional library directories" box on the right (replacing the path i set).
