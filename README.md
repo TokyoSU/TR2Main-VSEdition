@@ -6,9 +6,9 @@ The goal of the project is to make 1:1 clone of the original PC game, to fix all
 
 ## Getting Started
 
-You may download patched Tomb2.exe, TR2Main.dll from [releases](https://github.com/Arsunt/TR2Main/releases), put them in your game folder and just launch. Also you may build TR2Main.dll yourself and use it with patched Tomb2.exe from [here](/binaries).
+You may download patched Tomb2.exe, TR2Main.dll from [releases](https://github.com/TokyoSU/TR2Main-VSEdition/releases), put them in your game folder and just launch. Also you may build TR2Main.dll yourself and use it with patched Tomb2.exe from the [releases](https://github.com/TokyoSU/TR2Main-VSEdition/releases).
 
-The Golden Mask game is included into a [release pack](https://github.com/Arsunt/TR2Main/releases), since it's freeware. The original game level files must be officially obtained via Steam/GOG/CD/whatever.
+The Golden Mask game is included into a [release pack](https://github.com/TokyoSU/TR2Main-VSEdition/releases), since it's freeware. The original game level files must be officially obtained via Steam/GOG/CD/whatever.
 
 ## Changelog
 
@@ -16,15 +16,13 @@ Learn about [the latest improvements](CHANGELOG.md).
 
 ## Built With
 
-* [Code::Blocks](http://www.codeblocks.org) - C/C++ IDE used
-* [GCC](https://gcc.gnu.org) - C/C++ compiler
-* [Doxygen](http://www.doxygen.org) - documentation
+* [Visual studio 2022](https://visualstudio.microsoft.com/fr/)
 
 ## Authors
 
 * **Michael Chaban** \([Arsunt](https://github.com/Arsunt)\). Author of the project. E-mail: <arsunt@gmail.com>
 * [**ChocolateFan**](https://github.com/asasas9500). Decompilation.
-* [**TokyoSU**](https://github.com/TokyoSU). Decompilation and features development.
+* [**TokyoSU**](https://github.com/TokyoSU). Decompilation and features development and also the Visual studio edition.
 * **PaulD**. Author of [CD audio solution](modding/cd_pauld.cpp) used now by Steam.
 * [**Lito Perezito**](https://litoperezito.com). The artist who created loading screens for The Golden Mask.
 
