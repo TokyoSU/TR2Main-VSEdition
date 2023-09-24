@@ -45,7 +45,7 @@ static bool isCDAudioEnabled = false;
 static DWORD CDVolume = 0;
 
 int S_SoundPlaySample(int channel, UINT16 volume, int pitch, int pan) {
-	if( !SoundIsActive )
+	if (!SoundIsActive)
 		return -3;
 
 	int calcPan = S_Sound_CalculateSamplePan(pan);
@@ -54,15 +54,15 @@ int S_SoundPlaySample(int channel, UINT16 volume, int pitch, int pan) {
 }
 
 int S_Sound_CalculateSampleVolume(DWORD volume) {
-	return (int)(((double)(S_MasterVolume * volume)/0x200000.p0 - 1.0) * 5000.0);
+	return (int)(((double)(S_MasterVolume * volume) / 0x200000.p0 - 1.0) * 5000.0);
 }
 
 int S_Sound_CalculateSamplePan(__int16 pan) {
-	return pan/16;
+	return pan / 16;
 }
 
 int S_SoundPlaySampleLooped(int channel, UINT16 volume, DWORD pitch, int pan) {
-	if( !SoundIsActive )
+	if (!SoundIsActive)
 		return -3;
 
 	int calcPan = S_Sound_CalculateSamplePan(pan);
@@ -71,7 +71,7 @@ int S_SoundPlaySampleLooped(int channel, UINT16 volume, DWORD pitch, int pan) {
 }
 
 void S_SoundSetPanAndVolume(int channel, int pan, UINT16 volume) {
-	if( SoundIsActive ) {
+	if (SoundIsActive) {
 		int calcPan = S_Sound_CalculateSamplePan(pan);
 		int calcVolume = S_Sound_CalculateSampleVolume(volume);
 		WinSndAdjustVolumeAndPan(channel, calcVolume, calcPan);
@@ -79,7 +79,7 @@ void S_SoundSetPanAndVolume(int channel, int pan, UINT16 volume) {
 }
 
 void S_SoundSetPitch(int channel, DWORD pitch) {
-	if( SoundIsActive )
+	if (SoundIsActive)
 		WinSndAdjustPitch(channel, pitch);
 }
 
@@ -88,18 +88,18 @@ void S_SoundSetMasterVolume(DWORD volume) {
 }
 
 void S_SoundStopSample(int channel) {
-	if( SoundIsActive )
+	if (SoundIsActive)
 		WinSndStopSample(channel);
 }
 
 void S_SoundStopAllSamples() {
-	if( SoundIsActive )
-		for( DWORD i=0; i<32; ++i )
+	if (SoundIsActive)
+		for (DWORD i = 0; i < 32; ++i)
 			WinSndStopSample(i);
 }
 
 BOOL S_SoundSampleIsPlaying(int channel) {
-	if( !SoundIsActive )
+	if (!SoundIsActive)
 		return FALSE;
 
 	return WinSndIsChannelPlaying(channel);
@@ -110,22 +110,22 @@ bool CD_Init() {
 	MCI_SET_PARMS setParams;
 
 #ifndef FEATURE_NOCD_DATA
-	while( !SelectDrive() ) {
-		if( !CD_NoteAlert(MAKEINTRESOURCE(IDD_CD_PROMPT), HGameWindow) )
+	while (!SelectDrive()) {
+		if (!CD_NoteAlert(MAKEINTRESOURCE(IDD_CD_PROMPT), HGameWindow))
 			return false;
 	}
 #endif // !FEATURE_NOCD_DATA
 
 #ifdef FEATURE_PAULD_CDAUDIO
 	PaulD_isActive = PaulD_CD_Init();
-	if( PaulD_isActive ) return true;
+	if (PaulD_isActive) return true;
 #endif // FEATURE_PAULD_CDAUDIO
 
-	if( isCDAudioEnabled )
+	if (isCDAudioEnabled)
 		return true;
 
 	openParams.lpstrDeviceType = "cdaudio";
-	if( 0 == mciSendCommand(0, MCI_OPEN, MCI_OPEN_TYPE, (DWORD_PTR)&openParams) ) {
+	if (0 == mciSendCommand(0, MCI_OPEN, MCI_OPEN_TYPE, (DWORD_PTR)&openParams)) {
 		MciDeviceID = openParams.wDeviceID;
 		setParams.dwTimeFormat = MCI_FORMAT_TMSF;
 		mciSendCommand(MciDeviceID, MCI_SET, MCI_SET_TIME_FORMAT, (DWORD_PTR)&setParams);
@@ -138,13 +138,13 @@ void CD_Cleanup() {
 	MCI_GENERIC_PARMS params;
 
 #ifdef FEATURE_PAULD_CDAUDIO
-	if( PaulD_isActive ) {
+	if (PaulD_isActive) {
 		PaulD_CD_Cleanup();
 		return;
 	}
 #endif // FEATURE_PAULD_CDAUDIO
 
-	if( !isCDAudioEnabled )
+	if (!isCDAudioEnabled)
 		return;
 
 	mciSendCommand(MciDeviceID, MCI_STOP, 0, (DWORD_PTR)&params);
@@ -158,22 +158,22 @@ void S_CDLoop() {
 	MCI_STATUS_PARMS statusParams;
 
 #ifdef FEATURE_PAULD_CDAUDIO
-	if( PaulD_isActive ) {
+	if (PaulD_isActive) {
 		PaulD_CDLoop();
 		return;
 	}
 #endif // FEATURE_PAULD_CDAUDIO
 
-	if( CD_LoopTrack == 0 || ++CD_LoopCounter < 150 )
+	if (CD_LoopTrack == 0 || ++CD_LoopCounter < 150)
 		return;
 
 	CD_LoopCounter = 0;
 	statusParams.dwItem = MCI_STATUS_MODE;
 	rc = mciSendCommand(MciDeviceID, MCI_STATUS, MCI_STATUS_ITEM, (DWORD_PTR)&statusParams);
-	if( (rc == 0) && (statusParams.dwReturn == MCI_MODE_STOP) ) {
+	if ((rc == 0) && (statusParams.dwReturn == MCI_MODE_STOP)) {
 		playParams.dwFrom = CD_LoopTrack;
 		playParams.dwTo = CD_LoopTrack + 1;
-		mciSendCommand(MciDeviceID, MCI_PLAY, MCI_NOTIFY_FAILURE|MCI_NOTIFY_ABORTED, (DWORD_PTR)&playParams);
+		mciSendCommand(MciDeviceID, MCI_PLAY, MCI_NOTIFY_FAILURE | MCI_NOTIFY_ABORTED, (DWORD_PTR)&playParams);
 	}
 }
 
@@ -182,22 +182,22 @@ void S_CDPlay(__int16 trackID, BOOL isLooped) {
 	MCI_PLAY_PARMS playParams;
 
 #ifdef FEATURE_PAULD_CDAUDIO
-	if( PaulD_isActive ) {
+	if (PaulD_isActive) {
 		PaulD_CDPlay(trackID, isLooped);
 		return;
 	}
 #endif // FEATURE_PAULD_CDAUDIO
 
-	if( MusicVolume == 0 )
+	if (MusicVolume == 0)
 		return;
 
 	CD_TrackID = trackID;
 	track = GetRealTrack(trackID);
 	playParams.dwFrom = track;
 	playParams.dwTo = track + 1;
-	mciSendCommand(MciDeviceID, MCI_PLAY, MCI_NOTIFY_FAILURE|MCI_NOTIFY_ABORTED, (DWORD_PTR)&playParams);
+	mciSendCommand(MciDeviceID, MCI_PLAY, MCI_NOTIFY_FAILURE | MCI_NOTIFY_ABORTED, (DWORD_PTR)&playParams);
 
-	if( isLooped ) {
+	if (isLooped) {
 		CD_LoopTrack = track;
 		CD_LoopCounter = 120;
 	}
@@ -207,13 +207,13 @@ void S_CDStop() {
 	MCI_GENERIC_PARMS params;
 
 #ifdef FEATURE_PAULD_CDAUDIO
-	if( PaulD_isActive ) {
+	if (PaulD_isActive) {
 		PaulD_CDStop();
 		return;
 	}
 #endif // FEATURE_PAULD_CDAUDIO
 
-	if( CD_TrackID > 0 ) {
+	if (CD_TrackID > 0) {
 		mciSendCommand(MciDeviceID, MCI_STOP, 0, (DWORD_PTR)&params);
 		CD_TrackID = 0;
 		CD_LoopTrack = 0;
@@ -226,7 +226,7 @@ BOOL StartSyncedAudio(int trackID) {
 	MCI_SET_PARMS setParams;
 
 #ifdef FEATURE_PAULD_CDAUDIO
-	if( PaulD_isActive )
+	if (PaulD_isActive)
 		return PaulD_StartSyncedAudio(trackID);
 #endif // FEATURE_PAULD_CDAUDIO
 
@@ -234,12 +234,12 @@ BOOL StartSyncedAudio(int trackID) {
 	track = GetRealTrack(trackID);
 
 	setParams.dwTimeFormat = MCI_FORMAT_TMSF;
-	if( 0 != mciSendCommand(MciDeviceID, MCI_SET, MCI_SET_TIME_FORMAT, (DWORD_PTR)&setParams) )
+	if (0 != mciSendCommand(MciDeviceID, MCI_SET, MCI_SET_TIME_FORMAT, (DWORD_PTR)&setParams))
 		return FALSE;
 
 	playParams.dwFrom = track;
 	playParams.dwTo = track + 1;
-	return ( 0 == mciSendCommand(MciDeviceID, MCI_PLAY, MCI_NOTIFY_FAILURE|MCI_NOTIFY_ABORTED, (DWORD_PTR)&playParams) );
+	return (0 == mciSendCommand(MciDeviceID, MCI_PLAY, MCI_NOTIFY_FAILURE | MCI_NOTIFY_ABORTED, (DWORD_PTR)&playParams));
 }
 
 DWORD S_CDGetLoc() {
@@ -247,17 +247,17 @@ DWORD S_CDGetLoc() {
 	MCI_STATUS_PARMS statusParams;
 
 #ifdef FEATURE_PAULD_CDAUDIO
-	if( PaulD_isActive )
+	if (PaulD_isActive)
 		return PaulD_CDGetLoc();
 #endif // FEATURE_PAULD_CDAUDIO
 
 	statusParams.dwItem = MCI_STATUS_POSITION;
-	if( 0 != mciSendCommand(MciDeviceID, MCI_STATUS, MCI_STATUS_ITEM, (DWORD_PTR)&statusParams) )
+	if (0 != mciSendCommand(MciDeviceID, MCI_STATUS, MCI_STATUS_ITEM, (DWORD_PTR)&statusParams))
 		return 0;
 
 	pos = statusParams.dwReturn;
 	// calculate audio frames position (75 audio frames per second)
-	return (MCI_TMSF_MINUTE(pos)*60 + MCI_TMSF_SECOND(pos))*75 + MCI_TMSF_FRAME(pos);
+	return (MCI_TMSF_MINUTE(pos) * 60 + MCI_TMSF_SECOND(pos)) * 75 + MCI_TMSF_FRAME(pos);
 }
 
 void S_CDVolume(DWORD volume) {
@@ -268,33 +268,33 @@ void S_CDVolume(DWORD volume) {
 	CDVolume = volume; // NOTE: store current CD Audio volume
 
 #ifdef FEATURE_PAULD_CDAUDIO
-	if( PaulD_isActive ) {
+	if (PaulD_isActive) {
 		PaulD_CDVolume(volume);
 		return;
 	}
 #endif // FEATURE_PAULD_CDAUDIO
 
-	if( auxDevCount == 0)
+	if (auxDevCount == 0)
 		return;
 
 	volume *= 0x100; // 0 .. 255 -> 0..65280
 
-	for( UINT i=0; i<auxDevCount; ++i ) {
+	for (UINT i = 0; i < auxDevCount; ++i) {
 		auxGetDevCaps(i, &caps, sizeof(AUXCAPS));
 
-		switch( caps.wTechnology ) {
-			case AUXCAPS_CDAUDIO :
-				auxSetVolume(i, MAKELONG(volume, volume));
-				isVolumeSet = true;
-				break;
+		switch (caps.wTechnology) {
+		case AUXCAPS_CDAUDIO:
+			auxSetVolume(i, MAKELONG(volume, volume));
+			isVolumeSet = true;
+			break;
 
-			case AUXCAPS_AUXIN :
-				deviceID = i;
-				break;
+		case AUXCAPS_AUXIN:
+			deviceID = i;
+			break;
 		}
 	}
 
-	if( !isVolumeSet && deviceID != (UINT)(-1) )
+	if (!isVolumeSet && deviceID != (UINT)(-1))
 		auxSetVolume(deviceID, MAKELONG(volume, volume));
 }
 

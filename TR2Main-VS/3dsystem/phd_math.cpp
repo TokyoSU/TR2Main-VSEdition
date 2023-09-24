@@ -23,7 +23,7 @@
 #include "3dsystem/phd_math.h"
 #include "global/vars.h"
 
-// Arctan base table
+ // Arctan base table
 static int AtanBaseTable[8] = {
 	 0x0000,
 	-0x4000,
@@ -434,26 +434,26 @@ int __fastcall phd_atan(int x, int y) {
 	int swapBuf;
 	int flags = 0;
 
-	if( x == 0 && y == 0 )
+	if (x == 0 && y == 0)
 		return 0;
 
-	if( x < 0 ) {
+	if (x < 0) {
 		flags |= 4;
 		x = -x;
 	}
 
-	if( y < 0 ) {
+	if (y < 0) {
 		flags |= 2;
 		y = -y;
 	}
 
-	if( y > x ) {
+	if (y > x) {
 		flags |= 1;
 		SWAP(x, y, swapBuf);
 	}
 
-	result = AtanBaseTable[flags] + AtanAngleTable[0x800*y/x];
-	if ( result < 0 )
+	result = AtanBaseTable[flags] + AtanAngleTable[0x800 * y / x];
+	if (result < 0)
 		result = -result;
 
 	return result;
@@ -464,14 +464,14 @@ int __fastcall phd_cos(__int16 angle) {
 }
 
 int __fastcall phd_sin(__int16 angle) {
-	UINT16 sector = (UINT16)angle & (PHD_180-1); // sector range will be: 0..0x7FFF (0..179.99 degrees)
+	UINT16 sector = (UINT16)angle & (PHD_180 - 1); // sector range will be: 0..0x7FFF (0..179.99 degrees)
 
-	if( sector > PHD_90 )
+	if (sector > PHD_90)
 		sector = PHD_180 - sector; // sector range will be: 0x0000..0x4000 (0..90 degrees)
 
-	int result = PhdSinTable[sector/16];
+	int result = PhdSinTable[sector / 16];
 
-	if( (UINT16)angle >= PHD_180 )
+	if ((UINT16)angle >= PHD_180)
 		result = -result;
 
 	return result;
@@ -482,13 +482,12 @@ DWORD __fastcall phd_sqrt(DWORD n) {
 	DWORD base = 0x40000000;
 	DWORD basedResult;
 
-	for( ; base != 0; base >>= 2 ) {
-		for( ; base != 0; base >>= 2 ) {
-
+	for (; base != 0; base >>= 2) {
+		for (; base != 0; base >>= 2) {
 			basedResult = base + result;
 			result >>= 1;
 
-			if( basedResult > n ) {
+			if (basedResult > n) {
 				break;
 			}
 

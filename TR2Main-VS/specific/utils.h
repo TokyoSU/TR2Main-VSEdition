@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 DWORD SyncTicks(DWORD skip); // NOTE: this function is not presented in the original game
 void UpdateTicks(); // 0x00456680
 bool TIME_Init(); // 0x004566C0
@@ -40,6 +40,6 @@ int UT_MessageBox(LPCTSTR lpText, HWND hWnd); // 0x00456910
 int UT_ErrorBox(UINT uID, HWND hWnd); // 0x00456930
 BOOL CD_NoteAlert(LPCTSTR lpTemplateName, HWND hWndParent); // 0x00456980
 INT_PTR CALLBACK DialogBoxProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lParam); // 0x004569B0
-void UT_MemBlt(BYTE *dstBuf, DWORD dstX, DWORD dstY, DWORD width, DWORD height, DWORD dstPitch,
-					   BYTE *srcBuf, DWORD srcX, DWORD srcY, DWORD srcPitch); // 0x004574A0
+void UT_MemBlt(BYTE* dstBuf, DWORD dstX, DWORD dstY, DWORD width, DWORD height, DWORD dstPitch,
+	BYTE* srcBuf, DWORD srcX, DWORD srcY, DWORD srcPitch); // 0x004574A0
 #endif // UTILS_H_INCLUDED

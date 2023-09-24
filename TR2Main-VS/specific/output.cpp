@@ -82,9 +82,9 @@ typedef struct ShadowInfo_t {
 PHD_TEXTURE TextureBackupUV[ARRAY_SIZE(PhdTextureInfo)];
 
 #if (DIRECT3D_VERSION >= 0x900)
-static bool SWR_StretchBlt(SWR_BUFFER *dstBuf, RECT *dstRect, SWR_BUFFER *srcBuf, RECT *srcRect) {
-	if( !srcBuf || !srcBuf->bitmap || !srcBuf->width || !srcBuf->height ||
-		!dstBuf || !dstBuf->bitmap || !dstBuf->width || !dstBuf->height )
+static bool SWR_StretchBlt(SWR_BUFFER* dstBuf, RECT* dstRect, SWR_BUFFER* srcBuf, RECT* srcRect) {
+	if (!srcBuf || !srcBuf->bitmap || !srcBuf->width || !srcBuf->height ||
+		!dstBuf || !dstBuf->bitmap || !dstBuf->width || !dstBuf->height)
 	{
 		return false;
 	}
@@ -93,7 +93,7 @@ static bool SWR_StretchBlt(SWR_BUFFER *dstBuf, RECT *dstRect, SWR_BUFFER *srcBuf
 	int sy = 0;
 	int sw = srcBuf->width;
 	int sh = srcBuf->height;
-	if( srcRect ) {
+	if (srcRect) {
 		sx = srcRect->left;
 		sy = srcRect->top;
 		sw = srcRect->right;
@@ -104,14 +104,14 @@ static bool SWR_StretchBlt(SWR_BUFFER *dstBuf, RECT *dstRect, SWR_BUFFER *srcBuf
 		CLAMP(sh, 0, (int)srcBuf->height);
 		sw -= sx;
 		sh -= sy;
-		if( !sw || !sh ) return false;
+		if (!sw || !sh) return false;
 	}
 
 	int dx = 0;
 	int dy = 0;
 	int dw = dstBuf->width;
 	int dh = dstBuf->height;
-	if( dstRect ) {
+	if (dstRect) {
 		dx = dstRect->left;
 		dy = dstRect->top;
 		dw = dstRect->right;
@@ -122,36 +122,35 @@ static bool SWR_StretchBlt(SWR_BUFFER *dstBuf, RECT *dstRect, SWR_BUFFER *srcBuf
 		CLAMP(dh, 0, (int)dstBuf->height);
 		dw -= dx;
 		dh -= dy;
-		if( !dw || !dh ) return false;
+		if (!dw || !dh) return false;
 	}
 
-	if( dw < 0 ) {
+	if (dw < 0) {
 		dx += dw;
 		dw = -dw;
 		sx += sw;
 		sw = -sw;
 	}
 
-	if( dh < 0 ) {
+	if (dh < 0) {
 		dy += dh;
 		dh = -dh;
 		sy += sh;
 		sh = -sh;
 	}
 
+	int* x = (int*)malloc(sizeof(int) * dw);
+	if (!x) return false;
 
-	int *x = (int *)malloc(sizeof(int) * dw);
-	if( !x ) return false;
-
-	for( int i = 0; i < dw; ++i ) {
+	for (int i = 0; i < dw; ++i) {
 		x[i] = i * sw / dw;
 	}
 
-	for( int j = 0; j < dh; ++j ) {
+	for (int j = 0; j < dh; ++j) {
 		int y = j * sh / dh;
 		LPBYTE src = srcBuf->bitmap + srcBuf->width * y + sx;
 		LPBYTE dst = dstBuf->bitmap + dstBuf->width * j + dx;
-		for( int i = 0; i < dw; ++i ) {
+		for (int i = 0; i < dw; ++i) {
 			dst[i] = src[x[i]];
 		}
 	}
@@ -193,23 +192,24 @@ int GetRenderWidth() {
 void S_InitialisePolyList(BOOL clearBackBuffer) {
 	DWORD flags = 0;
 
-	if( WinVidNeedToResetBuffers ) {
+	if (WinVidNeedToResetBuffers) {
 #if (DIRECT3D_VERSION < 0x900)
 		RestoreLostBuffers();
 #endif // (DIRECT3D_VERSION < 0x900)
 		WinVidSpinMessageLoop(false);
-		if( SavedAppSettings.FullScreen ) {
-			flags = CLRB_BackBuffer|CLRB_PrimaryBuffer;
-			if( SavedAppSettings.RenderMode == RM_Software )
+		if (SavedAppSettings.FullScreen) {
+			flags = CLRB_BackBuffer | CLRB_PrimaryBuffer;
+			if (SavedAppSettings.RenderMode == RM_Software)
 				flags |= CLRB_RenderBuffer;
-			if( SavedAppSettings.TripleBuffering )
+			if (SavedAppSettings.TripleBuffering)
 				flags |= CLRB_ThirdBuffer;
 #if (DIRECT3D_VERSION < 0x900)
 			WaitPrimaryBufferFlip();
 #endif // (DIRECT3D_VERSION < 0x900)
-		} else {
+		}
+		else {
 			flags = CLRB_WindowedPrimaryBuffer;
-			if( SavedAppSettings.RenderMode == RM_Hardware )
+			if (SavedAppSettings.RenderMode == RM_Hardware)
 				flags |= CLRB_BackBuffer;
 			else
 				flags |= CLRB_RenderBuffer;
@@ -220,24 +220,25 @@ void S_InitialisePolyList(BOOL clearBackBuffer) {
 	}
 
 	flags = CLRB_PhdWinSize;
-	if( SavedAppSettings.RenderMode == RM_Software ) {
+	if (SavedAppSettings.RenderMode == RM_Software) {
 		// Software Renderer
 #if (DIRECT3D_VERSION >= 0x900)
-		if( clearBackBuffer )
-			flags |= CLRB_BackBuffer|CLRB_RenderBuffer;
+		if (clearBackBuffer)
+			flags |= CLRB_BackBuffer | CLRB_RenderBuffer;
 #else // (DIRECT3D_VERSION >= 0x900)
 		flags |= CLRB_RenderBuffer;
 #endif // (DIRECT3D_VERSION >= 0x900)
 		ClearBuffers(flags, 0);
-	} else {
+	}
+	else {
 		// Hardware Renderer
-		if( clearBackBuffer )
+		if (clearBackBuffer)
 			flags |= CLRB_BackBuffer;
 #if (DIRECT3D_VERSION >= 0x900)
-		if( SavedAppSettings.ZBuffer )
+		if (SavedAppSettings.ZBuffer)
 			flags |= CLRB_ZBuffer;
 #else // (DIRECT3D_VERSION >= 0x900)
-		if( SavedAppSettings.ZBuffer && ZBufferSurface != NULL )
+		if (SavedAppSettings.ZBuffer && ZBufferSurface != NULL)
 			flags |= CLRB_ZBuffer;
 #endif // (DIRECT3D_VERSION >= 0x900)
 
@@ -262,11 +263,12 @@ void S_ClearScreen() {
 }
 
 void S_InitialiseScreen(GF_LEVEL_TYPE levelType) {
-	if( levelType < 0 ) {
+	if (levelType < 0) {
 		// No Level
 		FadeToPal(0, GamePalette8);
-	} else {
-		if( levelType != GFL_TITLE ) {
+	}
+	else {
+		if (levelType != GFL_TITLE) {
 			// Not title
 			TempVideoRemove();
 		}
@@ -274,7 +276,7 @@ void S_InitialiseScreen(GF_LEVEL_TYPE levelType) {
 		FadeToPal(30, GamePalette8);
 	}
 
-	if( SavedAppSettings.RenderMode == RM_Hardware ) {
+	if (SavedAppSettings.RenderMode == RM_Hardware) {
 		HWR_InitState();
 	}
 }
@@ -282,14 +284,14 @@ void S_InitialiseScreen(GF_LEVEL_TYPE levelType) {
 void S_OutputPolyList() {
 	DDSDESC desc;
 
-	if( SavedAppSettings.RenderMode == RM_Software ) {
+	if (SavedAppSettings.RenderMode == RM_Software) {
 		// Software renderer
 		phd_SortPolyList();
 #if (DIRECT3D_VERSION >= 0x900)
 		// prefetch surface lock
 		extern LPDDS CaptureBufferSurface;
 		HRESULT rc = CaptureBufferSurface->LockRect(&desc, NULL, D3DLOCK_DONOTWAIT);
-		if( FAILED(rc) && rc != D3DERR_WASSTILLDRAWING ) {
+		if (FAILED(rc) && rc != D3DERR_WASSTILLDRAWING) {
 			return;
 		}
 		// do software rendering
@@ -297,20 +299,21 @@ void S_OutputPolyList() {
 		PrepareSWR(RenderBuffer.width, RenderBuffer.height);
 		phd_PrintPolyList(RenderBuffer.bitmap);
 		// finish surface lock
-		if( rc == D3DERR_WASSTILLDRAWING && FAILED(CaptureBufferSurface->LockRect(&desc, NULL, 0)) ) {
+		if (rc == D3DERR_WASSTILLDRAWING && FAILED(CaptureBufferSurface->LockRect(&desc, NULL, 0))) {
 			return;
 		}
 		// copy bitmap to surface
-		BYTE *src = RenderBuffer.bitmap;
-		for( DWORD i=0; i<RenderBuffer.height; ++i ) {
-			DWORD *dst = (DWORD *)((BYTE *)desc.pBits + desc.Pitch * i);
-			for( DWORD j=0; j<RenderBuffer.width; ++j ) {
-				if( *src ) {
+		BYTE* src = RenderBuffer.bitmap;
+		for (DWORD i = 0; i < RenderBuffer.height; ++i) {
+			DWORD* dst = (DWORD*)((BYTE*)desc.pBits + desc.Pitch * i);
+			for (DWORD j = 0; j < RenderBuffer.width; ++j) {
+				if (*src) {
 					BYTE r = WinVidPalette[*src].peRed;
 					BYTE g = WinVidPalette[*src].peGreen;
 					BYTE b = WinVidPalette[*src].peBlue;
 					*dst++ = RGB_MAKE(r, g, b);
-				} else {
+				}
+				else {
 					*dst++ = 0;
 				}
 				++src;
@@ -319,18 +322,19 @@ void S_OutputPolyList() {
 		// unlock surface
 		CaptureBufferSurface->UnlockRect();
 #else // (DIRECT3D_VERSION >= 0x900)
-		if SUCCEEDED(WinVidBufferLock(RenderBufferSurface, &desc, DDLOCK_WRITEONLY|DDLOCK_WAIT)) {
+		if SUCCEEDED(WinVidBufferLock(RenderBufferSurface, &desc, DDLOCK_WRITEONLY | DDLOCK_WAIT)) {
 #ifdef FEATURE_NOLEGACY_OPTIONS
 			extern void PrepareSWR(int pitch, int height);
 			PrepareSWR(desc.lPitch, desc.dwHeight);
 #endif // FEATURE_NOLEGACY_OPTIONS
-			phd_PrintPolyList((BYTE *)desc.lpSurface);
+			phd_PrintPolyList((BYTE*)desc.lpSurface);
 			WinVidBufferUnlock(RenderBufferSurface, &desc);
 		}
 #endif // (DIRECT3D_VERSION >= 0x900)
-	} else {
+	}
+	else {
 		// Hardware renderer
-		if( !SavedAppSettings.ZBuffer || !SavedAppSettings.DontSortPrimitives ) {
+		if (!SavedAppSettings.ZBuffer || !SavedAppSettings.DontSortPrimitives) {
 			phd_SortPolyList();
 		}
 		HWR_DrawPolyList();
@@ -338,12 +342,12 @@ void S_OutputPolyList() {
 	}
 }
 
-int S_GetObjectBounds(__int16 *bPtr) {
+int S_GetObjectBounds(__int16* bPtr) {
 	int xMin, xMax, yMin, yMax, zMin, zMax;
 	int numZ, xv, yv, zv;
 	PHD_VECTOR vtx[8];
 
-	if( PhdMatrixPtr->_23 >= PhdFarZ )
+	if (PhdMatrixPtr->_23 >= PhdFarZ)
 		return 0; // object box is out of screen
 
 	xMin = bPtr[0];
@@ -367,34 +371,34 @@ int S_GetObjectBounds(__int16 *bPtr) {
 
 	numZ = 0;
 
-	for( int i=0; i<8; ++i ) {
+	for (int i = 0; i < 8; ++i) {
 		zv = PhdMatrixPtr->_20 * vtx[i].x +
-			 PhdMatrixPtr->_21 * vtx[i].y +
-			 PhdMatrixPtr->_22 * vtx[i].z +
-			 PhdMatrixPtr->_23;
+			PhdMatrixPtr->_21 * vtx[i].y +
+			PhdMatrixPtr->_22 * vtx[i].z +
+			PhdMatrixPtr->_23;
 
-		if( zv > PhdNearZ && zv < PhdFarZ ) {
+		if (zv > PhdNearZ && zv < PhdFarZ) {
 			++numZ;
 			zv /= PhdPersp;
 
 			xv = (PhdMatrixPtr->_00 * vtx[i].x +
-				  PhdMatrixPtr->_01 * vtx[i].y +
-				  PhdMatrixPtr->_02 * vtx[i].z +
-				  PhdMatrixPtr->_03) / zv;
+				PhdMatrixPtr->_01 * vtx[i].y +
+				PhdMatrixPtr->_02 * vtx[i].z +
+				PhdMatrixPtr->_03) / zv;
 
-			if( xMin > xv )
+			if (xMin > xv)
 				xMin = xv;
-			if( xMax < xv )
+			if (xMax < xv)
 				xMax = xv;
 
 			yv = (PhdMatrixPtr->_10 * vtx[i].x +
-				  PhdMatrixPtr->_11 * vtx[i].y +
-				  PhdMatrixPtr->_12 * vtx[i].z +
-				  PhdMatrixPtr->_13) / zv;
+				PhdMatrixPtr->_11 * vtx[i].y +
+				PhdMatrixPtr->_12 * vtx[i].z +
+				PhdMatrixPtr->_13) / zv;
 
-			if( yMin > yv )
+			if (yMin > yv)
 				yMin = yv;
-			if( yMax < yv )
+			if (yMax < yv)
 				yMax = yv;
 		}
 	}
@@ -404,10 +408,10 @@ int S_GetObjectBounds(__int16 *bPtr) {
 	yMin += PhdWinCenterY;
 	yMax += PhdWinCenterY;
 
-	if( numZ == 0 || xMin > PhdWinRight || yMin > PhdWinBottom || xMax < PhdWinLeft || yMax < PhdWinTop )
+	if (numZ == 0 || xMin > PhdWinRight || yMin > PhdWinBottom || xMax < PhdWinLeft || yMax < PhdWinTop)
 		return 0; // object box is out of screen
 
-	if ( numZ < 8 || xMin < 0 || yMin < 0 || xMax > PhdWinMaxX || yMax > PhdWinMaxY )
+	if (numZ < 8 || xMin < 0 || yMin < 0 || xMax > PhdWinMaxX || yMax > PhdWinMaxY)
 		return -1; // object box is clipped
 
 	return 1; // object box is totally on screen
@@ -415,11 +419,11 @@ int S_GetObjectBounds(__int16 *bPtr) {
 
 void S_InsertBackPolygon(int x0, int y0, int x1, int y1) {
 	ins_flat_rect(PhdWinMinX + x0, PhdWinMinY + y0,
-				  PhdWinMinX + x1, PhdWinMinY + y1,
-				  PhdFarZ + 1, InvColours[ICLR_Black]);
+		PhdWinMinX + x1, PhdWinMinY + y1,
+		PhdFarZ + 1, InvColours[ICLR_Black]);
 }
 
-void S_PrintShadow(__int16 radius, __int16 *bPtr, ITEM_INFO *item) {
+void S_PrintShadow(__int16 radius, __int16* bPtr, ITEM_INFO* item) {
 	static SHADOW_INFO ShadowInfo = {
 		0,
 		0,
@@ -442,15 +446,16 @@ void S_PrintShadow(__int16 radius, __int16 *bPtr, ITEM_INFO *item) {
 	zAdd = (z1 - z0) * radius / 0x400;
 
 #ifdef FEATURE_VIDEOFX_IMPROVED
-	if( ShadowMode == 1 ) {
+	if (ShadowMode == 1) {
 		// The shadow is a circle
 		ShadowInfo.vertexCount = 32;
-		for( int i = 0; i < ShadowInfo.vertexCount; ++i ) {
+		for (int i = 0; i < ShadowInfo.vertexCount; ++i) {
 			int angle = (PHD_180 + i * PHD_360) / ShadowInfo.vertexCount;
 			ShadowInfo.vertex[i].x = midX + (xAdd * 2) * phd_sin(angle) / PHD_IONE;
 			ShadowInfo.vertex[i].z = midZ + (zAdd * 2) * phd_cos(angle) / PHD_IONE;
 		}
-	} else
+	}
+	else
 #endif // FEATURE_VIDEOFX_IMPROVED
 	{
 		// The shadow is an octagon
@@ -474,18 +479,18 @@ void S_PrintShadow(__int16 radius, __int16 *bPtr, ITEM_INFO *item) {
 	}
 
 	// Update screen parameters
-	FltWinLeft		= (double)(PhdWinMinX + PhdWinLeft);
-	FltWinTop		= (double)(PhdWinMinY + PhdWinTop);
-	FltWinRight		= (double)(PhdWinMinX + PhdWinRight+1);
-	FltWinBottom	= (double)(PhdWinMinY + PhdWinBottom+1);
-	FltWinCenterX	= (double)(PhdWinMinX + PhdWinCenterX);
-	FltWinCenterY	= (double)(PhdWinMinY + PhdWinCenterY);
+	FltWinLeft = (double)(PhdWinMinX + PhdWinLeft);
+	FltWinTop = (double)(PhdWinMinY + PhdWinTop);
+	FltWinRight = (double)(PhdWinMinX + PhdWinRight + 1);
+	FltWinBottom = (double)(PhdWinMinY + PhdWinBottom + 1);
+	FltWinCenterX = (double)(PhdWinMinX + PhdWinCenterX);
+	FltWinCenterY = (double)(PhdWinMinY + PhdWinCenterY);
 
 	// Transform and print the shadow
 	phd_PushMatrix();
 	phd_TranslateAbs(item->pos.x, item->floor, item->pos.z);
 	phd_RotY(item->pos.rotY);
-	if( calc_object_vertices(&ShadowInfo.polyCount) ) {
+	if (calc_object_vertices(&ShadowInfo.polyCount)) {
 		// NOTE: Here 24 is DepthQ index (shade factor).
 		// 0 lightest, 15 no shade, 31 darkest (pitch black).
 		// But original code has value 32 supposed to be interpreted as 24 (which means 50% darker)
@@ -498,9 +503,9 @@ void S_PrintShadow(__int16 radius, __int16 *bPtr, ITEM_INFO *item) {
 }
 
 void S_CalculateLight(int x, int y, int z, __int16 roomNumber) {
-	ROOM_INFO *room;
+	ROOM_INFO* room;
 	int xDist, yDist, zDist, distance, radius, depth;
-	int xBrightest=0, yBrightest=0, zBrightest=0;
+	int xBrightest = 0, yBrightest = 0, zBrightest = 0;
 	int brightest, adder;
 	int shade, shade1, shade2;
 	int falloff, falloff1, falloff2;
@@ -512,9 +517,9 @@ void S_CalculateLight(int x, int y, int z, __int16 roomNumber) {
 	brightest = 0;
 
 	// Static light calculation
-	if( room->lightMode != 0 ) {
+	if (room->lightMode != 0) {
 		lightShade = RoomLightShades[room->lightMode];
-		for( int i = 0; i < room->numLights; ++i ) {
+		for (int i = 0; i < room->numLights; ++i) {
 			xDist = x - room->light[i].x;
 			yDist = y - room->light[i].y;
 			zDist = z - room->light[i].z;
@@ -529,16 +534,17 @@ void S_CalculateLight(int x, int y, int z, __int16 roomNumber) {
 			shade1 = falloff1 * intensity1 / (falloff1 + distance);
 			shade2 = falloff2 * intensity2 / (falloff2 + distance);
 
-			shade = shade1 + (shade2 - shade1) * lightShade / (WIBBLE_SIZE-1);
-			if( shade > brightest ) {
+			shade = shade1 + (shade2 - shade1) * lightShade / (WIBBLE_SIZE - 1);
+			if (shade > brightest) {
 				brightest = shade;
 				xBrightest = xDist;
 				yBrightest = yDist;
 				zBrightest = zDist;
 			}
 		}
-	} else {
-		for( int i = 0; i < room->numLights; ++i ) {
+	}
+	else {
+		for (int i = 0; i < room->numLights; ++i) {
 			xDist = x - room->light[i].x;
 			yDist = y - room->light[i].y;
 			zDist = z - room->light[i].z;
@@ -549,7 +555,7 @@ void S_CalculateLight(int x, int y, int z, __int16 roomNumber) {
 			distance = (SQR(xDist) + SQR(yDist) + SQR(zDist)) >> 12;
 
 			shade = falloff * intensity / (falloff + distance);
-			if( shade > brightest ) {
+			if (shade > brightest) {
 				brightest = shade;
 				xBrightest = xDist;
 				yBrightest = yDist;
@@ -560,7 +566,7 @@ void S_CalculateLight(int x, int y, int z, __int16 roomNumber) {
 	adder = brightest;
 
 	// Dynamic light calculation
-	for( DWORD i = 0; i < DynamicLightCount; ++i ) {
+	for (DWORD i = 0; i < DynamicLightCount; ++i) {
 		xDist = x - DynamicLights[i].x;
 		yDist = y - DynamicLights[i].y;
 		zDist = z - DynamicLights[i].z;
@@ -569,14 +575,14 @@ void S_CalculateLight(int x, int y, int z, __int16 roomNumber) {
 
 		radius = 1 << falloff;
 
-		if( (xDist >= -radius && xDist <= radius) &&
+		if ((xDist >= -radius && xDist <= radius) &&
 			(yDist >= -radius && yDist <= radius) &&
-			(zDist >= -radius && zDist <= radius) )
+			(zDist >= -radius && zDist <= radius))
 		{
 			distance = SQR(xDist) + SQR(yDist) + SQR(zDist);
-			if( distance <= SQR(radius) ) {
+			if (distance <= SQR(radius)) {
 				shade = (1 << intensity) - (distance >> (2 * falloff - intensity));
-				if( shade > brightest ) {
+				if (shade > brightest) {
 					brightest = shade;
 					xBrightest = xDist;
 					yBrightest = yDist;
@@ -588,11 +594,12 @@ void S_CalculateLight(int x, int y, int z, __int16 roomNumber) {
 	}
 
 	// Light finalization
-	adder = adder/2;
-	if( adder == 0 ) {
+	adder = adder / 2;
+	if (adder == 0) {
 		LsAdder = room->ambient1;
 		LsDivider = 0;
-	} else {
+	}
+	else {
 		LsAdder = room->ambient1 - adder;
 		LsDivider = (1 << (W2V_SHIFT + 12)) / adder;
 		phd_GetVectorAngles(xBrightest, yBrightest, zBrightest, &angles);
@@ -604,10 +611,10 @@ void S_CalculateLight(int x, int y, int z, __int16 roomNumber) {
 #ifdef FEATURE_VIEW_IMPROVED
 	LsAdder += CalculateFogShade(depth);
 #else // !FEATURE_VIEW_IMPROVED
-	if( depth > DEPTHQ_START ) // fog begin
+	if (depth > DEPTHQ_START) // fog begin
 		LsAdder += depth - DEPTHQ_START;
 #endif // FEATURE_VIEW_IMPROVED
-	if( LsAdder > 0x1FFF ) // fog end
+	if (LsAdder > 0x1FFF) // fog end
 		LsAdder = 0x1FFF;
 }
 
@@ -619,23 +626,23 @@ void S_CalculateStaticLight(__int16 adder) {
 #ifdef FEATURE_VIEW_IMPROVED
 	LsAdder += CalculateFogShade(depth);
 #else // !FEATURE_VIEW_IMPROVED
-	if( depth > DEPTHQ_START ) // fog begin
+	if (depth > DEPTHQ_START) // fog begin
 		LsAdder += depth - DEPTHQ_START;
 #endif // FEATURE_VIEW_IMPROVED
-	if( LsAdder > 0x1FFF ) // fog end
+	if (LsAdder > 0x1FFF) // fog end
 		LsAdder = 0x1FFF;
 }
 
-void S_CalculateStaticMeshLight(int x, int y, int z, int shade1, int shade2, ROOM_INFO *room) {
+void S_CalculateStaticMeshLight(int x, int y, int z, int shade1, int shade2, ROOM_INFO* room) {
 	int adder, shade, falloff, intensity;
 	int xDist, yDist, zDist, distance, radius;
 
 	adder = shade1;
-	if( room->lightMode != 0 ) {
-		adder += (shade2 - shade1) * RoomLightShades[room->lightMode] / (WIBBLE_SIZE-1);
+	if (room->lightMode != 0) {
+		adder += (shade2 - shade1) * RoomLightShades[room->lightMode] / (WIBBLE_SIZE - 1);
 	}
 
-	for( DWORD i = 0; i < DynamicLightCount; ++i ) {
+	for (DWORD i = 0; i < DynamicLightCount; ++i) {
 		xDist = x - DynamicLights[i].x;
 		yDist = y - DynamicLights[i].y;
 		zDist = z - DynamicLights[i].z;
@@ -644,15 +651,15 @@ void S_CalculateStaticMeshLight(int x, int y, int z, int shade1, int shade2, ROO
 
 		radius = 1 << falloff;
 
-		if( (xDist >= -radius && xDist <= radius) &&
+		if ((xDist >= -radius && xDist <= radius) &&
 			(yDist >= -radius && yDist <= radius) &&
-			(zDist >= -radius && zDist <= radius) )
+			(zDist >= -radius && zDist <= radius))
 		{
 			distance = SQR(xDist) + SQR(yDist) + SQR(zDist);
-			if( distance <= SQR(radius) ) {
+			if (distance <= SQR(radius)) {
 				shade = (1 << intensity) - (distance >> (2 * falloff - intensity));
 				adder -= shade;
-				if( adder < 0 ) {
+				if (adder < 0) {
 					adder = 0;
 					break;
 				}
@@ -662,27 +669,26 @@ void S_CalculateStaticMeshLight(int x, int y, int z, int shade1, int shade2, ROO
 	S_CalculateStaticLight(adder);
 }
 
-void S_LightRoom(ROOM_INFO *room) {
+void S_LightRoom(ROOM_INFO* room) {
 	int shade, falloff, intensity;
 	int xPos, yPos, zPos;
 	int xDist, yDist, zDist, distance, radius;
 	int roomVtxCount;
-	ROOM_VERTEX_INFO *roomVtx;
+	ROOM_VERTEX_INFO* roomVtx;
 
-
-	if( room->lightMode != 0 ) {
-		int *roomLightTable = RoomLightTables[RoomLightShades[room->lightMode]].table;
+	if (room->lightMode != 0) {
+		int* roomLightTable = RoomLightTables[RoomLightShades[room->lightMode]].table;
 		roomVtxCount = *room->data;
-		roomVtx = (ROOM_VERTEX_INFO *)(room->data + 1);
-		for( int i = 0; i < roomVtxCount; ++i ) {
+		roomVtx = (ROOM_VERTEX_INFO*)(room->data + 1);
+		for (int i = 0; i < roomVtxCount; ++i) {
 			__int16 wibble = roomLightTable[roomVtx[i].lightTableValue % WIBBLE_SIZE];
 			roomVtx[i].lightAdder = roomVtx[i].lightBase + wibble;
 		}
 	}
-	else if( (room->flags & 0x10) != 0 ) {
+	else if ((room->flags & 0x10) != 0) {
 		roomVtxCount = *room->data;
-		roomVtx = (ROOM_VERTEX_INFO *)(room->data + 1);
-		for( int i = 0; i < roomVtxCount; ++i ) {
+		roomVtx = (ROOM_VERTEX_INFO*)(room->data + 1);
+		for (int i = 0; i < roomVtxCount; ++i) {
 			roomVtx[i].lightAdder = roomVtx[i].lightBase;
 		}
 		room->flags &= ~0x10;
@@ -693,7 +699,7 @@ void S_LightRoom(ROOM_INFO *room) {
 	int xMax = 0x400 * (room->ySize - 1);
 	int zMax = 0x400 * (room->xSize - 1);
 
-	for( DWORD i = 0; i < DynamicLightCount; ++i ) {
+	for (DWORD i = 0; i < DynamicLightCount; ++i) {
 		xPos = DynamicLights[i].x - room->x;
 		yPos = DynamicLights[i].y;
 		zPos = DynamicLights[i].z - room->z;
@@ -702,24 +708,24 @@ void S_LightRoom(ROOM_INFO *room) {
 
 		radius = 1 << falloff;
 
-		if( xPos + radius >= xMin && zPos + radius >= zMin && xPos - radius <= xMax && zPos - radius <= zMax ) {
+		if (xPos + radius >= xMin && zPos + radius >= zMin && xPos - radius <= xMax && zPos - radius <= zMax) {
 			room->flags |= 0x10;
 			roomVtxCount = *room->data;
-			roomVtx = (ROOM_VERTEX_INFO *)(room->data + 1);
-			for( int j = 0; j < roomVtxCount; ++j ) {
-				if( roomVtx[j].lightAdder != 0 ) {
+			roomVtx = (ROOM_VERTEX_INFO*)(room->data + 1);
+			for (int j = 0; j < roomVtxCount; ++j) {
+				if (roomVtx[j].lightAdder != 0) {
 					xDist = roomVtx[j].x - xPos;
 					yDist = roomVtx[j].y - yPos;
 					zDist = roomVtx[j].z - zPos;
-					if( (xDist >= -radius && xDist <= radius) &&
+					if ((xDist >= -radius && xDist <= radius) &&
 						(yDist >= -radius && yDist <= radius) &&
-						(zDist >= -radius && zDist <= radius) )
+						(zDist >= -radius && zDist <= radius))
 					{
 						distance = SQR(xDist) + SQR(yDist) + SQR(zDist);
-						if( distance <= SQR(radius) ) {
+						if (distance <= SQR(radius)) {
 							shade = (1 << intensity) - (distance >> (2 * falloff - intensity));
 							roomVtx[j].lightAdder -= shade;
-							if( roomVtx[j].lightAdder < 0 )
+							if (roomVtx[j].lightAdder < 0)
 								roomVtx[j].lightAdder = 0;
 						}
 					}
@@ -733,15 +739,16 @@ void S_DrawHealthBar(int percent) {
 #ifdef FEATURE_HUD_IMPROVED
 	int barWidth = GetRenderScale(100);
 	int barHeight = GetRenderScale(5);
-	int barXOffset = GetRenderScale((PsxBarPosEnabled && !IsInventoryActive ) ? 20 : 8);
-	int barYOffset = GetRenderScale((PsxBarPosEnabled && !IsInventoryActive ) ? 18 : 8);
+	int barXOffset = GetRenderScale((PsxBarPosEnabled && !IsInventoryActive) ? 20 : 8);
+	int barYOffset = GetRenderScale((PsxBarPosEnabled && !IsInventoryActive) ? 18 : 8);
 	int pixel = GetRenderScale(1);
 	int x0, x1;
 
-	if( PsxBarPosEnabled ) {
+	if (PsxBarPosEnabled) {
 		x1 = PhdWinMinX + DumpWidth - barXOffset;
 		x0 = x1 - barWidth;
-	} else {
+	}
+	else {
 		x0 = PhdWinMinX + barXOffset;
 		x1 = x0 + barWidth;
 	}
@@ -754,24 +761,25 @@ void S_DrawHealthBar(int percent) {
 	// Disable underwater shading
 	IsShadeEffect = false;
 
-	if( HealthBarMode != 0 && SavedAppSettings.RenderMode == RM_Hardware ) {
-		if( SavedAppSettings.ZBuffer ) {
+	if (HealthBarMode != 0 && SavedAppSettings.RenderMode == RM_Hardware) {
+		if (SavedAppSettings.ZBuffer) {
 			PSX_DrawHealthBar(x0, y0, x1, y1, bar, pixel, 255);
-		} else {
+		}
+		else {
 			PSX_InsertHealthBar(x0, y0, x1, y1, bar, pixel, 255);
 		}
 		return;
 	}
 
 	// Frame
-	ins_flat_rect(x0-pixel*2, y0-pixel*2, x1+pixel*2, y1+pixel*2, PhdNearZ + 50, InvColours[ICLR_White]);
-	ins_flat_rect(x0-pixel*1, y0-pixel*1, x1+pixel*2, y1+pixel*2, PhdNearZ + 40, InvColours[ICLR_Gray]);
-	ins_flat_rect(x0-pixel*1, y0-pixel*1, x1+pixel*1, y1+pixel*1, PhdNearZ + 30, InvColours[ICLR_Black]);
+	ins_flat_rect(x0 - pixel * 2, y0 - pixel * 2, x1 + pixel * 2, y1 + pixel * 2, PhdNearZ + 50, InvColours[ICLR_White]);
+	ins_flat_rect(x0 - pixel * 1, y0 - pixel * 1, x1 + pixel * 2, y1 + pixel * 2, PhdNearZ + 40, InvColours[ICLR_Gray]);
+	ins_flat_rect(x0 - pixel * 1, y0 - pixel * 1, x1 + pixel * 1, y1 + pixel * 1, PhdNearZ + 30, InvColours[ICLR_Black]);
 
 	// Health bar
-	if( bar > 0 ) {
-		ins_flat_rect(x0, y0+pixel*0, x0+bar, y0+barHeight,	PhdNearZ + 20, InvColours[ICLR_Red]);
-		ins_flat_rect(x0, y0+pixel*1, x0+bar, y0+pixel*2,	PhdNearZ + 10, InvColours[ICLR_Orange]);
+	if (bar > 0) {
+		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[ICLR_Red]);
+		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[ICLR_Orange]);
 	}
 #else // !FEATURE_HUD_IMPROVED
 	int i;
@@ -790,21 +798,21 @@ void S_DrawHealthBar(int percent) {
 	IsShadeEffect = false;
 
 	// Black background
-	for( i = 0; i < (barHeight+2); ++i )
-		ins_line(x0-2, y0+i-1, x1+1, y0+i-1, PhdNearZ + 50, InvColours[ICLR_Black]);
+	for (i = 0; i < (barHeight + 2); ++i)
+		ins_line(x0 - 2, y0 + i - 1, x1 + 1, y0 + i - 1, PhdNearZ + 50, InvColours[ICLR_Black]);
 
 	// Dark frame
-	ins_line(x0-2, y1+1, x1+2, y1+1, PhdNearZ + 40, InvColours[ICLR_Gray]);
-	ins_line(x1+2, y0-2, x1+2, y1+1, PhdNearZ + 40, InvColours[ICLR_Gray]);
+	ins_line(x0 - 2, y1 + 1, x1 + 2, y1 + 1, PhdNearZ + 40, InvColours[ICLR_Gray]);
+	ins_line(x1 + 2, y0 - 2, x1 + 2, y1 + 1, PhdNearZ + 40, InvColours[ICLR_Gray]);
 
 	// Light frame
-	ins_line(x0-2, y0-2, x1+2, y0-2, PhdNearZ + 30, InvColours[ICLR_White]);
-	ins_line(x0-2, y1+1, x0-2, y0-2, PhdNearZ + 30, InvColours[ICLR_White]);
+	ins_line(x0 - 2, y0 - 2, x1 + 2, y0 - 2, PhdNearZ + 30, InvColours[ICLR_White]);
+	ins_line(x0 - 2, y1 + 1, x0 - 2, y0 - 2, PhdNearZ + 30, InvColours[ICLR_White]);
 
 	// Health bar
-	if( bar > 0 ) {
-		for( i = 0; i < barHeight; ++i )
-			ins_line(x0, y0+i, x0+bar, y0+i, PhdNearZ + 20, ( i == 1 ) ? InvColours[ICLR_Orange] : InvColours[ICLR_Red]);
+	if (bar > 0) {
+		for (i = 0; i < barHeight; ++i)
+			ins_line(x0, y0 + i, x0 + bar, y0 + i, PhdNearZ + 20, (i == 1) ? InvColours[ICLR_Orange] : InvColours[ICLR_Red]);
 	}
 #endif // FEATURE_HUD_IMPROVED
 }
@@ -827,24 +835,25 @@ void S_DrawAirBar(int percent) {
 	// Disable underwater shading
 	IsShadeEffect = false;
 
-	if( HealthBarMode != 0 && SavedAppSettings.RenderMode == RM_Hardware ) {
-		if( SavedAppSettings.ZBuffer ) {
+	if (HealthBarMode != 0 && SavedAppSettings.RenderMode == RM_Hardware) {
+		if (SavedAppSettings.ZBuffer) {
 			PSX_DrawAirBar(x0, y0, x1, y1, bar, pixel, 255);
-		} else {
+		}
+		else {
 			PSX_InsertAirBar(x0, y0, x1, y1, bar, pixel, 255);
 		}
 		return;
 	}
 
 	// Frame
-	ins_flat_rect(x0-pixel*2, y0-pixel*2, x1+pixel*2, y1+pixel*2, PhdNearZ + 50, InvColours[ICLR_White]);
-	ins_flat_rect(x0-pixel*1, y0-pixel*1, x1+pixel*2, y1+pixel*2, PhdNearZ + 40, InvColours[ICLR_Gray]);
-	ins_flat_rect(x0-pixel*1, y0-pixel*1, x1+pixel*1, y1+pixel*1, PhdNearZ + 30, InvColours[ICLR_Black]);
+	ins_flat_rect(x0 - pixel * 2, y0 - pixel * 2, x1 + pixel * 2, y1 + pixel * 2, PhdNearZ + 50, InvColours[ICLR_White]);
+	ins_flat_rect(x0 - pixel * 1, y0 - pixel * 1, x1 + pixel * 2, y1 + pixel * 2, PhdNearZ + 40, InvColours[ICLR_Gray]);
+	ins_flat_rect(x0 - pixel * 1, y0 - pixel * 1, x1 + pixel * 1, y1 + pixel * 1, PhdNearZ + 30, InvColours[ICLR_Black]);
 
 	// Air bar
-	if( bar > 0 ) {
-		ins_flat_rect(x0, y0+pixel*0, x0+bar, y0+barHeight,	PhdNearZ + 20, InvColours[ICLR_Blue]);
-		ins_flat_rect(x0, y0+pixel*1, x0+bar, y0+pixel*2,	PhdNearZ + 10, InvColours[ICLR_White]);
+	if (bar > 0) {
+		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[ICLR_Blue]);
+		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[ICLR_White]);
 	}
 #else // !FEATURE_HUD_IMPROVED
 	int i;
@@ -863,21 +872,21 @@ void S_DrawAirBar(int percent) {
 	IsShadeEffect = false;
 
 	// Black background
-	for( i = 0; i < (barHeight+2); ++i )
-		ins_line(x0-2, y0+i-1, x1+1, y0+i-1, PhdNearZ + 50, InvColours[ICLR_Black]);
+	for (i = 0; i < (barHeight + 2); ++i)
+		ins_line(x0 - 2, y0 + i - 1, x1 + 1, y0 + i - 1, PhdNearZ + 50, InvColours[ICLR_Black]);
 
 	// Dark frame
-	ins_line(x0-2, y1+1, x1+2, y1+1, PhdNearZ + 40, InvColours[ICLR_Gray]);
-	ins_line(x1+2, y0-2, x1+2, y1+1, PhdNearZ + 40, InvColours[ICLR_Gray]);
+	ins_line(x0 - 2, y1 + 1, x1 + 2, y1 + 1, PhdNearZ + 40, InvColours[ICLR_Gray]);
+	ins_line(x1 + 2, y0 - 2, x1 + 2, y1 + 1, PhdNearZ + 40, InvColours[ICLR_Gray]);
 
 	// Light frame
-	ins_line(x0-2, y0-2, x1+2, y0-2, PhdNearZ + 30, InvColours[ICLR_White]);
-	ins_line(x0-2, y1+1, x0-2, y0-2, PhdNearZ + 30, InvColours[ICLR_White]);
+	ins_line(x0 - 2, y0 - 2, x1 + 2, y0 - 2, PhdNearZ + 30, InvColours[ICLR_White]);
+	ins_line(x0 - 2, y1 + 1, x0 - 2, y0 - 2, PhdNearZ + 30, InvColours[ICLR_White]);
 
 	// Air bar
-	if( bar > 0 ) {
-		for( i = 0; i < barHeight; ++i )
-			ins_line(x0, y0+i, x0+bar, y0+i, PhdNearZ + 20, ( i == 1 ) ? InvColours[ICLR_White] : InvColours[ICLR_Blue]);
+	if (bar > 0) {
+		for (i = 0; i < barHeight; ++i)
+			ins_line(x0, y0 + i, x0 + bar, y0 + i, PhdNearZ + 20, (i == 1) ? InvColours[ICLR_White] : InvColours[ICLR_Blue]);
 	}
 #endif // FEATURE_HUD_IMPROVED
 }
@@ -885,18 +894,18 @@ void S_DrawAirBar(int percent) {
 void AnimateTextures(int nTicks) {
 	static int tickComp = 0;
 	__int16 i, j;
-	__int16 *ptr;
+	__int16* ptr;
 	PHD_TEXTURE temp1, temp2;
 
 	tickComp += nTicks;
-	while( tickComp > TICKS_PER_FRAME * 5 ) {
+	while (tickComp > TICKS_PER_FRAME * 5) {
 		ptr = AnimatedTextureRanges;
 		i = *(ptr++);
-		for( ; i>0; --i, ++ptr ) {
+		for (; i > 0; --i, ++ptr) {
 			j = *(ptr++);
 			temp1 = PhdTextureInfo[*ptr];
 			temp2 = TextureBackupUV[*ptr];
-			for ( ; j>0; --j, ++ptr ) {
+			for (; j > 0; --j, ++ptr) {
 				PhdTextureInfo[ptr[0]] = PhdTextureInfo[ptr[1]];
 				TextureBackupUV[ptr[0]] = TextureBackupUV[ptr[1]];
 			}
@@ -908,7 +917,7 @@ void AnimateTextures(int nTicks) {
 }
 
 void S_SetupBelowWater(BOOL underwater) {
-	if( IsWet != underwater ) {
+	if (IsWet != underwater) {
 		FadeToPal(1, underwater ? WaterPalette : GamePalette8);
 		IsWet = underwater;
 	}
@@ -925,22 +934,22 @@ void S_SetupAboveWater(BOOL underwater) {
 
 void S_AnimateTextures(int nTicks) {
 	WibbleOffset = (WibbleOffset + nTicks / TICKS_PER_FRAME) % WIBBLE_SIZE;
-	RoomLightShades[1] = GetRandomDraw() & (WIBBLE_SIZE-1);
-	RoomLightShades[2] = (WIBBLE_SIZE-1) * (phd_sin(WibbleOffset * PHD_360 / WIBBLE_SIZE) + PHD_IONE) / 2 / PHD_IONE;
+	RoomLightShades[1] = GetRandomDraw() & (WIBBLE_SIZE - 1);
+	RoomLightShades[2] = (WIBBLE_SIZE - 1) * (phd_sin(WibbleOffset * PHD_360 / WIBBLE_SIZE) + PHD_IONE) / 2 / PHD_IONE;
 
-	if( GF_SunsetEnabled ) {
+	if (GF_SunsetEnabled) {
 		// NOTE: in the original game there was: SunsetTimer += nTicks;
 		// so the timer was reset every time when the saved game is loaded
 		SunsetTimer = SaveGame.statistics.timer * TICKS_PER_FRAME;
 		CLAMPG(SunsetTimer, SUNSET_TIMEOUT);
-		RoomLightShades[3] = (WIBBLE_SIZE-1) * SunsetTimer / SUNSET_TIMEOUT;
+		RoomLightShades[3] = (WIBBLE_SIZE - 1) * SunsetTimer / SUNSET_TIMEOUT;
 	}
 	AnimateTextures(nTicks);
 }
 
 void S_DisplayPicture(LPCTSTR fileName, BOOL isTitle) {
 #ifdef FEATURE_BACKGROUND_IMPROVED
-	if( !isTitle ) {
+	if (!isTitle) {
 		init_game_malloc();
 	}
 	BGND2_LoadPicture(fileName, isTitle, FALSE);
@@ -949,39 +958,40 @@ void S_DisplayPicture(LPCTSTR fileName, BOOL isTitle) {
 	HANDLE hFile;
 	DWORD fileSize;
 	DWORD bitmapSize;
-	BYTE *fileData;
-	BYTE *bitmapData;
+	BYTE* fileData;
+	BYTE* bitmapData;
 	LPCTSTR fullPath;
 
 	fullPath = GetFullPath(fileName);
 	hFile = CreateFile(fullPath, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if( hFile == INVALID_HANDLE_VALUE )
+	if (hFile == INVALID_HANDLE_VALUE)
 		return;
 
-	if( !isTitle )
+	if (!isTitle)
 		init_game_malloc();
 
 	fileSize = GetFileSize(hFile, NULL);
-	fileData = (BYTE *)game_malloc(fileSize, GBUF_LoadPiccyBuffer);
+	fileData = (BYTE*)game_malloc(fileSize, GBUF_LoadPiccyBuffer);
 	ReadFile(hFile, fileData, fileSize, &bytesRead, NULL);
 	CloseHandle(hFile);
 
-	bitmapSize = 640*480;
-	bitmapData = (BYTE *)game_malloc(bitmapSize, GBUF_LoadPiccyBuffer);
+	bitmapSize = 640 * 480;
+	bitmapData = (BYTE*)game_malloc(bitmapSize, GBUF_LoadPiccyBuffer);
 	DecompPCX(fileData, fileSize, bitmapData, PicPalette);
 
-	if( SavedAppSettings.RenderMode == RM_Software ) {
+	if (SavedAppSettings.RenderMode == RM_Software) {
 #if (DIRECT3D_VERSION >= 0x900)
-		if( PictureBuffer.bitmap != NULL)
+		if (PictureBuffer.bitmap != NULL)
 			memcpy(PictureBuffer.bitmap, bitmapData, PictureBuffer.width * PictureBuffer.height);
 #else // (DIRECT3D_VERSION >= 0x900)
 		WinVidCopyBitmapToBuffer(PictureBufferSurface, bitmapData);
 #endif // (DIRECT3D_VERSION >= 0x900)
-	} else {
+	}
+	else {
 		BGND_Make640x480(bitmapData, PicPalette);
 	}
 
-	if( !isTitle ) {
+	if (!isTitle) {
 #if (DIRECT3D_VERSION >= 0x900)
 		memcpy(GamePalette8, PicPalette, sizeof(GamePalette8));
 #else // (DIRECT3D_VERSION >= 0x900)
@@ -995,7 +1005,7 @@ void S_DisplayPicture(LPCTSTR fileName, BOOL isTitle) {
 
 void S_SyncPictureBufferPalette() {
 #if (DIRECT3D_VERSION >= 0x900)
-	if( PictureBuffer.bitmap == NULL ) return;
+	if (PictureBuffer.bitmap == NULL) return;
 	SyncSurfacePalettes(PictureBuffer.bitmap, PictureBuffer.width, PictureBuffer.height, PictureBuffer.width, PicPalette, PictureBuffer.bitmap, PictureBuffer.width, GamePalette8, TRUE);
 	memcpy(PicPalette, GamePalette8, sizeof(PicPalette));
 #else // (DIRECT3D_VERSION >= 0x900)
@@ -1008,7 +1018,7 @@ void S_SyncPictureBufferPalette() {
 	int height = 480;
 #endif // FEATURE_BACKGROUND_IMPROVED
 
-	if( PictureBufferSurface == NULL || FAILED(WinVidBufferLock(PictureBufferSurface, &desc, DDLOCK_WRITEONLY|DDLOCK_WAIT)) )
+	if (PictureBufferSurface == NULL || FAILED(WinVidBufferLock(PictureBufferSurface, &desc, DDLOCK_WRITEONLY | DDLOCK_WAIT)))
 		return;
 
 	SyncSurfacePalettes(desc.lpSurface, width, height, desc.lPitch, PicPalette, desc.lpSurface, desc.lPitch, GamePalette8, TRUE);
@@ -1018,7 +1028,7 @@ void S_SyncPictureBufferPalette() {
 }
 
 void S_DontDisplayPicture() {
-	if( SavedAppSettings.RenderMode == RM_Hardware ) {
+	if (SavedAppSettings.RenderMode == RM_Hardware) {
 		BGND_Free();
 		BGND_PictureIsReady = false;
 	}
@@ -1032,7 +1042,7 @@ void ScreenPartialDump() {
 	UpdateFrame(true, &PhdWinRect);
 }
 
-void FadeToPal(int fadeValue, RGB888 *palette) {
+void FadeToPal(int fadeValue, RGB888* palette) {
 	int i, j;
 	int palStartIdx = 0;
 	int palEndIdx = 256;
@@ -1042,24 +1052,24 @@ void FadeToPal(int fadeValue, RGB888 *palette) {
 	PALETTEENTRY fadePal[256];
 
 #if (DIRECT3D_VERSION >= 0x900)
-	if( SavedAppSettings.RenderMode != RM_Software )
+	if (SavedAppSettings.RenderMode != RM_Software)
 		return;
 #else // (DIRECT3D_VERSION >= 0x900)
-	if( !GameVid_IsVga )
+	if (!GameVid_IsVga)
 		return;
 
-	if( GameVid_IsWindowedVga ) {
+	if (GameVid_IsWindowedVga) {
 		palStartIdx += 10;
 		palEndIdx -= 10;
 		palSize -= 20;
 	}
 #endif // (DIRECT3D_VERSION >= 0x900)
 
-	if( fadeValue <= 1 ) {
-		for( i=palStartIdx; i<palEndIdx; ++i ) {
-			WinVidPalette[i].peRed   = palette[i].red;
+	if (fadeValue <= 1) {
+		for (i = palStartIdx; i < palEndIdx; ++i) {
+			WinVidPalette[i].peRed = palette[i].red;
 			WinVidPalette[i].peGreen = palette[i].green;
-			WinVidPalette[i].peBlue  = palette[i].blue;
+			WinVidPalette[i].peBlue = palette[i].blue;
 		}
 #if (DIRECT3D_VERSION >= 0x900)
 		S_InitialisePolyList(FALSE);
@@ -1070,18 +1080,18 @@ void FadeToPal(int fadeValue, RGB888 *palette) {
 		return;
 	}
 
-	for( i=palStartIdx; i<palEndIdx; ++i ) {
+	for (i = palStartIdx; i < palEndIdx; ++i) {
 		fadePal[i] = WinVidPalette[i];
 	}
 
-	for( j=0; j<=fadeValue; ++j ) {
+	for (j = 0; j <= fadeValue; ++j) {
 #ifdef FEATURE_BACKGROUND_IMPROVED
-		if( S_UpdateInput() ) return;
+		if (S_UpdateInput()) return;
 #endif // FEATURE_BACKGROUND_IMPROVED
-		for( i=palStartIdx; i<palEndIdx; ++i ) {
-			WinVidPalette[i].peRed   = fadePal[i].peRed   + (palette[i].red   - fadePal[i].peRed)   * j / fadeValue;
+		for (i = palStartIdx; i < palEndIdx; ++i) {
+			WinVidPalette[i].peRed = fadePal[i].peRed + (palette[i].red - fadePal[i].peRed) * j / fadeValue;
 			WinVidPalette[i].peGreen = fadePal[i].peGreen + (palette[i].green - fadePal[i].peGreen) * j / fadeValue;
-			WinVidPalette[i].peBlue  = fadePal[i].peBlue  + (palette[i].blue  - fadePal[i].peBlue)  * j / fadeValue;
+			WinVidPalette[i].peBlue = fadePal[i].peBlue + (palette[i].blue - fadePal[i].peBlue) * j / fadeValue;
 		}
 #if (DIRECT3D_VERSION >= 0x900)
 		S_InitialisePolyList(FALSE);
@@ -1094,9 +1104,9 @@ void FadeToPal(int fadeValue, RGB888 *palette) {
 }
 
 void ScreenClear(bool isPhdWinSize) {
-	DWORD flags = ( SavedAppSettings.RenderMode == RM_Hardware ) ? CLRB_BackBuffer : CLRB_RenderBuffer;
+	DWORD flags = (SavedAppSettings.RenderMode == RM_Hardware) ? CLRB_BackBuffer : CLRB_RenderBuffer;
 
-	if( isPhdWinSize )
+	if (isPhdWinSize)
 		flags |= CLRB_PhdWinSize;
 
 	ClearBuffers(flags, 0);
@@ -1108,11 +1118,13 @@ void S_CopyScreenToBuffer() {
 #endif // (DIRECT3D_VERSION < 0x900)
 #ifdef FEATURE_BACKGROUND_IMPROVED
 	DWORD bgndMode = 0;
-	if( IsFadeToBlack ) {
+	if (IsFadeToBlack) {
 		bgndMode = 0;
-	} else if( IsInventoryActive ) {
+	}
+	else if (IsInventoryActive) {
 		bgndMode = InvBackgroundMode;
-	} else if( GF_CurrentEvent() == GFE_LEVCOMPLETE ) {
+	}
+	else if (GF_CurrentEvent() == GFE_LEVCOMPLETE) {
 		bgndMode = StatsBackgroundMode;
 	}
 	DWORD width = PhdWinWidth;
@@ -1122,34 +1134,36 @@ void S_CopyScreenToBuffer() {
 	DWORD height = 480;
 #endif // FEATURE_BACKGROUND_IMPROVED
 
-	if( SavedAppSettings.RenderMode == RM_Software ) {
+	if (SavedAppSettings.RenderMode == RM_Software) {
 #ifdef FEATURE_BACKGROUND_IMPROVED
 #if (DIRECT3D_VERSION >= 0x900)
-		if( PictureBuffer.bitmap == NULL ||
+		if (PictureBuffer.bitmap == NULL ||
 			PictureBuffer.width != width ||
-			PictureBuffer.height != height )
+			PictureBuffer.height != height)
 		{
 			BGND_PictureWidth = width;
 			BGND_PictureHeight = height;
 			try {
 				CreatePictureBuffer();
-			} catch(...) {
+			}
+			catch (...) {
 				return;
 			}
 		}
 #else // (DIRECT3D_VERSION >= 0x900)
-		if( PictureBufferSurface != NULL &&
-			(BGND_PictureWidth != width || BGND_PictureHeight != height) )
+		if (PictureBufferSurface != NULL &&
+			(BGND_PictureWidth != width || BGND_PictureHeight != height))
 		{
 			PictureBufferSurface->Release();
 			PictureBufferSurface = NULL;
 		}
-		if( PictureBufferSurface == NULL ) {
+		if (PictureBufferSurface == NULL) {
 			BGND_PictureWidth = width;
 			BGND_PictureHeight = height;
 			try {
 				CreatePictureBuffer();
-			} catch(...) {
+			}
+			catch (...) {
 				return;
 			}
 		}
@@ -1163,26 +1177,26 @@ void S_CopyScreenToBuffer() {
 #endif // (DIRECT3D_VERSION >= 0x900)
 #if (DIRECT3D_VERSION >= 0x900)
 #ifdef FEATURE_BACKGROUND_IMPROVED
-		if( InventoryMode != INV_PauseMode || PauseBackgroundMode != 0 )
+		if (InventoryMode != INV_PauseMode || PauseBackgroundMode != 0)
 #endif // FEATURE_BACKGROUND_IMPROVED
 		{
-			BYTE *ptr = PictureBuffer.bitmap;
+			BYTE* ptr = PictureBuffer.bitmap;
 			DWORD num = PictureBuffer.width * PictureBuffer.height;
-			for( DWORD i = 0; i < num; ++i ) {
+			for (DWORD i = 0; i < num; ++i) {
 				ptr[i] = DepthQIndex[ptr[i]];
 			}
 		}
 #else // (DIRECT3D_VERSION >= 0x900)
-		if(
+		if (
 #ifdef FEATURE_BACKGROUND_IMPROVED
-			(InventoryMode != INV_PauseMode || PauseBackgroundMode != 0) &&
+		(InventoryMode != INV_PauseMode || PauseBackgroundMode != 0) &&
 #endif // FEATURE_BACKGROUND_IMPROVED
-			SUCCEEDED(WinVidBufferLock(PictureBufferSurface, &desc, DDLOCK_WRITEONLY|DDLOCK_WAIT)) )
+			SUCCEEDED(WinVidBufferLock(PictureBufferSurface, &desc, DDLOCK_WRITEONLY | DDLOCK_WAIT)))
 		{
-			BYTE *surface = (BYTE *)desc.lpSurface;
+			BYTE* surface = (BYTE*)desc.lpSurface;
 
-			for( DWORD i = 0; i < height; ++i ) {
-				for( DWORD j = 0; j < width; ++j ) {
+			for (DWORD i = 0; i < height; ++i) {
+				for (DWORD j = 0; j < width; ++j) {
 					surface[j] = DepthQIndex[surface[j]];
 				}
 				surface += desc.lPitch;
@@ -1193,7 +1207,7 @@ void S_CopyScreenToBuffer() {
 		memcpy(PicPalette, GamePalette8, sizeof(PicPalette));
 	}
 #ifdef FEATURE_BACKGROUND_IMPROVED
-	else if( bgndMode == 0 ) {
+	else if (bgndMode == 0) {
 		BGND2_CapturePicture();
 	}
 #endif // FEATURE_BACKGROUND_IMPROVED
@@ -1207,26 +1221,28 @@ void S_CopyBufferToScreen() {
 #endif // defined(FEATURE_VIDEOFX_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
 #ifdef FEATURE_BACKGROUND_IMPROVED
 	DWORD bgndMode = 0;
-	if( IsFadeToBlack ) {
+	if (IsFadeToBlack) {
 		bgndMode = 0;
-	} else if( IsInventoryActive ) {
+	}
+	else if (IsInventoryActive) {
 		bgndMode = InvBackgroundMode;
-	} else if( GF_CurrentEvent() == GFE_LEVCOMPLETE ) {
+	}
+	else if (GF_CurrentEvent() == GFE_LEVCOMPLETE) {
 		bgndMode = StatsBackgroundMode;
 	}
 #endif // FEATURE_BACKGROUND_IMPROVED
 
-	if( SavedAppSettings.RenderMode == RM_Software ) {
+	if (SavedAppSettings.RenderMode == RM_Software) {
 #if (DIRECT3D_VERSION >= 0x900)
-		if( PictureBuffer.bitmap == NULL ) {
+		if (PictureBuffer.bitmap == NULL) {
 			return;
 		}
 #else // (DIRECT3D_VERSION >= 0x900)
-		if( PictureBufferSurface == NULL ) { // NOTE: additional check just in case
+		if (PictureBufferSurface == NULL) { // NOTE: additional check just in case
 			return;
 		}
 #endif // (DIRECT3D_VERSION >= 0x900)
-		if( memcmp(GamePalette8, PicPalette, sizeof(PicPalette)) ) {
+		if (memcmp(GamePalette8, PicPalette, sizeof(PicPalette))) {
 			S_SyncPictureBufferPalette();
 		}
 #ifdef FEATURE_BACKGROUND_IMPROVED
@@ -1239,19 +1255,20 @@ void S_CopyBufferToScreen() {
 		RenderBufferSurface->Blt(&rect, PictureBufferSurface, NULL, DDBLT_WAIT, NULL);
 #endif // (DIRECT3D_VERSION >= 0x900)
 	}
-	else if( BGND_PictureIsReady && (!BGND_IsCaptured || bgndMode == 0) ) {
+	else if (BGND_PictureIsReady && (!BGND_IsCaptured || bgndMode == 0)) {
 		HWR_EnableZBuffer(false, false);
 		RECT rect = PhdWinRect;
-		if( !BGND_IsCaptured ) {
+		if (!BGND_IsCaptured) {
 			BGND2_LoadPicture(NULL, FALSE, TRUE); // reload picture if required
 		}
 		BGND_DrawInGameBlack(); // draw black background for picture margins
 		BGND2_CalculatePictureRect(&rect);
 		BGND2_DrawTextures(&rect, color);
-		if( BGND_IsCaptured ) {
-			if( InventoryMode != INV_PauseMode ) {
+		if (BGND_IsCaptured) {
+			if (InventoryMode != INV_PauseMode) {
 				BGND2_FadeTo(128, -12); // the captured background image fades out to 50%
-			} else if( PauseBackgroundMode != 0 ) {
+			}
+			else if (PauseBackgroundMode != 0) {
 				BGND2_FadeTo(128, -128); // the captured background image instantly gets 50%
 			}
 		}
@@ -1263,31 +1280,31 @@ void S_CopyBufferToScreen() {
 		RenderBufferSurface->Blt(&GameVidRect, PictureBufferSurface, NULL, DDBLT_WAIT, NULL);
 #endif // (DIRECT3D_VERSION >= 0x900)
 	}
-	else if( BGND_PictureIsReady ) {
+	else if (BGND_PictureIsReady) {
 		BGND_GetPageHandles();
 		HWR_EnableZBuffer(false, false);
 
-		static const int tileX[4] = {0, 256, 512, 640};
-		static const int tileY[3] = {0, 256, 480};
+		static const int tileX[4] = { 0, 256, 512, 640 };
+		static const int tileY[3] = { 0, 256, 480 };
 		int i, x[4], y[3];
 
-		for( i = 0; i < 4; ++i )
-			 x[i] = tileX[i] * PhdWinWidth / 640 + PhdWinMinX;
-		for( i = 0; i < 3; ++i )
-			 y[i] = tileY[i] * PhdWinHeight / 480 + PhdWinMinY;
+		for (i = 0; i < 4; ++i)
+			x[i] = tileX[i] * PhdWinWidth / 640 + PhdWinMinX;
+		for (i = 0; i < 3; ++i)
+			y[i] = tileY[i] * PhdWinHeight / 480 + PhdWinMinY;
 
-		DrawTextureTile(x[0], y[0], x[1]-x[0], y[1]-y[0], BGND_PageHandles[0],
-						0, 0, 256, 256, color, color, color, color);
-		DrawTextureTile(x[1], y[0], x[2]-x[1], y[1]-y[0], BGND_PageHandles[1],
-						0, 0, 256, 256, color, color, color, color);
-		DrawTextureTile(x[2], y[0], x[3]-x[2], y[1]-y[0], BGND_PageHandles[2],
-						0, 0, 128, 256, color, color, color, color);
-		DrawTextureTile(x[0], y[1], x[1]-x[0], y[2]-y[1], BGND_PageHandles[3],
-						0, 0, 256, 224, color, color, color, color);
-		DrawTextureTile(x[1], y[1], x[2]-x[1], y[2]-y[1], BGND_PageHandles[4],
-						0, 0, 256, 224, color, color, color, color);
-		DrawTextureTile(x[2], y[1], x[3]-x[2], y[2]-y[1], BGND_PageHandles[2],
-						128, 0, 128, 224, color, color, color, color);
+		DrawTextureTile(x[0], y[0], x[1] - x[0], y[1] - y[0], BGND_PageHandles[0],
+			0, 0, 256, 256, color, color, color, color);
+		DrawTextureTile(x[1], y[0], x[2] - x[1], y[1] - y[0], BGND_PageHandles[1],
+			0, 0, 256, 256, color, color, color, color);
+		DrawTextureTile(x[2], y[0], x[3] - x[2], y[1] - y[0], BGND_PageHandles[2],
+			0, 0, 128, 256, color, color, color, color);
+		DrawTextureTile(x[0], y[1], x[1] - x[0], y[2] - y[1], BGND_PageHandles[3],
+			0, 0, 256, 224, color, color, color, color);
+		DrawTextureTile(x[1], y[1], x[2] - x[1], y[2] - y[1], BGND_PageHandles[4],
+			0, 0, 256, 224, color, color, color, color);
+		DrawTextureTile(x[2], y[1], x[3] - x[2], y[2] - y[1], BGND_PageHandles[2],
+			128, 0, 128, 224, color, color, color, color);
 #endif // FEATURE_BACKGROUND_IMPROVED
 		HWR_EnableZBuffer(true, true);
 	}
@@ -1296,80 +1313,81 @@ void S_CopyBufferToScreen() {
 	}
 }
 
-BOOL DecompPCX(LPCBYTE pcx, DWORD pcxSize, LPBYTE pic, RGB888 *pal) {
-	PCX_HEADER *header;
+BOOL DecompPCX(LPCBYTE pcx, DWORD pcxSize, LPBYTE pic, RGB888* pal) {
+	PCX_HEADER* header;
 	DWORD w, h, width, height, pitch;
 	LPCBYTE src;
 	LPBYTE dst;
 
-	header = (PCX_HEADER *)pcx;
-	width  = header->xMax - header->xMin + 1;
+	header = (PCX_HEADER*)pcx;
+	width = header->xMax - header->xMin + 1;
 	height = header->yMax - header->yMin + 1;
 
-	if( header->manufacturer != 10 ||
+	if (header->manufacturer != 10 ||
 		header->version < 5 ||
 		header->bpp != 8 ||
 		header->rle != 1 ||
 		header->planes != 1 ||
-		width*height == 0 )
+		width * height == 0)
 	{
 		return FALSE;
 	}
 
 	src = pcx + sizeof(PCX_HEADER);
 	dst = pic;
-	pitch = width + width%2; // add padding if required
+	pitch = width + width % 2; // add padding if required
 	h = 0;
 	w = 0;
 
 	// NOTE: PCX decoder slightly redesigned to be more compatible and stable
-	while( h < height ) {
-		if( (*src & 0xC0) == 0xC0 ) {
+	while (h < height) {
+		if ((*src & 0xC0) == 0xC0) {
 			BYTE n = (*src++) & 0x3F;
 			BYTE c = *src++;
-			if( n > 0 ) {
-				if( w < width ) {
+			if (n > 0) {
+				if (w < width) {
 					CLAMPG(n, width - w);
 					memset(dst, c, n);
 					dst += n;
 				}
 				w += n;
 			}
-		} else {
+		}
+		else {
 			*dst++ = *src++;
 			++w;
 		}
-		if( w >= pitch ) {
+		if (w >= pitch) {
 			w = 0;
 			++h;
 		}
 	}
 
-	if( pal != NULL)
-		memcpy(pal, pcx + pcxSize - sizeof(RGB888)*256, sizeof(RGB888)*256);
+	if (pal != NULL)
+		memcpy(pal, pcx + pcxSize - sizeof(RGB888) * 256, sizeof(RGB888) * 256);
 
 	return TRUE;
 }
 
 // NOTE: this function is not presented in the original game
-int GetPcxResolution(LPCBYTE pcx, DWORD pcxSize, DWORD *width, DWORD *height) {
-	PCX_HEADER *header;
+int GetPcxResolution(LPCBYTE pcx, DWORD pcxSize, DWORD* width, DWORD* height) {
+	PCX_HEADER* header;
 
-	if( pcx == NULL || pcxSize <= sizeof(PCX_HEADER) || width == NULL || height == NULL ) {
+	if (pcx == NULL || pcxSize <= sizeof(PCX_HEADER) || width == NULL || height == NULL) {
 		return -1;
 	}
 
-	header  = (PCX_HEADER *)pcx;
-	*width  = header->xMax - header->xMin + 1;
+	header = (PCX_HEADER*)pcx;
+	*width = header->xMax - header->xMin + 1;
 	*height = header->yMax - header->yMin + 1;
 
-	if( header->manufacturer != 10 ||
+	if (header->manufacturer != 10 ||
 		header->version < 5 ||
 		header->bpp != 8 ||
 		header->rle != 1 ||
 		header->planes != 1 ||
 		*width == 0 ||
-		*height == 0 )
+		*height == 0)
 	{
 		return -1;
 	}

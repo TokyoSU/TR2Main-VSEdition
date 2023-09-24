@@ -26,9 +26,9 @@
 #include "global/vars.h"
 
 void IncreaseScreenSize() {
-	if( ScreenSizer < 1.0 ) {
+	if (ScreenSizer < 1.0) {
 		ScreenSizer += 0.08;
-		if( ScreenSizer > 1.0 ) {
+		if (ScreenSizer > 1.0) {
 			ScreenSizer = 1.0;
 		}
 		GameSizer = ScreenSizer;
@@ -37,9 +37,9 @@ void IncreaseScreenSize() {
 }
 
 void DecreaseScreenSize() {
-	if( ScreenSizer > 0.44 ) {
+	if (ScreenSizer > 0.44) {
 		ScreenSizer -= 0.08;
-		if( ScreenSizer < 0.44 ) {
+		if (ScreenSizer < 0.44) {
 			ScreenSizer = 0.44;
 		}
 		GameSizer = ScreenSizer;
@@ -54,10 +54,10 @@ void setup_screen_size() {
 	wwidth = (int)((double)GameVidWidth * ScreenSizer);
 	wheight = (int)((double)GameVidHeight * ScreenSizer);
 
-	if( wwidth > GameVidWidth )
+	if (wwidth > GameVidWidth)
 		wwidth = GameVidWidth;
 
-	if( wheight > GameVidHeight )
+	if (wheight > GameVidHeight)
 		wheight = GameVidHeight;
 
 	xoff = (GameVidWidth - wwidth) / 2;
@@ -79,7 +79,7 @@ void setup_screen_size() {
 
 void TempVideoAdjust(int hires, double sizer) {
 	IsVidSizeLock = TRUE;
-	if( ScreenSizer != sizer ) {
+	if (ScreenSizer != sizer) {
 		ScreenSizer = sizer;
 		setup_screen_size();
 	}
@@ -87,17 +87,17 @@ void TempVideoAdjust(int hires, double sizer) {
 
 void TempVideoRemove() {
 	IsVidSizeLock = FALSE;
-	if( ScreenSizer != GameSizer ) {
+	if (ScreenSizer != GameSizer) {
 		ScreenSizer = GameSizer;
 		setup_screen_size();
 	}
 }
 
 void S_FadeInInventory(BOOL isFade) {
-	if( InventoryMode != INV_TitleMode )
+	if (InventoryMode != INV_TitleMode)
 		S_CopyScreenToBuffer();
 
-	if( isFade ) {
+	if (isFade) {
 		FadeValue = 0x100000;
 		FadeLimit = 0x180000;
 		FadeAdder = +0x08000;
@@ -105,7 +105,7 @@ void S_FadeInInventory(BOOL isFade) {
 }
 
 void S_FadeOutInventory(BOOL isFade) {
-	if( isFade ) {
+	if (isFade) {
 		FadeValue = 0x180000;
 		FadeLimit = 0x100000;
 		FadeAdder = -0x08000;

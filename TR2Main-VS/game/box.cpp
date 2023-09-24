@@ -28,26 +28,27 @@
 #include "global/vars.h"
 
 void CreatureDie(__int16 itemID, BOOL explode) {
-	ITEM_INFO *item = &Items[itemID];
+	ITEM_INFO* item = &Items[itemID];
 	item->collidable = 0;
 	item->hitPoints = HP_DONT_TARGET;
 
-	if( explode ) {
+	if (explode) {
 		ExplodingDeath(itemID, ~0, 0);
 		KillItem(itemID);
-	} else {
+	}
+	else {
 		RemoveActiveItem(itemID);
 	}
 
 	DisableBaddieAI(itemID);
 	item->flags |= IFL_INVISIBLE;
-	if( item->clear_body ) {
+	if (item->clear_body) {
 		item->nextActive = PrevItemActive;
 		PrevItemActive = itemID;
 	}
 
-	ITEM_INFO *pickup = NULL;
-	for( int i = item->carriedItem; i != -1; i = pickup->carriedItem ) {
+	ITEM_INFO* pickup = NULL;
+	for (int i = item->carriedItem; i != -1; i = pickup->carriedItem) {
 		pickup = &Items[i];
 		pickup->pos.x = item->pos.x;
 		pickup->pos.y = item->pos.y;
@@ -56,10 +57,10 @@ void CreatureDie(__int16 itemID, BOOL explode) {
 	}
 }
 
-void CreatureKill(ITEM_INFO *item, int killAnim, int killState, int laraKillState) {
+void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillState) {
 #ifdef FEATURE_CHEAT
 	// Return Lara to normal state if Dozy cheat enabled
-	if( Lara.water_status == LWS_Cheat ) {
+	if (Lara.water_status == LWS_Cheat) {
 		Lara.water_status = LWS_AboveWater;
 		Lara.mesh_effects = 0;
 	}
@@ -80,7 +81,7 @@ void CreatureKill(ITEM_INFO *item, int killAnim, int killState, int laraKillStat
 	LaraItem->fallSpeed = 0;
 	LaraItem->gravity = 0;
 	LaraItem->speed = 0;
-	if( LaraItem->roomNumber != item->roomNumber ) {
+	if (LaraItem->roomNumber != item->roomNumber) {
 		ItemNewRoom(Lara.item_number, item->roomNumber);
 	}
 	AnimateItem(LaraItem);
@@ -98,33 +99,33 @@ void CreatureKill(ITEM_INFO *item, int killAnim, int killState, int laraKillStat
  * Inject function
  */
 void Inject_Box() {
-//	INJECT(0x0040E190, InitialiseCreature);
-//	INJECT(0x0040E1C0, CreatureActive);
-//	INJECT(0x0040E210, CreatureAIInfo);
-//	INJECT(0x0040E470, SearchLOT);
-//	INJECT(0x0040E670, UpdateLOT);
-//	INJECT(0x0040E6E0, TargetBox);
-//	INJECT(0x0040E780, StalkBox);
-//	INJECT(0x0040E880, EscapeBox);
-//	INJECT(0x0040E930, ValidBox);
-//	INJECT(0x0040E9E0, CreatureMood);
-//	INJECT(0x0040EE50, CalculateTarget);
-//	INJECT(0x0040F2B0, CreatureCreature);
-//	INJECT(0x0040F3B0, BadFloor);
+	//	INJECT(0x0040E190, InitialiseCreature);
+	//	INJECT(0x0040E1C0, CreatureActive);
+	//	INJECT(0x0040E210, CreatureAIInfo);
+	//	INJECT(0x0040E470, SearchLOT);
+	//	INJECT(0x0040E670, UpdateLOT);
+	//	INJECT(0x0040E6E0, TargetBox);
+	//	INJECT(0x0040E780, StalkBox);
+	//	INJECT(0x0040E880, EscapeBox);
+	//	INJECT(0x0040E930, ValidBox);
+	//	INJECT(0x0040E9E0, CreatureMood);
+	//	INJECT(0x0040EE50, CalculateTarget);
+	//	INJECT(0x0040F2B0, CreatureCreature);
+	//	INJECT(0x0040F3B0, BadFloor);
 
 	INJECT(0x0040F440, CreatureDie);
 
-//	INJECT(0x0040F500, CreatureAnimation);
-//	INJECT(0x0040FDD0, CreatureTurn);
-//	INJECT(0x0040FEB0, CreatureTilt);
-//	INJECT(0x0040FEF0, CreatureHead);
-//	INJECT(0x0040FF40, CreatureNeck);
-//	INJECT(0x0040FF90, CreatureFloat);
-//	INJECT(0x00410040, CreatureUnderwater);
-//	INJECT(0x00410090, CreatureEffect);
-//	INJECT(0x004100F0, CreatureVault);
+	//	INJECT(0x0040F500, CreatureAnimation);
+	//	INJECT(0x0040FDD0, CreatureTurn);
+	//	INJECT(0x0040FEB0, CreatureTilt);
+	//	INJECT(0x0040FEF0, CreatureHead);
+	//	INJECT(0x0040FF40, CreatureNeck);
+	//	INJECT(0x0040FF90, CreatureFloat);
+	//	INJECT(0x00410040, CreatureUnderwater);
+	//	INJECT(0x00410090, CreatureEffect);
+	//	INJECT(0x004100F0, CreatureVault);
 
 	INJECT(0x00410230, CreatureKill);
 
-//	INJECT(0x004103A0, GetBaddieTarget);
+	//	INJECT(0x004103A0, GetBaddieTarget);
 }

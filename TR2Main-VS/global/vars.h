@@ -22,9 +22,9 @@
 #ifndef GLOBAL_VARS_H_INCLUDED
 #define GLOBAL_VARS_H_INCLUDED
 
-/*
- * String Constants
- */
+ /*
+  * String Constants
+  */
 
 #define GameWindowName		"Tomb Raider II"
 #define GameClassName		"Dude:TombRaiderII:DDWndClass"
@@ -34,7 +34,7 @@
 
 #define MessageBoxName		"Tomb Raider II"
 
-// Variable macros
+  // Variable macros
 #define VAR_U_(address, type)			(*(type*)(address)) // uninitialized variable
 #define VAR_I_(address, type, value)	(*(type*)(address)) // initialized variable (value is just for info)
 #define ARRAY_(address, type, length)	(*(type(*)length)(address)) // array (can be multidimensional)
@@ -42,7 +42,7 @@
 /*
  * General Variables
  */
-// 3D insert function variables
+ // 3D insert function variables
 #define ins_trans_quad		(*(void(__cdecl **)(int,int,int,int,int))				0x00470318)
 #define ins_poly_trans8		(*(void(__cdecl **)(PHD_VBUF*,__int16))					0x0047032C)
 #define ins_flat_rect		(*(void(__cdecl **)(int,int,int,int,int,BYTE))			0x0047805C)
@@ -581,7 +581,7 @@ extern PHD_TEXTURE PhdTextureInfo[0x2000];
 #define DepthQIndex					ARRAY_(0x004BF2C8, BYTE, [256])
 #define PhdVBuf						ARRAY_(0x004BF3D0, PHD_VBUF, [1500])
 #ifdef FEATURE_EXTENDED_LIMITS
-extern BYTE *TexturePageBuffer8[128];
+extern BYTE* TexturePageBuffer8[128];
 #else // FEATURE_EXTENDED_LIMITS
 #define TexturePageBuffer8			ARRAY_(0x004D6AD0, BYTE*, [32])
 #endif // FEATURE_EXTENDED_LIMITS
@@ -666,7 +666,7 @@ extern STATIC_INFO StaticObjects[256];
 /*
  * GameFlow/Inventory Variables
  */
-// GameFlow/Inventory initialized variables
+ // GameFlow/Inventory initialized variables
 #define LoadGameRequester			VAR_I_(0x00465620, REQUEST_INFO,	"...")
 #define SaveGameRequester			VAR_I_(0x00465838, REQUEST_INFO,	"...")
 #define InvCompassOption			VAR_I_(0x00464A90, INVENTORY_ITEM,	"...")
@@ -782,9 +782,9 @@ extern STATIC_INFO StaticObjects[256];
 	NULL,
 }; */
 #ifdef FEATURE_HUD_IMPROVED
-extern INVENTORY_ITEM *InvOptionList[5];
-extern TEXT_STR_INFO *CtrlTextA[ARRAY_SIZE(Layout->key)];
-extern TEXT_STR_INFO *CtrlTextB[ARRAY_SIZE(Layout->key)];
+extern INVENTORY_ITEM* InvOptionList[5];
+extern TEXT_STR_INFO* CtrlTextA[ARRAY_SIZE(Layout->key)];
+extern TEXT_STR_INFO* CtrlTextB[ARRAY_SIZE(Layout->key)];
 #else // FEATURE_HUD_IMPROVED
 #define InvOptionList				ARRAY_(0x00465608, INVENTORY_ITEM*, [4]) /* = {
 	&InvPassportOption,

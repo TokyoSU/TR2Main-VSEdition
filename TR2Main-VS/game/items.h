@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 void InitialiseItemArray(int itemCount); // 0x00426CD0
 
 #define KillItem ((void(__cdecl*)(__int16)) 0x00426D30)

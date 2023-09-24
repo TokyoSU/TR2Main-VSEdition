@@ -38,12 +38,12 @@
 #include "modding/joy_output.h"
 #endif // FEATURE_INPUT_IMPROVED
 
-static BITE_INFO SkidooLeftGun = {219, -71, 550, 0};
-static BITE_INFO SkidooRightGun = {-235, -71, 550, 0};
+static BITE_INFO SkidooLeftGun = { 219, -71, 550, 0 };
+static BITE_INFO SkidooRightGun = { -235, -71, 550, 0 };
 
-void DoSnowEffect(ITEM_INFO *item) {
+void DoSnowEffect(ITEM_INFO* item) {
 	__int16 fxID;
-	FX_INFO *fx;
+	FX_INFO* fx;
 	int displacement;
 
 	fxID = CreateEffect(item->roomNumber);
@@ -59,7 +59,8 @@ void DoSnowEffect(ITEM_INFO *item) {
 		fx->speed = 0;
 		if (item->speed < 64) {
 			fx->fallspeed = (ABS(item->speed) - 64) * GetRandomDraw() >> 15;
-		} else {
+		}
+		else {
 			fx->fallspeed = 0;
 		}
 		PhdMatrixPtr->_23 = 0;
@@ -69,9 +70,9 @@ void DoSnowEffect(ITEM_INFO *item) {
 	}
 }
 
-void SkidooExplode(ITEM_INFO *item) {
+void SkidooExplode(ITEM_INFO* item) {
 	__int16 fxID;
-	FX_INFO *fx;
+	FX_INFO* fx;
 
 	fxID = CreateEffect(item->roomNumber);
 	if (fxID != -1) {
@@ -93,20 +94,20 @@ void SkidooExplode(ITEM_INFO *item) {
 }
 
 void SkidooGuns() {
-	WEAPON_INFO *weapon = &Weapons[LGT_Skidoo];
+	WEAPON_INFO* weapon = &Weapons[LGT_Skidoo];
 	LaraGetNewTarget(weapon);
 	AimWeapon(weapon, &Lara.right_arm);
 
-	if( CHK_ANY(InputStatus, IN_ACTION) ) {
+	if (CHK_ANY(InputStatus, IN_ACTION)) {
 		__int16 angles[2];
 		angles[0] = Lara.right_arm.y_rot + LaraItem->pos.rotY;
 		angles[1] = Lara.right_arm.x_rot;
-		if( FireWeapon(LGT_Skidoo, Lara.target, LaraItem, angles) ) {
+		if (FireWeapon(LGT_Skidoo, Lara.target, LaraItem, angles)) {
 			Lara.right_arm.flash_gun = weapon->flashTime;
 			PlaySoundEffect(weapon->sampleNum, &LaraItem->pos, 0);
-			int x = LaraItem->pos.x + (phd_sin(LaraItem->pos.rotY) >> (W2V_SHIFT-10));
+			int x = LaraItem->pos.x + (phd_sin(LaraItem->pos.rotY) >> (W2V_SHIFT - 10));
 			int y = LaraItem->pos.y - 0x200;
-			int z = LaraItem->pos.z + (phd_cos(LaraItem->pos.rotY) >> (W2V_SHIFT-10));
+			int z = LaraItem->pos.z + (phd_cos(LaraItem->pos.rotY) >> (W2V_SHIFT - 10));
 			AddDynamicLight(x, y, z, 12, 11);
 			CreatureEffect(&Items[Lara.skidoo], &SkidooLeftGun, GunShot);
 			CreatureEffect(&Items[Lara.skidoo], &SkidooRightGun, GunShot);
@@ -117,19 +118,20 @@ void SkidooGuns() {
 	}
 }
 
-void DrawSkidoo(ITEM_INFO *item) {
-	__int16 *frames[2];
+void DrawSkidoo(ITEM_INFO* item) {
+	__int16* frames[2];
 	int rate = 0;
 	UINT16 flags = 0;
-	OBJECT_INFO *obj;
+	OBJECT_INFO* obj;
 
 	int frac = GetFrames(item, frames, &rate);
-	if( item->data ) {
-		flags = *(UINT16 *)item->data;
+	if (item->data) {
+		flags = *(UINT16*)item->data;
 	}
-	if( CHK_ANY(flags, 4) ) {
+	if (CHK_ANY(flags, 4)) {
 		obj = &Objects[ID_SKIDOO_ARMED];
-	} else {
+	}
+	else {
 		obj = &Objects[item->objectID];
 	}
 
@@ -138,21 +140,22 @@ void DrawSkidoo(ITEM_INFO *item) {
 	phd_RotYXZ(item->pos.rotY, item->pos.rotX, item->pos.rotZ);
 	int clip = S_GetObjectBounds(frames[0]);
 
-	if( clip ) {
+	if (clip) {
 		CalculateObjectLighting(item, frames[0]);
 
-		__int16 **track = 0;
-		__int16 **meshPtr = &MeshPtr[obj->meshIndex];
-		int *bonePtr = &AnimBones[obj->boneIndex];
-		if( (flags & 3) == 1 ) {
+		__int16** track = 0;
+		__int16** meshPtr = &MeshPtr[obj->meshIndex];
+		int* bonePtr = &AnimBones[obj->boneIndex];
+		if ((flags & 3) == 1) {
 			track = &MeshPtr[Objects[ID_SKIDOO_LARA].meshIndex + 1];
-		} else if( (flags & 3) == 2 ) {
+		}
+		else if ((flags & 3) == 2) {
 			track = &MeshPtr[Objects[ID_SKIDOO_LARA].meshIndex + 7];
 		}
 
-		if( frac ) {
-			UINT16 *rot1 = (UINT16 *)&frames[0][9];
-			UINT16 *rot2 = (UINT16 *)&frames[1][9];
+		if (frac) {
+			UINT16* rot1 = (UINT16*)&frames[0][9];
+			UINT16* rot2 = (UINT16*)&frames[1][9];
 			InitInterpolate(frac, rate);
 			phd_TranslateRel_ID(frames[0][6], frames[0][7], frames[0][8], frames[1][6], frames[1][7], frames[1][8]);
 			phd_RotYXZsuperpack_I(&rot1, &rot2, 0);
@@ -164,17 +167,17 @@ void DrawSkidoo(ITEM_INFO *item) {
 			ClearMeshReflectState();
 #endif // FEATURE_VIDEOFX_IMPROVED
 
-			for( int i = 1; i < obj->nMeshes; ++i ) {
+			for (int i = 1; i < obj->nMeshes; ++i) {
 				DWORD state = *bonePtr;
-				if( CHK_ANY(state, 1) ) {
+				if (CHK_ANY(state, 1)) {
 					phd_PopMatrix_I();
 				}
-				if( CHK_ANY(state, 2) ) {
+				if (CHK_ANY(state, 2)) {
 					phd_PushMatrix_I();
 				}
 				phd_TranslateRel_I(bonePtr[1], bonePtr[2], bonePtr[3]);
 				phd_RotYXZsuperpack_I(&rot1, &rot2, 0);
-				if( track ) {
+				if (track) {
 #ifdef FEATURE_VIDEOFX_IMPROVED
 					SetMeshReflectState(ID_SKIDOO_LARA, (flags & 3) == 1 ? 1 : 7);
 #endif // FEATURE_VIDEOFX_IMPROVED
@@ -183,7 +186,8 @@ void DrawSkidoo(ITEM_INFO *item) {
 					ClearMeshReflectState();
 #endif // FEATURE_VIDEOFX_IMPROVED
 					track = NULL;
-				} else {
+				}
+				else {
 #ifdef FEATURE_VIDEOFX_IMPROVED
 					SetMeshReflectState(CHK_ANY(flags, 4) ? (int)ID_SKIDOO_ARMED : item->objectID, i);
 #endif // FEATURE_VIDEOFX_IMPROVED
@@ -194,8 +198,9 @@ void DrawSkidoo(ITEM_INFO *item) {
 				}
 				bonePtr += 4;
 			}
-		} else {
-			UINT16 *rot = (UINT16 *)&frames[0][9];
+		}
+		else {
+			UINT16* rot = (UINT16*)&frames[0][9];
 			phd_TranslateRel(frames[0][6], frames[0][7], frames[0][8]);
 			phd_RotYXZsuperpack(&rot, 0);
 #ifdef FEATURE_VIDEOFX_IMPROVED
@@ -206,17 +211,17 @@ void DrawSkidoo(ITEM_INFO *item) {
 			ClearMeshReflectState();
 #endif // FEATURE_VIDEOFX_IMPROVED
 
-			for( int i = 1; i < obj->nMeshes; ++i ) {
+			for (int i = 1; i < obj->nMeshes; ++i) {
 				DWORD state = *bonePtr;
-				if( CHK_ANY(state, 1) ) {
+				if (CHK_ANY(state, 1)) {
 					phd_PopMatrix();
 				}
-				if( CHK_ANY(state, 2) ) {
+				if (CHK_ANY(state, 2)) {
 					phd_PushMatrix();
 				}
 				phd_TranslateRel(bonePtr[1], bonePtr[2], bonePtr[3]);
 				phd_RotYXZsuperpack(&rot, 0);
-				if( track ) {
+				if (track) {
 #ifdef FEATURE_VIDEOFX_IMPROVED
 					SetMeshReflectState(ID_SKIDOO_LARA, (flags & 3) == 1 ? 1 : 7);
 #endif // FEATURE_VIDEOFX_IMPROVED
@@ -225,7 +230,8 @@ void DrawSkidoo(ITEM_INFO *item) {
 					ClearMeshReflectState();
 #endif // FEATURE_VIDEOFX_IMPROVED
 					track = NULL;
-				} else {
+				}
+				else {
 #ifdef FEATURE_VIDEOFX_IMPROVED
 					SetMeshReflectState(CHK_ANY(flags, 4) ? (int)ID_SKIDOO_ARMED : item->objectID, i);
 #endif // FEATURE_VIDEOFX_IMPROVED
@@ -245,34 +251,34 @@ void DrawSkidoo(ITEM_INFO *item) {
  * Inject function
  */
 void Inject_Skidoo() {
-//	INJECT(0x0043CEE0, InitialiseSkidoo);
-//	INJECT(0x0043CF20, SkidooCheckGeton);
-//	INJECT(0x0043D010, SkidooCollision);
-//	INJECT(0x0043D110, SkidooBaddieCollision);
-//	INJECT(0x0043D310, TestHeight);
-//	INJECT(0x0043D3D0, DoShift);
-//	INJECT(0x0043D650, DoDynamics);
-//	INJECT(0x0043D6B0, GetCollisionAnim);
+	//	INJECT(0x0043CEE0, InitialiseSkidoo);
+	//	INJECT(0x0043CF20, SkidooCheckGeton);
+	//	INJECT(0x0043D010, SkidooCollision);
+	//	INJECT(0x0043D110, SkidooBaddieCollision);
+	//	INJECT(0x0043D310, TestHeight);
+	//	INJECT(0x0043D3D0, DoShift);
+	//	INJECT(0x0043D650, DoDynamics);
+	//	INJECT(0x0043D6B0, GetCollisionAnim);
 
 	INJECT(0x0043D740, DoSnowEffect);
 
-//	INJECT(0x0043D880, SkidooDynamics);
-//	INJECT(0x0043DD20, SkidooUserControl);
-//	INJECT(0x0043DEE0, SkidooCheckGetOffOK);
-//	INJECT(0x0043DFF0, SkidooAnimation);
+	//	INJECT(0x0043D880, SkidooDynamics);
+	//	INJECT(0x0043DD20, SkidooUserControl);
+	//	INJECT(0x0043DEE0, SkidooCheckGetOffOK);
+	//	INJECT(0x0043DFF0, SkidooAnimation);
 
 	INJECT(0x0043E2D0, SkidooExplode);
 
-//	INJECT(0x0043E350, SkidooCheckGetOff);
+	//	INJECT(0x0043E350, SkidooCheckGetOff);
 
 	INJECT(0x0043E590, SkidooGuns);
 
-//	INJECT(0x0043E6B0, SkidooControl);
+	//	INJECT(0x0043E6B0, SkidooControl);
 
 	INJECT(0x0043EB10, DrawSkidoo);
 
-//	INJECT(0x0043EDF0, InitialiseSkidman);
-//	INJECT(0x0043EE80, SkidManControl);
-//	INJECT(0x0043F280, SkidmanPush);
-//	INJECT(0x0043F3A0, SkidmanCollision);
+	//	INJECT(0x0043EDF0, InitialiseSkidman);
+	//	INJECT(0x0043EE80, SkidManControl);
+	//	INJECT(0x0043F280, SkidmanPush);
+	//	INJECT(0x0043F3A0, SkidmanCollision);
 }

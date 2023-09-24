@@ -23,21 +23,19 @@
 #include "game/larafire.h"
 #include "global/vars.h"
 
-
-
-/*
- * Inject function
- */
+ /*
+  * Inject function
+  */
 void Inject_LaraFire() {
-//	INJECT(0x0042E740, LaraGun);
-//	INJECT(0x0042ECB0, CheckForHoldingState);
-//	INJECT(0x0042ECF0, InitialiseNewWeapon);
-//	INJECT(0x0042EE30, LaraTargetInfo);
-//	INJECT(0x0042EFD0, LaraGetNewTarget);
-//	INJECT(0x0042F1F0, find_target_point);
-//	INJECT(0x0042F2A0, AimWeapon);
-//	INJECT(0x0042F370, FireWeapon);
-//	INJECT(0x0042F6E0, HitTarget);
-//	INJECT(0x0042F780, SmashItem);
-//	INJECT(0x0042F7E0, WeaponObject);
+	//	INJECT(0x0042E740, LaraGun);
+	//	INJECT(0x0042ECB0, CheckForHoldingState);
+	//	INJECT(0x0042ECF0, InitialiseNewWeapon);
+	//	INJECT(0x0042EE30, LaraTargetInfo);
+	//	INJECT(0x0042EFD0, LaraGetNewTarget);
+	//	INJECT(0x0042F1F0, find_target_point);
+	//	INJECT(0x0042F2A0, AimWeapon);
+	//	INJECT(0x0042F370, FireWeapon);
+	//	INJECT(0x0042F6E0, HitTarget);
+	//	INJECT(0x0042F780, SmashItem);
+	//	INJECT(0x0042F7E0, WeaponObject);
 }

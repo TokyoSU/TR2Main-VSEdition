@@ -24,14 +24,14 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 int Display_Inventory(INVENTORY_MODE invMode); // 0x00422060
 void Construct_Inventory(); // 0x004232F0
-void SelectMeshes(INVENTORY_ITEM *invItem); // 0x00423450
-int AnimateInventoryItem(INVENTORY_ITEM *invItem); // 0x004234E0
-void DrawInventoryItem(INVENTORY_ITEM *invItem); // 0x00423570
+void SelectMeshes(INVENTORY_ITEM* invItem); // 0x00423450
+int AnimateInventoryItem(INVENTORY_ITEM* invItem); // 0x004234E0
+void DrawInventoryItem(INVENTORY_ITEM* invItem); // 0x00423570
 DWORD GetDebouncedInput(DWORD input); // 0x004239A0
 void DoInventoryPicture(); //0x004239C0
 void DoInventoryBackground(); // 0x004239D0

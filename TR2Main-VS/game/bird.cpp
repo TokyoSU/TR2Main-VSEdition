@@ -23,12 +23,10 @@
 #include "game/bird.h"
 #include "global/vars.h"
 
-
-
-/*
- * Inject function
- */
+ /*
+  * Inject function
+  */
 void Inject_Bird() {
-//	INJECT(0x0040C860, InitialiseEagle);
-//	INJECT(0x0040C8F0, EagleControl);
+	//	INJECT(0x0040C860, InitialiseEagle);
+	//	INJECT(0x0040C8F0, EagleControl);
 }

@@ -31,45 +31,50 @@
 #endif // FEATURE_INPUT_IMPROVED
 
 void PistolHandler(int weaponType) {
-	WEAPON_INFO *weapon = &Weapons[weaponType];
+	WEAPON_INFO* weapon = &Weapons[weaponType];
 
-	if( CHK_ANY(InputStatus, IN_ACTION) ) {
+	if (CHK_ANY(InputStatus, IN_ACTION)) {
 		LaraTargetInfo(weapon);
-	} else {
+	}
+	else {
 		Lara.target = 0;
 	}
 
-	if( !Lara.target ) {
+	if (!Lara.target) {
 		LaraGetNewTarget(weapon);
 	}
 
 	AimWeapon(weapon, &Lara.left_arm);
 	AimWeapon(weapon, &Lara.right_arm);
 
-	if( Lara.left_arm.lock && !Lara.right_arm.lock ) {
+	if (Lara.left_arm.lock && !Lara.right_arm.lock) {
 		Lara.head_y_rot = Lara.torso_y_rot = Lara.left_arm.y_rot / 2;
 		Lara.head_x_rot = Lara.torso_x_rot = Lara.left_arm.x_rot / 2;
-	} else if( !Lara.left_arm.lock && Lara.right_arm.lock ) {
+	}
+	else if (!Lara.left_arm.lock && Lara.right_arm.lock) {
 		Lara.head_y_rot = Lara.torso_y_rot = Lara.right_arm.y_rot / 2;
 		Lara.head_x_rot = Lara.torso_x_rot = Lara.right_arm.x_rot / 2;
-	} else if ( Lara.left_arm.lock && Lara.right_arm.lock ) {
+	}
+	else if (Lara.left_arm.lock && Lara.right_arm.lock) {
 		Lara.head_y_rot = Lara.torso_y_rot = (Lara.right_arm.y_rot + Lara.left_arm.y_rot) / 4;
 		Lara.head_x_rot = Lara.torso_x_rot = (Lara.right_arm.x_rot + Lara.left_arm.x_rot) / 4;
 	}
 
 	AnimatePistols(weaponType);
 
-	if( Lara.left_arm.flash_gun || Lara.right_arm.flash_gun ) {
-		int x = LaraItem->pos.x + (phd_sin(LaraItem->pos.rotY) >> (W2V_SHIFT-10));
+	if (Lara.left_arm.flash_gun || Lara.right_arm.flash_gun) {
+		int x = LaraItem->pos.x + (phd_sin(LaraItem->pos.rotY) >> (W2V_SHIFT - 10));
 		int y = LaraItem->pos.y - 0x200;
-		int z = LaraItem->pos.z + (phd_cos(LaraItem->pos.rotY) >> (W2V_SHIFT-10));
+		int z = LaraItem->pos.z + (phd_cos(LaraItem->pos.rotY) >> (W2V_SHIFT - 10));
 		AddDynamicLight(x, y, z, 12, 11);
 #ifdef FEATURE_INPUT_IMPROVED
-		if( weaponType == LGT_Uzis ) {
+		if (weaponType == LGT_Uzis) {
 			JoyVibrate(0x400, 0x400, 1, 0x100, 2, false);
-		} else if( Lara.left_arm.flash_gun && Lara.right_arm.flash_gun ) {
+		}
+		else if (Lara.left_arm.flash_gun && Lara.right_arm.flash_gun) {
 			JoyVibrate(0x600, 0x600, 1, 0x300, 2, false);
-		} else {
+		}
+		else {
 			JoyVibrate(0x400, 0x400, 1, 0x100, 2, false);
 		}
 #endif // FEATURE_INPUT_IMPROVED
@@ -80,15 +85,15 @@ void PistolHandler(int weaponType) {
  * Inject function
  */
 void Inject_Lara2Gun() {
-//	INJECT(0x0042D000, set_pistol_arm);
-//	INJECT(0x0042D050, draw_pistols);
-//	INJECT(0x0042D0D0, undraw_pistols);
-//	INJECT(0x0042D300, ready_pistols);
-//	INJECT(0x0042D360, draw_pistol_meshes);
-//	INJECT(0x0042D3B0, undraw_pistol_mesh_left);
-//	INJECT(0x0042D3F0, undraw_pistol_mesh_right);
+	//	INJECT(0x0042D000, set_pistol_arm);
+	//	INJECT(0x0042D050, draw_pistols);
+	//	INJECT(0x0042D0D0, undraw_pistols);
+	//	INJECT(0x0042D300, ready_pistols);
+	//	INJECT(0x0042D360, draw_pistol_meshes);
+	//	INJECT(0x0042D3B0, undraw_pistol_mesh_left);
+	//	INJECT(0x0042D3F0, undraw_pistol_mesh_right);
 
 	INJECT(0x0042D430, PistolHandler);
 
-//	INJECT(0x0042D5C0, AnimatePistols);
+	//	INJECT(0x0042D5C0, AnimatePistols);
 }

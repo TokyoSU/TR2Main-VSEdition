@@ -24,17 +24,17 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 #ifdef FEATURE_HUD_IMPROVED
 #define HUD_SPRITE_RESERVED (256)
 
 bool LoadButtonSprites();
-bool GetTextSpriteByName(const char *name, int nameLen, DWORD *sprite, int *spacing);
+bool GetTextSpriteByName(const char* name, int nameLen, DWORD* sprite, int* spacing);
 #endif // FEATURE_HUD_IMPROVED
 
-int MakeCustomTexture(DWORD x, DWORD y, DWORD width, DWORD height, DWORD pitch, DWORD side, DWORD bpp, BYTE *bitmap, RGB888 *bmpPal, int hwrPal, BYTE *swrBuf, bool keyColor);
+int MakeCustomTexture(DWORD x, DWORD y, DWORD width, DWORD height, DWORD pitch, DWORD side, DWORD bpp, BYTE* bitmap, RGB888* bmpPal, int hwrPal, BYTE* swrBuf, bool keyColor);
 
 #if (DIRECT3D_VERSION >= 0x900)
 bool IsTexPagesConfigLoaded();

@@ -24,7 +24,7 @@
 
 #include "global/types.h"
 
-// Requester flags
+ // Requester flags
 #define REQFLAG_NOCURSOR	(1)
 
 // Requester item flags
@@ -35,20 +35,20 @@
 /*
  * Function list
  */
-void Init_Requester(REQUEST_INFO *req); // 0x00425580
-void Remove_Requester(REQUEST_INFO *req); // 0x00425610
-void ReqItemCentreAlign(REQUEST_INFO *req, TEXT_STR_INFO *textInfo); // 0x004256C0
-void ReqItemLeftAlign(REQUEST_INFO *req, TEXT_STR_INFO *textInfo); // 0x004256E0
-void ReqItemRightAlign(REQUEST_INFO *req, TEXT_STR_INFO *textInfo); // 0x00425740
-int Display_Requester(REQUEST_INFO *req, BOOL removeOnDeselect, BOOL isBackground); // 0x004257A0
-void SetRequesterHeading(REQUEST_INFO *req, const char *string1, DWORD flags1, const char *string2, DWORD flags2); // 0x00426010
-void RemoveAllReqItems(REQUEST_INFO *req); // 0x004260C0
-void ChangeRequesterItem(REQUEST_INFO *req, DWORD itemIdx, const char *string1, DWORD flags1, const char *string2, DWORD flags2); // 0x004260E0
-void AddRequesterItem(REQUEST_INFO *req, const char *string1, DWORD flags1, const char *string2, DWORD flags2); // 0x004261A0
-void SetPCRequesterSize(REQUEST_INFO *req, int maxLines, __int16 yPos); // 0x00426250
+void Init_Requester(REQUEST_INFO* req); // 0x00425580
+void Remove_Requester(REQUEST_INFO* req); // 0x00425610
+void ReqItemCentreAlign(REQUEST_INFO* req, TEXT_STR_INFO* textInfo); // 0x004256C0
+void ReqItemLeftAlign(REQUEST_INFO* req, TEXT_STR_INFO* textInfo); // 0x004256E0
+void ReqItemRightAlign(REQUEST_INFO* req, TEXT_STR_INFO* textInfo); // 0x00425740
+int Display_Requester(REQUEST_INFO* req, BOOL removeOnDeselect, BOOL isBackground); // 0x004257A0
+void SetRequesterHeading(REQUEST_INFO* req, const char* string1, DWORD flags1, const char* string2, DWORD flags2); // 0x00426010
+void RemoveAllReqItems(REQUEST_INFO* req); // 0x004260C0
+void ChangeRequesterItem(REQUEST_INFO* req, DWORD itemIdx, const char* string1, DWORD flags1, const char* string2, DWORD flags2); // 0x004260E0
+void AddRequesterItem(REQUEST_INFO* req, const char* string1, DWORD flags1, const char* string2, DWORD flags2); // 0x004261A0
+void SetPCRequesterSize(REQUEST_INFO* req, int maxLines, __int16 yPos); // 0x00426250
 BOOL AddAssaultTime(DWORD newTime); // 0x00426290
 void ShowGymStatsText(); // 0x00426320
-void ShowStatsText(char *timeString, BOOL removeOnDeselect); // 0x00426500
+void ShowStatsText(char* timeString, BOOL removeOnDeselect); // 0x00426500
 void ShowEndStatsText(); // 0x004268A0
 
 #endif // INVTEXT_H_INCLUDED

@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 #define LaraGun ((void(__cdecl*)(void)) 0x0042E740)
 #define CheckForHoldingState ((int(__cdecl*)(int)) 0x0042ECB0)
 #define InitialiseNewWeapon ((void(__cdecl*)(void)) 0x0042ECF0)

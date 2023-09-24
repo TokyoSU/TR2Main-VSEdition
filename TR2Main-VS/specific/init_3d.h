@@ -24,11 +24,11 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 #if (DIRECT3D_VERSION < 0x900)
-void Enumerate3DDevices(DISPLAY_ADAPTER *adapter); // 0x004445F0
+void Enumerate3DDevices(DISPLAY_ADAPTER* adapter); // 0x004445F0
 #endif // (DIRECT3D_VERSION < 0x900)
 bool D3DCreate(); // 0x00444620
 void D3DRelease(); // 0x00444640

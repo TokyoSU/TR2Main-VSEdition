@@ -24,11 +24,11 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 void PSX_Background(HWR_TEXHANDLE texSource, int tu, int tv, int t_width, int t_height, int halfRowCount,
-					__int16 amplitude, __int16 deformWavePhase, __int16 shortWavePhase, __int16 longWavePhase);
+	__int16 amplitude, __int16 deformWavePhase, __int16 shortWavePhase, __int16 longWavePhase);
 
 void BGND2_CleanupCaptureTextures();
 
@@ -42,8 +42,8 @@ int BGND2_LoadPicture(LPCTSTR fileName, BOOL isTitle, BOOL isReload);
 
 int BGND2_ShowPicture(DWORD fadeIn, DWORD waitIn, DWORD fadeOut, DWORD waitOut, BOOL inputCheck);
 
-void BGND2_DrawTextures(RECT *rect, D3DCOLOR color);
+void BGND2_DrawTextures(RECT* rect, D3DCOLOR color);
 
-int BGND2_CalculatePictureRect(RECT *rect);
+int BGND2_CalculatePictureRect(RECT* rect);
 
 #endif // BACKGROUND_NEW_H_INCLUDED

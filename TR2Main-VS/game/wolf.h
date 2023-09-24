@@ -24,10 +24,10 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
-// NOTE: these functions are presented in the "Golden Mask" only
+ /*
+  * Function list
+  */
+  // NOTE: these functions are presented in the "Golden Mask" only
 void InitialiseWolf(__int16 itemID); // tomb2gold:0x004431C0
 void WolfControl(__int16 itemID); // tomb2gold:0x004431F0
 

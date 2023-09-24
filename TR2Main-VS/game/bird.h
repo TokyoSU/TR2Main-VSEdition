@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 #define InitialiseEagle ((void(__cdecl*)(__int16)) 0x0040C860)
 #define EagleControl ((void(__cdecl*)(__int16)) 0x0040C8F0)
 

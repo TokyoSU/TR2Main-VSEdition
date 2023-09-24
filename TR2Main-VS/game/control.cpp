@@ -49,81 +49,89 @@ int ControlPhase(int nTicks, BOOL demoMode) {
 	int result = 0;
 
 	CLAMPG(nTicks, 5 * TICKS_PER_FRAME);
-	for( tickCount += nTicks; tickCount > 0; tickCount -= TICKS_PER_FRAME ) {
-		if( CD_TrackID > 0 ) {
+	for (tickCount += nTicks; tickCount > 0; tickCount -= TICKS_PER_FRAME) {
+		if (CD_TrackID > 0) {
 			S_CDLoop();
 		}
-		if( !CHK_ANY(GF_GameFlow.flags, GFF_CheatModeCheckDisabled) ) {
+		if (!CHK_ANY(GF_GameFlow.flags, GFF_CheatModeCheckDisabled)) {
 			CheckCheatMode();
 		}
-		if( IsLevelComplete ) {
+		if (IsLevelComplete) {
 			return 1;
 		}
 		S_UpdateInput();
-		if( IsResetFlag ) {
+		if (IsResetFlag) {
 			return GF_EXIT_TO_TITLE;
 		}
-		if( demoMode ) {
-			if( InputStatus ) {
+		if (demoMode) {
+			if (InputStatus) {
 				return GF_GameFlow.onDemo_Interrupt;
 			}
 			GetDemoInput();
-			if( InputStatus == (DWORD)~0 ) {
+			if (InputStatus == (DWORD)~0) {
 				InputStatus = 0;
 				return GF_GameFlow.onDemo_End;
 			}
-		} else {
-			if( CHK_ANY(GF_GameFlow.flags, GFF_NoInputTimeout) ) {
-				if( InputStatus ) {
+		}
+		else {
+			if (CHK_ANY(GF_GameFlow.flags, GFF_NoInputTimeout)) {
+				if (InputStatus) {
 					NoInputCounter = 0;
-				} else if( ++NoInputCounter > GF_GameFlow.noInput_Time ) {
+				}
+				else if (++NoInputCounter > GF_GameFlow.noInput_Time) {
 					return GF_START_DEMO;
 				}
 			}
 		}
-		if( OverlayStatus == 2 || Lara.death_count > 10*30 || (Lara.death_count > 2*30 && InputStatus) ) {
-			if( demoMode ) {
+		if (OverlayStatus == 2 || Lara.death_count > 10 * 30 || (Lara.death_count > 2 * 30 && InputStatus)) {
+			if (demoMode) {
 				return GF_GameFlow.onDeath_DemoMode;
 			}
-			if( CurrentLevel == 0 ) { // Lara's Home
+			if (CurrentLevel == 0) { // Lara's Home
 				return GF_EXIT_TO_TITLE;
 			}
-			if( OverlayStatus == 2 ) {
+			if (OverlayStatus == 2) {
 				OverlayStatus = 1;
 				result = Display_Inventory(INV_DeathMode);
-				if( result ) {
+				if (result) {
 					return result;
 				}
-			} else {
+			}
+			else {
 				OverlayStatus = 2;
 			}
 		}
-		if( !Lara.death_count && !Lara.extra_anim && (CHK_ANY(InputStatus, IN_OPTION|IN_LOAD|IN_SAVE) || OverlayStatus <= 0) ) {
-			if( OverlayStatus > 0 ) {
-				if( CHK_ANY(GF_GameFlow.flags, GFF_LoadSaveDisabled) ) {
-					OverlayStatus = 0;
-				} else if( CHK_ANY(InputStatus, IN_LOAD) ) {
-					OverlayStatus = -1;
-				} else if( CHK_ANY(InputStatus, IN_SAVE) ) {
-					OverlayStatus = -2;
-				} else {
+		if (!Lara.death_count && !Lara.extra_anim && (CHK_ANY(InputStatus, IN_OPTION | IN_LOAD | IN_SAVE) || OverlayStatus <= 0)) {
+			if (OverlayStatus > 0) {
+				if (CHK_ANY(GF_GameFlow.flags, GFF_LoadSaveDisabled)) {
 					OverlayStatus = 0;
 				}
-			} else {
-				if( OverlayStatus == -1 ) {
+				else if (CHK_ANY(InputStatus, IN_LOAD)) {
+					OverlayStatus = -1;
+				}
+				else if (CHK_ANY(InputStatus, IN_SAVE)) {
+					OverlayStatus = -2;
+				}
+				else {
+					OverlayStatus = 0;
+				}
+			}
+			else {
+				if (OverlayStatus == -1) {
 					result = Display_Inventory(INV_LoadMode);
-				} else if( OverlayStatus == -2 ) {
+				}
+				else if (OverlayStatus == -2) {
 					result = Display_Inventory(INV_SaveMode);
-				} else {
+				}
+				else {
 					result = Display_Inventory(INV_GameMode);
 				}
 				OverlayStatus = 1;
-				if( result ) {
-					if( InventoryExtraData[0] != 1 ) {
+				if (result) {
+					if (InventoryExtraData[0] != 1) {
 						return result;
-
 					}
-					if( CurrentLevel == 0 ) { // Lara's Home
+					if (CurrentLevel == 0) { // Lara's Home
 						return 1;
 					}
 					CreateSaveGameInfo();
@@ -134,24 +142,24 @@ int ControlPhase(int nTicks, BOOL demoMode) {
 		}
 
 #ifdef FEATURE_BACKGROUND_IMPROVED
-		if( !Lara.death_count && !Lara.extra_anim && CHK_ANY(InputStatus, IN_PAUSE) && S_Pause() ) {
+		if (!Lara.death_count && !Lara.extra_anim && CHK_ANY(InputStatus, IN_PAUSE) && S_Pause()) {
 			return 1;
 		}
 #endif // FEATURE_BACKGROUND_IMPROVED
 
 		DynamicLightCount = 0;
 
-		for( id = NextItemActive; id >= 0; id = next ) {
+		for (id = NextItemActive; id >= 0; id = next) {
 			next = Items[id].nextActive;
 			// NOTE: there is no IFL_CLEARBODY check in the original code
-			if( Objects[Items[id].objectID].control && !CHK_ANY(Items[id].flags, IFL_CLEARBODY) ) {
+			if (Objects[Items[id].objectID].control && !CHK_ANY(Items[id].flags, IFL_CLEARBODY)) {
 				Objects[Items[id].objectID].control(id);
 			}
 		}
 
-		for( id = NextEffectActive; id >= 0; id = next ) {
+		for (id = NextEffectActive; id >= 0; id = next) {
 			next = Effects[id].next_active;
-			if( Objects[Effects[id].object_number].control ) {
+			if (Objects[Effects[id].object_number].control) {
 				Objects[Effects[id].object_number].control(id);
 			}
 		}
@@ -163,7 +171,7 @@ int ControlPhase(int nTicks, BOOL demoMode) {
 		--HealthBarTimer;
 
 		// Update statistics timer for normal levels
-		if( CurrentLevel != 0 || IsAssaultTimerActive ) {
+		if (CurrentLevel != 0 || IsAssaultTimerActive) {
 			++SaveGame.statistics.timer;
 		}
 	}
@@ -174,37 +182,39 @@ int ControlPhase(int nTicks, BOOL demoMode) {
 }
 
 void TriggerCDTrack(__int16 value, UINT16 flags, __int16 type) {
-	if( value > 1 && value < 64 ) {
+	if (value > 1 && value < 64) {
 		TriggerNormalCDTrack(value, flags, type);
 	}
 }
 
 void TriggerNormalCDTrack(__int16 value, UINT16 flags, __int16 type) {
-	if( type != 2 ) {
+	if (type != 2) {
 		UINT16 codebits = flags & IFL_CODEBITS;
-		if( CHK_ANY(codebits, CD_Flags[value]) ){
+		if (CHK_ANY(codebits, CD_Flags[value])) {
 			return;
 		}
-		if( CHK_ANY(flags, IFL_INVISIBLE) ) {
+		if (CHK_ANY(flags, IFL_INVISIBLE)) {
 			CD_Flags[value] |= codebits;
 		}
 	}
 
-	if( value == CD_TrackID ) {
+	if (value == CD_TrackID) {
 		UINT8 timer = CD_Flags[value] & 0xFF;
-		if( timer ) {
-			if( !--timer ) {
+		if (timer) {
+			if (!--timer) {
 				CD_TrackID = -1;
 				S_CDPlay(value, FALSE);
 			}
 			CD_Flags[value] = (CD_Flags[value] & ~0xFF) | timer;
 		}
-	} else {
+	}
+	else {
 		UINT8 timer = flags & 0xFF;
-		if( timer ) {
+		if (timer) {
 			CD_TrackID = value;
 			CD_Flags[value] = (CD_Flags[value] & ~0xFF) | ((timer * 30) & 0xFF);
-		} else {
+		}
+		else {
 			S_CDPlay(value, FALSE);
 		}
 	}
@@ -215,25 +225,25 @@ void TriggerNormalCDTrack(__int16 value, UINT16 flags, __int16 type) {
  */
 void Inject_Control() {
 	INJECT(0x00414370, ControlPhase);
-//	INJECT(0x004146C0, AnimateItem);
-//	INJECT(0x00414A30, GetChange);
-//	INJECT(0x00414AE0, TranslateItem);
-//	INJECT(0x00414B40, GetFloor);
-//	INJECT(0x00414CE0, GetWaterHeight);
-//	INJECT(0x00414E50, GetHeight);
-//	INJECT(0x004150D0, RefreshCamera);
-//	INJECT(0x004151C0, TestTriggers);
-//	INJECT(0x004158A0, TriggerActive);
-//	INJECT(0x00415900, GetCeiling);
-//	INJECT(0x00415B60, GetDoor);
-//	INJECT(0x00415BB0, LOS);
-//	INJECT(0x00415C50, zLOS);
-//	INJECT(0x00415F40, xLOS);
-//	INJECT(0x00416230, ClipTarget);
-//	INJECT(0x00416310, ObjectOnLOS);
-//	INJECT(0x00416610, FlipMap);
-//	INJECT(0x004166D0, RemoveRoomFlipItems);
-//	INJECT(0x00416770, AddRoomFlipItems);
+	//	INJECT(0x004146C0, AnimateItem);
+	//	INJECT(0x00414A30, GetChange);
+	//	INJECT(0x00414AE0, TranslateItem);
+	//	INJECT(0x00414B40, GetFloor);
+	//	INJECT(0x00414CE0, GetWaterHeight);
+	//	INJECT(0x00414E50, GetHeight);
+	//	INJECT(0x004150D0, RefreshCamera);
+	//	INJECT(0x004151C0, TestTriggers);
+	//	INJECT(0x004158A0, TriggerActive);
+	//	INJECT(0x00415900, GetCeiling);
+	//	INJECT(0x00415B60, GetDoor);
+	//	INJECT(0x00415BB0, LOS);
+	//	INJECT(0x00415C50, zLOS);
+	//	INJECT(0x00415F40, xLOS);
+	//	INJECT(0x00416230, ClipTarget);
+	//	INJECT(0x00416310, ObjectOnLOS);
+	//	INJECT(0x00416610, FlipMap);
+	//	INJECT(0x004166D0, RemoveRoomFlipItems);
+	//	INJECT(0x00416770, AddRoomFlipItems);
 
 	INJECT(0x004167D0, TriggerCDTrack);
 	INJECT(0x00416800, TriggerNormalCDTrack);

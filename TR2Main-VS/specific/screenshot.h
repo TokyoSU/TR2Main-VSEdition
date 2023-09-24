@@ -24,13 +24,13 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 void ScreenShotPCX(); // 0x0044E9A0
-DWORD CompPCX(BYTE *bitmap, DWORD width, DWORD height, RGB888 *palette, BYTE **pcxData); // 0x0044EAB0
-DWORD EncodeLinePCX(BYTE *src, DWORD width, BYTE *dst); // 0x0044EB60
-DWORD EncodePutPCX(BYTE value, BYTE num, BYTE *buffer); // 0x0044EC40
+DWORD CompPCX(BYTE* bitmap, DWORD width, DWORD height, RGB888* palette, BYTE** pcxData); // 0x0044EAB0
+DWORD EncodeLinePCX(BYTE* src, DWORD width, BYTE* dst); // 0x0044EB60
+DWORD EncodePutPCX(BYTE value, BYTE num, BYTE* buffer); // 0x0044EC40
 void ScreenShot(LPDDS screen); // 0x0044EC80
 
 #endif // SCREENSHOT_H_INCLUDED

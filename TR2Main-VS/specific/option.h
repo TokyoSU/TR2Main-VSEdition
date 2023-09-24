@@ -24,18 +24,18 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
-void do_inventory_options(INVENTORY_ITEM *item); // 0x0044EE80
-void do_passport_option(INVENTORY_ITEM *item); // 0x0044EF90
-void do_gamma_option(INVENTORY_ITEM *item); // ----------
-void do_detail_option(INVENTORY_ITEM *item); // 0x0044F5E0
-void do_sound_option(INVENTORY_ITEM *item); // 0x0044F8C0
-void do_compass_option(INVENTORY_ITEM *item); // 0x0044FD60
+ /*
+  * Function list
+  */
+void do_inventory_options(INVENTORY_ITEM* item); // 0x0044EE80
+void do_passport_option(INVENTORY_ITEM* item); // 0x0044EF90
+void do_gamma_option(INVENTORY_ITEM* item); // ----------
+void do_detail_option(INVENTORY_ITEM* item); // 0x0044F5E0
+void do_sound_option(INVENTORY_ITEM* item); // 0x0044F8C0
+void do_compass_option(INVENTORY_ITEM* item); // 0x0044FD60
 void FlashConflicts(); // 0x0044FE20
 void DefaultConflict(); // 0x0044FEA0
-void do_control_option(INVENTORY_ITEM *item); // 0x0044FEE0
+void do_control_option(INVENTORY_ITEM* item); // 0x0044FEE0
 void S_ShowControls(); // 0x004505F0
 void S_ChangeCtrlText(); // 0x00450AC0
 void S_RemoveCtrlText(); // 0x00450B60

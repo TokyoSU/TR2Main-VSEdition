@@ -23,53 +23,53 @@
 #include "modding/json_utils.h"
 #include "global/vars.h"
 
-json_value *GetJsonField(json_value *root, json_type fieldType, const char *name, DWORD *pIndex) {
-	if( root == NULL || root->type != json_object ) {
+json_value* GetJsonField(json_value* root, json_type fieldType, const char* name, DWORD* pIndex) {
+	if (root == NULL || root->type != json_object) {
 		return NULL;
 	}
-	json_value *result = NULL;
+	json_value* result = NULL;
 	DWORD len = name ? strlen(name) : 0;
 	DWORD i = pIndex ? *pIndex : 0;
-	for( ; i < root->u.object.length; ++i ) {
-		if( root->u.object.values[i].value->type == fieldType ) {
-			if( !name || (len == root->u.object.values[i].name_length
-				&& !strncmp(root->u.object.values[i].name, name, len)) )
+	for (; i < root->u.object.length; ++i) {
+		if (root->u.object.values[i].value->type == fieldType) {
+			if (!name || (len == root->u.object.values[i].name_length
+				&& !strncmp(root->u.object.values[i].name, name, len)))
 			{
 				result = root->u.object.values[i].value;
 				break;
 			}
 		}
 	}
-	if( pIndex ) *pIndex = i;
+	if (pIndex) *pIndex = i;
 	return result;
 }
 
-json_value *GetJsonObjectByStringField(json_value *root, const char *name, const char *str, bool caseSensitive, DWORD *pIndex) {
-	if( root == NULL || root->type != json_array || !name || !*name || !str ) {
+json_value* GetJsonObjectByStringField(json_value* root, const char* name, const char* str, bool caseSensitive, DWORD* pIndex) {
+	if (root == NULL || root->type != json_array || !name || !*name || !str) {
 		return NULL;
 	}
-	json_value *result = NULL;
+	json_value* result = NULL;
 	DWORD len = strlen(str);
 	DWORD i = pIndex ? *pIndex : 0;
-	for( ; i < root->u.array.length; ++i ) {
-		json_value *key = GetJsonField(root->u.array.values[i], json_string, name, NULL);
-		if( key && len == key->u.string.length &&
-			(caseSensitive ? strncmp(key->u.string.ptr, str, len) : !strncasecmp(key->u.string.ptr, str, len)) )
+	for (; i < root->u.array.length; ++i) {
+		json_value* key = GetJsonField(root->u.array.values[i], json_string, name, NULL);
+		if (key && len == key->u.string.length &&
+			(caseSensitive ? strncmp(key->u.string.ptr, str, len) : !strncasecmp(key->u.string.ptr, str, len)))
 		{
 			result = root->u.array.values[i];
 			break;
 		}
 	}
-	if( pIndex ) *pIndex = i;
+	if (pIndex) *pIndex = i;
 	return result;
 }
 
-int GetJsonIntegerFieldValue(json_value *root, const char *name, int defaultValue) {
-	json_value *field = GetJsonField(root, json_integer, name, NULL);
+int GetJsonIntegerFieldValue(json_value* root, const char* name, int defaultValue) {
+	json_value* field = GetJsonField(root, json_integer, name, NULL);
 	return field ? field->u.integer : defaultValue;
 }
 
-double GetJsonFloatFieldValue(json_value *root, const char *name, double defaultValue) {
-	json_value *field = GetJsonField(root, json_double, name, NULL);
+double GetJsonFloatFieldValue(json_value* root, const char* name, double defaultValue) {
+	json_value* field = GetJsonField(root, json_double, name, NULL);
 	return field ? field->u.dbl : defaultValue;
 }

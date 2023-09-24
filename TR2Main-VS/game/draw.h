@@ -24,26 +24,26 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 #define DrawPhaseCinematic ((int(__cdecl*)(void)) 0x00418920)
 #define DrawPhaseGame ((int(__cdecl*)(void)) 0x00418960)
 
 void DrawRooms(__int16 currentRoom); // 0x004189A0
 void GetRoomBounds(); // 0x00418C50
-void SetRoomBounds(__int16 *ptrObj, int roomNumber, ROOM_INFO *parent); // 0x00418E20
-void ClipRoom(ROOM_INFO *room); // 0x004191A0
+void SetRoomBounds(__int16* ptrObj, int roomNumber, ROOM_INFO* parent); // 0x00418E20
+void ClipRoom(ROOM_INFO* room); // 0x004191A0
 void PrintRooms(__int16 roomNumber); // 0x00419580
 void PrintObjects(__int16 roomNumber); // 0x00419640
 void DrawEffect(__int16 fx_id); // 0x00419870
-void DrawSpriteItem(ITEM_INFO *item); // 0x004199C0
-void DrawDummyItem(ITEM_INFO *item);
-void DrawAnimatingItem(ITEM_INFO *item); // 0x00419A50
+void DrawSpriteItem(ITEM_INFO* item); // 0x004199C0
+void DrawDummyItem(ITEM_INFO* item);
+void DrawAnimatingItem(ITEM_INFO* item); // 0x00419A50
 
 #define DrawLara ((void(__cdecl*)(ITEM_INFO*)) 0x00419DD0)
 
-void DrawLaraInt(ITEM_INFO *item, __int16 *frame1, __int16 *frame2, int frac, int rate);
+void DrawLaraInt(ITEM_INFO* item, __int16* frame1, __int16* frame2, int frac, int rate);
 
 #define InitInterpolate ((void(__cdecl*)(int, int)) 0x0041B6F0)
 #define phd_PopMatrix_I ((void(__cdecl*)(void)) 0x0041B730)
@@ -56,8 +56,8 @@ void DrawLaraInt(ITEM_INFO *item, __int16 *frame1, __int16 *frame2, int frac, in
 #define phd_RotYXZ_I ((void(__cdecl*)(int, int, int)) 0x0041B8F0)
 #define phd_RotYXZsuperpack_I ((void(__cdecl*)(UINT16**, UINT16**, int)) 0x0041B940)
 
-void phd_RotYXZsuperpack(UINT16 **pptr, int index); // 0x0041B980
-void phd_PutPolygons_I(__int16 *ptrObj, int clip); // 0x0041BA30
+void phd_RotYXZsuperpack(UINT16** pptr, int index); // 0x0041B980
+void phd_PutPolygons_I(__int16* ptrObj, int clip); // 0x0041BA30
 
 #define InterpolateMatrix ((void(__cdecl*)(void)) 0x0041BA60)
 #define InterpolateArmMatrix ((void(__cdecl*)(void)) 0x0041BC10)

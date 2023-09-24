@@ -24,11 +24,11 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
-//	0x00416BF0:		Harpoon
-//	0x00416C70:		GetWaterSurface
+ /*
+  * Function list
+  */
+  //	0x00416BF0:		Harpoon
+  //	0x00416C70:		GetWaterSurface
 
 #define DiverControl ((void(__cdecl*)(__int16)) 0x00416D80)
 

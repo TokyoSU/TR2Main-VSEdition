@@ -32,28 +32,28 @@
 extern DWORD AlphaBlendMode;
 #endif // FEATURE_VIDEOFX_IMPROVED
 
-void DrawFlareInAir(ITEM_INFO *item) {
+void DrawFlareInAir(ITEM_INFO* item) {
 	int rate;
-	__int16 *ptr[2];
+	__int16* ptr[2];
 	GetFrames(item, ptr, &rate);
 	phd_PushMatrix();
 	phd_TranslateAbs(item->pos.x, item->pos.y, item->pos.z);
 	phd_RotYXZ(item->pos.rotY, item->pos.rotX, item->pos.rotZ);
 	int clip = S_GetObjectBounds(ptr[0]);
-	if( clip ) {
+	if (clip) {
 		CalculateObjectLighting(item, ptr[0]);
 		phd_PutPolygons(MeshPtr[Objects[ID_FLARE_ITEM].meshIndex], clip);
-		if( CHK_ANY((DWORD)item->data, 0x8000) ) {
+		if (CHK_ANY((DWORD)item->data, 0x8000)) {
 			phd_TranslateRel(-6, 6, 80);
 			phd_RotX(-90 * PHD_DEGREE);
 			phd_RotY(2 * GetRandomDraw());
 			S_CalculateStaticLight(0x800);
 			phd_PutPolygons(MeshPtr[Objects[ID_FLARE_FIRE].meshIndex], clip);
 #ifdef FEATURE_VIDEOFX_IMPROVED
-			if( AlphaBlendMode ) {
+			if (AlphaBlendMode) {
 				int shade = (GetRandomDraw() & 0xFFF) + 0x1000;
 				DWORD flags = GLOW_FLARE_COLOR;
-				flags |= SPR_BLEND_ADD|SPR_TINT|SPR_SHADE|SPR_SEMITRANS;
+				flags |= SPR_BLEND_ADD | SPR_TINT | SPR_SHADE | SPR_SEMITRANS;
 				S_DrawSprite(flags, 0, 0, 0, Objects[ID_GLOW].meshIndex, shade, 0);
 			}
 #endif // FEATURE_VIDEOFX_IMPROVED
@@ -66,17 +66,17 @@ void DrawFlareInAir(ITEM_INFO *item) {
  * Inject function
  */
 void Inject_LaraFlare() {
-//	INJECT(0x0042F840, DoFlareLight);
-//	INJECT(0x0042F8E0, DoFlareInHand);
+	//	INJECT(0x0042F840, DoFlareLight);
+	//	INJECT(0x0042F8E0, DoFlareInHand);
 
 	INJECT(0x0042F9C0, DrawFlareInAir);
 
-//	INJECT(0x0042FAC0, CreateFlare);
-//	INJECT(0x0042FCA0, set_flare_arm);
-//	INJECT(0x0042FCF0, draw_flare);
-//	INJECT(0x0042FE60, undraw_flare);
-//	INJECT(0x00430090, draw_flare_meshes);
-//	INJECT(0x004300B0, undraw_flare_meshes);
-//	INJECT(0x004300D0, ready_flare);
-//	INJECT(0x00430110, FlareControl);
+	//	INJECT(0x0042FAC0, CreateFlare);
+	//	INJECT(0x0042FCA0, set_flare_arm);
+	//	INJECT(0x0042FCF0, draw_flare);
+	//	INJECT(0x0042FE60, undraw_flare);
+	//	INJECT(0x00430090, draw_flare_meshes);
+	//	INJECT(0x004300B0, undraw_flare_meshes);
+	//	INJECT(0x004300D0, ready_flare);
+	//	INJECT(0x00430110, FlareControl);
 }

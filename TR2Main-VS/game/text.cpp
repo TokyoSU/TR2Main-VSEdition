@@ -38,78 +38,78 @@ extern DWORD InvTextBoxMode;
 #define IS_CHAR_DIACRITIC(x)	((x) == '(' || (x) == ')' || (x) == '$' || (x) == '~')
 
 static const BYTE T_TextSpacing[0x6E] = {
-//	A	B	C	D	E	F	G	H
-	14, 11, 11, 11, 11, 11, 11, 13,
-//	I	J	K	L	M	N	O	P
-	 8, 11, 12, 11, 13, 13, 12, 11,
-//	Q	R	S	T	U	V	W	X
-	12, 12, 11, 12, 13, 13, 13, 12,
-//	Y	Z	a	b	c	d	e	f
-	12, 11,  9,  9,  9,  9,  9,  9,
-//	g	h	i	j	k	l	m	n
-	 9,  9,  5,  9,  9,  5, 12, 10,
-//	o	p	q	r	s	t	u	v
-	 9,  9,  9,  8,  9,  8,  9,  9,
-//	w	x	y	z	0	1	2	3
-	11,  9,  9,  9, 12,  8, 10, 10,
-//	4	5	6	7	8	9	.	,
-	10, 10, 10,  9, 10, 10,  5,  5,
-//	!	?	[	di"	/	di^	di'	-
-	 5, 11,  9, 10,  8,  6,  6,  7,
-//	+	:	€	]	\	`	#	'
-	 7,  3, 11,  8, 13, 16,  9,  4,
-//	arU	arD	dg0	dg1	dg2	dg3	dg4	dg5
-	12, 12,  7,  5,  7,  7,  7,  7,
-//	dg6	dg7	dg8	dg9	js1	js2	js3	js4
-	 7,  7,  7,  7, 16, 14, 14, 14,
-//	js5	js6	js7	js8	js9	sc0	sc1	sc2
-	16, 16, 16, 16, 16, 12, 14,  8,
-//	sc3	sc4	dwn	up	lft	rht
-	 8,  8,  8,  8,  8,  8,
+	//	A	B	C	D	E	F	G	H
+		14, 11, 11, 11, 11, 11, 11, 13,
+		//	I	J	K	L	M	N	O	P
+			 8, 11, 12, 11, 13, 13, 12, 11,
+			 //	Q	R	S	T	U	V	W	X
+				 12, 12, 11, 12, 13, 13, 13, 12,
+				 //	Y	Z	a	b	c	d	e	f
+					 12, 11,  9,  9,  9,  9,  9,  9,
+					 //	g	h	i	j	k	l	m	n
+						  9,  9,  5,  9,  9,  5, 12, 10,
+						  //	o	p	q	r	s	t	u	v
+							   9,  9,  9,  8,  9,  8,  9,  9,
+							   //	w	x	y	z	0	1	2	3
+								   11,  9,  9,  9, 12,  8, 10, 10,
+								   //	4	5	6	7	8	9	.	,
+									   10, 10, 10,  9, 10, 10,  5,  5,
+									   //	!	?	[	di"	/	di^	di'	-
+											5, 11,  9, 10,  8,  6,  6,  7,
+											//	+	:	€	]	\	`	#	'
+												 7,  3, 11,  8, 13, 16,  9,  4,
+												 //	arU	arD	dg0	dg1	dg2	dg3	dg4	dg5
+													 12, 12,  7,  5,  7,  7,  7,  7,
+													 //	dg6	dg7	dg8	dg9	js1	js2	js3	js4
+														  7,  7,  7,  7, 16, 14, 14, 14,
+														  //	js5	js6	js7	js8	js9	sc0	sc1	sc2
+															  16, 16, 16, 16, 16, 12, 14,  8,
+															  //	sc3	sc4	dwn	up	lft	rht
+																   8,  8,  8,  8,  8,  8,
 };
 
 static const BYTE T_RemapASCII[0x5F] = {
-//	nop			!	"to [		#	$to di`	%to €	&to #		'
-	0x00,	0x40,	0x42,	0x4E,	0x4D,	0x4A,	0x4E,	0x4F,
-//	(to di^	)to di'	*to js1  	+		,		-		.		/
-	0x45,	0x46,	0x5C,	0x48,	0x3F,	0x47,	0x3E,	0x44,
-//		0		1		2		3		4		5		6		7
-	0x34,	0x35,	0x36,	0x37,	0x38,	0x39,	0x3A,	0x3B,
-//		8		9		:	;to :	<to [	=to €	>to	]		?
-	0x3C,	0x3D,	0x49,	0x49,	0x42,	0x4A,	0x4B,	0x41,
-//	@to	A		A		B		C		D		E		F		G
-	0x00,	0x00,	0x01,	0x02,	0x03,	0x04,	0x05,	0x06,
-//		H		I		J		K		L		M		N		O
-	0x07,	0x08,	0x09,	0x0A,	0x0B,	0x0C,	0x0D,	0x0E,
-//		P		Q		R		S		T		U		V		W
-	0x0F,	0x10,	0x11,	0x12,	0x13,	0x14,	0x15,	0x16,
-//		X		Y		Z	[to arU		\	]to	arD ^to js6	_to js7
-	0x17,	0x18,	0x19,	0x50,	0x4C,	0x51,	0x61,	0x62,
-//		`		a		b		c		d		e		f		g
-	0x4D,	0x1A,	0x1B,	0x1C,	0x1D,	0x1E,	0x1F,	0x20,
-//		h		i		j		k		l		m		n		o
-	0x21,	0x22,	0x23,	0x24,	0x25,	0x26,	0x27,	0x28,
-//		p		q		r		s		t		u		v		w
-	0x29,	0x2A,	0x2B,	0x2C,	0x2D,	0x2E,	0x2F,	0x30,
-//		x		y		z	{to js9	|to sc0	}to sc1	~to di"
-	0x31,	0x32,	0x33,	0x64,	0x65,	0x66,	0x43,
+	//	nop			!	"to [		#	$to di`	%to €	&to #		'
+		0x00,	0x40,	0x42,	0x4E,	0x4D,	0x4A,	0x4E,	0x4F,
+		//	(to di^	)to di'	*to js1  	+		,		-		.		/
+			0x45,	0x46,	0x5C,	0x48,	0x3F,	0x47,	0x3E,	0x44,
+			//		0		1		2		3		4		5		6		7
+				0x34,	0x35,	0x36,	0x37,	0x38,	0x39,	0x3A,	0x3B,
+				//		8		9		:	;to :	<to [	=to €	>to	]		?
+					0x3C,	0x3D,	0x49,	0x49,	0x42,	0x4A,	0x4B,	0x41,
+					//	@to	A		A		B		C		D		E		F		G
+						0x00,	0x00,	0x01,	0x02,	0x03,	0x04,	0x05,	0x06,
+						//		H		I		J		K		L		M		N		O
+							0x07,	0x08,	0x09,	0x0A,	0x0B,	0x0C,	0x0D,	0x0E,
+							//		P		Q		R		S		T		U		V		W
+								0x0F,	0x10,	0x11,	0x12,	0x13,	0x14,	0x15,	0x16,
+								//		X		Y		Z	[to arU		\	]to	arD ^to js6	_to js7
+									0x17,	0x18,	0x19,	0x50,	0x4C,	0x51,	0x61,	0x62,
+									//		`		a		b		c		d		e		f		g
+										0x4D,	0x1A,	0x1B,	0x1C,	0x1D,	0x1E,	0x1F,	0x20,
+										//		h		i		j		k		l		m		n		o
+											0x21,	0x22,	0x23,	0x24,	0x25,	0x26,	0x27,	0x28,
+											//		p		q		r		s		t		u		v		w
+												0x29,	0x2A,	0x2B,	0x2C,	0x2D,	0x2E,	0x2F,	0x30,
+												//		x		y		z	{to js9	|to sc0	}to sc1	~to di"
+													0x31,	0x32,	0x33,	0x64,	0x65,	0x66,	0x43,
 };
 
 void T_InitPrint() {
 	DisplayModeInfo(NULL);
 
-	for( int i=0; i<64; ++i )
+	for (int i = 0; i < 64; ++i)
 		TextInfoTable[i].flags = 0;
 
 	TextStringCount = 0;
 }
 
-TEXT_STR_INFO *__cdecl T_Print(int x, int y, __int16 z, const char *str) {
-	if( str == NULL || TextStringCount >= 64 )
+TEXT_STR_INFO* __cdecl T_Print(int x, int y, __int16 z, const char* str) {
+	if (str == NULL || TextStringCount >= 64)
 		return NULL;
 
-	for( int i=0; i<64; ++i ) {
-		if( !CHK_ANY(TextInfoTable[i].flags, TIF_Active) ) {
+	for (int i = 0; i < 64; ++i) {
+		if (!CHK_ANY(TextInfoTable[i].flags, TIF_Active)) {
 			int stringLen = T_GetStringLen(str);
 			CLAMPG(stringLen, 64); // NOTE: useless check, but decided to leave it here
 
@@ -124,16 +124,16 @@ TEXT_STR_INFO *__cdecl T_Print(int x, int y, __int16 z, const char *str) {
 #endif // FEATURE_HUD_IMPROVED
 			TextInfoTable[i].zPos = z;
 			TextInfoTable[i].letterSpacing = 1;
-			TextInfoTable[i].wordSpacing   = 6;
+			TextInfoTable[i].wordSpacing = 6;
 
 			TextInfoTable[i].textFlags = 0;
-			TextInfoTable[i].outlFlags  = 0;
+			TextInfoTable[i].outlFlags = 0;
 			TextInfoTable[i].bgndFlags = 0;
 			TextInfoTable[i].bgndSizeX = 0;
 			TextInfoTable[i].bgndSizeY = 0;
-			TextInfoTable[i].bgndOffX  = 0;
-			TextInfoTable[i].bgndOffY  = 0;
-			TextInfoTable[i].bgndOffZ  = 0;
+			TextInfoTable[i].bgndOffX = 0;
+			TextInfoTable[i].bgndOffY = 0;
+			TextInfoTable[i].bgndOffZ = 0;
 
 			TextInfoTable[i].flags = TIF_Active;
 			TextInfoTable[i].pString = TheStrings[i].str;
@@ -147,38 +147,39 @@ TEXT_STR_INFO *__cdecl T_Print(int x, int y, __int16 z, const char *str) {
 	return NULL;
 }
 
-void T_ChangeText(TEXT_STR_INFO *textInfo, const char *newString) {
-	if( newString == NULL || textInfo == NULL || !CHK_ANY(textInfo->flags, TIF_Active) )
+void T_ChangeText(TEXT_STR_INFO* textInfo, const char* newString) {
+	if (newString == NULL || textInfo == NULL || !CHK_ANY(textInfo->flags, TIF_Active))
 		return;
 
 	// NOTE: the original code was unsafe crap. Reimplemented it a little safer
 	strncpy(textInfo->pString, newString, 64);
-	if( T_GetStringLen(newString) >= 64 )
+	if (T_GetStringLen(newString) >= 64)
 		textInfo->pString[63] = 0;
 }
 
-void T_SetScale(TEXT_STR_INFO *textInfo, int scaleH, int scaleV) {
-	if( textInfo != NULL ) {
+void T_SetScale(TEXT_STR_INFO* textInfo, int scaleH, int scaleV) {
+	if (textInfo != NULL) {
 		textInfo->scaleH = scaleH;
 		textInfo->scaleV = scaleV;
 	}
 }
 
-void T_FlashText(TEXT_STR_INFO *textInfo, __int16 state, __int16 rate) {
-	if( textInfo == NULL)
+void T_FlashText(TEXT_STR_INFO* textInfo, __int16 state, __int16 rate) {
+	if (textInfo == NULL)
 		return;
 
-	if( state == 0 ) {
+	if (state == 0) {
 		textInfo->flags &= ~TIF_Flash;
-	} else {
+	}
+	else {
 		textInfo->flags |= TIF_Flash;
 		textInfo->flashRate = rate;
 		textInfo->flashCount = rate;
 	}
 }
 
-void T_AddBackground(TEXT_STR_INFO *textInfo, __int16 xSize, __int16 ySize, __int16 xOff, __int16 yOff, __int16 zOff, INV_COLOURS invColour, GOURAUD_FILL *gour, UINT16 flags) {
-	if( textInfo == NULL )
+void T_AddBackground(TEXT_STR_INFO* textInfo, __int16 xSize, __int16 ySize, __int16 xOff, __int16 yOff, __int16 zOff, INV_COLOURS invColour, GOURAUD_FILL* gour, UINT16 flags) {
+	if (textInfo == NULL)
 		return;
 
 	textInfo->flags |= TIF_Bgnd;
@@ -201,13 +202,13 @@ void T_AddBackground(TEXT_STR_INFO *textInfo, __int16 xSize, __int16 ySize, __in
 	textInfo->bgndFlags = flags;
 }
 
-void T_RemoveBackground(TEXT_STR_INFO *textInfo) {
-	if( textInfo != NULL )
+void T_RemoveBackground(TEXT_STR_INFO* textInfo) {
+	if (textInfo != NULL)
 		textInfo->flags &= ~TIF_Bgnd;
 }
 
-void T_AddOutline(TEXT_STR_INFO *textInfo, BOOL state, INV_COLOURS invColour, GOURAUD_OUTLINE *gour, UINT16 flags) {
-	if( textInfo != NULL ) {
+void T_AddOutline(TEXT_STR_INFO* textInfo, BOOL state, INV_COLOURS invColour, GOURAUD_OUTLINE* gour, UINT16 flags) {
+	if (textInfo != NULL) {
 		textInfo->flags |= TIF_Outline;
 		textInfo->outlColour = invColour;
 		textInfo->outlGour = gour;
@@ -215,47 +216,49 @@ void T_AddOutline(TEXT_STR_INFO *textInfo, BOOL state, INV_COLOURS invColour, GO
 	}
 }
 
-void T_RemoveOutline(TEXT_STR_INFO *textInfo) {
-	if( textInfo != NULL )
+void T_RemoveOutline(TEXT_STR_INFO* textInfo) {
+	if (textInfo != NULL)
 		textInfo->flags &= ~TIF_Outline;
 }
 
-void T_CentreH(TEXT_STR_INFO *textInfo, UINT16 state) {
-	if( textInfo != NULL ) {
-		if( state )
+void T_CentreH(TEXT_STR_INFO* textInfo, UINT16 state) {
+	if (textInfo != NULL) {
+		if (state)
 			textInfo->flags |= TIF_CentreH;
 		else
 			textInfo->flags &= ~TIF_CentreH;
 	}
 }
 
-void T_CentreV(TEXT_STR_INFO *textInfo, UINT16 state) {
-	if( textInfo != NULL ) {
-		if( state )
+void T_CentreV(TEXT_STR_INFO* textInfo, UINT16 state) {
+	if (textInfo != NULL) {
+		if (state)
 			textInfo->flags |= TIF_CentreV;
 		else
 			textInfo->flags &= ~TIF_CentreV;
 	}
 }
 
-void T_RightAlign(TEXT_STR_INFO *textInfo, bool state) {
-	if( textInfo == NULL)
+void T_RightAlign(TEXT_STR_INFO* textInfo, bool state) {
+	if (textInfo == NULL)
 		return;
 
-	if( state ) {
+	if (state) {
 		textInfo->flags |= TIF_Right;
-	} else {
+	}
+	else {
 		textInfo->flags &= ~TIF_Right;
 	}
 }
 
-void T_BottomAlign(TEXT_STR_INFO *textInfo, bool state) {
-	if( textInfo == NULL)
+void T_BottomAlign(TEXT_STR_INFO* textInfo, bool state) {
+	if (textInfo == NULL)
 		return;
 
-	if( state ) {
+	if (state) {
 		textInfo->flags |= TIF_Bottom;
-	} else {
+	}
+	else {
 		textInfo->flags &= ~TIF_Bottom;
 	}
 }
@@ -280,7 +283,7 @@ void T_DrawTextBox(int sx, int sy, int z, int width, int height) {
 	x1 = sx - offset + width;
 	y1 = sy - offset + height;
 
-	width = PHD_ONE * (width  - offset * 2) / 8;
+	width = PHD_ONE * (width - offset * 2) / 8;
 	height = PHD_ONE * (height - offset * 2) / 8;
 
 	S_DrawScreenSprite2d(x0, y0, z, scaleH, scaleV, (meshIdx + 0), 0x1000, 0);
@@ -288,13 +291,13 @@ void T_DrawTextBox(int sx, int sy, int z, int width, int height) {
 	S_DrawScreenSprite2d(x1, y1, z, scaleH, scaleV, (meshIdx + 2), 0x1000, 0);
 	S_DrawScreenSprite2d(x0, y1, z, scaleH, scaleV, (meshIdx + 3), 0x1000, 0);
 
-	S_DrawScreenSprite2d(x0, y0, z, width,  scaleV, (meshIdx + 4), 0x1000, 0);
+	S_DrawScreenSprite2d(x0, y0, z, width, scaleV, (meshIdx + 4), 0x1000, 0);
 	S_DrawScreenSprite2d(x1, y0, z, scaleH, height, (meshIdx + 5), 0x1000, 0);
-	S_DrawScreenSprite2d(x0, y1, z, width,  scaleV, (meshIdx + 6), 0x1000, 0);
+	S_DrawScreenSprite2d(x0, y1, z, width, scaleV, (meshIdx + 6), 0x1000, 0);
 	S_DrawScreenSprite2d(x0, y0, z, scaleH, height, (meshIdx + 7), 0x1000, 0);
 }
 
-DWORD T_GetTextWidth(TEXT_STR_INFO *textInfo) {
+DWORD T_GetTextWidth(TEXT_STR_INFO* textInfo) {
 	int spacing;
 	DWORD width, scaleH, sprite;
 
@@ -305,53 +308,57 @@ DWORD T_GetTextWidth(TEXT_STR_INFO *textInfo) {
 	scaleH = GetTextScaleH(textInfo->scaleH);
 #endif // FEATURE_HUD_IMPROVED
 
-	for( BYTE *str = (BYTE *)textInfo->pString; *str != 0; str++ ) {
-		if( !IS_CHAR_LEGAL(*str) || IS_CHAR_DIACRITIC(*str) ) {
+	for (BYTE* str = (BYTE*)textInfo->pString; *str != 0; str++) {
+		if (!IS_CHAR_LEGAL(*str) || IS_CHAR_DIACRITIC(*str)) {
 			continue; // if char code is illegal or not required for width measuring, go to next char
 		}
 
-		if( *str == 0x20 ) { // Check if char is "Space"
+		if (*str == 0x20) { // Check if char is "Space"
 			// "Space" uses wordSpacing value instead of sprite width
 			spacing = textInfo->wordSpacing;
 		}
-		else if( IS_CHAR_SECRET(*str) ) { // Check if "Secret" sprite
+		else if (IS_CHAR_SECRET(*str)) { // Check if "Secret" sprite
 			// "Secret" sprites have spacing=16
 			spacing = 16;
 #ifdef FEATURE_HUD_IMPROVED
-		} else if( *str == 0x7F ) { // Check if it's the opening code of the named sprite sequence
-			BYTE *ptr = (BYTE *)strchr((const char *)str+1, 0x1F);
-			if( ptr == NULL ) break; // Closing code is not found, break now!
-			if( !GetTextSpriteByName((const char *)str+1, ptr-str-1, &sprite, &spacing) ) {
+		}
+		else if (*str == 0x7F) { // Check if it's the opening code of the named sprite sequence
+			BYTE* ptr = (BYTE*)strchr((const char*)str + 1, 0x1F);
+			if (ptr == NULL) break; // Closing code is not found, break now!
+			if (!GetTextSpriteByName((const char*)str + 1, ptr - str - 1, &sprite, &spacing)) {
 				spacing = 0;
 			}
 			str = ptr; // move pointer to the sequence end
 #endif // FEATURE_HUD_IMPROVED
-		} else {
-			if( *str < 0x0B ) { // Check if "Digit" sprite
+		}
+		else {
+			if (*str < 0x0B) { // Check if "Digit" sprite
 				sprite = *str + 0x51; // We have (*str >= 0x01) here. "Digit" sprite codes start from (0x52 = 0x01 + 0x51)
 			}
-			else if( *str <= 0x12 ) { // Check if "Special" sprite. NOTE: original code was (*str < 0x10) but this was wrong
+			else if (*str <= 0x12) { // Check if "Special" sprite. NOTE: original code was (*str < 0x10) but this was wrong
 				// Check if normal *str or "Special" sprite
 				sprite = *str + 0x5B;  // We have (*str >= 0x0B) here. "Special" sprite codes start from (0x66 = 0x0B + 0x5B)
-			} else { // here (*str > 0x20)
+			}
+			else { // here (*str > 0x20)
 				sprite = T_RemapASCII[*str - 0x20]; // For normal letters we have sprite code table
 			}
 
 			// Check if normal letter sprite has digit representation
-			if( *str >= '0' && *str <= '9' ) { // NOTE: original code was (sprite >= '0' && sprite <= '9') but this was wrong
+			if (*str >= '0' && *str <= '9') { // NOTE: original code was (sprite >= '0' && sprite <= '9') but this was wrong
 				// Normal letter sprites with digits have spacing=12
 				spacing = 12;
-			} else {
+			}
+			else {
 				// For "Digit", "Special" and normal letter sprites we use spacing table + letterSpacing
 #if defined(FEATURE_HUD_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
 				spacing = GetTexPagesGlyphSpacing(sprite);
-				if( !spacing ) spacing = T_TextSpacing[sprite];
+				if (!spacing) spacing = T_TextSpacing[sprite];
 #else // defined(FEATURE_HUD_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
 				spacing = T_TextSpacing[sprite];
 #endif // defined(FEATURE_HUD_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
 				// NOTE: this condition was added instead of returned value recalculation (see below).
 				// In the original code spacing addition was unconditional
-				if( str[1] != 0 ) { // If this letter is not last, add letterSpacing
+				if (str[1] != 0) { // If this letter is not last, add letterSpacing
 					spacing += textInfo->letterSpacing;
 				}
 			}
@@ -363,8 +370,8 @@ DWORD T_GetTextWidth(TEXT_STR_INFO *textInfo) {
 	return width;
 }
 
-BOOL T_RemovePrint(TEXT_STR_INFO *textInfo) {
-	if( textInfo == NULL || !CHK_ANY(textInfo->flags, TIF_Active) )
+BOOL T_RemovePrint(TEXT_STR_INFO* textInfo) {
+	if (textInfo == NULL || !CHK_ANY(textInfo->flags, TIF_Active))
 		return false;
 
 	textInfo->flags &= ~TIF_Active;
@@ -372,30 +379,30 @@ BOOL T_RemovePrint(TEXT_STR_INFO *textInfo) {
 	return true;
 }
 
-__int16 T_GetStringLen(const char *str) {
+__int16 T_GetStringLen(const char* str) {
 	// Calculates string length up to 64 chars including null terminator
-	for( int i=0; i<64; ++i ) {
-		if( str[i] == 0 )
-			return i+1;
+	for (int i = 0; i < 64; ++i) {
+		if (str[i] == 0)
+			return i + 1;
 	}
 	return 64;
 }
 
 void T_DrawText() {
-	for( int i=0; i<64; ++i ) {
-		if( CHK_ANY(TextInfoTable[i].flags, TIF_Active) )
+	for (int i = 0; i < 64; ++i) {
+		if (CHK_ANY(TextInfoTable[i].flags, TIF_Active))
 			T_DrawThisText(&TextInfoTable[i]);
 	}
 }
 
-void T_DrawThisText(TEXT_STR_INFO *textInfo) {
+void T_DrawThisText(TEXT_STR_INFO* textInfo) {
 	int x, y, z, xOff, spacing;
 	int boxX, boxY, boxZ, boxW, boxH;
 	DWORD textWidth, scaleH, scaleV, sprite;
 #ifdef FEATURE_HUD_IMPROVED
 	int sx, sy, sh, sv;
 
-	if( CHK_ANY(textInfo->flags, TIF_Hide) ) {
+	if (CHK_ANY(textInfo->flags, TIF_Hide)) {
 		return;
 	}
 
@@ -407,13 +414,13 @@ void T_DrawThisText(TEXT_STR_INFO *textInfo) {
 #endif // FEATURE_HUD_IMPROVED
 
 	// Do text flashing if required
-	if( CHK_ANY(textInfo->flags, TIF_Flash) ) {
+	if (CHK_ANY(textInfo->flags, TIF_Flash)) {
 		textInfo->flashCount -= (__int16)Camera.numberFrames;
 
-		if( textInfo->flashCount <= -textInfo->flashRate ) {
+		if (textInfo->flashCount <= -textInfo->flashRate) {
 			textInfo->flashCount = textInfo->flashRate;
 		}
-		else if ( textInfo->flashCount < 0 ) {
+		else if (textInfo->flashCount < 0) {
 			return;
 		}
 	}
@@ -425,34 +432,34 @@ void T_DrawThisText(TEXT_STR_INFO *textInfo) {
 
 #ifdef FEATURE_HUD_IMPROVED
 	// Horizontal alignment
-	if( CHK_ANY(textInfo->flags, TIF_CentreH) ) {
+	if (CHK_ANY(textInfo->flags, TIF_CentreH)) {
 		x += (GetRenderWidthDownscaled() - textWidth) / 2;
 	}
-	else if( CHK_ANY(textInfo->flags, TIF_Right) ) {
+	else if (CHK_ANY(textInfo->flags, TIF_Right)) {
 		x += GetRenderWidthDownscaled() - textWidth;
 	}
 
 	// Vertical alignment
-	if( CHK_ANY(textInfo->flags, TIF_CentreV) ) {
+	if (CHK_ANY(textInfo->flags, TIF_CentreV)) {
 		y += GetRenderHeightDownscaled() / 2;
 	}
-	else if ( CHK_ANY(textInfo->flags, TIF_Bottom) ) {
+	else if (CHK_ANY(textInfo->flags, TIF_Bottom)) {
 		y += GetRenderHeightDownscaled();
 	}
 #else // FEATURE_HUD_IMPROVED
 	// Horizontal alignment
-	if( CHK_ANY(textInfo->flags, TIF_CentreH) ) {
+	if (CHK_ANY(textInfo->flags, TIF_CentreH)) {
 		x += (GetRenderWidth() - textWidth) / 2;
 	}
-	else if( CHK_ANY(textInfo->flags, TIF_Right) ) {
+	else if (CHK_ANY(textInfo->flags, TIF_Right)) {
 		x += GetRenderWidth() - textWidth;
 	}
 
 	// Vertical alignment
-	if( CHK_ANY(textInfo->flags, TIF_CentreV) ) {
+	if (CHK_ANY(textInfo->flags, TIF_CentreV)) {
 		y += GetRenderHeight() / 2;
 	}
-	else if ( CHK_ANY(textInfo->flags, TIF_Bottom) ) {
+	else if (CHK_ANY(textInfo->flags, TIF_Bottom)) {
 		y += GetRenderHeight();
 	}
 #endif // FEATURE_HUD_IMPROVED
@@ -461,16 +468,16 @@ void T_DrawThisText(TEXT_STR_INFO *textInfo) {
 	boxY = y + textInfo->bgndOffY - (4 * scaleV / PHD_ONE) - (11 * scaleV / PHD_ONE);
 	boxZ = z + textInfo->bgndOffZ + 2;
 
-	for( BYTE *str = (BYTE *)textInfo->pString; *str != 0; str++ ) {
+	for (BYTE* str = (BYTE*)textInfo->pString; *str != 0; str++) {
 		// Check if char code is in illegal range
-		if( !IS_CHAR_LEGAL(*str) )
+		if (!IS_CHAR_LEGAL(*str))
 			continue;
 
-		if( *str == 0x20 ) { // Check if char is "Space"
+		if (*str == 0x20) { // Check if char is "Space"
 			// "Space" uses wordSpacing value instead of sprite width
 			x += textInfo->wordSpacing * scaleH / PHD_ONE;
 		}
-		else if( IS_CHAR_SECRET(*str) ) { // Check if "Secret" sprite
+		else if (IS_CHAR_SECRET(*str)) { // Check if "Secret" sprite
 			// Draw "Secret" sprite
 #ifdef FEATURE_HUD_IMPROVED
 			sx = GetTextScaleH(x + 10);
@@ -482,11 +489,12 @@ void T_DrawThisText(TEXT_STR_INFO *textInfo) {
 			// "Secret" sprites have spacing=16
 			x += 16 * scaleH / PHD_ONE;
 #ifdef FEATURE_HUD_IMPROVED
-		} else if( *str == 0x7F ) { // Check if it's the opening code of the named sprite sequence
-			BYTE *ptr = (BYTE *)strchr((const char *)str+1, 0x1F);
-			if( ptr == NULL ) break; // Closing code is not found, break now!
-			if( GetTextSpriteByName((const char *)str+1, ptr-str-1, &sprite, &xOff) ) {
-				if( x > 0 && x < GetRenderWidthDownscaled() && y > 0 && y < GetRenderHeightDownscaled() ) {
+		}
+		else if (*str == 0x7F) { // Check if it's the opening code of the named sprite sequence
+			BYTE* ptr = (BYTE*)strchr((const char*)str + 1, 0x1F);
+			if (ptr == NULL) break; // Closing code is not found, break now!
+			if (GetTextSpriteByName((const char*)str + 1, ptr - str - 1, &sprite, &xOff)) {
+				if (x > 0 && x < GetRenderWidthDownscaled() && y > 0 && y < GetRenderHeightDownscaled()) {
 					sx = GetTextScaleH(x);
 					sy = GetTextScaleV(y);
 					sh = GetTextScaleH(scaleH);
@@ -497,25 +505,27 @@ void T_DrawThisText(TEXT_STR_INFO *textInfo) {
 			}
 			str = ptr; // move pointer to the sequence end
 #endif // FEATURE_HUD_IMPROVED
-		} else {
-			if( *str < 0x0B ) { // Check if "Digit" sprite
+		}
+		else {
+			if (*str < 0x0B) { // Check if "Digit" sprite
 				sprite = *str + 0x51; // We have (*str >= 0x01) here. "Digit" sprite codes start from (0x52 = 0x01 + 0x51)
 			}
-			else if( *str <= 0x12 ) { // Check if "Special" sprite. NOTE: original code was (*str < 0x10) but this was wrong
+			else if (*str <= 0x12) { // Check if "Special" sprite. NOTE: original code was (*str < 0x10) but this was wrong
 				// Check if normal *str or "Special" sprite
 				sprite = *str + 0x5B;  // We have (*str >= 0x0B) here. "Special" sprite codes start from (0x66 = 0x0B + 0x5B)
-			} else { // here (*str > 0x20)
+			}
+			else { // here (*str > 0x20)
 				sprite = T_RemapASCII[*str - 0x20]; // For normal letters we have sprite code table
 			}
 
 			// Check if normal letter sprite is digit representation
 			// Normal letter sprites with digits have spacing=12
 			// But sprite itself is center aligned in this space
-			if( *str >= '0' && *str <= '9' ) {
+			if (*str >= '0' && *str <= '9') {
 				// !!! Here we do LEFT spacing part for digit letters !!!
 #if defined(FEATURE_HUD_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
 				spacing = GetTexPagesGlyphSpacing(sprite);
-				if( !spacing ) spacing = T_TextSpacing[sprite];
+				if (!spacing) spacing = T_TextSpacing[sprite];
 #else // defined(FEATURE_HUD_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
 				spacing = T_TextSpacing[sprite];
 #endif // defined(FEATURE_HUD_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
@@ -525,7 +535,7 @@ void T_DrawThisText(TEXT_STR_INFO *textInfo) {
 
 			// Draw letter sprite
 #ifdef FEATURE_HUD_IMPROVED
-			if( x > 0 && x < GetRenderWidthDownscaled() && y > 0 && y < GetRenderHeightDownscaled() ) {
+			if (x > 0 && x < GetRenderWidthDownscaled() && y > 0 && y < GetRenderHeightDownscaled()) {
 #if (DIRECT3D_VERSION >= 0x900)
 				sx = GetTextScaleH(x + GetTexPagesGlyphXOffset(sprite));
 				sy = GetTextScaleV(y + GetTexPagesGlyphYOffset(sprite));
@@ -540,28 +550,29 @@ void T_DrawThisText(TEXT_STR_INFO *textInfo) {
 				S_DrawScreenSprite2d(sx, sy, z, sh, sv, (Objects[ID_ALPHABET].meshIndex + sprite), 0x1000, textInfo->textFlags);
 			}
 #else // FEATURE_HUD_IMPROVED
-			if( x > 0 && x < GetRenderWidth() && y > 0 && y < GetRenderHeight() ) {
+			if (x > 0 && x < GetRenderWidth() && y > 0 && y < GetRenderHeight()) {
 				S_DrawScreenSprite2d(x, y, z, scaleH, scaleV, (Objects[ID_ALPHABET].meshIndex + sprite), 0x1000, textInfo->textFlags);
 			}
 #endif // FEATURE_HUD_IMPROVED
 
 			// Check if letter is diacritic
 			// Diacritics are drawn right on the next letter sprite, so there is no spacing for them
-			if( IS_CHAR_DIACRITIC(*str) )
+			if (IS_CHAR_DIACRITIC(*str))
 				continue;
 
 			// Check if normal letter sprite is digit representation
 #if defined(FEATURE_HUD_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
 			spacing = GetTexPagesGlyphSpacing(sprite);
-			if( !spacing ) spacing = T_TextSpacing[sprite];
+			if (!spacing) spacing = T_TextSpacing[sprite];
 #else // defined(FEATURE_HUD_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
 			spacing = T_TextSpacing[sprite];
 #endif // defined(FEATURE_HUD_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
-			if( *str >= '0' && *str <= '9' ) {
+			if (*str >= '0' && *str <= '9') {
 				// !!! Here we do RIGHT spacing part for digit letters !!!
 				xOff = (12 - spacing) / 2;
 				x += (12 - xOff) * scaleH / PHD_ONE;
-			} else {
+			}
+			else {
 				// For "Digit", "Special" and normal letter sprites we use spacing table + letterSpacing
 				xOff = spacing;
 				xOff += textInfo->letterSpacing;
@@ -571,17 +582,19 @@ void T_DrawThisText(TEXT_STR_INFO *textInfo) {
 	}
 
 	// Draw background/outline if required
-	if( CHK_ANY(textInfo->flags, TIF_Bgnd|TIF_Outline) ) {
-		if( textInfo->bgndSizeX != 0 ) {
+	if (CHK_ANY(textInfo->flags, TIF_Bgnd | TIF_Outline)) {
+		if (textInfo->bgndSizeX != 0) {
 			boxX += ((int)textWidth - textInfo->bgndSizeX) / 2;
 			boxW = textInfo->bgndSizeX + 4;
-		} else {
+		}
+		else {
 			boxW = textWidth + 4;
 		}
 
-		if( textInfo->bgndSizeY != 0 ) {
+		if (textInfo->bgndSizeY != 0) {
 			boxH = textInfo->bgndSizeY;
-		} else {
+		}
+		else {
 #ifdef FEATURE_HUD_IMPROVED
 			boxH = (SavedAppSettings.RenderMode == RM_Hardware && InvTextBoxMode ? 14 : 16) * scaleV / PHD_ONE;
 #else // !FEATURE_HUD_IMPROVED
@@ -596,26 +609,27 @@ void T_DrawThisText(TEXT_STR_INFO *textInfo) {
 		sv = GetTextScaleV(boxH);
 
 		// Draw background
-		if( CHK_ANY(textInfo->flags, TIF_Bgnd) ) {
+		if (CHK_ANY(textInfo->flags, TIF_Bgnd)) {
 			S_DrawScreenFBox(sx, sy, boxZ, sh, sv, textInfo->bgndColor, textInfo->bgndGour, textInfo->bgndFlags);
 		}
 
 		// Draw outline
-		if( CHK_ANY(textInfo->flags, TIF_Outline) ) {
-			if( SavedAppSettings.RenderMode == RM_Hardware && InvTextBoxMode ) {
+		if (CHK_ANY(textInfo->flags, TIF_Outline)) {
+			if (SavedAppSettings.RenderMode == RM_Hardware && InvTextBoxMode) {
 				S_DrawScreenBox(sx, sy, boxZ, sh, sv, textInfo->outlColour, textInfo->outlGour, textInfo->outlFlags);
-			} else {
+			}
+			else {
 				T_DrawTextBox(sx, sy, z, sh, sv);
 			}
 		}
 #else // FEATURE_HUD_IMPROVED
 		// Draw background
-		if( CHK_ANY(textInfo->flags, TIF_Bgnd) ) {
+		if (CHK_ANY(textInfo->flags, TIF_Bgnd)) {
 			S_DrawScreenFBox(boxX, boxY, boxZ, boxW, boxH, textInfo->bgndColor, textInfo->bgndGour, textInfo->bgndFlags);
 		}
 
 		// Draw outline
-		if( CHK_ANY(textInfo->flags, TIF_Outline) ) {
+		if (CHK_ANY(textInfo->flags, TIF_Outline)) {
 			T_DrawTextBox(boxX, boxY, z, boxW, boxH);
 		}
 #endif // FEATURE_HUD_IMPROVED
@@ -631,7 +645,7 @@ DWORD GetTextScaleH(DWORD baseScale) {
 	renderWidth = GetRenderWidth();
 	CLAMPL(renderWidth, 640)
 
-	renderScale = renderWidth * PHD_ONE / 640;
+		renderScale = renderWidth * PHD_ONE / 640;
 	return (baseScale / PHD_HALF) * (renderScale / PHD_HALF);
 #endif // FEATURE_HUD_IMPROVED
 }
@@ -645,19 +659,20 @@ DWORD GetTextScaleV(DWORD baseScale) {
 	renderHeight = GetRenderHeight();
 	CLAMPL(renderHeight, 480)
 
-	renderScale = renderHeight * PHD_ONE / 480;
+		renderScale = renderHeight * PHD_ONE / 480;
 	return (baseScale / PHD_HALF) * (renderScale / PHD_HALF);
 #endif // FEATURE_HUD_IMPROVED
 }
 
 #ifdef FEATURE_HUD_IMPROVED
-void T_HideText(TEXT_STR_INFO *textInfo, __int16 state) {
-	if( textInfo == NULL)
+void T_HideText(TEXT_STR_INFO* textInfo, __int16 state) {
+	if (textInfo == NULL)
 		return;
 
-	if( state == 0 ) {
+	if (state == 0) {
 		textInfo->flags &= ~TIF_Hide;
-	} else {
+	}
+	else {
 		textInfo->flags |= TIF_Hide;
 	}
 }

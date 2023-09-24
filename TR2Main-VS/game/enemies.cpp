@@ -23,20 +23,18 @@
 #include "game/enemies.h"
 #include "global/vars.h"
 
-
-
-/*
- * Inject function
- */
+ /*
+  * Inject function
+  */
 void Inject_Enemies() {
-//	INJECT(0x0041DB30, Knife);
-//	INJECT(0x0041DBB0, Cult2Control);
-//	INJECT(0x0041DFE0, MonkControl);
-//	INJECT(0x0041E4B0, Worker3Control);
-//	INJECT(0x0041EAC0, DrawXianLord);
-//	INJECT(0x0041EEC0, XianDamage);
-//	INJECT(0x0041EF70, InitialiseXianLord);
-//	INJECT(0x0041EFD0, XianLordControl);
-//	INJECT(0x0041F5B0, WarriorSparkleTrail);
-//	INJECT(0x0041F650, WarriorControl);
+	//	INJECT(0x0041DB30, Knife);
+	//	INJECT(0x0041DBB0, Cult2Control);
+	//	INJECT(0x0041DFE0, MonkControl);
+	//	INJECT(0x0041E4B0, Worker3Control);
+	//	INJECT(0x0041EAC0, DrawXianLord);
+	//	INJECT(0x0041EEC0, XianDamage);
+	//	INJECT(0x0041EF70, InitialiseXianLord);
+	//	INJECT(0x0041EFD0, XianLordControl);
+	//	INJECT(0x0041F5B0, WarriorSparkleTrail);
+	//	INJECT(0x0041F650, WarriorControl);
 }

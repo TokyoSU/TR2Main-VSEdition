@@ -24,20 +24,20 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 int PathStringCombine(LPSTR destPath, DWORD destSize, LPCSTR filePath, LPCSTR fileName);
 
-int AutoSelectExtension(LPSTR fileName, const STRING_FIXED4 *exts, DWORD num_exts);
+int AutoSelectExtension(LPSTR fileName, const STRING_FIXED4* exts, DWORD num_exts);
 
-int AutoSelectPathAndExtension(LPSTR fileName, LPCSTR path, const STRING_FIXED4 *exts, DWORD num_exts);
+int AutoSelectPathAndExtension(LPSTR fileName, LPCSTR path, const STRING_FIXED4* exts, DWORD num_exts);
 
 int CreateDirectories(LPCSTR path, bool isFileName);
 
 int CreateSequenceFilename(LPSTR destName, DWORD destSize, LPCSTR filePath, LPCSTR fileExt, LPCSTR nameBase, int seqDigits, int seqNumber);
 
-int CreateDateTimeFilename(LPSTR fileName, DWORD destSize, LPCSTR filePath, LPCSTR fileExt, SYSTEMTIME *lastTime, int *lastIndex);
+int CreateDateTimeFilename(LPSTR fileName, DWORD destSize, LPCSTR filePath, LPCSTR fileExt, SYSTEMTIME* lastTime, int* lastIndex);
 
 int AddFilenameSuffix(LPSTR destName, DWORD destSize, LPCSTR fileName, LPCSTR suffix);
 

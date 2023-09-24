@@ -62,29 +62,31 @@ extern bool LoadingScreensEnabled;
 #endif // FEATURE_HUD_IMPROVED
 
 #ifdef FEATURE_VIDEOFX_IMPROVED
-static bool MarkSemitransPoly(__int16 *ptrObj, int vtxCount, bool colored, LPVOID param) {
+static bool MarkSemitransPoly(__int16* ptrObj, int vtxCount, bool colored, LPVOID param) {
 	UINT16 index = ptrObj[vtxCount];
-	if( colored ) {
+	if (colored) {
 		GamePalette16[index >> 8].peFlags = 1; // semitransparent blending mode 1
-	} else {
+	}
+	else {
 		PhdTextureInfo[index].drawtype = DRAW_Semitrans;
 	}
 	return true;
 }
 
-static bool MarkSemitransMesh(int objID, int meshIdx, POLYFILTER *filter) {
-	if( objID < 0 ) return false;
-	__int16 *ptrObj = NULL;
+static bool MarkSemitransMesh(int objID, int meshIdx, POLYFILTER* filter) {
+	if (objID < 0) return false;
+	__int16* ptrObj = NULL;
 	// if mesh index is negative, then it's a static mesh
-	if( meshIdx < 0 ) {
-		if( (DWORD)objID >= ARRAY_SIZE(StaticObjects) ) return false;
-		STATIC_INFO *obj = &StaticObjects[objID];
-		if( !CHK_ANY(obj->flags, 2) ) return false; // no such drawable static for patching
+	if (meshIdx < 0) {
+		if ((DWORD)objID >= ARRAY_SIZE(StaticObjects)) return false;
+		STATIC_INFO* obj = &StaticObjects[objID];
+		if (!CHK_ANY(obj->flags, 2)) return false; // no such drawable static for patching
 		ptrObj = MeshPtr[obj->meshIndex];
-	} else {
-		if( (DWORD)objID >= ARRAY_SIZE(Objects) ) return false;
-		OBJECT_INFO *obj = &Objects[objID];
-		if( !obj->loaded || meshIdx >= obj->nMeshes ) return false; // no such object/mesh for patching
+	}
+	else {
+		if ((DWORD)objID >= ARRAY_SIZE(Objects)) return false;
+		OBJECT_INFO* obj = &Objects[objID];
+		if (!obj->loaded || meshIdx >= obj->nMeshes) return false; // no such object/mesh for patching
 		ptrObj = MeshPtr[obj->meshIndex + meshIdx];
 	}
 	return EnumeratePolys(ptrObj, false, MarkSemitransPoly, filter, NULL);
@@ -93,19 +95,19 @@ static bool MarkSemitransMesh(int objID, int meshIdx, POLYFILTER *filter) {
 static void MarkSemitransObjects() {
 #ifdef FEATURE_MOD_CONFIG
 	// Check if config is presented
-	if( IsModSemitransConfigLoaded() ) {
-		POLYFILTER_NODE *node = NULL;
-		POLYFILTER_NODE **obj = GetModSemitransObjectsFilter();
-		for( int i=0; i<ID_NUMBER_OBJECTS; ++i ) {
-			for( node = obj[i]; node != NULL; node = node->next ) {
+	if (IsModSemitransConfigLoaded()) {
+		POLYFILTER_NODE* node = NULL;
+		POLYFILTER_NODE** obj = GetModSemitransObjectsFilter();
+		for (int i = 0; i < ID_NUMBER_OBJECTS; ++i) {
+			for (node = obj[i]; node != NULL; node = node->next) {
 				MarkSemitransMesh(i, node->id, &node->filter);
 			}
 		}
-		for( node = GetModSemitransStaticsFilter(); node != NULL; node = node->next ) {
+		for (node = GetModSemitransStaticsFilter(); node != NULL; node = node->next) {
 			MarkSemitransMesh(node->id, -1, &node->filter);
 		}
-		for( node = GetModSemitransRoomsFilter(); node != NULL; node = node->next ) {
-			if( node->id >= 0 && node->id < RoomCount ) {
+		for (node = GetModSemitransRoomsFilter(); node != NULL; node = node->next) {
+			if (node->id >= 0 && node->id < RoomCount) {
 				EnumeratePolys(RoomInfo[node->id].data, true, MarkSemitransPoly, &node->filter, NULL);
 			}
 		}
@@ -154,32 +156,32 @@ static void MarkSemitransObjects() {
 }
 
 static void MarkSemitransTextureRanges() {
-	POLYINDEX *filter = NULL;
-	__int16 *ptr = AnimatedTextureRanges;
+	POLYINDEX* filter = NULL;
+	__int16* ptr = AnimatedTextureRanges;
 
 #ifdef FEATURE_MOD_CONFIG
 	filter = GetModSemitransAnimtexFilter();
 	// Check if filter is presented
-	if( filter != NULL && (filter[0].idx || filter[0].num) ) {
+	if (filter != NULL && (filter[0].idx || filter[0].num)) {
 		int polyIndex = 0;
 		int polyNumber = *(ptr++);
-		for( int i=0; i<POLYFILTER_SIZE; ++i ) {
-			if( filter[i].idx < polyIndex || filter[i].idx >= polyNumber ) {
+		for (int i = 0; i < POLYFILTER_SIZE; ++i) {
+			if (filter[i].idx < polyIndex || filter[i].idx >= polyNumber) {
 				return;
 			}
 			int skip = filter[i].idx - polyIndex;
 			polyIndex += skip;
-			if( polyIndex >= polyNumber ) {
+			if (polyIndex >= polyNumber) {
 				return;
 			}
-			while( skip-- > 0 ) {
+			while (skip-- > 0) {
 				int len = 1 + *(ptr++);
 				ptr += len;
 			}
 			int number = MIN(filter[i].num, polyNumber - polyIndex);
 			polyIndex += number;
-			while( number-- > 0 ) {
-				for( int j = *(ptr++); j>=0; --j, ++ptr ) {
+			while (number-- > 0) {
+				for (int j = *(ptr++); j >= 0; --j, ++ptr) {
 					PhdTextureInfo[*ptr].drawtype = DRAW_Semitrans;
 				}
 			}
@@ -189,9 +191,9 @@ static void MarkSemitransTextureRanges() {
 #endif // FEATURE_MOD_CONFIG
 
 	// If filter is absent or disabled, do it in automatic mode
-	for( int i = *(ptr++); i>0; --i ) {
-		for( int j = *(ptr++); j>=0; --j, ++ptr ) {
-			if( filter != NULL || PhdTextureInfo[*ptr].drawtype == DRAW_ColorKey ) {
+	for (int i = *(ptr++); i > 0; --i) {
+		for (int j = *(ptr++); j >= 0; --j, ++ptr) {
+			if (filter != NULL || PhdTextureInfo[*ptr].drawtype == DRAW_ColorKey) {
 				// all animated room textures with colorkey are supposed to be semitransparent
 				PhdTextureInfo[*ptr].drawtype = DRAW_Semitrans;
 			}
@@ -201,19 +203,19 @@ static void MarkSemitransTextureRanges() {
 
 void UpdateDepthQ(bool isReset) {
 	static DEPTHQ_ENTRY depthQBackup[15];
-	if( isReset ) {
+	if (isReset) {
 		memcpy(depthQBackup, DepthQTable, sizeof(DEPTHQ_ENTRY) * 15);
 		return;
 	}
-	switch( SavedAppSettings.LightingMode ) {
+	switch (SavedAppSettings.LightingMode) {
 	case 0:
-		for( DWORD i = 0; i < 15; ++i ) {
+		for (DWORD i = 0; i < 15; ++i) {
 			DepthQTable[i] = DepthQTable[15];
 		}
 		break;
 	case 1:
 		memcpy(&DepthQTable[7], &depthQBackup[7], sizeof(DEPTHQ_ENTRY) * 8);
-		for( DWORD i = 0; i < 7; ++i ) {
+		for (DWORD i = 0; i < 7; ++i) {
 			DepthQTable[i] = DepthQTable[7];
 		}
 		break;
@@ -227,24 +229,24 @@ void UpdateDepthQ(bool isReset) {
 #if defined(FEATURE_MOD_CONFIG)
 bool BarefootSfxEnabled = true;
 
-static void LoadBareFootSFX(int *sampleIndexes, int sampleCount) {
-	if( !BarefootSfxEnabled || !IsModBarefoot() || !sampleIndexes || sampleCount < 1 ) return;
+static void LoadBareFootSFX(int* sampleIndexes, int sampleCount) {
+	if (!BarefootSfxEnabled || !IsModBarefoot() || !sampleIndexes || sampleCount < 1) return;
 
 	LPCTSTR sfxFileName = GetFullPath("data\\barefoot.sfx");
-	if( !PathFileExists(sfxFileName) ) return;
+	if (!PathFileExists(sfxFileName)) return;
 
 	HANDLE hSfxFile = CreateFile(sfxFileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if( hSfxFile == INVALID_HANDLE_VALUE ) return;
+	if (hSfxFile == INVALID_HANDLE_VALUE) return;
 
 	int i, j;
-	for( i=0, j=0; i < sampleCount; ++j ) {
+	for (i = 0, j = 0; i < sampleCount; ++j) {
 		DWORD bytesRead;
 		WAVEPCM_HEADER waveHeader;
 		ReadFileSync(hSfxFile, &waveHeader, sizeof(WAVEPCM_HEADER), &bytesRead, NULL);
 
-		if( waveHeader.dwRiffChunkID != 0x46464952 || // "RIFF"
+		if (waveHeader.dwRiffChunkID != 0x46464952 || // "RIFF"
 			waveHeader.dwFormat != 0x45564157 || // "WAVE"
-			waveHeader.dwDataSubchunkID != 0x61746164 ) // "data"
+			waveHeader.dwDataSubchunkID != 0x61746164) // "data"
 		{
 			CloseHandle(hSfxFile);
 			return;
@@ -254,18 +256,19 @@ static void LoadBareFootSFX(int *sampleIndexes, int sampleCount) {
 		LPWAVEFORMATEX waveFormat = (LPWAVEFORMATEX)&waveHeader.wFormatTag;
 		waveFormat->cbSize = 0;
 
-		if( sampleIndexes[i] == j ) {
+		if (sampleIndexes[i] == j) {
 			LPVOID waveData = game_malloc(dataSize, GBUF_Samples);
 			ReadFileSync(hSfxFile, waveData, dataSize, &bytesRead, NULL);
 			WinSndMakeSample(i, waveFormat, waveData, dataSize);
 			game_free(dataSize);
 			++i;
-		} else {
+		}
+		else {
 			SetFilePointer(hSfxFile, dataSize, NULL, FILE_CURRENT);
 		}
 	}
-	for( i=0; i<4; ++i ) { // there are no more than 4 barefoot step samples
-		if( SampleInfos[i].sfxID >= 4 ) break;
+	for (i = 0; i < 4; ++i) { // there are no more than 4 barefoot step samples
+		if (SampleInfos[i].sfxID >= 4) break;
 		// SFX parameters are taken from the PlayStation version
 		SampleInfos[i].volume = 0x3332;
 		SampleInfos[i].randomness = 0;
@@ -280,36 +283,36 @@ int PatternTexPage = -1;
 
 static struct {
 	int x, y, side, page;
-} BgndPattern = {0, 0, 0, -1};
+} BgndPattern = { 0, 0, 0, -1 };
 
 static bool GetBgndPatternInfo() {
 	memset(&BgndPattern, 0, sizeof(BgndPattern));
-	if( !Objects[ID_INV_BACKGROUND].loaded ) {
+	if (!Objects[ID_INV_BACKGROUND].loaded) {
 		return false;
 	}
 
-	__int16 *meshPtr = MeshPtr[Objects[ID_INV_BACKGROUND].meshIndex];
-	meshPtr += 3+2; // skip mesh coords (3*INT16) and radius (1*INT32)
+	__int16* meshPtr = MeshPtr[Objects[ID_INV_BACKGROUND].meshIndex];
+	meshPtr += 3 + 2; // skip mesh coords (3*INT16) and radius (1*INT32)
 
 	int num = *(meshPtr++);
-	meshPtr += num*3; // skip vertices (each one is 3xINT16)
+	meshPtr += num * 3; // skip vertices (each one is 3xINT16)
 
 	num = *(meshPtr++);
-	if( num >= 0 ) // negative num means lights instead of normals
-		meshPtr += num*3; // skip normals (each is 3xINT16)
+	if (num >= 0) // negative num means lights instead of normals
+		meshPtr += num * 3; // skip normals (each is 3xINT16)
 	else
 		meshPtr -= num; // skip lights (each one is INT16)
 
 	num = *(meshPtr++); // get quads number (we need at least one)
-	if( num < 1 ) return false;
+	if (num < 1) return false;
 
 	meshPtr += 4; // skip 4 vertex indices of 1st textured quad (each one is INT16)
 	DWORD textureIndex = *(meshPtr++); // get texture index of 1st textured quad.
 
-	PHD_TEXTURE *texture = &PhdTextureInfo[textureIndex];
-	PHD_UV *uv = texture->uv;
-	if( uv[0].u != uv[3].u && uv[1].u != uv[2].u && uv[0].u >= uv[2].u &&
-		uv[0].v != uv[1].v && uv[2].v != uv[3].v && uv[0].v >= uv[2].v )
+	PHD_TEXTURE* texture = &PhdTextureInfo[textureIndex];
+	PHD_UV* uv = texture->uv;
+	if (uv[0].u != uv[3].u && uv[1].u != uv[2].u && uv[0].u >= uv[2].u &&
+		uv[0].v != uv[1].v && uv[2].v != uv[3].v && uv[0].v >= uv[2].v)
 	{
 		return false;
 	}
@@ -318,10 +321,10 @@ static bool GetBgndPatternInfo() {
 	int y = (uv[0].v % 0x100 + uv[0].v) / 0x100;
 	int w = (uv[2].u % 0x100 + uv[2].u) / 0x100 - x;
 	int h = (uv[2].v % 0x100 + uv[2].v) / 0x100 - y;
-	if( w != h ) return false;
+	if (w != h) return false;
 
-	while( h%2 == 0 ) h /= 2;
-	if( h != 1 ) return false;
+	while (h % 2 == 0) h /= 2;
+	if (h != 1) return false;
 
 	BgndPattern.x = x;
 	BgndPattern.y = y;
@@ -331,15 +334,15 @@ static bool GetBgndPatternInfo() {
 }
 
 static int CreateBgndPatternTexture(HANDLE hFile) {
-	if( hFile == INVALID_HANDLE_VALUE || SavedAppSettings.RenderMode != RM_Hardware || BgndPattern.side <= 0 ) {
+	if (hFile == INVALID_HANDLE_VALUE || SavedAppSettings.RenderMode != RM_Hardware || BgndPattern.side <= 0) {
 		return -1;
 	}
 	int pageIndex = -1;
 
 #if (DIRECT3D_VERSION >= 0x900)
-	if( PathFileExists("textures/background.png") ) {
+	if (PathFileExists("textures/background.png")) {
 		pageIndex = AddExternalTexture("textures/background.png", true);
-		if( pageIndex >= 0 ) {
+		if (pageIndex >= 0) {
 			HWR_TexturePageIndexes[HwrTexturePagesCount] = pageIndex;
 			HWR_PageHandles[HwrTexturePagesCount] = GetTexturePageHandle(pageIndex);
 			pageIndex = HwrTexturePagesCount++;
@@ -352,31 +355,32 @@ static int CreateBgndPatternTexture(HANDLE hFile) {
 	int pageCount = 0;
 	SetFilePointer(hFile, LevelFileTexPagesOffset, NULL, FILE_BEGIN);
 	ReadFileSync(hFile, &pageCount, sizeof(pageCount), &bytesRead, NULL);
-	if( BgndPattern.page >= pageCount ) {
+	if (BgndPattern.page >= pageCount) {
 		return -1;
 	}
 
 #if (DIRECT3D_VERSION >= 0x900)
-	if( IsExternalTexture(BgndPattern.page) ) {
+	if (IsExternalTexture(BgndPattern.page)) {
 		return -1;
 	}
 #endif // (DIRECT3D_VERSION >= 0x900)
 
-	DWORD pageSize = ( TextureFormat.bpp < 16 ) ? 256*256*1 : 256*256*2;
-	BYTE *bitmap = (BYTE *)GlobalAlloc(GMEM_FIXED, pageSize);
-	if( TextureFormat.bpp < 16 ) {
-		SetFilePointer(hFile, BgndPattern.page*(256*256*1), NULL, FILE_CURRENT);
+	DWORD pageSize = (TextureFormat.bpp < 16) ? 256 * 256 * 1 : 256 * 256 * 2;
+	BYTE* bitmap = (BYTE*)GlobalAlloc(GMEM_FIXED, pageSize);
+	if (TextureFormat.bpp < 16) {
+		SetFilePointer(hFile, BgndPattern.page * (256 * 256 * 1), NULL, FILE_CURRENT);
 		ReadFileSync(hFile, bitmap, pageSize, &bytesRead, NULL);
 		pageIndex = MakeCustomTexture(BgndPattern.x, BgndPattern.y, BgndPattern.side, BgndPattern.side,
-									256, BgndPattern.side, 8, bitmap, GamePalette8, PaletteIndex, NULL, false);
-	} else {
-		SetFilePointer(hFile, pageCount*(256*256*1) + BgndPattern.page*(256*256*2), NULL, FILE_CURRENT);
+			256, BgndPattern.side, 8, bitmap, GamePalette8, PaletteIndex, NULL, false);
+	}
+	else {
+		SetFilePointer(hFile, pageCount * (256 * 256 * 1) + BgndPattern.page * (256 * 256 * 2), NULL, FILE_CURRENT);
 		ReadFileSync(hFile, bitmap, pageSize, &bytesRead, NULL);
 		pageIndex = MakeCustomTexture(BgndPattern.x, BgndPattern.y, BgndPattern.side, BgndPattern.side,
-									256, BgndPattern.side, 16, bitmap, NULL, -1, NULL, false);
+			256, BgndPattern.side, 16, bitmap, NULL, -1, NULL, false);
 	}
 
-	if( pageIndex >= 0 ) {
+	if (pageIndex >= 0) {
 		HWR_TexturePageIndexes[HwrTexturePagesCount] = pageIndex;
 		HWR_PageHandles[HwrTexturePagesCount] = GetTexturePageHandle(pageIndex);
 		pageIndex = HwrTexturePagesCount++;
@@ -392,7 +396,7 @@ static GF_LEVEL_TYPE LoadLevelType = GFL_NOLEVEL;
 BOOL ReadFileSync(HANDLE hFile, LPVOID lpBuffer, DWORD nBytesToRead, LPDWORD lpnBytesRead, LPOVERLAPPED lpOverlapped) {
 	ReadFileBytesCounter += nBytesToRead;
 
-	if( ReadFileBytesCounter > 0x4000 ) {
+	if (ReadFileBytesCounter > 0x4000) {
 		ReadFileBytesCounter = 0;
 		WinVidSpinMessageLoop(false);
 	}
@@ -404,41 +408,43 @@ BOOL LoadTexturePages(HANDLE hFile) {
 	DWORD bytesRead;
 	DWORD pageSize;
 	LPVOID texPageBuffer;
-	BYTE *texPagePtr;
+	BYTE* texPagePtr;
 
 	ReadFileSync(hFile, &pageCount, sizeof(pageCount), &bytesRead, NULL);
 
 	// for software renderer read 8bit texture pages to GAME allocated buffer and skip 16bit pages
-	if( SavedAppSettings.RenderMode == RM_Software ) {
-		for( i=0; i<pageCount; ++i ) {
-			if( TexturePageBuffer8[i] == NULL ) {
-				TexturePageBuffer8[i] = (BYTE *)game_malloc(256*256*1, GBUF_TexturePages);
+	if (SavedAppSettings.RenderMode == RM_Software) {
+		for (i = 0; i < pageCount; ++i) {
+			if (TexturePageBuffer8[i] == NULL) {
+				TexturePageBuffer8[i] = (BYTE*)game_malloc(256 * 256 * 1, GBUF_TexturePages);
 			}
-			ReadFileSync(hFile, TexturePageBuffer8[i], 256*256*1, &bytesRead, NULL);
+			ReadFileSync(hFile, TexturePageBuffer8[i], 256 * 256 * 1, &bytesRead, NULL);
 		}
-		SetFilePointer(hFile, pageCount*(256*256*2), NULL, FILE_CURRENT);
-	} else {
+		SetFilePointer(hFile, pageCount * (256 * 256 * 2), NULL, FILE_CURRENT);
+	}
+	else {
 		// for hardware renderer do BPP check and load 8 bit or 16 bit texture pages to GLOBAL allocated memory and skip others
-		pageSize = ( TextureFormat.bpp < 16 ) ? 256*256*1 : 256*256*2;
-		texPageBuffer = GlobalAlloc(GMEM_FIXED, pageCount*pageSize);
+		pageSize = (TextureFormat.bpp < 16) ? 256 * 256 * 1 : 256 * 256 * 2;
+		texPageBuffer = GlobalAlloc(GMEM_FIXED, pageCount * pageSize);
 
-		if( texPageBuffer == NULL )
+		if (texPageBuffer == NULL)
 			return FALSE;
 
-		texPagePtr = (BYTE *)texPageBuffer;
+		texPagePtr = (BYTE*)texPageBuffer;
 
-		if( TextureFormat.bpp < 16 ) {
+		if (TextureFormat.bpp < 16) {
 			// load 8 bit texture pages and skip 16 bit texture pages
-			for( i=0; i<pageCount; ++i ) {
+			for (i = 0; i < pageCount; ++i) {
 				ReadFileSync(hFile, texPagePtr, pageSize, &bytesRead, NULL);
 				texPagePtr += pageSize;
 			}
-			SetFilePointer(hFile, pageCount*(256*256*2), NULL, FILE_CURRENT);
+			SetFilePointer(hFile, pageCount * (256 * 256 * 2), NULL, FILE_CURRENT);
 			HWR_LoadTexturePages(pageCount, texPageBuffer, GamePalette8);
-		} else {
+		}
+		else {
 			// skip 8 bit texture pages and load 16 bit texture pages
-			SetFilePointer(hFile, pageCount*(256*256*1), NULL, FILE_CURRENT);
-			for( i=0; i<pageCount; ++i ) {
+			SetFilePointer(hFile, pageCount * (256 * 256 * 1), NULL, FILE_CURRENT);
+			for (i = 0; i < pageCount; ++i) {
 				ReadFileSync(hFile, texPagePtr, pageSize, &bytesRead, NULL);
 				texPagePtr += pageSize;
 			}
@@ -463,21 +469,20 @@ BOOL LoadRooms(HANDLE hFile) {
 
 	// Get number of rooms
 	ReadFileSync(hFile, &RoomCount, sizeof(__int16), &bytesRead, NULL);
-	if( RoomCount < 0 || RoomCount > 0x400 ) {
+	if (RoomCount < 0 || RoomCount > 0x400) {
 		lstrcpy(StringToShow, "LoadRoom(): Too many rooms");
 		return FALSE;
 	}
 
 	// Allocate memory for room info
-	RoomInfo = (ROOM_INFO *)game_malloc(sizeof(ROOM_INFO)*RoomCount, GBUF_RoomInfos);
-	if( RoomInfo == NULL ) {
+	RoomInfo = (ROOM_INFO*)game_malloc(sizeof(ROOM_INFO) * RoomCount, GBUF_RoomInfos);
+	if (RoomInfo == NULL) {
 		lstrcpy(StringToShow, "LoadRoom(): Could not allocate memory for rooms");
 		return FALSE;
 	}
 
 	// For every room read info
-	for( int i = 0; i < RoomCount; ++i ) {
-
+	for (int i = 0; i < RoomCount; ++i) {
 		// Room position
 		ReadFileSync(hFile, &RoomInfo[i].x, sizeof(int), &bytesRead, NULL);
 		ReadFileSync(hFile, &RoomInfo[i].z, sizeof(int), &bytesRead, NULL);
@@ -489,45 +494,48 @@ BOOL LoadRooms(HANDLE hFile) {
 
 		// Room mesh
 		ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
-		RoomInfo[i].data = (__int16 *)game_malloc(sizeof(__int16)*dwCount, GBUF_RoomMesh);
-		ReadFileSync(hFile, RoomInfo[i].data, sizeof(__int16)*dwCount, &bytesRead, NULL);
+		RoomInfo[i].data = (__int16*)game_malloc(sizeof(__int16) * dwCount, GBUF_RoomMesh);
+		ReadFileSync(hFile, RoomInfo[i].data, sizeof(__int16) * dwCount, &bytesRead, NULL);
 
 		// Doors
 		ReadFileSync(hFile, &wCount, sizeof(__int16), &bytesRead, NULL);
-		if( wCount == 0 ) {
+		if (wCount == 0) {
 			RoomInfo[i].doors = NULL;
-		} else {
-			RoomInfo[i].doors = (DOOR_INFOS *)game_malloc(sizeof(__int16) + sizeof(DOOR_INFO)*wCount, GBUF_RoomDoor);
+		}
+		else {
+			RoomInfo[i].doors = (DOOR_INFOS*)game_malloc(sizeof(__int16) + sizeof(DOOR_INFO) * wCount, GBUF_RoomDoor);
 			RoomInfo[i].doors->wCount = wCount;
-			ReadFileSync(hFile, &RoomInfo[i].doors->door, sizeof(DOOR_INFO)*wCount, &bytesRead, NULL);
+			ReadFileSync(hFile, &RoomInfo[i].doors->door, sizeof(DOOR_INFO) * wCount, &bytesRead, NULL);
 		}
 
 		// Room floor
 		ReadFileSync(hFile, &RoomInfo[i].xSize, sizeof(__int16), &bytesRead, NULL);
 		ReadFileSync(hFile, &RoomInfo[i].ySize, sizeof(__int16), &bytesRead, NULL);
 		dwCount = RoomInfo[i].xSize * RoomInfo[i].ySize;
-		RoomInfo[i].floor = (FLOOR_INFO *)game_malloc(sizeof(FLOOR_INFO)*dwCount, GBUF_RoomFloor);
-		ReadFileSync(hFile, RoomInfo[i].floor, sizeof(FLOOR_INFO)*dwCount, &bytesRead, NULL);
+		RoomInfo[i].floor = (FLOOR_INFO*)game_malloc(sizeof(FLOOR_INFO) * dwCount, GBUF_RoomFloor);
+		ReadFileSync(hFile, RoomInfo[i].floor, sizeof(FLOOR_INFO) * dwCount, &bytesRead, NULL);
 
 		// Room lights
 		ReadFileSync(hFile, &RoomInfo[i].ambient1, sizeof(__int16), &bytesRead, NULL);
 		ReadFileSync(hFile, &RoomInfo[i].ambient2, sizeof(__int16), &bytesRead, NULL);
 		ReadFileSync(hFile, &RoomInfo[i].lightMode, sizeof(__int16), &bytesRead, NULL);
 		ReadFileSync(hFile, &RoomInfo[i].numLights, sizeof(__int16), &bytesRead, NULL);
-		if( RoomInfo[i].numLights == 0 ) {
+		if (RoomInfo[i].numLights == 0) {
 			RoomInfo[i].light = NULL;
-		} else {
-			RoomInfo[i].light = (LIGHT_INFO *)game_malloc(sizeof(LIGHT_INFO)*RoomInfo[i].numLights, GBUF_RoomLights);
-			ReadFileSync(hFile, RoomInfo[i].light, sizeof(LIGHT_INFO)*RoomInfo[i].numLights, &bytesRead, NULL);
+		}
+		else {
+			RoomInfo[i].light = (LIGHT_INFO*)game_malloc(sizeof(LIGHT_INFO) * RoomInfo[i].numLights, GBUF_RoomLights);
+			ReadFileSync(hFile, RoomInfo[i].light, sizeof(LIGHT_INFO) * RoomInfo[i].numLights, &bytesRead, NULL);
 		}
 
 		// Static mesh infos
 		ReadFileSync(hFile, &RoomInfo[i].numMeshes, sizeof(__int16), &bytesRead, NULL);
-		if( RoomInfo[i].numMeshes == 0 ) {
+		if (RoomInfo[i].numMeshes == 0) {
 			RoomInfo[i].mesh = NULL;
-		} else {
-			RoomInfo[i].mesh = (MESH_INFO *)game_malloc(sizeof(MESH_INFO)*RoomInfo[i].numMeshes, GBUF_RoomStaticMeshInfos);
-			ReadFileSync(hFile, RoomInfo[i].mesh, sizeof(MESH_INFO)*RoomInfo[i].numMeshes, &bytesRead, NULL);
+		}
+		else {
+			RoomInfo[i].mesh = (MESH_INFO*)game_malloc(sizeof(MESH_INFO) * RoomInfo[i].numMeshes, GBUF_RoomStaticMeshInfos);
+			ReadFileSync(hFile, RoomInfo[i].mesh, sizeof(MESH_INFO) * RoomInfo[i].numMeshes, &bytesRead, NULL);
 		}
 
 		// Flipped (alternative) room
@@ -548,8 +556,8 @@ BOOL LoadRooms(HANDLE hFile) {
 
 	// Read floor data
 	ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
-	FloorData = (__int16 *)game_malloc(sizeof(__int16)*dwCount, GBUF_FloorData);
-	ReadFileSync(hFile, FloorData, sizeof(__int16)*dwCount, &bytesRead, NULL);
+	FloorData = (__int16*)game_malloc(sizeof(__int16) * dwCount, GBUF_FloorData);
+	ReadFileSync(hFile, FloorData, sizeof(__int16) * dwCount, &bytesRead, NULL);
 	return TRUE;
 }
 
@@ -557,23 +565,23 @@ void AdjustTextureUVs(bool resetUvAdd) {
 	DWORD i, j;
 	int offset;
 	BYTE uvFlags;
-	PHD_UV *pUV, *pBackup;
+	PHD_UV* pUV, * pBackup;
 	// NOTE: there was no such backup in the original game
 	extern PHD_TEXTURE TextureBackupUV[ARRAY_SIZE(PhdTextureInfo)];
-	if( resetUvAdd ) {
+	if (resetUvAdd) {
 		memcpy(TextureBackupUV, PhdTextureInfo, TextureInfoCount * sizeof(PHD_TEXTURE));
 	}
 #if (DIRECT3D_VERSION >= 0x900)
-	if( SavedAppSettings.RenderMode == RM_Hardware ) {
+	if (SavedAppSettings.RenderMode == RM_Hardware) {
 		double forcedAdjust = GetTexPagesAdjustment();
-		if( forcedAdjust > 0.0) {
+		if (forcedAdjust > 0.0) {
 			UvAdd = (int)(forcedAdjust * 256.0);
-			for( i=0; i<TextureInfoCount; ++i ) {
+			for (i = 0; i < TextureInfoCount; ++i) {
 				uvFlags = LabTextureUVFlags[i];
 				pUV = PhdTextureInfo[i].uv;
 				pBackup = TextureBackupUV[i].uv;
 
-				for( j=0; j<4; ++j ) {
+				for (j = 0; j < 4; ++j) {
 					pUV[j].u = pBackup[j].u + ((uvFlags & 1) ? -UvAdd : UvAdd);
 					pUV[j].v = pBackup[j].v + ((uvFlags & 2) ? -UvAdd : UvAdd);
 					uvFlags >>= 2;
@@ -584,20 +592,22 @@ void AdjustTextureUVs(bool resetUvAdd) {
 	}
 #endif // (DIRECT3D_VERSION >= 0x900)
 
-	if( SavedAppSettings.RenderMode == RM_Hardware && (SavedAppSettings.TexelAdjustMode == TAM_Always ||
-		(SavedAppSettings.TexelAdjustMode == TAM_BilinearOnly && SavedAppSettings.BilinearFiltering)) )
+	if (SavedAppSettings.RenderMode == RM_Hardware && (SavedAppSettings.TexelAdjustMode == TAM_Always ||
+		(SavedAppSettings.TexelAdjustMode == TAM_BilinearOnly && SavedAppSettings.BilinearFiltering)))
 	{
 		UvAdd = SavedAppSettings.LinearAdjustment;
-	} else {
+	}
+	else {
 		UvAdd = SavedAppSettings.NearestAdjustment;
 	}
 
-	for( i=0; i<TextureInfoCount; ++i ) {
-		if( SavedAppSettings.RenderMode == RM_Hardware ) {
+	for (i = 0; i < TextureInfoCount; ++i) {
+		if (SavedAppSettings.RenderMode == RM_Hardware) {
 			// NOTE: page side is not counted in the original game, but we need it for HD textures
 			offset = UvAdd * 256 / GetTextureSideByPage(PhdTextureInfo[i].tpage);
 			CLAMPL(offset, 1);
-		} else {
+		}
+		else {
 			offset = UvAdd;
 		}
 
@@ -605,7 +615,7 @@ void AdjustTextureUVs(bool resetUvAdd) {
 		pUV = PhdTextureInfo[i].uv;
 		pBackup = TextureBackupUV[i].uv;
 
-		for( j=0; j<4; ++j ) {
+		for (j = 0; j < 4; ++j) {
 			pUV[j].u = pBackup[j].u + ((uvFlags & 1) ? -offset : offset);
 			pUV[j].v = pBackup[j].v + ((uvFlags & 2) ? -offset : offset);
 			uvFlags >>= 2;
@@ -620,66 +630,66 @@ BOOL LoadObjects(HANDLE hFile) {
 	DWORD animCount;
 	DWORD animOffset;
 	DWORD objNumber;
-	UINT16 *uv;
+	UINT16* uv;
 
 	// Load mesh base data
 	ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
-	Meshes = (__int16 *)game_malloc(sizeof(__int16)*dwCount, GBUF_Meshes);
-	ReadFileSync(hFile, Meshes, sizeof(__int16)*dwCount, &bytesRead, NULL);
+	Meshes = (__int16*)game_malloc(sizeof(__int16) * dwCount, GBUF_Meshes);
+	ReadFileSync(hFile, Meshes, sizeof(__int16) * dwCount, &bytesRead, NULL);
 
 	// Load mesh pointers
 	ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
-	MeshPtr = (__int16 **)game_malloc(sizeof(__int16 *)*dwCount, GBUF_MeshPointers);
-	ReadFileSync(hFile, MeshPtr, sizeof(__int16 *)*dwCount, &bytesRead, NULL);
+	MeshPtr = (__int16**)game_malloc(sizeof(__int16*) * dwCount, GBUF_MeshPointers);
+	ReadFileSync(hFile, MeshPtr, sizeof(__int16*) * dwCount, &bytesRead, NULL);
 
 	// Remap mesh pointers
-	for( i = 0; i < dwCount; ++i )
-		MeshPtr[i] = (__int16 *)((DWORD)Meshes + (DWORD)MeshPtr[i]);
+	for (i = 0; i < dwCount; ++i)
+		MeshPtr[i] = (__int16*)((DWORD)Meshes + (DWORD)MeshPtr[i]);
 
 	// Load anims
 	ReadFileSync(hFile, &animCount, sizeof(DWORD), &bytesRead, NULL);
-	Anims = (ANIM_STRUCT *)game_malloc(sizeof(ANIM_STRUCT)*animCount, GBUF_Anims);
-	ReadFileSync(hFile, Anims, sizeof(ANIM_STRUCT)*animCount, &bytesRead, NULL);
+	Anims = (ANIM_STRUCT*)game_malloc(sizeof(ANIM_STRUCT) * animCount, GBUF_Anims);
+	ReadFileSync(hFile, Anims, sizeof(ANIM_STRUCT) * animCount, &bytesRead, NULL);
 
 	// Load changes
 	ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
-	AnimChanges = (CHANGE_STRUCT *)game_malloc(sizeof(CHANGE_STRUCT)*dwCount, GBUF_Structs);
-	ReadFileSync(hFile, AnimChanges, sizeof(CHANGE_STRUCT)*dwCount, &bytesRead, NULL);
+	AnimChanges = (CHANGE_STRUCT*)game_malloc(sizeof(CHANGE_STRUCT) * dwCount, GBUF_Structs);
+	ReadFileSync(hFile, AnimChanges, sizeof(CHANGE_STRUCT) * dwCount, &bytesRead, NULL);
 
 	// Load ranges
 	ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
-	AnimRanges = (RANGE_STRUCT *)game_malloc(sizeof(RANGE_STRUCT)*dwCount, GBUF_Ranges);
-	ReadFileSync(hFile, AnimRanges, sizeof(RANGE_STRUCT)*dwCount, &bytesRead, NULL);
+	AnimRanges = (RANGE_STRUCT*)game_malloc(sizeof(RANGE_STRUCT) * dwCount, GBUF_Ranges);
+	ReadFileSync(hFile, AnimRanges, sizeof(RANGE_STRUCT) * dwCount, &bytesRead, NULL);
 
 	// Load commands
 	ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
-	AnimCommands = (__int16 *)game_malloc(sizeof(__int16)*dwCount, GBUF_Commands);
-	ReadFileSync(hFile, AnimCommands, sizeof(__int16)*dwCount, &bytesRead, NULL);
+	AnimCommands = (__int16*)game_malloc(sizeof(__int16) * dwCount, GBUF_Commands);
+	ReadFileSync(hFile, AnimCommands, sizeof(__int16) * dwCount, &bytesRead, NULL);
 
 	// Load bones
 	ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
-	AnimBones = (int *)game_malloc(sizeof(int)*dwCount, GBUF_Bones);
-	ReadFileSync(hFile, AnimBones, sizeof(int)*dwCount, &bytesRead, NULL);
+	AnimBones = (int*)game_malloc(sizeof(int) * dwCount, GBUF_Bones);
+	ReadFileSync(hFile, AnimBones, sizeof(int) * dwCount, &bytesRead, NULL);
 
 	// Load frames
 	ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
-	AnimFrames = (__int16 *)game_malloc(sizeof(__int16)*dwCount, GBUF_Frames);
-	ReadFileSync(hFile, AnimFrames, sizeof(__int16)*dwCount, &bytesRead, NULL);
+	AnimFrames = (__int16*)game_malloc(sizeof(__int16) * dwCount, GBUF_Frames);
+	ReadFileSync(hFile, AnimFrames, sizeof(__int16) * dwCount, &bytesRead, NULL);
 
 	// Remap anim pointers
-	for( i = 0; i < animCount; ++i )
-		Anims[i].framePtr = (__int16 *)((DWORD)AnimFrames + (DWORD)Anims[i].framePtr);
+	for (i = 0; i < animCount; ++i)
+		Anims[i].framePtr = (__int16*)((DWORD)AnimFrames + (DWORD)Anims[i].framePtr);
 
 	// Load animated objects
 	ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
-	for( i = 0; i < dwCount; ++i ) {
+	for (i = 0; i < dwCount; ++i) {
 		ReadFileSync(hFile, &objNumber, sizeof(DWORD), &bytesRead, NULL);
 		ReadFileSync(hFile, &Objects[objNumber].nMeshes, sizeof(__int16), &bytesRead, NULL);
 		ReadFileSync(hFile, &Objects[objNumber].meshIndex, sizeof(__int16), &bytesRead, NULL);
 		ReadFileSync(hFile, &Objects[objNumber].boneIndex, sizeof(int), &bytesRead, NULL);
 		ReadFileSync(hFile, &animOffset, sizeof(DWORD), &bytesRead, NULL);
 		ReadFileSync(hFile, &Objects[objNumber].animIndex, sizeof(__int16), &bytesRead, NULL);
-		Objects[objNumber].frameBase = (__int16 *)((DWORD)AnimFrames + animOffset);
+		Objects[objNumber].frameBase = (__int16*)((DWORD)AnimFrames + animOffset);
 		Objects[objNumber].loaded = 1;
 	}
 
@@ -691,7 +701,7 @@ BOOL LoadObjects(HANDLE hFile) {
 #ifdef FEATURE_VIDEOFX_IMPROVED
 	memset(&StaticObjects, 0, sizeof(StaticObjects)); // NOTE: we need to be sure that a static object is really loaded
 #endif // FEATURE_VIDEOFX_IMPROVED
-	for( i = 0; i < dwCount; ++i ) {
+	for (i = 0; i < dwCount; ++i) {
 		ReadFileSync(hFile, &objNumber, sizeof(DWORD), &bytesRead, NULL);
 		ReadFileSync(hFile, &StaticObjects[objNumber].meshIndex, sizeof(__int16), &bytesRead, NULL);
 		ReadFileSync(hFile, &StaticObjects[objNumber].drawBounds, sizeof(STATIC_BOUNDS), &bytesRead, NULL);
@@ -701,19 +711,20 @@ BOOL LoadObjects(HANDLE hFile) {
 
 	// Load textures info
 	ReadFileSync(hFile, &TextureInfoCount, sizeof(DWORD), &bytesRead, NULL);
-	if( TextureInfoCount > ARRAY_SIZE(PhdTextureInfo) ) {
+	if (TextureInfoCount > ARRAY_SIZE(PhdTextureInfo)) {
 		lstrcpy(StringToShow, "Too many Textures in level");
 		return FALSE;
 	}
-	ReadFileSync(hFile, PhdTextureInfo, sizeof(PHD_TEXTURE)*TextureInfoCount, &bytesRead, NULL);
-	for( i = 0; i < TextureInfoCount; ++i ) {
+	ReadFileSync(hFile, PhdTextureInfo, sizeof(PHD_TEXTURE) * TextureInfoCount, &bytesRead, NULL);
+	for (i = 0; i < TextureInfoCount; ++i) {
 		LabTextureUVFlags[i] = 0;
 		uv = &PhdTextureInfo[i].uv[0].u;
-		for( j = 0; j < 8; ++j ) {
-			if( (uv[j] & 0x0080) != 0 ) {
+		for (j = 0; j < 8; ++j) {
+			if ((uv[j] & 0x0080) != 0) {
 				uv[j] |= 0x00FF;
 				LabTextureUVFlags[i] |= (1 << j);
-			} else {
+			}
+			else {
 				uv[j] &= 0xFF00;
 			}
 		}
@@ -734,17 +745,18 @@ BOOL LoadSprites(HANDLE hFile) {
 
 	// Load sprite infos
 	ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
-	ReadFileSync(hFile, PhdSpriteInfo, sizeof(PHD_SPRITE)*dwCount, &bytesRead, NULL);
+	ReadFileSync(hFile, PhdSpriteInfo, sizeof(PHD_SPRITE) * dwCount, &bytesRead, NULL);
 
 	// Assign sprites to objects
 	ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
-	for( DWORD i = 0; i < dwCount; ++i ) {
+	for (DWORD i = 0; i < dwCount; ++i) {
 		ReadFileSync(hFile, &objNumber, sizeof(DWORD), &bytesRead, NULL);
-		if ( objNumber < ID_NUMBER_OBJECTS ) {
+		if (objNumber < ID_NUMBER_OBJECTS) {
 			ReadFileSync(hFile, &Objects[objNumber].nMeshes, sizeof(__int16), &bytesRead, NULL);
-			ReadFileSync(hFile, &Objects[objNumber].meshIndex,  sizeof(__int16), &bytesRead, NULL);
+			ReadFileSync(hFile, &Objects[objNumber].meshIndex, sizeof(__int16), &bytesRead, NULL);
 			Objects[objNumber].loaded = 1;
-		} else {
+		}
+		else {
 			objNumber -= ID_NUMBER_OBJECTS;
 			SetFilePointer(hFile, sizeof(__int16), NULL, FILE_CURRENT); // StaticObjects don't have nMeshes (just one mesh)
 			ReadFileSync(hFile, &StaticObjects[objNumber].meshIndex, sizeof(__int16), &bytesRead, NULL);
@@ -757,34 +769,34 @@ BOOL LoadItems(HANDLE hFile) {
 	DWORD itemsCount, bytesRead;
 
 	ReadFileSync(hFile, &itemsCount, sizeof(DWORD), &bytesRead, NULL);
-	if( itemsCount == 0 )
+	if (itemsCount == 0)
 		return TRUE;
 
-	if( itemsCount > 256 ) {
+	if (itemsCount > 256) {
 		lstrcpy(StringToShow, "LoadItems(): Too Many Items being Loaded!!");
 		return FALSE;
 	}
 
-	Items = (ITEM_INFO *)game_malloc(sizeof(ITEM_INFO)*256, GBUF_Items);
-	if( Items == NULL ) {
+	Items = (ITEM_INFO*)game_malloc(sizeof(ITEM_INFO) * 256, GBUF_Items);
+	if (Items == NULL) {
 		lstrcpy(StringToShow, "LoadItems(): Unable to allocate memory for 'items'");
 		return FALSE;
 	}
 	LevelItemCount = itemsCount;
 	InitialiseItemArray(256);
 
-	for( DWORD i = 0; i < itemsCount; ++i ) {
-		ReadFileSync(hFile, &Items[i].objectID,		sizeof(__int16),	&bytesRead, NULL);
-		ReadFileSync(hFile, &Items[i].roomNumber,	sizeof(__int16),	&bytesRead, NULL);
-		ReadFileSync(hFile, &Items[i].pos.x,		sizeof(int),		&bytesRead, NULL);
-		ReadFileSync(hFile, &Items[i].pos.y,		sizeof(int),		&bytesRead, NULL);
-		ReadFileSync(hFile, &Items[i].pos.z,		sizeof(int),		&bytesRead, NULL);
-		ReadFileSync(hFile, &Items[i].pos.rotY,		sizeof(__int16),	&bytesRead, NULL);
-		ReadFileSync(hFile, &Items[i].shade1,		sizeof(__int16),	&bytesRead, NULL);
-		ReadFileSync(hFile, &Items[i].shade2,		sizeof(__int16),	&bytesRead, NULL);
-		ReadFileSync(hFile, &Items[i].flags,		sizeof(UINT16),		&bytesRead, NULL);
+	for (DWORD i = 0; i < itemsCount; ++i) {
+		ReadFileSync(hFile, &Items[i].objectID, sizeof(__int16), &bytesRead, NULL);
+		ReadFileSync(hFile, &Items[i].roomNumber, sizeof(__int16), &bytesRead, NULL);
+		ReadFileSync(hFile, &Items[i].pos.x, sizeof(int), &bytesRead, NULL);
+		ReadFileSync(hFile, &Items[i].pos.y, sizeof(int), &bytesRead, NULL);
+		ReadFileSync(hFile, &Items[i].pos.z, sizeof(int), &bytesRead, NULL);
+		ReadFileSync(hFile, &Items[i].pos.rotY, sizeof(__int16), &bytesRead, NULL);
+		ReadFileSync(hFile, &Items[i].shade1, sizeof(__int16), &bytesRead, NULL);
+		ReadFileSync(hFile, &Items[i].shade2, sizeof(__int16), &bytesRead, NULL);
+		ReadFileSync(hFile, &Items[i].flags, sizeof(UINT16), &bytesRead, NULL);
 
-		if( Items[i].objectID < 0 || Items[i].objectID >= ID_NUMBER_OBJECTS ) {
+		if (Items[i].objectID < 0 || Items[i].objectID >= ID_NUMBER_OBJECTS) {
 			wsprintf(StringToShow, "LoadItems(): Bad Object number (%d) on Item %d", Items[i].objectID, i);
 			return FALSE;
 		}
@@ -800,22 +812,23 @@ BOOL LoadDepthQ(HANDLE hFile) {
 	RGB888 paletteBuffer[256];
 #endif // (DIRECT3D_VERSION < 0x900)
 
-	ReadFileSync(hFile, DepthQTable, 32*sizeof(DEPTHQ_ENTRY), &bytesRead, NULL);
+	ReadFileSync(hFile, DepthQTable, 32 * sizeof(DEPTHQ_ENTRY), &bytesRead, NULL);
 
-	for( i=0; i<32; ++i )
+	for (i = 0; i < 32; ++i)
 		DepthQTable[i].index[0] = 0;
 
 #if (DIRECT3D_VERSION >= 0x900)
 	memcpy(DepthQIndex, &DepthQTable[24], sizeof(DEPTHQ_ENTRY));
 #else // (DIRECT3D_VERSION >= 0x900)
-	if( GameVid_IsWindowedVga ) {
-		CopyBitmapPalette(GamePalette8, DepthQTable[0].index, 32*sizeof(DEPTHQ_ENTRY), paletteBuffer);
+	if (GameVid_IsWindowedVga) {
+		CopyBitmapPalette(GamePalette8, DepthQTable[0].index, 32 * sizeof(DEPTHQ_ENTRY), paletteBuffer);
 		SyncSurfacePalettes(DepthQTable, 256, 32, 256, GamePalette8, DepthQTable, 256, paletteBuffer, true);
 		memcpy(GamePalette8, paletteBuffer, sizeof(GamePalette8));
-		for( i=0; i<256; ++i ) {
+		for (i = 0; i < 256; ++i) {
 			DepthQIndex[i] = S_COLOUR(GamePalette8[i].red, GamePalette8[i].green, GamePalette8[i].blue);
 		}
-	} else {
+	}
+	else {
 		memcpy(DepthQIndex, &DepthQTable[24], sizeof(DEPTHQ_ENTRY));
 	}
 #endif // (DIRECT3D_VERSION >= 0x900)
@@ -824,17 +837,17 @@ BOOL LoadDepthQ(HANDLE hFile) {
 	UpdateDepthQ(true);
 #endif // FEATURE_VIDEOFX_IMPROVED
 
-	for( i=0; i<32; ++i ) {
-		for( j=0; j<256; ++j ) {
+	for (i = 0; i < 32; ++i) {
+		for (j = 0; j < 256; ++j) {
 			GouraudTable[j].index[i] = DepthQTable[i].index[j];
 		}
 	}
 
 	IsWet = 0;
-	for( i=0; i<256; ++i ) {
-		WaterPalette[i].red   = GamePalette8[i].red   * 2 / 3;
+	for (i = 0; i < 256; ++i) {
+		WaterPalette[i].red = GamePalette8[i].red * 2 / 3;
 		WaterPalette[i].green = GamePalette8[i].green * 2 / 3;
-		WaterPalette[i].blue  = GamePalette8[i].blue;
+		WaterPalette[i].blue = GamePalette8[i].blue;
 	}
 
 	return TRUE;
@@ -843,27 +856,27 @@ BOOL LoadDepthQ(HANDLE hFile) {
 BOOL LoadPalettes(HANDLE hFile) {
 	DWORD bytesRead;
 
-	ReadFileSync(hFile, GamePalette8, 256*sizeof(RGB888), &bytesRead, NULL);
+	ReadFileSync(hFile, GamePalette8, 256 * sizeof(RGB888), &bytesRead, NULL);
 
 	GamePalette8[0].red = 0;
 	GamePalette8[0].green = 0;
 	GamePalette8[0].blue = 0;
 
-	for( int i=1; i<256; ++i ) {
+	for (int i = 1; i < 256; ++i) {
 		// NOTE: the original code just shifts left 2 bits. But this way is slightly better
-		GamePalette8[i].red   = (GamePalette8[i].red   << 2) | (GamePalette8[i].red   >> 4);
+		GamePalette8[i].red = (GamePalette8[i].red << 2) | (GamePalette8[i].red >> 4);
 		GamePalette8[i].green = (GamePalette8[i].green << 2) | (GamePalette8[i].green >> 4);
-		GamePalette8[i].blue  = (GamePalette8[i].blue  << 2) | (GamePalette8[i].blue  >> 4);
+		GamePalette8[i].blue = (GamePalette8[i].blue << 2) | (GamePalette8[i].blue >> 4);
 	}
 
-	ReadFileSync(hFile, GamePalette16, 256*sizeof(PALETTEENTRY), &bytesRead, NULL);
+	ReadFileSync(hFile, GamePalette16, 256 * sizeof(PALETTEENTRY), &bytesRead, NULL);
 #if (DIRECT3D_VERSION >= 0x900)
-	if( !IsTexPagesLegacyColors() ) {
-		for( int i=0; i<256; ++i ) {
-			PALETTEENTRY *pal = &GamePalette16[i];
-			pal->peRed   = (pal->peRed   & 0xF8) | (pal->peRed   >> 5);
+	if (!IsTexPagesLegacyColors()) {
+		for (int i = 0; i < 256; ++i) {
+			PALETTEENTRY* pal = &GamePalette16[i];
+			pal->peRed = (pal->peRed & 0xF8) | (pal->peRed >> 5);
 			pal->peGreen = (pal->peGreen & 0xF8) | (pal->peGreen >> 5);
-			pal->peBlue  = (pal->peBlue  & 0xF8) | (pal->peBlue  >> 5);
+			pal->peBlue = (pal->peBlue & 0xF8) | (pal->peBlue >> 5);
 		}
 	}
 #endif // (DIRECT3D_VERSION >= 0x900)
@@ -874,12 +887,12 @@ BOOL LoadCameras(HANDLE hFile) {
 	DWORD bytesRead;
 
 	ReadFileSync(hFile, &CameraCount, sizeof(DWORD), &bytesRead, NULL);
-	if( CameraCount != 0 ) {
-		Camera.fixed = (OBJECT_VECTOR *)game_malloc(sizeof(OBJECT_VECTOR)*CameraCount, GBUF_Cameras);
-		if ( Camera.fixed == NULL ) {
+	if (CameraCount != 0) {
+		Camera.fixed = (OBJECT_VECTOR*)game_malloc(sizeof(OBJECT_VECTOR) * CameraCount, GBUF_Cameras);
+		if (Camera.fixed == NULL) {
 			return FALSE;
 		}
-		ReadFileSync(hFile, Camera.fixed, sizeof(OBJECT_VECTOR)*CameraCount, &bytesRead, NULL);
+		ReadFileSync(hFile, Camera.fixed, sizeof(OBJECT_VECTOR) * CameraCount, &bytesRead, NULL);
 	}
 	return TRUE;
 }
@@ -888,12 +901,12 @@ BOOL LoadSoundEffects(HANDLE hFile) {
 	DWORD bytesRead;
 
 	ReadFileSync(hFile, &SoundFxCount, sizeof(DWORD), &bytesRead, NULL);
-	if( SoundFxCount != 0 ) {
-		SoundFx = (OBJECT_VECTOR *)game_malloc(sizeof(OBJECT_VECTOR)*SoundFxCount, GBUF_SoundFX);
-		if( SoundFx == NULL ) {
+	if (SoundFxCount != 0) {
+		SoundFx = (OBJECT_VECTOR*)game_malloc(sizeof(OBJECT_VECTOR) * SoundFxCount, GBUF_SoundFX);
+		if (SoundFx == NULL) {
 			return FALSE;
 		}
-		ReadFileSync(hFile, SoundFx, sizeof(OBJECT_VECTOR)*SoundFxCount, &bytesRead, NULL);
+		ReadFileSync(hFile, SoundFx, sizeof(OBJECT_VECTOR) * SoundFxCount, &bytesRead, NULL);
 	}
 	return TRUE;
 }
@@ -903,43 +916,43 @@ BOOL LoadBoxes(HANDLE hFile) {
 
 	// Load Boxes
 	ReadFileSync(hFile, &BoxesCount, sizeof(DWORD), &bytesRead, NULL);
-	Boxes = (BOX_INFO *)game_malloc(sizeof(BOX_INFO)*BoxesCount, GBUF_Boxes);
-	ReadFileSync(hFile, Boxes, sizeof(BOX_INFO)*BoxesCount, &bytesRead, NULL);
-	if( bytesRead != sizeof(BOX_INFO)*BoxesCount ) {
+	Boxes = (BOX_INFO*)game_malloc(sizeof(BOX_INFO) * BoxesCount, GBUF_Boxes);
+	ReadFileSync(hFile, Boxes, sizeof(BOX_INFO) * BoxesCount, &bytesRead, NULL);
+	if (bytesRead != sizeof(BOX_INFO) * BoxesCount) {
 		lstrcpy(StringToShow, "LoadBoxes(): Unable to load boxes");
 		return FALSE;
 	}
 
 	// Load Overlaps
 	ReadFileSync(hFile, &overlapsCount, sizeof(DWORD), &bytesRead, NULL);
-	Overlaps = (UINT16 *)game_malloc(sizeof(UINT16)*overlapsCount, GBUF_Overlaps);
-	ReadFileSync(hFile, Overlaps, sizeof(UINT16)*overlapsCount, &bytesRead, NULL);
-	if( bytesRead != sizeof(UINT16)*overlapsCount ) {
+	Overlaps = (UINT16*)game_malloc(sizeof(UINT16) * overlapsCount, GBUF_Overlaps);
+	ReadFileSync(hFile, Overlaps, sizeof(UINT16) * overlapsCount, &bytesRead, NULL);
+	if (bytesRead != sizeof(UINT16) * overlapsCount) {
 		lstrcpy(StringToShow, "LoadBoxes(): Unable to load box overlaps");
 		return FALSE;
 	}
 
 	// Load GroundZones and FlyZones
-	for( int i=0; i<2; ++i ) {
-		for( int j=0; j<4; ++j ) {
-			if( (j == 2) ||
+	for (int i = 0; i < 2; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			if ((j == 2) ||
 				(j == 1 && !Objects[ID_SPIDER_or_WOLF].loaded && !Objects[ID_SKIDOO_ARMED].loaded) ||
-				(j == 3 && !Objects[ID_YETI].loaded && !Objects[ID_WORKER3].loaded) )
+				(j == 3 && !Objects[ID_YETI].loaded && !Objects[ID_WORKER3].loaded))
 			{
-				SetFilePointer(hFile, sizeof(__int16)*BoxesCount, NULL, FILE_CURRENT); // skip some GroundZones
+				SetFilePointer(hFile, sizeof(__int16) * BoxesCount, NULL, FILE_CURRENT); // skip some GroundZones
 				continue;
 			}
 
-			GroundZones[j*2+i] = (__int16 *)game_malloc(sizeof(__int16)*BoxesCount, GBUF_GroundZone);
-			ReadFileSync(hFile, GroundZones[j*2+i], sizeof(__int16)*BoxesCount, &bytesRead, NULL);
-			if( bytesRead != sizeof(__int16)*BoxesCount ) {
+			GroundZones[j * 2 + i] = (__int16*)game_malloc(sizeof(__int16) * BoxesCount, GBUF_GroundZone);
+			ReadFileSync(hFile, GroundZones[j * 2 + i], sizeof(__int16) * BoxesCount, &bytesRead, NULL);
+			if (bytesRead != sizeof(__int16) * BoxesCount) {
 				lstrcpy(StringToShow, "LoadBoxes(): Unable to load 'ground_zone'");
 				return FALSE;
 			}
 		}
-		FlyZones[i] = (__int16 *)game_malloc(sizeof(__int16)*BoxesCount, GBUF_FlyZone);
-		ReadFileSync(hFile, FlyZones[i], sizeof(__int16)*BoxesCount, &bytesRead, NULL);
-		if( bytesRead != sizeof(__int16)*BoxesCount ) {
+		FlyZones[i] = (__int16*)game_malloc(sizeof(__int16) * BoxesCount, GBUF_FlyZone);
+		ReadFileSync(hFile, FlyZones[i], sizeof(__int16) * BoxesCount, &bytesRead, NULL);
+		if (bytesRead != sizeof(__int16) * BoxesCount) {
 			lstrcpy(StringToShow, "LoadBoxes(): Unable to load 'fly_zone'");
 			return FALSE;
 		}
@@ -951,8 +964,8 @@ BOOL LoadAnimatedTextures(HANDLE hFile) {
 	DWORD animTexCount, bytesRead;
 
 	ReadFileSync(hFile, &animTexCount, sizeof(DWORD), &bytesRead, NULL);
-	AnimatedTextureRanges = (__int16 *)game_malloc(sizeof(__int16)*animTexCount, GBUF_AnimatingTextureRanges);
-	ReadFileSync(hFile, AnimatedTextureRanges, sizeof(__int16)*animTexCount, &bytesRead, NULL);
+	AnimatedTextureRanges = (__int16*)game_malloc(sizeof(__int16) * animTexCount, GBUF_AnimatingTextureRanges);
+	ReadFileSync(hFile, AnimatedTextureRanges, sizeof(__int16) * animTexCount, &bytesRead, NULL);
 	return TRUE;
 }
 
@@ -960,11 +973,12 @@ BOOL LoadCinematic(HANDLE hFile) {
 	DWORD bytesRead;
 
 	ReadFileSync(hFile, &CineFramesCount, sizeof(__int16), &bytesRead, NULL);
-	if( CineFramesCount != 0 ) {
-		CineFrames = (CINE_FRAME_INFO *)game_malloc(sizeof(CINE_FRAME_INFO)*CineFramesCount, GBUF_CinematicFrames);
-		ReadFileSync(hFile, CineFrames, sizeof(CINE_FRAME_INFO)*CineFramesCount, &bytesRead, NULL);
+	if (CineFramesCount != 0) {
+		CineFrames = (CINE_FRAME_INFO*)game_malloc(sizeof(CINE_FRAME_INFO) * CineFramesCount, GBUF_CinematicFrames);
+		ReadFileSync(hFile, CineFrames, sizeof(CINE_FRAME_INFO) * CineFramesCount, &bytesRead, NULL);
 		IsCinematicLoaded = TRUE;
-	} else {
+	}
+	else {
 		IsCinematicLoaded = FALSE;
 	}
 	return TRUE;
@@ -977,10 +991,11 @@ BOOL LoadDemo(HANDLE hFile) {
 	DemoCount = 0;
 	DemoPtr = game_malloc(36000, GBUF_LoadDemoBuffer);
 	ReadFileSync(hFile, &demoSize, sizeof(__int16), &bytesRead, NULL);
-	if( demoSize != 0 ) {
+	if (demoSize != 0) {
 		ReadFileSync(hFile, DemoPtr, demoSize, &bytesRead, NULL);
 		IsDemoLoaded = TRUE;
-	} else {
+	}
+	else {
 		IsDemoLoaded = FALSE;
 	}
 	return TRUE;
@@ -989,14 +1004,14 @@ BOOL LoadDemo(HANDLE hFile) {
 void LoadDemoExternal(LPCTSTR levelName) {
 	HANDLE hFile;
 	DWORD bytesRead = 0;
-	char fileName[80] = {0};
+	char fileName[80] = { 0 };
 
 	strcpy(fileName, levelName);
 	ChangeFileNameExtension(fileName, "DEM");
 	hFile = CreateFile(fileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if( hFile != INVALID_HANDLE_VALUE ) {
+	if (hFile != INVALID_HANDLE_VALUE) {
 		ReadFileSync(hFile, DemoPtr, 36000, &bytesRead, NULL);
-		IsDemoLoaded = ( bytesRead > 0 );
+		IsDemoLoaded = (bytesRead > 0);
 		CloseHandle(hFile);
 	}
 }
@@ -1014,7 +1029,7 @@ BOOL LoadSamples(HANDLE hFile) {
 	int sampleIndexes[500];
 
 	SoundIsActive = FALSE;
-	if( !WinSndIsSoundEnabled() ) {
+	if (!WinSndIsSoundEnabled()) {
 		return TRUE;
 	}
 	WinSndFreeAllSamples();
@@ -1024,42 +1039,42 @@ BOOL LoadSamples(HANDLE hFile) {
 
 	// Load Sample Infos
 	ReadFileSync(hFile, &SampleInfoCount, sizeof(DWORD), &bytesRead, NULL);
-	if( SampleInfoCount == 0 ) {
+	if (SampleInfoCount == 0) {
 		return FALSE;
 	}
-	SampleInfos = (SAMPLE_INFO *)game_malloc(sizeof(SAMPLE_INFO)*SampleInfoCount, GBUF_SampleInfos);
-	ReadFileSync(hFile, SampleInfos, sizeof(SAMPLE_INFO)*SampleInfoCount, &bytesRead, NULL);
+	SampleInfos = (SAMPLE_INFO*)game_malloc(sizeof(SAMPLE_INFO) * SampleInfoCount, GBUF_SampleInfos);
+	ReadFileSync(hFile, SampleInfos, sizeof(SAMPLE_INFO) * SampleInfoCount, &bytesRead, NULL);
 
 	// Load Samples Count
 	ReadFileSync(hFile, &sampleCount, sizeof(int), &bytesRead, NULL);
-	if( sampleCount == 0 ) {
+	if (sampleCount == 0) {
 		return FALSE;
 	}
 
 	// Load Samples Indexes
-	ReadFileSync(hFile, sampleIndexes, sizeof(DWORD)*sampleCount, &bytesRead, NULL);
+	ReadFileSync(hFile, sampleIndexes, sizeof(DWORD) * sampleCount, &bytesRead, NULL);
 
 	// Open SFX file
 	sfxFileName = "data\\main.sfx";
 #ifdef FEATURE_GOLD
 	// For the Gold mode use the Gold SFX, if the level is not Title and not Lara's Home
-	if( IsGold() && LoadLevelType != GFL_TITLE && CurrentLevel != 0 ) {
+	if (IsGold() && LoadLevelType != GFL_TITLE && CurrentLevel != 0) {
 		sfxFileName = "data\\maing.sfx";
 	}
 #endif // FEATURE_GOLD
 	sfxFileName = GetFullPath(sfxFileName);
 	hSfxFile = CreateFile(sfxFileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if( hSfxFile == INVALID_HANDLE_VALUE ) {
+	if (hSfxFile == INVALID_HANDLE_VALUE) {
 		wsprintf(StringToShow, "Could not open MAIN.SFX file");
 		return FALSE;
 	}
 
-	for( i=0, j=0; i < sampleCount; ++j ) {
+	for (i = 0, j = 0; i < sampleCount; ++j) {
 		ReadFileSync(hSfxFile, &waveHeader, sizeof(WAVEPCM_HEADER), &bytesRead, NULL);
 
-		if( waveHeader.dwRiffChunkID != 0x46464952 || // "RIFF"
+		if (waveHeader.dwRiffChunkID != 0x46464952 || // "RIFF"
 			waveHeader.dwFormat != 0x45564157 || // "WAVE"
-			waveHeader.dwDataSubchunkID != 0x61746164 ) // "data"
+			waveHeader.dwDataSubchunkID != 0x61746164) // "data"
 		{
 			CloseHandle(hSfxFile);
 			return FALSE;
@@ -1069,16 +1084,17 @@ BOOL LoadSamples(HANDLE hFile) {
 		waveFormat = (LPWAVEFORMATEX)&waveHeader.wFormatTag;
 		waveFormat->cbSize = 0;
 
-		if( sampleIndexes[i] == j ) {
+		if (sampleIndexes[i] == j) {
 			waveData = game_malloc(dataSize, GBUF_Samples);
 			ReadFileSync(hSfxFile, waveData, dataSize, &bytesRead, NULL);
-			if( !WinSndMakeSample(i, waveFormat, waveData, dataSize) ) {
+			if (!WinSndMakeSample(i, waveFormat, waveData, dataSize)) {
 				CloseHandle(hSfxFile);
 				return FALSE;
 			}
 			game_free(dataSize);
 			++i;
-		} else {
+		}
+		else {
 			SetFilePointer(hSfxFile, dataSize, NULL, FILE_CURRENT);
 		}
 	}
@@ -1090,11 +1106,11 @@ BOOL LoadSamples(HANDLE hFile) {
 	return TRUE;
 }
 
-void ChangeFileNameExtension(char *fileName, const char *fileExt) {
-	char *fileNamePtr = fileName;
+void ChangeFileNameExtension(char* fileName, const char* fileExt) {
+	char* fileNamePtr = fileName;
 
-	for( ; *fileNamePtr; ++fileNamePtr ) {
-		if( *fileNamePtr == '.' )
+	for (; *fileNamePtr; ++fileNamePtr) {
+		if (*fileNamePtr == '.')
 			break;
 	}
 
@@ -1122,13 +1138,13 @@ BOOL SelectDrive() {
 	char driveName[] = "A:\\";
 
 	DriveLetter = 'A';
-	for( driveBitMask = GetLogicalDrives(); driveBitMask; driveBitMask >>= 1 ) {
-		if( (driveBitMask & 1) != 0 ) {
+	for (driveBitMask = GetLogicalDrives(); driveBitMask; driveBitMask >>= 1) {
+		if ((driveBitMask & 1) != 0) {
 			driveName[0] = DriveLetter;
-			if( GetDriveType(driveName) == DRIVE_CDROM ) {
+			if (GetDriveType(driveName) == DRIVE_CDROM) {
 				fileName[0] = DriveLetter;
 				hFile = CreateFile(fileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-				if( hFile != INVALID_HANDLE_VALUE ) {
+				if (hFile != INVALID_HANDLE_VALUE) {
 					CloseHandle(hFile);
 					return TRUE;
 				}
@@ -1151,15 +1167,15 @@ BOOL LoadLevel(LPCTSTR fileName, int levelID) {
 	strcpy(LevelFileName, fullPath);
 	init_game_malloc();
 
-	hFile = CreateFile(fullPath, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN|FILE_ATTRIBUTE_NORMAL, NULL);
-	if( hFile == INVALID_HANDLE_VALUE ) {
+	hFile = CreateFile(fullPath, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile == INVALID_HANDLE_VALUE) {
 		wsprintf(StringToShow, "LoadLevel(): Could not open %s (level %d)", fullPath, levelID);
 		return FALSE;
 	}
 
 	ReadFileSync(hFile, &levelVersion, sizeof(levelVersion), &bytesRead, NULL);
-	if( levelVersion != REQ_LEVEL_VERSION ) {
-		if( levelVersion < REQ_LEVEL_VERSION )
+	if (levelVersion != REQ_LEVEL_VERSION) {
+		if (levelVersion < REQ_LEVEL_VERSION)
 			wsprintf(StringToShow, "FATAL: Level %d (%s) is OUT OF DATE (version %d). COPY NEW EDITOR", levelID, fullPath, fileName);
 		else
 			wsprintf(StringToShow, "FATAL: Level %d (%s) requires a new TOMB2.EXE (version %d) to run", levelID, fullPath, fileName);
@@ -1167,39 +1183,39 @@ BOOL LoadLevel(LPCTSTR fileName, int levelID) {
 	}
 
 #if (DIRECT3D_VERSION >= 0x900)
-	if( SavedAppSettings.RenderMode == RM_Hardware ) {
+	if (SavedAppSettings.RenderMode == RM_Hardware) {
 		LoadTexPagesConfiguration(LevelFileName);
 	}
 #endif // (DIRECT3D_VERSION >= 0x900)
 
 	LevelFilePalettesOffset = SetFilePointer(hFile, 0, NULL, FILE_CURRENT);
-	if( !LoadPalettes(hFile) ) {
+	if (!LoadPalettes(hFile)) {
 		goto EXIT;
 	}
 
 	LevelFileTexPagesOffset = SetFilePointer(hFile, 0, NULL, FILE_CURRENT);
-	if( !LoadTexturePages(hFile) ) {
+	if (!LoadTexturePages(hFile)) {
 		goto EXIT;
 	}
 
 	ReadFileSync(hFile, &reserved, sizeof(reserved), &bytesRead, NULL);
-	if( !LoadRooms(hFile) ||
+	if (!LoadRooms(hFile) ||
 		!LoadObjects(hFile) ||
 		!LoadSprites(hFile) ||
 		!LoadCameras(hFile) ||
 		!LoadSoundEffects(hFile) ||
 		!LoadBoxes(hFile) ||
 		!LoadAnimatedTextures(hFile) ||
-		!LoadItems(hFile) )
+		!LoadItems(hFile))
 	{
 		goto EXIT;
 	}
 
 	LevelFileDepthQOffset = SetFilePointer(hFile, 0, NULL, FILE_CURRENT);
-	if( !LoadDepthQ(hFile) ||
+	if (!LoadDepthQ(hFile) ||
 		!LoadCinematic(hFile) ||
 		!LoadDemo(hFile) ||
-		!LoadSamples(hFile) )
+		!LoadSamples(hFile))
 	{
 		goto EXIT;
 	}
@@ -1214,7 +1230,7 @@ BOOL LoadLevel(LPCTSTR fileName, int levelID) {
 #endif // FEATURE_BACKGROUND_IMPROVED
 	result = TRUE;
 
-EXIT :
+EXIT:
 	CloseHandle(hFile);
 	return result;
 }
@@ -1226,10 +1242,10 @@ BOOL S_LoadLevelFile(LPCTSTR fileName, int levelID, GF_LEVEL_TYPE levelType) {
 	LoadModConfiguration(fileName);
 	BOOL result = LoadLevel(fileName, levelID);
 #ifdef FEATURE_BACKGROUND_IMPROVED
-	if( LoadingScreensEnabled && GetModLoadingPix() && (levelType == GFL_NORMAL || levelType == GFL_SAVED) ) {
+	if (LoadingScreensEnabled && GetModLoadingPix() && (levelType == GFL_NORMAL || levelType == GFL_SAVED)) {
 		RGB888 palette[256];
 		memcpy(palette, GamePalette8, sizeof(GamePalette8));
-		if( !BGND2_LoadPicture(GetModLoadingPix(), FALSE, FALSE) ) {
+		if (!BGND2_LoadPicture(GetModLoadingPix(), FALSE, FALSE)) {
 			BGND2_ShowPicture(30, 90, 10, 2, TRUE);
 			S_DontDisplayPicture();
 			InputStatus = 0;
@@ -1244,7 +1260,7 @@ BOOL S_LoadLevelFile(LPCTSTR fileName, int levelID, GF_LEVEL_TYPE levelType) {
 }
 
 void S_UnloadLevelFile() {
-	if( SavedAppSettings.RenderMode == RM_Hardware ) {
+	if (SavedAppSettings.RenderMode == RM_Hardware) {
 		HWR_FreeTexturePages();
 	}
 	memset(TexturePageBuffer8, 0, sizeof(TexturePageBuffer8));
@@ -1259,7 +1275,7 @@ void S_UnloadLevelFile() {
 }
 
 void S_AdjustTexelCoordinates() {
-	if( TextureInfoCount != 0 ) {
+	if (TextureInfoCount != 0) {
 		AdjustTextureUVs(false);
 	}
 }
@@ -1267,26 +1283,26 @@ void S_AdjustTexelCoordinates() {
 BOOL S_ReloadLevelGraphics(BOOL reloadPalettes, BOOL reloadTexPages) {
 	HANDLE hFile;
 
-	if( *LevelFileName ) {
+	if (*LevelFileName) {
 		hFile = CreateFile(LevelFileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		if( hFile == INVALID_HANDLE_VALUE )
+		if (hFile == INVALID_HANDLE_VALUE)
 			return FALSE;
 
 #if (DIRECT3D_VERSION >= 0x900)
-		if( SavedAppSettings.RenderMode == RM_Hardware ) {
+		if (SavedAppSettings.RenderMode == RM_Hardware) {
 			LoadTexPagesConfiguration(LevelFileName);
 		}
 #endif // (DIRECT3D_VERSION >= 0x900)
 
-		if( reloadPalettes && SavedAppSettings.RenderMode == RM_Software ) {
+		if (reloadPalettes && SavedAppSettings.RenderMode == RM_Software) {
 			SetFilePointer(hFile, LevelFilePalettesOffset, NULL, FILE_BEGIN);
 			LoadPalettes(hFile);
 			SetFilePointer(hFile, LevelFileDepthQOffset, NULL, FILE_BEGIN);
 			LoadDepthQ(hFile);
 		}
 
-		if( reloadTexPages ) {
-			if( SavedAppSettings.RenderMode == RM_Hardware )
+		if (reloadTexPages) {
+			if (SavedAppSettings.RenderMode == RM_Hardware)
 				HWR_FreeTexturePages();
 			SetFilePointer(hFile, LevelFileTexPagesOffset, NULL, FILE_BEGIN);
 			LoadTexturePages(hFile);
@@ -1297,13 +1313,13 @@ BOOL S_ReloadLevelGraphics(BOOL reloadPalettes, BOOL reloadTexPages) {
 		CloseHandle(hFile);
 	}
 
-	if( reloadPalettes )
+	if (reloadPalettes)
 		InitColours();
 
 	return TRUE;
 }
 
-BOOL Read_Strings(DWORD dwCount, char **stringTable, char **stringBuffer, LPDWORD lpBufferSize, HANDLE hFile) {
+BOOL Read_Strings(DWORD dwCount, char** stringTable, char** stringBuffer, LPDWORD lpBufferSize, HANDLE hFile) {
 	DWORD i, bytesRead;
 	UINT16 bufferSize;
 	UINT16 offsets[200]; // buffer for offsets
@@ -1312,18 +1328,18 @@ BOOL Read_Strings(DWORD dwCount, char **stringTable, char **stringBuffer, LPDWOR
 	ReadFileSync(hFile, &bufferSize, sizeof(bufferSize), &bytesRead, NULL);
 
 	*lpBufferSize = bufferSize;
-	*stringBuffer = (char *)GlobalAlloc(GMEM_FIXED, bufferSize);
+	*stringBuffer = (char*)GlobalAlloc(GMEM_FIXED, bufferSize);
 
-	if( *stringBuffer == NULL )
+	if (*stringBuffer == NULL)
 		return FALSE;
 
 	ReadFileSync(hFile, *stringBuffer, bufferSize, &bytesRead, NULL);
-	if( (GF_GameFlow.flags & GFF_UseSecurityTag) != 0 ) {
-		for( i = 0; i < bufferSize; ++i )
+	if ((GF_GameFlow.flags & GFF_UseSecurityTag) != 0) {
+		for (i = 0; i < bufferSize; ++i)
 			(*stringBuffer)[i] ^= GF_GameFlow.cypherCode;
 	}
 
-	for( i=0; i < dwCount; ++i ) {
+	for (i = 0; i < dwCount; ++i) {
 		stringTable[i] = &(*stringBuffer)[offsets[i]];
 	}
 	return TRUE;
@@ -1339,62 +1355,62 @@ BOOL S_LoadGameFlow(LPCTSTR fileName) {
 	LPCTSTR filePath = GetFullPath(fileName);
 	HANDLE hFile = CreateFile(filePath, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
-	if( hFile == INVALID_HANDLE_VALUE )
+	if (hFile == INVALID_HANDLE_VALUE)
 		return FALSE;
 
 	ReadFileSync(hFile, &scriptVersion, sizeof(DWORD), &bytesRead, NULL);
-	if( scriptVersion != REQ_SCRIPT_VERSION )
+	if (scriptVersion != REQ_SCRIPT_VERSION)
 		goto CLEANUP;
 
 	ReadFileSync(hFile, &scriptDescription, DESCRIPTION_LENGTH, &bytesRead, NULL);
 	ReadFileSync(hFile, &flowSize, sizeof(flowSize), &bytesRead, NULL);
-	if( flowSize != sizeof(GAME_FLOW) )
+	if (flowSize != sizeof(GAME_FLOW))
 		goto CLEANUP;
 
 	ReadFileSync(hFile, &GF_GameFlow, flowSize, &bytesRead, NULL);
 
-	READ_STRINGS(GF_GameFlow.num_Levels,	GF_LevelNamesStringTable,	&GF_LevelNamesStringBuffer,		&bytesRead, hFile, CLEANUP);
-	READ_STRINGS(GF_GameFlow.num_Pictures,	GF_PictureFilesStringTable,	&GF_PictureFilesStringBuffer,	&bytesRead, hFile, CLEANUP);
-	READ_STRINGS(GF_GameFlow.num_Titles,	GF_TitleFilesStringTable,	&GF_TitleFilesStringBuffer,		&bytesRead, hFile, CLEANUP);
-	READ_STRINGS(GF_GameFlow.num_Fmvs,		GF_FmvFilesStringTable,		&GF_FmvFilesStringBuffer,		&bytesRead, hFile, CLEANUP);
-	READ_STRINGS(GF_GameFlow.num_Levels,	GF_LevelFilesStringTable,	&GF_LevelFilesStringBuffer,		&bytesRead, hFile, CLEANUP);
-	READ_STRINGS(GF_GameFlow.num_Cutscenes,	GF_CutsFilesStringTable,	&GF_CutsFilesStringBuffer,		&bytesRead, hFile, CLEANUP);
+	READ_STRINGS(GF_GameFlow.num_Levels, GF_LevelNamesStringTable, &GF_LevelNamesStringBuffer, &bytesRead, hFile, CLEANUP);
+	READ_STRINGS(GF_GameFlow.num_Pictures, GF_PictureFilesStringTable, &GF_PictureFilesStringBuffer, &bytesRead, hFile, CLEANUP);
+	READ_STRINGS(GF_GameFlow.num_Titles, GF_TitleFilesStringTable, &GF_TitleFilesStringBuffer, &bytesRead, hFile, CLEANUP);
+	READ_STRINGS(GF_GameFlow.num_Fmvs, GF_FmvFilesStringTable, &GF_FmvFilesStringBuffer, &bytesRead, hFile, CLEANUP);
+	READ_STRINGS(GF_GameFlow.num_Levels, GF_LevelFilesStringTable, &GF_LevelFilesStringBuffer, &bytesRead, hFile, CLEANUP);
+	READ_STRINGS(GF_GameFlow.num_Cutscenes, GF_CutsFilesStringTable, &GF_CutsFilesStringBuffer, &bytesRead, hFile, CLEANUP);
 
 	ReadFileSync(hFile, offsets, sizeof(UINT16) * (GF_GameFlow.num_Levels + 1), &bytesRead, NULL);
 	ReadFileSync(hFile, &scriptSize, sizeof(scriptSize), &bytesRead, NULL);
 
-	GF_ScriptBuffer = (__int16 *)GlobalAlloc(GMEM_FIXED, scriptSize);
-	if( GF_ScriptBuffer == NULL )
+	GF_ScriptBuffer = (__int16*)GlobalAlloc(GMEM_FIXED, scriptSize);
+	if (GF_ScriptBuffer == NULL)
 		goto CLEANUP;
 
 	ReadFileSync(hFile, GF_ScriptBuffer, scriptSize, &bytesRead, NULL);
-	for( int i=0; i < (GF_GameFlow.num_Levels + 1); ++i ) {
-		GF_ScriptTable[i] = &GF_ScriptBuffer[offsets[i+1]/2];
+	for (int i = 0; i < (GF_GameFlow.num_Levels + 1); ++i) {
+		GF_ScriptTable[i] = &GF_ScriptBuffer[offsets[i + 1] / 2];
 	}
 
-	if( GF_GameFlow.num_Demos > 0 )
+	if (GF_GameFlow.num_Demos > 0)
 		ReadFileSync(hFile, GF_DemoLevels, sizeof(UINT16) * GF_GameFlow.num_Demos, &bytesRead, NULL);
 
 	ReadFileSync(hFile, &gameStringsCount, sizeof(gameStringsCount), &bytesRead, NULL);
-	if( gameStringsCount != REQ_GAME_STR_COUNT )
+	if (gameStringsCount != REQ_GAME_STR_COUNT)
 		goto CLEANUP;
 
 	// game and platform specific strings
-	READ_STRINGS(gameStringsCount,			GF_GameStringTable,			&GF_GameStringBuffer,			&bytesRead, hFile, CLEANUP);
-	READ_STRINGS(SPECIFIC_STR_COUNT,		GF_SpecificStringTable,		&GF_SpecificStringBuffer,		&bytesRead, hFile, CLEANUP);
+	READ_STRINGS(gameStringsCount, GF_GameStringTable, &GF_GameStringBuffer, &bytesRead, hFile, CLEANUP);
+	READ_STRINGS(SPECIFIC_STR_COUNT, GF_SpecificStringTable, &GF_SpecificStringBuffer, &bytesRead, hFile, CLEANUP);
 	// puzzle strings
-	READ_STRINGS(GF_GameFlow.num_Levels,	GF_Puzzle1StringTable,		&GF_Puzzle1StringBuffer,		&bytesRead, hFile, CLEANUP);
-	READ_STRINGS(GF_GameFlow.num_Levels,	GF_Puzzle2StringTable,		&GF_Puzzle2StringBuffer,		&bytesRead, hFile, CLEANUP);
-	READ_STRINGS(GF_GameFlow.num_Levels,	GF_Puzzle3StringTable,		&GF_Puzzle3StringBuffer,		&bytesRead, hFile, CLEANUP);
-	READ_STRINGS(GF_GameFlow.num_Levels,	GF_Puzzle4StringTable,		&GF_Puzzle4StringBuffer,		&bytesRead, hFile, CLEANUP);
+	READ_STRINGS(GF_GameFlow.num_Levels, GF_Puzzle1StringTable, &GF_Puzzle1StringBuffer, &bytesRead, hFile, CLEANUP);
+	READ_STRINGS(GF_GameFlow.num_Levels, GF_Puzzle2StringTable, &GF_Puzzle2StringBuffer, &bytesRead, hFile, CLEANUP);
+	READ_STRINGS(GF_GameFlow.num_Levels, GF_Puzzle3StringTable, &GF_Puzzle3StringBuffer, &bytesRead, hFile, CLEANUP);
+	READ_STRINGS(GF_GameFlow.num_Levels, GF_Puzzle4StringTable, &GF_Puzzle4StringBuffer, &bytesRead, hFile, CLEANUP);
 	// pickup strings
-	READ_STRINGS(GF_GameFlow.num_Levels,	GF_Pickup1StringTable,		&GF_Pickup1StringBuffer,		&bytesRead, hFile, CLEANUP);
-	READ_STRINGS(GF_GameFlow.num_Levels,	GF_Pickup2StringTable,		&GF_Pickup2StringBuffer,		&bytesRead, hFile, CLEANUP);
+	READ_STRINGS(GF_GameFlow.num_Levels, GF_Pickup1StringTable, &GF_Pickup1StringBuffer, &bytesRead, hFile, CLEANUP);
+	READ_STRINGS(GF_GameFlow.num_Levels, GF_Pickup2StringTable, &GF_Pickup2StringBuffer, &bytesRead, hFile, CLEANUP);
 	// key strings
-	READ_STRINGS(GF_GameFlow.num_Levels,	GF_Key1StringTable,			&GF_Key1StringBuffer,			&bytesRead, hFile, CLEANUP);
-	READ_STRINGS(GF_GameFlow.num_Levels,	GF_Key2StringTable,			&GF_Key2StringBuffer,			&bytesRead, hFile, CLEANUP);
-	READ_STRINGS(GF_GameFlow.num_Levels,	GF_Key3StringTable,			&GF_Key3StringBuffer,			&bytesRead, hFile, CLEANUP);
-	READ_STRINGS(GF_GameFlow.num_Levels,	GF_Key4StringTable,			&GF_Key4StringBuffer,			&bytesRead, hFile, CLEANUP);
+	READ_STRINGS(GF_GameFlow.num_Levels, GF_Key1StringTable, &GF_Key1StringBuffer, &bytesRead, hFile, CLEANUP);
+	READ_STRINGS(GF_GameFlow.num_Levels, GF_Key2StringTable, &GF_Key2StringBuffer, &bytesRead, hFile, CLEANUP);
+	READ_STRINGS(GF_GameFlow.num_Levels, GF_Key3StringTable, &GF_Key3StringBuffer, &bytesRead, hFile, CLEANUP);
+	READ_STRINGS(GF_GameFlow.num_Levels, GF_Key4StringTable, &GF_Key4StringBuffer, &bytesRead, hFile, CLEANUP);
 
 	result = TRUE;
 

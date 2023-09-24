@@ -55,7 +55,7 @@ bool JoystickVibrationEnabled = true;
 bool JoystickLedColorEnabled = true;
 
 BOOL CALLBACK DInputEnumJoystickAxisCallback(LPCDIDEVICEOBJECTINSTANCE pdidoi, LPVOID pContext) {
-	if( !pdidoi || !pContext ) {
+	if (!pdidoi || !pContext) {
 		return DIENUM_CONTINUE;
 	}
 
@@ -64,7 +64,7 @@ BOOL CALLBACK DInputEnumJoystickAxisCallback(LPCDIDEVICEOBJECTINSTANCE pdidoi, L
 	prop.diph.dwHeaderSize = sizeof(prop.diph);
 	prop.diph.dwHow = DIPH_BYOFFSET;
 	prop.diph.dwObj = pdidoi->dwOfs;
-	if( FAILED( IDID_SysJoystick->GetProperty(DIPROP_RANGE, &prop.diph) ) ) {
+	if (FAILED(IDID_SysJoystick->GetProperty(DIPROP_RANGE, &prop.diph))) {
 		return DIENUM_CONTINUE;
 	}
 
@@ -73,9 +73,9 @@ BOOL CALLBACK DInputEnumJoystickAxisCallback(LPCDIDEVICEOBJECTINSTANCE pdidoi, L
 		DIJOFS_RX, DIJOFS_RY, DIJOFS_RZ,
 	};
 
-	JOY_AXIS_RANGE *axisRanges = (JOY_AXIS_RANGE *)pContext;
-	for( int i=0; i<JoyAxisNumber; ++i ) {
-		if( pdidoi->dwOfs == axisOfs[i] ) {
+	JOY_AXIS_RANGE* axisRanges = (JOY_AXIS_RANGE*)pContext;
+	for (int i = 0; i < JoyAxisNumber; ++i) {
+		if (pdidoi->dwOfs == axisOfs[i]) {
 			axisRanges[i].lMin = prop.lMin;
 			axisRanges[i].lMax = prop.lMax;
 			break;
@@ -85,22 +85,22 @@ BOOL CALLBACK DInputEnumJoystickAxisCallback(LPCDIDEVICEOBJECTINSTANCE pdidoi, L
 }
 
 static BOOL CALLBACK RawInputCallBack(LPGUID lpGuid, LPCTSTR lpDeviceName, LPCTSTR lpProductName, WORD vid, WORD pid, LPVOID lpContext) {
-	if( lpGuid == NULL || lpDeviceName == NULL || lpProductName == NULL || lpContext == NULL || IsXInputDevice(vid, pid) )
+	if (lpGuid == NULL || lpDeviceName == NULL || lpProductName == NULL || lpContext == NULL || IsXInputDevice(vid, pid))
 		return TRUE;
 
-	JOYSTICK_LIST *joyList = (JOYSTICK_LIST *)lpContext;
-	JOYSTICK_NODE *joyNode = new JOYSTICK_NODE;
+	JOYSTICK_LIST* joyList = (JOYSTICK_LIST*)lpContext;
+	JOYSTICK_NODE* joyNode = new JOYSTICK_NODE;
 
-	if( joyNode == NULL )
+	if (joyNode == NULL)
 		return TRUE;
 
 	joyNode->next = NULL;
 	joyNode->previous = joyList->tail;
 
-	if( !joyList->head )
+	if (!joyList->head)
 		joyList->head = joyNode;
 
-	if( joyList->tail )
+	if (joyList->tail)
 		joyList->tail->next = joyNode;
 
 	joyList->tail = joyNode;
@@ -108,8 +108,8 @@ static BOOL CALLBACK RawInputCallBack(LPGUID lpGuid, LPCTSTR lpDeviceName, LPCTS
 
 	joyNode->body.joystickGuid = *lpGuid;
 	joyNode->body.lpJoystickGuid = &joyNode->body.joystickGuid;
-	FlaggedStringCreate(&joyNode->body.productName, strlen(lpProductName)+1);
-	FlaggedStringCreate(&joyNode->body.instanceName, strlen(lpDeviceName)+1);
+	FlaggedStringCreate(&joyNode->body.productName, strlen(lpProductName) + 1);
+	FlaggedStringCreate(&joyNode->body.instanceName, strlen(lpDeviceName) + 1);
 	lstrcpy(joyNode->body.productName.lpString, lpProductName);
 	lstrcpy(joyNode->body.instanceName.lpString, lpDeviceName);
 	joyNode->body.iface = JOY_RawInput;
@@ -120,26 +120,27 @@ void SetJoystickOutput(WORD leftMotor, WORD rightMotor, DWORD ledColor) {
 	static DWORD leftMotorOld = ~0;
 	static DWORD rightMotorOld = ~0;
 	static DWORD ledColorOld = ~0;
-	if( !SavedAppSettings.JoystickEnabled
-		|| (leftMotor == leftMotorOld && rightMotor == rightMotorOld && ledColor == ledColorOld) )
+	if (!SavedAppSettings.JoystickEnabled
+		|| (leftMotor == leftMotorOld && rightMotor == rightMotorOld && ledColor == ledColorOld))
 	{
 		return;
 	}
 	bool result = true;
 
-	if( XInputIndex >= 0 ) {
+	if (XInputIndex >= 0) {
 		XINPUT_VIBRATION vibration;
-		vibration.wLeftMotorSpeed  = leftMotor;
+		vibration.wLeftMotorSpeed = leftMotor;
 		vibration.wRightMotorSpeed = rightMotor;
 #ifndef WIN32
 		XInputEnable(TRUE);
 #endif
 		result = (ERROR_SUCCESS == XInputSetState(XInputIndex, &vibration));
-	} else if( IsRawInput ) {
+	}
+	else if (IsRawInput) {
 		result = RawInputSetState(leftMotor, rightMotor, ledColor);
 	}
 
-	if( result ) {
+	if (result) {
 		leftMotorOld = leftMotor;
 		rightMotorOld = rightMotor;
 		ledColorOld = ledColor;
@@ -147,14 +148,14 @@ void SetJoystickOutput(WORD leftMotor, WORD rightMotor, DWORD ledColor) {
 }
 
 JOYTYPE GetJoystickType() {
-	if( SavedAppSettings.JoystickEnabled && SavedAppSettings.PreferredJoystick ) {
-		if( IsRawInput ) {
+	if (SavedAppSettings.JoystickEnabled && SavedAppSettings.PreferredJoystick) {
+		if (IsRawInput) {
 			return JT_PLAYSTATION;
 		}
-		if( XInputIndex >= 0 ) {
+		if (XInputIndex >= 0) {
 			return JT_XINPUT;
 		}
-		if( IDID_SysJoystick != NULL ) {
+		if (IDID_SysJoystick != NULL) {
 			return JT_DIRECTINPUT;
 		}
 	}
@@ -162,11 +163,11 @@ JOYTYPE GetJoystickType() {
 }
 
 bool IsJoyVibrationSupported() {
-	if( IsRawInput ) {
+	if (IsRawInput) {
 		return true;
 	}
-	if( XInputIndex >= 0 ) {
-		return( XInputCaps.Vibration.wLeftMotorSpeed || XInputCaps.Vibration.wRightMotorSpeed );
+	if (XInputIndex >= 0) {
+		return(XInputCaps.Vibration.wLeftMotorSpeed || XInputCaps.Vibration.wRightMotorSpeed);
 	}
 	return false;
 }
@@ -184,19 +185,19 @@ bool IsJoyLedColorEnabled() {
 }
 #endif // FEATURE_INPUT_IMPROVED
 
-extern void FlaggedStringDelete(STRING_FLAGGED *item);
-extern bool FlaggedStringCopy(STRING_FLAGGED *dst, STRING_FLAGGED *src);
+extern void FlaggedStringDelete(STRING_FLAGGED* item);
+extern bool FlaggedStringCopy(STRING_FLAGGED* dst, STRING_FLAGGED* src);
 
 bool DInputCreate() {
 #if (DIRECTINPUT_VERSION >= 0x800)
-	return SUCCEEDED(DirectInput8Create(GameModule, DIRECTINPUT_VERSION, IID_IDirectInput8, (LPVOID *)&DInput, NULL));
+	return SUCCEEDED(DirectInput8Create(GameModule, DIRECTINPUT_VERSION, IID_IDirectInput8, (LPVOID*)&DInput, NULL));
 #else // (DIRECTINPUT_VERSION >= 0x800)
 	return SUCCEEDED(DirectInputCreate(GameModule, DIRECTINPUT_VERSION, &DInput, NULL));
 #endif // (DIRECTINPUT_VERSION >= 0x800)
 }
 
 void DInputRelease() {
-	if( DInput != NULL ) {
+	if (DInput != NULL) {
 		DInput->Release();
 		DInput = NULL;
 	}
@@ -213,10 +214,10 @@ void WinInReadKeyboard(LPVOID lpInputData) {
 }
 
 #ifdef FEATURE_INPUT_IMPROVED
-static void PovToPos(int *xPos, int *yPos, DWORD pov) {
-	int x=0, y=0;
+static void PovToPos(int* xPos, int* yPos, DWORD pov) {
+	int x = 0, y = 0;
 	// Check if D-PAD is not centered
-	if( LOWORD(pov) != 0xFFFF ) {
+	if (LOWORD(pov) != 0xFFFF) {
 		// We need here cyclic quadrilateral with a side 32.
 		// The radius of circumscribed circle is approx 23 = 16 * SQRT(2)
 		x = +23 * phd_sin(pov * PHD_360 / 36000) / PHD_IONE;
@@ -224,44 +225,44 @@ static void PovToPos(int *xPos, int *yPos, DWORD pov) {
 		CLAMP(x, -16, 16);
 		CLAMP(y, -16, 16);
 	}
-	if( xPos ) *xPos = x;
-	if( yPos ) *yPos = y;
+	if (xPos) *xPos = x;
+	if (yPos) *yPos = y;
 }
 
 static int SelectJoyDirection(int dp, int ls, int rs, int threshold) {
 	// D-Pad has priority
-	if( ABS(dp) > threshold ) return dp;
+	if (ABS(dp) > threshold) return dp;
 	// if sticks have opposite directions, just sum them
-	if( (ls^rs) < 0 ) return ls + rs;
+	if ((ls ^ rs) < 0) return ls + rs;
 	// or just select the one with max value
-	if( ABS(rs) > ABS(ls) ) return rs;
+	if (ABS(rs) > ABS(ls)) return rs;
 	return ls;
 }
 
-static DWORD XInputReadJoystick(int *xPos, int *yPos) {
-	if( !xPos || !yPos || XInputIndex < 0 ) return 0;
+static DWORD XInputReadJoystick(int* xPos, int* yPos) {
+	if (!xPos || !yPos || XInputIndex < 0) return 0;
 	*xPos = *yPos = 0;
 	DWORD buttonStatus = 0;
 	XINPUT_STATE state;
 #ifndef WIN32
 	XInputEnable(TRUE);
 #endif
-	if( ERROR_SUCCESS != XInputGetState(XInputIndex, &state) ) {
+	if (ERROR_SUCCESS != XInputGetState(XInputIndex, &state)) {
 		return 0;
 	}
 
-	int dx=0, dy=0, lx=0, ly=0, rx=0, ry=0;
-	if( XINPUT_DPAD(XInputCaps.Gamepad.wButtons) ) {
+	int dx = 0, dy = 0, lx = 0, ly = 0, rx = 0, ry = 0;
+	if (XINPUT_DPAD(XInputCaps.Gamepad.wButtons)) {
 		dx += CHK_ANY(state.Gamepad.wButtons, XINPUT_GAMEPAD_DPAD_RIGHT) ? 16 : 0;
 		dx -= CHK_ANY(state.Gamepad.wButtons, XINPUT_GAMEPAD_DPAD_LEFT) ? 16 : 0;
 		dy += CHK_ANY(state.Gamepad.wButtons, XINPUT_GAMEPAD_DPAD_DOWN) ? 16 : 0;
 		dy -= CHK_ANY(state.Gamepad.wButtons, XINPUT_GAMEPAD_DPAD_UP) ? 16 : 0;
 	}
-	if( XInputCaps.Gamepad.sThumbLX && XInputCaps.Gamepad.sThumbLY ) {
+	if (XInputCaps.Gamepad.sThumbLX && XInputCaps.Gamepad.sThumbLY) {
 		lx = 16 * state.Gamepad.sThumbLX / 0x8000;
 		ly = -16 * state.Gamepad.sThumbLY / 0x8000;
 	}
-	if( XInputCaps.Gamepad.sThumbRX && XInputCaps.Gamepad.sThumbRY ) {
+	if (XInputCaps.Gamepad.sThumbRX && XInputCaps.Gamepad.sThumbRY) {
 		rx = 16 * state.Gamepad.sThumbRX / 0x8000;
 		ry = -16 * state.Gamepad.sThumbRY / 0x8000;
 	}
@@ -284,17 +285,17 @@ static DWORD XInputReadJoystick(int *xPos, int *yPos) {
 	return buttonStatus;
 }
 
-static DWORD RawInputReadJoystick(int *xPos, int *yPos) {
-	if( !xPos || !yPos || !IsRawInput ) return 0;
+static DWORD RawInputReadJoystick(int* xPos, int* yPos) {
+	if (!xPos || !yPos || !IsRawInput) return 0;
 	*xPos = *yPos = 0;
 	DWORD buttonStatus = 0;
 	RINPUT_STATE state;
 
-	if( !RawInputGetState(&state) ) {
+	if (!RawInputGetState(&state)) {
 		return 0;
 	}
 
-	int dx=0, dy=0, lx=0, ly=0, rx=0, ry=0;
+	int dx = 0, dy = 0, lx = 0, ly = 0, rx = 0, ry = 0;
 	PovToPos(&dx, &dy, state.dPad);
 	lx = (int)(+16.0 * state.axisLX);
 	ly = (int)(-16.0 * state.axisLY);
@@ -320,78 +321,79 @@ static DWORD RawInputReadJoystick(int *xPos, int *yPos) {
 	return buttonStatus;
 }
 
-static DWORD DInputReadJoystick(int *xPos, int *yPos) {
-	if( !xPos || !yPos || !IDID_SysJoystick ) return 0;
+static DWORD DInputReadJoystick(int* xPos, int* yPos) {
+	if (!xPos || !yPos || !IDID_SysJoystick) return 0;
 	*xPos = *yPos = 0;
 	DWORD buttonStatus = 0;
 	DIJOYSTATE joyState;
 
 #if (DIRECTINPUT_VERSION >= 0x800)
-	while( FAILED(IDID_SysJoystick->Poll()) || FAILED(IDID_SysJoystick->GetDeviceState(sizeof(joyState), &joyState)) )
+	while (FAILED(IDID_SysJoystick->Poll()) || FAILED(IDID_SysJoystick->GetDeviceState(sizeof(joyState), &joyState)))
 #else // (DIRECTINPUT_VERSION >= 0x800)
-	while( FAILED(IDID_SysJoystick->GetDeviceState(sizeof(joyState), &joyState)) )
+	while (FAILED(IDID_SysJoystick->GetDeviceState(sizeof(joyState), &joyState)))
 #endif // (DIRECTINPUT_VERSION >= 0x800)
 	{
 		if FAILED(IDID_SysJoystick->Acquire()) return 0;
 	}
 
-	int dx=0, dy=0, lx=0, ly=0, rx=0, ry=0;
-	if( JoyCaps.dwPOVs ) {
+	int dx = 0, dy = 0, lx = 0, ly = 0, rx = 0, ry = 0;
+	if (JoyCaps.dwPOVs) {
 		PovToPos(&dx, &dy, joyState.rgdwPOV[0]);
 	}
-	if( HAS_AXIS(JoyX) && HAS_AXIS(JoyY) ) {
+	if (HAS_AXIS(JoyX) && HAS_AXIS(JoyY)) {
 		lx = 32 * joyState.lX / (JoyRanges[JoyX].lMax - JoyRanges[JoyX].lMin) - 16;
 		ly = 32 * joyState.lY / (JoyRanges[JoyY].lMax - JoyRanges[JoyY].lMin) - 16;
 	}
-	if( HAS_AXIS(JoyZ) && HAS_AXIS(JoyRZ) ) {
-		rx = 32 * joyState.lZ  / (JoyRanges[JoyZ].lMax  - JoyRanges[JoyZ].lMin)  - 16;
+	if (HAS_AXIS(JoyZ) && HAS_AXIS(JoyRZ)) {
+		rx = 32 * joyState.lZ / (JoyRanges[JoyZ].lMax - JoyRanges[JoyZ].lMin) - 16;
 		ry = 32 * joyState.lRz / (JoyRanges[JoyRZ].lMax - JoyRanges[JoyRZ].lMin) - 16;
-	} else if( HAS_AXIS(JoyRX) && HAS_AXIS(JoyRY) ) {
+	}
+	else if (HAS_AXIS(JoyRX) && HAS_AXIS(JoyRY)) {
 		rx = 32 * joyState.lRx / (JoyRanges[JoyRX].lMax - JoyRanges[JoyRX].lMin) - 16;
 		ry = 32 * joyState.lRy / (JoyRanges[JoyRY].lMax - JoyRanges[JoyRY].lMin) - 16;
 	}
 	*xPos = SelectJoyDirection(dx, lx, rx, 8);
 	*yPos = SelectJoyDirection(dy, ly, ry, 8);
 
-	for( DWORD i=0; i<MIN(JoyCaps.dwButtons, 32); ++i ) {
-		buttonStatus |= CHK_ANY(joyState.rgbButtons[i], 0x80) ? 1<<i : 0;
+	for (DWORD i = 0; i < MIN(JoyCaps.dwButtons, 32); ++i) {
+		buttonStatus |= CHK_ANY(joyState.rgbButtons[i], 0x80) ? 1 << i : 0;
 	}
 	return buttonStatus;
 }
 #endif // FEATURE_INPUT_IMPROVED
 
-DWORD WinInReadJoystick(int *xPos, int *yPos) {
+DWORD WinInReadJoystick(int* xPos, int* yPos) {
 #ifdef FEATURE_INPUT_IMPROVED
-	*yPos = 0;
+	* yPos = 0;
 	*xPos = 0;
-	if( !SavedAppSettings.JoystickEnabled ) return 0;
-	switch( GetJoystickType() ) {
-		case JT_XINPUT:
-			return XInputReadJoystick(xPos, yPos);
-		case JT_PLAYSTATION:
-			return RawInputReadJoystick(xPos, yPos);
-		case JT_DIRECTINPUT:
-			return DInputReadJoystick(xPos, yPos);
-		case JT_NONE:
-			break;
+	if (!SavedAppSettings.JoystickEnabled) return 0;
+	switch (GetJoystickType()) {
+	case JT_XINPUT:
+		return XInputReadJoystick(xPos, yPos);
+	case JT_PLAYSTATION:
+		return RawInputReadJoystick(xPos, yPos);
+	case JT_DIRECTINPUT:
+		return DInputReadJoystick(xPos, yPos);
+	case JT_NONE:
+		break;
 	}
 	return 0;
 #else // FEATURE_INPUT_IMPROVED
 	static bool joyNeedCaps = true;
 	static JOYCAPS joyCaps;
 
-	if( SavedAppSettings.JoystickEnabled ) {
-		if( joyNeedCaps && JOYERR_NOERROR == joyGetDevCaps(0, &joyCaps, sizeof(JOYCAPS)) ) {
+	if (SavedAppSettings.JoystickEnabled) {
+		if (joyNeedCaps && JOYERR_NOERROR == joyGetDevCaps(0, &joyCaps, sizeof(JOYCAPS))) {
 			joyNeedCaps = false;
 		}
 
-		if( !joyNeedCaps ) {
+		if (!joyNeedCaps) {
 			JOYINFOEX joyInfo;
 
 			joyInfo.dwSize = sizeof(JOYINFOEX);
-			joyInfo.dwFlags = JOY_RETURNBUTTONS|JOY_RETURNX|JOY_RETURNY;
+			joyInfo.dwFlags = JOY_RETURNBUTTONS | JOY_RETURNX | JOY_RETURNY;
 
-			if( JOYERR_NOERROR == joyGetPosEx(0, &joyInfo) ) {
+			if (JOYERR_NOERROR == joyGetPosEx(0, &joyInfo)) {
 				*xPos = 32 * joyInfo.dwXpos / (joyCaps.wXmax - joyCaps.wXmin) - 16;
 				*yPos = 32 * joyInfo.dwYpos / (joyCaps.wYmax - joyCaps.wYmin) - 16;
 				return joyInfo.dwButtons;
@@ -407,10 +409,10 @@ DWORD WinInReadJoystick(int *xPos, int *yPos) {
 }
 
 bool WinInputInit() {
-	JOYSTICK_NODE *node, *nextNode;
+	JOYSTICK_NODE* node, * nextNode;
 	bool result;
 
-	for( node = JoystickList.head; node; node = nextNode ) {
+	for (node = JoystickList.head; node; node = nextNode) {
 		nextNode = node->next;
 		FlaggedStringDelete(&node->body.productName);
 		FlaggedStringDelete(&node->body.instanceName);
@@ -421,7 +423,7 @@ bool WinInputInit() {
 	JoystickList.tail = NULL;
 	JoystickList.dwCount = 0;
 
-	if( !DInputCreate() )
+	if (!DInputCreate())
 		return false;
 
 	result = DInputEnumDevices(&JoystickList);
@@ -430,24 +432,24 @@ bool WinInputInit() {
 	return result;
 }
 
-bool DInputEnumDevices(JOYSTICK_LIST *joystickList) {
+bool DInputEnumDevices(JOYSTICK_LIST* joystickList) {
 #ifdef FEATURE_INPUT_IMPROVED
-	for( DWORD i = 0; i < XUSER_MAX_COUNT; ++i ) {
+	for (DWORD i = 0; i < XUSER_MAX_COUNT; ++i) {
 		XINPUT_STATE state;
 		memset(&state, 0, sizeof(state));
-		if( ERROR_SUCCESS != XInputGetState(i, &state) ) {
+		if (ERROR_SUCCESS != XInputGetState(i, &state)) {
 			continue;
 		}
-		JOYSTICK_NODE *joyNode = new JOYSTICK_NODE;
-		if( joyNode == NULL ) {
+		JOYSTICK_NODE* joyNode = new JOYSTICK_NODE;
+		if (joyNode == NULL) {
 			continue;
 		}
 		joyNode->next = NULL;
 		joyNode->previous = joystickList->tail;
-		if( !joystickList->head ) {
+		if (!joystickList->head) {
 			joystickList->head = joyNode;
 		}
-		if( joystickList->tail ) {
+		if (joystickList->tail) {
 			joystickList->tail->next = joyNode;
 		}
 		joystickList->tail = joyNode;
@@ -457,7 +459,7 @@ bool DInputEnumDevices(JOYSTICK_LIST *joystickList) {
 		joyNode->body.lpJoystickGuid = &joyNode->body.joystickGuid;
 		FlaggedStringCreate(&joyNode->body.productName, 256);
 		FlaggedStringCreate(&joyNode->body.instanceName, 256);
-		snprintf(joyNode->body.productName.lpString, 256, "XInput Controller %lu", i+1);
+		snprintf(joyNode->body.productName.lpString, 256, "XInput Controller %lu", i + 1);
 		joyNode->body.iface = JOY_XInput;
 	}
 	RawInputEnumerate(RawInputCallBack, (LPVOID)joystickList);
@@ -470,31 +472,31 @@ bool DInputEnumDevices(JOYSTICK_LIST *joystickList) {
 }
 
 BOOL CALLBACK DInputEnumDevicesCallback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef) {
-	if( lpddi == NULL || pvRef == NULL ) {
+	if (lpddi == NULL || pvRef == NULL) {
 		return DIENUM_CONTINUE;
 	}
 
 #ifdef FEATURE_INPUT_IMPROVED
 	DWORD vid = LOWORD(lpddi->guidProduct.Data1);
 	DWORD pid = HIWORD(lpddi->guidProduct.Data1);
-	if( GetRawInputName(vid, pid, FALSE) || IsXInputDevice(vid, pid) ) {
+	if (GetRawInputName(vid, pid, FALSE) || IsXInputDevice(vid, pid)) {
 		return DIENUM_CONTINUE;
 	}
 #endif // FEATURE_INPUT_IMPROVED
 
-	JOYSTICK_LIST *joyList = (JOYSTICK_LIST *)pvRef;
-	JOYSTICK_NODE *joyNode = new JOYSTICK_NODE;
+	JOYSTICK_LIST* joyList = (JOYSTICK_LIST*)pvRef;
+	JOYSTICK_NODE* joyNode = new JOYSTICK_NODE;
 
-	if( joyNode == NULL )
+	if (joyNode == NULL)
 		return DIENUM_CONTINUE;
 
 	joyNode->next = NULL;
 	joyNode->previous = joyList->tail;
 
-	if( !joyList->head )
+	if (!joyList->head)
 		joyList->head = joyNode;
 
-	if( joyList->tail )
+	if (joyList->tail)
 		joyList->tail->next = joyNode;
 
 	joyList->tail = joyNode;
@@ -513,24 +515,24 @@ BOOL CALLBACK DInputEnumDevicesCallback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 	return DIENUM_CONTINUE;
 }
 
-void FlaggedStringCreate(STRING_FLAGGED *item, DWORD dwSize) {
+void FlaggedStringCreate(STRING_FLAGGED* item, DWORD dwSize) {
 	item->lpString = new char[dwSize];
 
-	if( item->lpString != NULL ) {
+	if (item->lpString != NULL) {
 		*item->lpString = 0;
 		item->isPresented = true;
 	}
 }
 
-JOYSTICK_NODE *__cdecl GetJoystick(GUID *lpGuid) {
-	JOYSTICK_NODE *joystick;
+JOYSTICK_NODE* __cdecl GetJoystick(GUID* lpGuid) {
+	JOYSTICK_NODE* joystick;
 
-	if( JoystickList.dwCount == 0 )
+	if (JoystickList.dwCount == 0)
 		return NULL;
 
-	if( lpGuid != NULL ) {
-		for( joystick = JoystickList.head; joystick; joystick = joystick->next ) {
-			if( !memcmp(&joystick->body.joystickGuid, lpGuid, sizeof(GUID)) )
+	if (lpGuid != NULL) {
+		for (joystick = JoystickList.head; joystick; joystick = joystick->next) {
+			if (!memcmp(&joystick->body.joystickGuid, lpGuid, sizeof(GUID)))
 				return joystick;
 		}
 	}
@@ -540,19 +542,19 @@ JOYSTICK_NODE *__cdecl GetJoystick(GUID *lpGuid) {
 void DInputKeyboardCreate() {
 	if FAILED(DInput->CreateDevice(GUID_SysKeyboard, &IDID_SysKeyboard, NULL))
 		throw ERR_CantCreateKeyboardDevice;
-	if FAILED(IDID_SysKeyboard->SetCooperativeLevel(HGameWindow, DISCL_FOREGROUND|DISCL_NONEXCLUSIVE))
+	if FAILED(IDID_SysKeyboard->SetCooperativeLevel(HGameWindow, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE))
 		throw ERR_CantSetKBCooperativeLevel;
 	if FAILED(IDID_SysKeyboard->SetDataFormat(&c_dfDIKeyboard))
 		throw ERR_CantSetKBDataFormat;
 
 	// NOTE: there is no DIERR_OTHERAPPHASPRIO check in the original code
 	HRESULT res = IDID_SysKeyboard->Acquire();
-	if( !SUCCEEDED(res) && res != DIERR_OTHERAPPHASPRIO )
+	if (!SUCCEEDED(res) && res != DIERR_OTHERAPPHASPRIO)
 		throw ERR_CantAcquireKeyboard;
 }
 
 void DInputKeyboardRelease() {
-	if( IDID_SysKeyboard != NULL ) {
+	if (IDID_SysKeyboard != NULL) {
 		IDID_SysKeyboard->Unacquire();
 		IDID_SysKeyboard->Release();
 		IDID_SysKeyboard = NULL;
@@ -560,10 +562,10 @@ void DInputKeyboardRelease() {
 }
 
 bool DInputJoystickCreate() {
-	if( SavedAppSettings.PreferredJoystick == NULL )
+	if (SavedAppSettings.PreferredJoystick == NULL)
 		return true;
 
-	JOYSTICK *preferred = &SavedAppSettings.PreferredJoystick->body;
+	JOYSTICK* preferred = &SavedAppSettings.PreferredJoystick->body;
 	CurrentJoystick = *preferred;
 
 	FlaggedStringCopy(&CurrentJoystick.productName, &preferred->productName);
@@ -571,15 +573,15 @@ bool DInputJoystickCreate() {
 #ifdef FEATURE_INPUT_IMPROVED
 	XInputIndex = -1;
 	memset(&XInputCaps, 0, sizeof(XInputCaps));
-	GUID *guid = &CurrentJoystick.joystickGuid;
-	if( CurrentJoystick.iface == JOY_XInput ) {
-		if( ERROR_SUCCESS != XInputGetCapabilities(guid->Data4[7], 0, &XInputCaps) ) {
+	GUID* guid = &CurrentJoystick.joystickGuid;
+	if (CurrentJoystick.iface == JOY_XInput) {
+		if (ERROR_SUCCESS != XInputGetCapabilities(guid->Data4[7], 0, &XInputCaps)) {
 			return false;
 		}
 		XInputIndex = guid->Data4[7];
 		return true;
 	}
-	if( CurrentJoystick.iface == JOY_RawInput ) {
+	if (CurrentJoystick.iface == JOY_RawInput) {
 		IsRawInput = RawInputStart(CurrentJoystick.instanceName.lpString);
 		return IsRawInput;
 	}
@@ -588,7 +590,7 @@ bool DInputJoystickCreate() {
 	JoyCaps.dwSize = sizeof(JoyCaps);
 	if FAILED(DInput->CreateDevice(CurrentJoystick.joystickGuid, &IDID_SysJoystick, NULL))
 		return false;
-	if FAILED(IDID_SysJoystick->SetCooperativeLevel(HGameWindow, DISCL_FOREGROUND|DISCL_NONEXCLUSIVE))
+	if FAILED(IDID_SysJoystick->SetCooperativeLevel(HGameWindow, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE))
 		return false;
 	if FAILED(IDID_SysJoystick->SetDataFormat(&c_dfDIJoystick))
 		return false;
@@ -598,7 +600,7 @@ bool DInputJoystickCreate() {
 		return false;
 
 	HRESULT res = IDID_SysJoystick->Acquire();
-	if( !SUCCEEDED(res) && res != DIERR_OTHERAPPHASPRIO )
+	if (!SUCCEEDED(res) && res != DIERR_OTHERAPPHASPRIO)
 		return false;
 #endif // FEATURE_INPUT_IMPROVED
 
@@ -615,7 +617,7 @@ void DInputJoystickRelease() {
 #endif
 	XInputIndex = -1;
 #endif // FEATURE_INPUT_IMPROVED
-	if( IDID_SysJoystick != NULL ) {
+	if (IDID_SysJoystick != NULL) {
 		IDID_SysJoystick->Unacquire();
 		IDID_SysJoystick->Release();
 		IDID_SysJoystick = NULL;
@@ -623,7 +625,7 @@ void DInputJoystickRelease() {
 }
 
 void WinInStart() {
-	if( !DInputCreate() )
+	if (!DInputCreate())
 		throw ERR_CantCreateDirectInput;
 
 	DInputKeyboardCreate();
@@ -637,9 +639,9 @@ void WinInFinish() {
 }
 
 void WinInRunControlPanel(HWND hWnd) {
-	if( DInput != NULL ) {
+	if (DInput != NULL) {
 #ifdef FEATURE_INPUT_IMPROVED
-		JOYSTICK *preferred = &ChangedAppSettings.PreferredJoystick->body;
+		JOYSTICK* preferred = &ChangedAppSettings.PreferredJoystick->body;
 		if SUCCEEDED(DInput->CreateDevice(preferred->joystickGuid, &IDID_SysJoystick, NULL))
 		{
 			IDID_SysJoystick->RunControlPanel(hWnd, 0);
@@ -668,7 +670,7 @@ void Inject_InitInput() {
 	INJECT(0x00447670, DInputKeyboardCreate);
 	INJECT(0x00447740, DInputKeyboardRelease);
 	INJECT(0x00447770, DInputJoystickCreate);
-//	INJECT(----------, DInputJoystickRelease);
+	//	INJECT(----------, DInputJoystickRelease);
 	INJECT(0x00447860, WinInStart);
 	INJECT(0x00447890, WinInFinish);
 	INJECT(0x004478A0, WinInRunControlPanel);

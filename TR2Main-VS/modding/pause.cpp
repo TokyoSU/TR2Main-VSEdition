@@ -37,7 +37,7 @@
 #endif // FEATURE_INPUT_IMPROVED
 
 #ifdef FEATURE_BACKGROUND_IMPROVED
-static TEXT_STR_INFO *PausedText = NULL;
+static TEXT_STR_INFO* PausedText = NULL;
 
 static void RemovePausedText() {
 	T_RemovePrint(PausedText);
@@ -45,16 +45,16 @@ static void RemovePausedText() {
 }
 
 static void DisplayPausedText() {
-	if( PausedText == NULL ) {
+	if (PausedText == NULL) {
 		PausedText = T_Print(0, -24, 5, "Paused");
 		T_CentreH(PausedText, 1);
 		T_BottomAlign(PausedText, 1);
 	}
 }
 
-static int DisplayPauseRequester(const char *header, const char *option1, const char *option2, UINT16 selected) {
+static int DisplayPauseRequester(const char* header, const char* option1, const char* option2, UINT16 selected) {
 	static bool isPauseTextReady = false;
-	if( !isPauseTextReady ) {
+	if (!isPauseTextReady) {
 		StatsRequester.reqFlags &= ~REQFLAG_NOCURSOR;
 		SetPCRequesterSize(&StatsRequester, 2, -48);
 
@@ -66,8 +66,8 @@ static int DisplayPauseRequester(const char *header, const char *option1, const 
 		StatsRequester.pixWidth = 100;
 		StatsRequester.xPos = 0;
 		StatsRequester.zPos = 0;
-		StatsRequester.lpItemStrings1 = (char *)SaveGameStrings1;
-		StatsRequester.lpItemStrings2 = (char *)SaveGameStrings2;
+		StatsRequester.lpItemStrings1 = (char*)SaveGameStrings1;
+		StatsRequester.lpItemStrings2 = (char*)SaveGameStrings2;
 		StatsRequester.itemStringLen = 50;
 
 		Init_Requester(&StatsRequester);
@@ -84,9 +84,10 @@ static int DisplayPauseRequester(const char *header, const char *option1, const 
 	}
 
 	int select = Display_Requester(&StatsRequester, 0, 0);
-	if( select > 0 ) {
+	if (select > 0) {
 		isPauseTextReady = false;
-	} else {
+	}
+	else {
 		InputDB = 0;
 		InputStatus = 0;
 	}
@@ -98,32 +99,32 @@ static int PauseRequester() {
 	int select = 0;
 
 	InputDB = GetDebouncedInput(InputStatus);
-	switch( state ) {
-		case 0:
-			if( CHK_ANY(InputDB, IN_PAUSE) ) {
-				select = 1;
-				break;
-			}
-			if( CHK_ANY(InputDB, IN_OPTION) ) {
-				state = 1;
-			}
-			if( state != 1 ) break;
-			// fall through
-		case 1:
-			switch( DisplayPauseRequester(CHK_ANY(GF_GameFlow.flags, GFF_DemoVersion)? "Exit Demo?" : "Exit to title?", "Continue", "Quit", 0) ) {
-				case 1: select = 1; break;
-				case 2: state = 2; break;
-			};
-			if( state != 2 ) break;
-			// fall through
-		case 2:
-			switch( DisplayPauseRequester("Are you sure?", "Yes", "No", 1) ) {
-				case 1: select = -1; break;
-				case 2: select = 1; break;
-			};
+	switch (state) {
+	case 0:
+		if (CHK_ANY(InputDB, IN_PAUSE)) {
+			select = 1;
 			break;
+		}
+		if (CHK_ANY(InputDB, IN_OPTION)) {
+			state = 1;
+		}
+		if (state != 1) break;
+		// fall through
+	case 1:
+		switch (DisplayPauseRequester(CHK_ANY(GF_GameFlow.flags, GFF_DemoVersion) ? "Exit Demo?" : "Exit to title?", "Continue", "Quit", 0)) {
+		case 1: select = 1; break;
+		case 2: state = 2; break;
+		};
+		if (state != 2) break;
+		// fall through
+	case 2:
+		switch (DisplayPauseRequester("Are you sure?", "Yes", "No", 1)) {
+		case 1: select = -1; break;
+		case 2: select = 1; break;
+		};
+		break;
 	}
-	if( select ) state = 0;
+	if (select) state = 0;
 	return select;
 }
 
@@ -153,22 +154,24 @@ bool S_Pause() {
 #ifdef FEATURE_INPUT_IMPROVED
 		UpdateJoyOutput(false);
 #endif // FEATURE_INPUT_IMPROVED
-	} while( !S_UpdateInput() && 0 == (select=PauseRequester()) );
+	} while (!S_UpdateInput() && 0 == (select = PauseRequester()));
 
 	Remove_Requester(&StatsRequester);
 	RemovePausedText();
 	IsVidModeLock = false;
 	TempVideoRemove();
 #ifdef FEATURE_AUDIO_IMPROVED
-	if( Camera.underwater ) {
+	if (Camera.underwater) {
 		extern double UnderwaterMusicMute;
 		double volume = (1.0 - UnderwaterMusicMute) * (double)(MusicVolume * 25 + 5);
-		if( volume >= 1.0 ) {
+		if (volume >= 1.0) {
 			S_CDVolume((DWORD)volume);
-		} else {
+		}
+		else {
 			S_CDVolume(0);
 		}
-	} else {
+	}
+	else {
 		S_CDVolume(MusicVolume * 25 + 5);
 	}
 #else // FEATURE_AUDIO_IMPROVED

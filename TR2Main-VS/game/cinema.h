@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 void SetCutsceneTrack(int track); // 0x00411F30
 int StartCinematic(int levelID); // 0x00411F40
 void InitCinematicRooms(); // 0x00412060

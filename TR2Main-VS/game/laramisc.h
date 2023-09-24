@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 void LaraControl(__int16 itemID);
 
 #define AnimateLara ((void(__cdecl*)(ITEM_INFO*)) 0x00430A10)

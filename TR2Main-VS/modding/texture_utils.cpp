@@ -141,21 +141,21 @@ typedef enum {
 	kbd_enter,
 	kbd_add,
 
-	joy_di1,  joy_di2,  joy_di3,  joy_di4,  joy_di5,  joy_di6,  joy_di7,  joy_di8,
-	joy_di9,  joy_di10, joy_di11, joy_di12, joy_di13, joy_di14, joy_di15, joy_di16,
+	joy_di1, joy_di2, joy_di3, joy_di4, joy_di5, joy_di6, joy_di7, joy_di8,
+	joy_di9, joy_di10, joy_di11, joy_di12, joy_di13, joy_di14, joy_di15, joy_di16,
 
-	joy_ps1,  joy_ps2,  joy_ps3,  joy_ps4,  joy_ps5,  joy_ps6,  joy_ps7,  joy_ps8,
-	joy_ps9,  joy_ps10, joy_ps11, joy_ps12, joy_ps13, joy_ps14, joy_ps15, joy_ps16,
+	joy_ps1, joy_ps2, joy_ps3, joy_ps4, joy_ps5, joy_ps6, joy_ps7, joy_ps8,
+	joy_ps9, joy_ps10, joy_ps11, joy_ps12, joy_ps13, joy_ps14, joy_ps15, joy_ps16,
 
-	joy_xi1,  joy_xi2,  joy_xi3,  joy_xi4,  joy_xi5,  joy_xi6,  joy_xi7,  joy_xi8,
-	joy_xi9,  joy_xi10, joy_xi11, joy_xi12, joy_xi13, joy_xi14, joy_xi15, joy_xi16,
+	joy_xi1, joy_xi2, joy_xi3, joy_xi4, joy_xi5, joy_xi6, joy_xi7, joy_xi8,
+	joy_xi9, joy_xi10, joy_xi11, joy_xi12, joy_xi13, joy_xi14, joy_xi15, joy_xi16,
 
 	button_sprites_number,
 } SPR_BUTTONS;
 
 typedef struct {
 	int id;
-	const char *name;
+	const char* name;
 } MAP;
 
 static MAP btnMap[] = {
@@ -297,17 +297,17 @@ static MAP joyMapXI[] = {
 };
 
 static bool ButtonSpriteLoaded = false;
-static BYTE ButtonSpriteSpacing[256] = {0};
-static BYTE ButtonSpriteSWR[256*256] = {0};
+static BYTE ButtonSpriteSpacing[256] = { 0 };
+static BYTE ButtonSpriteSWR[256 * 256] = { 0 };
 
-static int compareMap(const void *a, const void *b) {
-	return strcmp(((const MAP *)a)->name, ((const MAP *)b)->name);
+static int compareMap(const void* a, const void* b) {
+	return strcmp(((const MAP*)a)->name, ((const MAP*)b)->name);
 }
 
 static void sortMaps() {
 	static bool once = false;
-	if( !once ) {
-		qsort(btnMap,   ARRAY_SIZE(btnMap),   sizeof(MAP), compareMap);
+	if (!once) {
+		qsort(btnMap, ARRAY_SIZE(btnMap), sizeof(MAP), compareMap);
 		qsort(joyMapDI, ARRAY_SIZE(joyMapDI), sizeof(MAP), compareMap);
 		qsort(joyMapPS, ARRAY_SIZE(joyMapPS), sizeof(MAP), compareMap);
 		qsort(joyMapXI, ARRAY_SIZE(joyMapXI), sizeof(MAP), compareMap);
@@ -315,18 +315,18 @@ static void sortMaps() {
 	}
 }
 
-static int searchMap(const char *name, MAP *mapArray, DWORD mapCount) {
-	if( !name || !*name ) return -1;
-	MAP keyItem = {0, name};
-	MAP *foundItem = (MAP *)bsearch(&keyItem, mapArray, mapCount, sizeof(MAP), compareMap);
+static int searchMap(const char* name, MAP* mapArray, DWORD mapCount) {
+	if (!name || !*name) return -1;
+	MAP keyItem = { 0, name };
+	MAP* foundItem = (MAP*)bsearch(&keyItem, mapArray, mapCount, sizeof(MAP), compareMap);
 	return foundItem ? foundItem->id : -1;
 }
 
-static bool ParseSpriteInfo(json_value *root, int id) {
-	if( root == NULL || root->type != json_object || id < 0 || id >= button_sprites_number ) {
+static bool ParseSpriteInfo(json_value* root, int id) {
+	if (root == NULL || root->type != json_object || id < 0 || id >= button_sprites_number) {
 		return false;
 	}
-	PHD_SPRITE *info = &PhdSpriteInfo[BTN_SPR_IDX + id];
+	PHD_SPRITE* info = &PhdSpriteInfo[BTN_SPR_IDX + id];
 
 	BYTE u = GetJsonIntegerFieldValue(root, "u", 0);
 	BYTE v = GetJsonIntegerFieldValue(root, "v", 0);
@@ -337,8 +337,8 @@ static bool ParseSpriteInfo(json_value *root, int id) {
 	ButtonSpriteSpacing[id] = GetJsonIntegerFieldValue(root, "spacing", 0);
 
 	info->offset = (v << 8) | u;
-	info->width = ABS(width)*256;
-	info->height = ABS(height)*256;
+	info->width = ABS(width) * 256;
+	info->height = ABS(height) * 256;
 	info->x1 = x;
 	info->y1 = y;
 	info->x2 = x + width;
@@ -347,29 +347,29 @@ static bool ParseSpriteInfo(json_value *root, int id) {
 	return true;
 }
 
-static bool ParseButtonSprites(json_value *root) {
-	if( root == NULL || root->type != json_object ) {
+static bool ParseButtonSprites(json_value* root) {
+	if (root == NULL || root->type != json_object) {
 		return false;
 	}
 	sortMaps();
-	for( DWORD i = 0; i < root->u.object.length; ++i ) {
-		if( root->u.object.values[i].value->type != json_object ) continue;
+	for (DWORD i = 0; i < root->u.object.length; ++i) {
+		if (root->u.object.values[i].value->type != json_object) continue;
 		int id = searchMap(root->u.object.values[i].name, btnMap, ARRAY_SIZE(btnMap));
 		ParseSpriteInfo(root->u.object.values[i].value, id);
 	}
 	return true;
 }
 
-static BYTE FindPaletteEntry(RGB888 *palette, int red, int green, int blue) {
+static BYTE FindPaletteEntry(RGB888* palette, int red, int green, int blue) {
 	UINT16 result = 0;
 	int diffMin = INT_MAX;
 	// skip index 0 as it is reserved as semitransparent
-	for( int i=1; i<256; ++i ) {
-		int diffRed   = red   - GamePalette8[i].red;
+	for (int i = 1; i < 256; ++i) {
+		int diffRed = red - GamePalette8[i].red;
 		int diffGreen = green - GamePalette8[i].green;
-		int diffBlue  = blue  - GamePalette8[i].blue;
+		int diffBlue = blue - GamePalette8[i].blue;
 		int diffTotal = SQR(diffRed) + SQR(diffGreen) + SQR(diffBlue);
-		if( diffTotal < diffMin ) {
+		if (diffTotal < diffMin) {
 			diffMin = diffTotal;
 			result = i;
 		}
@@ -377,20 +377,20 @@ static BYTE FindPaletteEntry(RGB888 *palette, int red, int green, int blue) {
 	return result;
 }
 
-static void AdaptToPalette(void *srcData, int width, int height, int srcPitch, RGB888 *srcPalette, void *dstData, int dstPitch, RGB888 *dstPalette) {
+static void AdaptToPalette(void* srcData, int width, int height, int srcPitch, RGB888* srcPalette, void* dstData, int dstPitch, RGB888* dstPalette) {
 	int i, j;
-	BYTE *src, *dst;
-	BYTE bufPalette[256] = {0};
+	BYTE* src, * dst;
+	BYTE bufPalette[256] = { 0 };
 
 	// skip index 0 as it is reserved as semitransparent
-	for( i=1; i<256; ++i ) {
+	for (i = 1; i < 256; ++i) {
 		bufPalette[i] = FindPaletteEntry(dstPalette, srcPalette[i].red, srcPalette[i].green, srcPalette[i].blue);
 	}
 
-	src = (BYTE *)srcData;
-	dst = (BYTE *)dstData;
-	for( i=0; i<height; ++i ) {
-		for( j=0; j<width; ++j ) {
+	src = (BYTE*)srcData;
+	dst = (BYTE*)dstData;
+	for (i = 0; i < height; ++i) {
+		for (j = 0; j < width; ++j) {
 			*(dst++) = bufPalette[*(src++)];
 		}
 		src += srcPitch - width;
@@ -398,41 +398,41 @@ static void AdaptToPalette(void *srcData, int width, int height, int srcPitch, R
 	}
 }
 
-static int LoadButtonSpriteTexturePage(bool *isExternal) {
+static int LoadButtonSpriteTexturePage(bool* isExternal) {
 	int pageIndex = -1;
 	DWORD width, height, pcxSize = 0;
 
 #if (DIRECT3D_VERSION >= 0x900)
-	if( SavedAppSettings.RenderMode == RM_Hardware && PathFileExists("textures/buttons.png") ) {
+	if (SavedAppSettings.RenderMode == RM_Hardware && PathFileExists("textures/buttons.png")) {
 		pageIndex = AddExternalTexture("textures/buttons.png", true);
-		if( pageIndex >= 0 ) {
+		if (pageIndex >= 0) {
 			HWR_TexturePageIndexes[HwrTexturePagesCount] = pageIndex;
 			HWR_PageHandles[HwrTexturePagesCount] = GetTexturePageHandle(pageIndex);
 			pageIndex = HwrTexturePagesCount++;
-			if( isExternal ) *isExternal = true;
+			if (isExternal) *isExternal = true;
 			return pageIndex;
 		}
 	}
-	if( isExternal ) *isExternal = false;
+	if (isExternal) *isExternal = false;
 #endif // (DIRECT3D_VERSION >= 0x900)
 
 	LPCBYTE pcxData = (LPCBYTE)GetResourceData("BUTTONS.PCX", &pcxSize);
-	if( !pcxData || !pcxSize || GetPcxResolution(pcxData, pcxSize, &width, &height)
-		|| width != height || (SavedAppSettings.RenderMode != RM_Hardware && width != 256) )
+	if (!pcxData || !pcxSize || GetPcxResolution(pcxData, pcxSize, &width, &height)
+		|| width != height || (SavedAppSettings.RenderMode != RM_Hardware && width != 256))
 	{
 		return -1;
 	}
 
-	RGB888 bmpPal[256] = {{0,0,0}};
-	BYTE *bitmap = (BYTE *)malloc(width * height);
-	if( bitmap != NULL ) {
-		if( DecompPCX(pcxData, pcxSize, bitmap, bmpPal) ) {
-			if( SavedAppSettings.RenderMode != RM_Hardware || TextureFormat.bpp < 16 ) {
+	RGB888 bmpPal[256] = { {0,0,0} };
+	BYTE* bitmap = (BYTE*)malloc(width * height);
+	if (bitmap != NULL) {
+		if (DecompPCX(pcxData, pcxSize, bitmap, bmpPal)) {
+			if (SavedAppSettings.RenderMode != RM_Hardware || TextureFormat.bpp < 16) {
 				AdaptToPalette(bitmap, width, height, width, bmpPal, bitmap, width, GamePalette8);
 				memcpy(bmpPal, GamePalette8, sizeof(bmpPal));
 			}
 			pageIndex = MakeCustomTexture(0, 0, width, height, width, width, 8, bitmap, bmpPal, PaletteIndex, ButtonSpriteSWR, true);
-			if( pageIndex >= 0 && SavedAppSettings.RenderMode == RM_Hardware ) {
+			if (pageIndex >= 0 && SavedAppSettings.RenderMode == RM_Hardware) {
 				HWR_TexturePageIndexes[HwrTexturePagesCount] = pageIndex;
 				HWR_PageHandles[HwrTexturePagesCount] = GetTexturePageHandle(pageIndex);
 				pageIndex = HwrTexturePagesCount++;
@@ -449,18 +449,18 @@ bool LoadButtonSprites() {
 	memset(&PhdSpriteInfo[BTN_SPR_IDX], 0, sizeof(PHD_SPRITE) * button_sprites_number);
 	bool isExternalTexture = false;
 	int pageIndex = LoadButtonSpriteTexturePage(&isExternalTexture);
-	if( pageIndex >= 0 ) {
-		for( int i = 0; i < button_sprites_number; ++i ) {
+	if (pageIndex >= 0) {
+		for (int i = 0; i < button_sprites_number; ++i) {
 			PhdSpriteInfo[BTN_SPR_IDX + i].texPage = pageIndex;
 		}
 		DWORD jsonSize = 0;
 #if (DIRECT3D_VERSION >= 0x900)
 		bool isExternalJson = false;
 		LPVOID jsonData = NULL;
-		if( isExternalTexture && PathFileExists("textures/buttons.json") ) {
+		if (isExternalTexture && PathFileExists("textures/buttons.json")) {
 			DWORD bytesRead = 0;
-			HANDLE hFile = CreateFile("textures/buttons.json", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN|FILE_ATTRIBUTE_NORMAL, NULL);
-			if( hFile != INVALID_HANDLE_VALUE ) {
+			HANDLE hFile = CreateFile("textures/buttons.json", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, NULL);
+			if (hFile != INVALID_HANDLE_VALUE) {
 				isExternalJson = true;
 				jsonSize = GetFileSize(hFile, NULL);
 				jsonData = malloc(jsonSize);
@@ -468,21 +468,21 @@ bool LoadButtonSprites() {
 				CloseHandle(hFile);
 			}
 		}
-		if( !isExternalJson ) {
+		if (!isExternalJson) {
 			jsonData = (LPVOID)GetResourceData("BUTTONS.JSON", &jsonSize);
 		}
 #else // (DIRECT3D_VERSION >= 0x900)
 		LPCVOID jsonData = GetResourceData("BUTTONS.JSON", &jsonSize);
 #endif // (DIRECT3D_VERSION >= 0x900)
-		if( jsonData && jsonSize ) {
-			json_value* json = json_parse((const json_char *)jsonData, jsonSize);
-			if( json != NULL ) {
+		if (jsonData && jsonSize) {
+			json_value* json = json_parse((const json_char*)jsonData, jsonSize);
+			if (json != NULL) {
 				ButtonSpriteLoaded = ParseButtonSprites(json);
 				json_value_free(json);
 			}
 		}
 #if (DIRECT3D_VERSION >= 0x900)
-		if( isExternalJson && jsonData ) {
+		if (isExternalJson && jsonData) {
 			free(jsonData);
 		}
 #endif // (DIRECT3D_VERSION >= 0x900)
@@ -490,110 +490,110 @@ bool LoadButtonSprites() {
 	return ButtonSpriteLoaded;
 }
 
-bool GetTextSpriteByName(const char *name, int nameLen, DWORD *sprite, int *spacing) {
+bool GetTextSpriteByName(const char* name, int nameLen, DWORD* sprite, int* spacing) {
 	int id = -1;
-	char mapName[64] = {0};
-	if( !ButtonSpriteLoaded || name == NULL || nameLen <= 0 || (DWORD)nameLen >= sizeof(mapName) ) {
+	char mapName[64] = { 0 };
+	if (!ButtonSpriteLoaded || name == NULL || nameLen <= 0 || (DWORD)nameLen >= sizeof(mapName)) {
 		return false;
 	}
 	memcpy(mapName, name, nameLen);
 
 	DWORD buttonStyle = JoystickButtonStyle;
 #ifdef FEATURE_INPUT_IMPROVED
-	if( buttonStyle == 0 ) {
-		switch( GetJoystickType() ) {
-			case JT_XINPUT:
-				buttonStyle = 3;
-				break;
-			case JT_PLAYSTATION:
-				buttonStyle = 2;
-				break;
-			case JT_DIRECTINPUT:
-			case JT_NONE:
-				buttonStyle = 1;
-				break;
+	if (buttonStyle == 0) {
+		switch (GetJoystickType()) {
+		case JT_XINPUT:
+			buttonStyle = 3;
+			break;
+		case JT_PLAYSTATION:
+			buttonStyle = 2;
+			break;
+		case JT_DIRECTINPUT:
+		case JT_NONE:
+			buttonStyle = 1;
+			break;
 		}
 	}
 #endif // FEATURE_INPUT_IMPROVED
-	switch( buttonStyle ) {
-		case 0:
-		case 1:
-			id = searchMap(mapName, joyMapDI, ARRAY_SIZE(joyMapDI));
-			break;
-		case 2:
-			id = searchMap(mapName, joyMapPS, ARRAY_SIZE(joyMapPS));
-			break;
-		case 3:
-			id = searchMap(mapName, joyMapXI, ARRAY_SIZE(joyMapXI));
-			break;
+	switch (buttonStyle) {
+	case 0:
+	case 1:
+		id = searchMap(mapName, joyMapDI, ARRAY_SIZE(joyMapDI));
+		break;
+	case 2:
+		id = searchMap(mapName, joyMapPS, ARRAY_SIZE(joyMapPS));
+		break;
+	case 3:
+		id = searchMap(mapName, joyMapXI, ARRAY_SIZE(joyMapXI));
+		break;
 	}
-	if( id < 0 || id >= button_sprites_number ) {
+	if (id < 0 || id >= button_sprites_number) {
 		id = searchMap(mapName, btnMap, ARRAY_SIZE(btnMap));
 	}
-	if( id < 0 || id >= button_sprites_number ) {
+	if (id < 0 || id >= button_sprites_number) {
 		return false;
 	}
-	if( sprite ) *sprite = BTN_SPR_IDX + id;
-	if( spacing ) *spacing = ButtonSpriteSpacing[id];
+	if (sprite) *sprite = BTN_SPR_IDX + id;
+	if (spacing) *spacing = ButtonSpriteSpacing[id];
 	return true;
 }
 #endif // FEATURE_HUD_IMPROVED
 
 // This prevents texture bleeding instead of UV adjustment
-static int FillEdgePadding(DWORD width, DWORD height, DWORD side, BYTE *bitmap, DWORD bpp) {
-	if( !width || !height || width > side || height > side || bitmap == NULL ) {
+static int FillEdgePadding(DWORD width, DWORD height, DWORD side, BYTE* bitmap, DWORD bpp) {
+	if (!width || !height || width > side || height > side || bitmap == NULL) {
 		return -1;
 	}
-	switch( bpp ) {
-		case  8 :
-		case 16 :
-		case 32 :
-			break;
-		default :
-			return -1;
+	switch (bpp) {
+	case  8:
+	case 16:
+	case 32:
+		break;
+	default:
+		return -1;
 	}
 
 	DWORD i;
 	DWORD padRight = side - width;
 	DWORD padBottom = side - height;
 
-	if( padRight > 0 ) {
-		switch( bpp ) {
-			case  8 : {
-				BYTE *p = (BYTE *)bitmap;
-				for( i = 0; i < height ; ++i ) {
-					p += width;
-					p[0] = p[-1];
-					p += padRight;
-				}
-				break;
+	if (padRight > 0) {
+		switch (bpp) {
+		case  8: {
+			BYTE* p = (BYTE*)bitmap;
+			for (i = 0; i < height; ++i) {
+				p += width;
+				p[0] = p[-1];
+				p += padRight;
 			}
-			case 16 : {
-				UINT16 *p = (UINT16 *)bitmap;
-				for( i = 0; i < height ; ++i ) {
-					p += width;
-					p[0] = p[-1];
-					p += padRight;
-				}
-				break;
+			break;
+		}
+		case 16: {
+			UINT16* p = (UINT16*)bitmap;
+			for (i = 0; i < height; ++i) {
+				p += width;
+				p[0] = p[-1];
+				p += padRight;
 			}
-			case 32 : {
-				DWORD *p = (DWORD *)bitmap;
-				for( i = 0; i < height ; ++i ) {
-					p += width;
-					p[0] = p[-1];
-					p += padRight;
-				}
-				break;
+			break;
+		}
+		case 32: {
+			DWORD* p = (DWORD*)bitmap;
+			for (i = 0; i < height; ++i) {
+				p += width;
+				p[0] = p[-1];
+				p += padRight;
 			}
-			default :
-				break;
+			break;
+		}
+		default:
+			break;
 		}
 	}
 
-	if( padBottom > 0 ) {
-		DWORD pitch = (width + padRight?1:0) * (bpp/8);
-		BYTE *p = bitmap + height * pitch;
+	if (padBottom > 0) {
+		DWORD pitch = (width + padRight ? 1 : 0) * (bpp / 8);
+		BYTE* p = bitmap + height * pitch;
 		memcpy(p, p - pitch, pitch);
 		p += pitch;
 	}
@@ -601,75 +601,80 @@ static int FillEdgePadding(DWORD width, DWORD height, DWORD side, BYTE *bitmap, 
 	return 0;
 }
 
-int MakeCustomTexture(DWORD x, DWORD y, DWORD width, DWORD height, DWORD pitch, DWORD side, DWORD bpp, BYTE *bitmap, RGB888 *bmpPal, int hwrPal, BYTE *swrBuf, bool keyColor) {
+int MakeCustomTexture(DWORD x, DWORD y, DWORD width, DWORD height, DWORD pitch, DWORD side, DWORD bpp, BYTE* bitmap, RGB888* bmpPal, int hwrPal, BYTE* swrBuf, bool keyColor) {
 	int pageIndex = -1;
-	if( bpp == 16 ) {
-		if( SavedAppSettings.RenderMode != RM_Hardware || TextureFormat.bpp < 16 ) { // texture cannot be indexed in this case
+	if (bpp == 16) {
+		if (SavedAppSettings.RenderMode != RM_Hardware || TextureFormat.bpp < 16) { // texture cannot be indexed in this case
 			return -1;
 		}
-		UINT16 *tmpBmp = (UINT16 *)calloc(2, SQR(side));
-		UINT16 *bmpDst = tmpBmp;
-		UINT16 *bmpSrc = (UINT16 *)bitmap + x + y * pitch;
+		UINT16* tmpBmp = (UINT16*)calloc(2, SQR(side));
+		UINT16* bmpDst = tmpBmp;
+		UINT16* bmpSrc = (UINT16*)bitmap + x + y * pitch;
 
-		for( DWORD j = 0; j < height; ++j ) {
+		for (DWORD j = 0; j < height; ++j) {
 			memcpy(bmpDst, bmpSrc, sizeof(UINT16) * width);
 			bmpSrc += pitch;
 			bmpDst += side;
 		}
-		FillEdgePadding(width, height, side, (BYTE *)tmpBmp, bpp);
-		pageIndex = AddTexturePage16(side, side, (BYTE *)tmpBmp);
+		FillEdgePadding(width, height, side, (BYTE*)tmpBmp, bpp);
+		pageIndex = AddTexturePage16(side, side, (BYTE*)tmpBmp);
 		free(tmpBmp);
 #if (DIRECT3D_VERSION >= 0x900)
-	} else if( bpp == 32 ) {
-		if( SavedAppSettings.RenderMode != RM_Hardware || TextureFormat.bpp < 16 ) { // texture cannot be indexed in this case
+	}
+	else if (bpp == 32) {
+		if (SavedAppSettings.RenderMode != RM_Hardware || TextureFormat.bpp < 16) { // texture cannot be indexed in this case
 			return -1;
 		}
-		DWORD *tmpBmp = (DWORD *)calloc(4, SQR(side));
-		DWORD *bmpDst = tmpBmp;
-		DWORD *bmpSrc = (DWORD *)bitmap + x + y * pitch;
+		DWORD* tmpBmp = (DWORD*)calloc(4, SQR(side));
+		DWORD* bmpDst = tmpBmp;
+		DWORD* bmpSrc = (DWORD*)bitmap + x + y * pitch;
 
-		for( DWORD j = 0; j < height; ++j ) {
+		for (DWORD j = 0; j < height; ++j) {
 			memcpy(bmpDst, bmpSrc, sizeof(DWORD) * width);
 			bmpSrc += pitch;
 			bmpDst += side;
 		}
-		FillEdgePadding(width, height, side, (BYTE *)tmpBmp, bpp);
-		pageIndex = AddTexturePage32(side, side, (BYTE *)tmpBmp, false);
+		FillEdgePadding(width, height, side, (BYTE*)tmpBmp, bpp);
+		pageIndex = AddTexturePage32(side, side, (BYTE*)tmpBmp, false);
 		free(tmpBmp);
 #endif // (DIRECT3D_VERSION >= 0x900)
-	} else if( SavedAppSettings.RenderMode == RM_Hardware && TextureFormat.bpp >= 16 ) {
-		UINT16 *tmpBmp = (UINT16 *)calloc(2, SQR(side));
-		UINT16 *bmpDst = tmpBmp;
-		BYTE *bmpSrc = bitmap + x + y * pitch;
+	}
+	else if (SavedAppSettings.RenderMode == RM_Hardware && TextureFormat.bpp >= 16) {
+		UINT16* tmpBmp = (UINT16*)calloc(2, SQR(side));
+		UINT16* bmpDst = tmpBmp;
+		BYTE* bmpSrc = bitmap + x + y * pitch;
 
 		// Translating bitmap data from 8 bit bitmap to 16 bit bitmap
-		for( DWORD j = 0; j < height; ++j ) {
-			for( DWORD i = 0; i < width; ++i ) {
-				if( !keyColor || bmpSrc[i] ) {
-					RGB888 *color = &bmpPal[bmpSrc[i]]; // get RGB color from palette
+		for (DWORD j = 0; j < height; ++j) {
+			for (DWORD i = 0; i < width; ++i) {
+				if (!keyColor || bmpSrc[i]) {
+					RGB888* color = &bmpPal[bmpSrc[i]]; // get RGB color from palette
 					bmpDst[i] = (1 << 15) // convert RGB to 16 bit
-							| (((UINT16)color->red   >> 3) << 10)
-							| (((UINT16)color->green >> 3) << 5)
-							| (((UINT16)color->blue  >> 3));
-				} else {
+						| (((UINT16)color->red >> 3) << 10)
+						| (((UINT16)color->green >> 3) << 5)
+						| (((UINT16)color->blue >> 3));
+				}
+				else {
 					bmpDst[i] = 0;
 				}
 			}
 			bmpSrc += pitch;
 			bmpDst += side;
 		}
-		FillEdgePadding(width, height, side, (BYTE *)tmpBmp, 16);
-		pageIndex = AddTexturePage16(side, side, (BYTE *)tmpBmp);
+		FillEdgePadding(width, height, side, (BYTE*)tmpBmp, 16);
+		pageIndex = AddTexturePage16(side, side, (BYTE*)tmpBmp);
 		free(tmpBmp);
-	} else if( SavedAppSettings.RenderMode == RM_Hardware ) {
-		BYTE *tmpBmp = (BYTE *)calloc(1, SQR(side));
+	}
+	else if (SavedAppSettings.RenderMode == RM_Hardware) {
+		BYTE* tmpBmp = (BYTE*)calloc(1, SQR(side));
 		UT_MemBlt(tmpBmp, 0, 0, width, height, side, bitmap, x, y, pitch);
 		FillEdgePadding(width, height, side, tmpBmp, 8);
 		pageIndex = AddTexturePage8(side, side, tmpBmp, hwrPal);
 		free(tmpBmp);
-	} else if( swrBuf != NULL && width == 256 && height == 256 && side == 256 ) {
-		for( DWORD i=0; i<ARRAY_SIZE(TexturePageBuffer8); ++i ) {
-			if( TexturePageBuffer8[i] == NULL || TexturePageBuffer8[i] == swrBuf ) {
+	}
+	else if (swrBuf != NULL && width == 256 && height == 256 && side == 256) {
+		for (DWORD i = 0; i < ARRAY_SIZE(TexturePageBuffer8); ++i) {
+			if (TexturePageBuffer8[i] == NULL || TexturePageBuffer8[i] == swrBuf) {
 				UT_MemBlt(swrBuf, 0, 0, width, height, side, bitmap, x, y, pitch);
 				TexturePageBuffer8[i] = swrBuf;
 				pageIndex = i;
@@ -714,8 +719,8 @@ double GetTexPagesAdjustment() {
 
 #ifdef FEATURE_HUD_IMPROVED
 int GetTexPagesGlyphSpacing(int id) {
-	if( id < 0 || id >= (int)ARRAY_SIZE(TexPagesConfig.glyphs)
-		|| SavedAppSettings.RenderMode == RM_Software )
+	if (id < 0 || id >= (int)ARRAY_SIZE(TexPagesConfig.glyphs)
+		|| SavedAppSettings.RenderMode == RM_Software)
 	{
 		return 0;
 	}
@@ -723,8 +728,8 @@ int GetTexPagesGlyphSpacing(int id) {
 }
 
 int GetTexPagesGlyphXOffset(int id) {
-	if( id < 0 || id >= (int)ARRAY_SIZE(TexPagesConfig.glyphs)
-		|| SavedAppSettings.RenderMode == RM_Software )
+	if (id < 0 || id >= (int)ARRAY_SIZE(TexPagesConfig.glyphs)
+		|| SavedAppSettings.RenderMode == RM_Software)
 	{
 		return 0;
 	}
@@ -732,8 +737,8 @@ int GetTexPagesGlyphXOffset(int id) {
 }
 
 int GetTexPagesGlyphYOffset(int id) {
-	if( id < 0 || id >= (int)ARRAY_SIZE(TexPagesConfig.glyphs)
-		|| SavedAppSettings.RenderMode == RM_Software )
+	if (id < 0 || id >= (int)ARRAY_SIZE(TexPagesConfig.glyphs)
+		|| SavedAppSettings.RenderMode == RM_Software)
 	{
 		return 0;
 	}
@@ -741,9 +746,9 @@ int GetTexPagesGlyphYOffset(int id) {
 }
 
 double GetTexPagesGlyphXStretch(int id) {
-	if( id < 0 || id >= (int)ARRAY_SIZE(TexPagesConfig.glyphs)
+	if (id < 0 || id >= (int)ARRAY_SIZE(TexPagesConfig.glyphs)
 		|| SavedAppSettings.RenderMode == RM_Software
-		|| TexPagesConfig.glyphs[id].xStretch <= 0.0 )
+		|| TexPagesConfig.glyphs[id].xStretch <= 0.0)
 	{
 		return 1.0;
 	}
@@ -751,9 +756,9 @@ double GetTexPagesGlyphXStretch(int id) {
 }
 
 double GetTexPagesGlyphYStretch(int id) {
-	if( id < 0 || id >= (int)ARRAY_SIZE(TexPagesConfig.glyphs)
+	if (id < 0 || id >= (int)ARRAY_SIZE(TexPagesConfig.glyphs)
 		|| SavedAppSettings.RenderMode == RM_Software
-		|| TexPagesConfig.glyphs[id].yStretch <= 0.0 )
+		|| TexPagesConfig.glyphs[id].yStretch <= 0.0)
 	{
 		return 1.0;
 	}
@@ -761,29 +766,29 @@ double GetTexPagesGlyphYStretch(int id) {
 }
 #endif // FEATURE_HUD_IMPROVED
 
-static bool ParseLevelTexPagesConfiguration(json_value *root) {
-	if( root == NULL || root->type != json_object ) {
+static bool ParseLevelTexPagesConfiguration(json_value* root) {
+	if (root == NULL || root->type != json_object) {
 		return false;
 	}
 	json_value* field = NULL;
 
 	field = GetJsonField(root, json_boolean, "legacy_colors", NULL);
-	if( field ) {
+	if (field) {
 		TexPagesConfig.isLegacyColors = field->u.boolean;
 	}
 
 	field = GetJsonField(root, json_double, "uv_adjust", NULL);
-	if( field ) {
+	if (field) {
 		TexPagesConfig.adjustment = field->u.dbl;
 	}
 
 #ifdef FEATURE_HUD_IMPROVED
 	json_value* glyphs = GetJsonField(root, json_array, "glyphs", NULL);
-	if( glyphs ) {
-		for( DWORD i = 0; i < glyphs->u.array.length; ++i ) {
-			json_value *glyph = glyphs->u.array.values[i];
+	if (glyphs) {
+		for (DWORD i = 0; i < glyphs->u.array.length; ++i) {
+			json_value* glyph = glyphs->u.array.values[i];
 			int id = GetJsonIntegerFieldValue(glyph, "id", -1);
-			if( id < 0 || id >= (int)ARRAY_SIZE(TexPagesConfig.glyphs) ) continue;
+			if (id < 0 || id >= (int)ARRAY_SIZE(TexPagesConfig.glyphs)) continue;
 			TexPagesConfig.glyphs[id].spacing = GetJsonIntegerFieldValue(glyph, "spacing", 0);
 			TexPagesConfig.glyphs[id].xOffset = GetJsonIntegerFieldValue(glyph, "x_offset", 0);
 			TexPagesConfig.glyphs[id].yOffset = GetJsonIntegerFieldValue(glyph, "y_offset", 0);
@@ -796,15 +801,15 @@ static bool ParseLevelTexPagesConfiguration(json_value *root) {
 	return true;
 }
 
-static bool ParseTexPagesConfiguration(char *levelName, json_value *root) {
-	if( root == NULL || root->type != json_object ) {
+static bool ParseTexPagesConfiguration(char* levelName, json_value* root) {
+	if (root == NULL || root->type != json_object) {
 		return false;
 	}
 	// parsing default configs
 	ParseLevelTexPagesConfiguration(GetJsonField(root, json_object, "default", NULL));
 	// parsing level specific configs
 	json_value* levels = GetJsonField(root, json_array, "levels", NULL);
-	if( levels ) ParseLevelTexPagesConfiguration(GetJsonObjectByStringField(levels, "filename", levelName, false, NULL));
+	if (levels) ParseLevelTexPagesConfiguration(GetJsonObjectByStringField(levels, "filename", levelName, false, NULL));
 	return true;
 }
 
@@ -814,26 +819,26 @@ void UnloadTexPagesConfiguration() {
 
 bool LoadTexPagesConfiguration(LPCTSTR levelFilePath) {
 	UnloadTexPagesConfiguration();
-	if( !PathFileExists(TEXPAGE_CONFIG_NAME) ) {
+	if (!PathFileExists(TEXPAGE_CONFIG_NAME)) {
 		return false;
 	}
-	char levelName[256] = {0};
-	strncpy(levelName, PathFindFileName(levelFilePath), sizeof(levelName)-1);
-	char *ext = PathFindExtension(levelName);
-	if( ext != NULL ) *ext = 0;
+	char levelName[256] = { 0 };
+	strncpy(levelName, PathFindFileName(levelFilePath), sizeof(levelName) - 1);
+	char* ext = PathFindExtension(levelName);
+	if (ext != NULL) *ext = 0;
 
 	DWORD bytesRead = 0;
-	HANDLE hFile = CreateFile(TEXPAGE_CONFIG_NAME, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN|FILE_ATTRIBUTE_NORMAL, NULL);
-	if( hFile == INVALID_HANDLE_VALUE ) {
+	HANDLE hFile = CreateFile(TEXPAGE_CONFIG_NAME, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile == INVALID_HANDLE_VALUE) {
 		return false;
 	}
 	DWORD cfgSize = GetFileSize(hFile, NULL);
-	void *cfgData = malloc(cfgSize);
+	void* cfgData = malloc(cfgSize);
 	ReadFile(hFile, cfgData, cfgSize, &bytesRead, NULL);
 	CloseHandle(hFile);
 
-	json_value* json = json_parse((const json_char *)cfgData, cfgSize);
-	if( json != NULL ) {
+	json_value* json = json_parse((const json_char*)cfgData, cfgSize);
+	if (json != NULL) {
 		TexPagesConfig.isLoaded = ParseTexPagesConfiguration(levelName, json);
 	}
 	json_value_free(json);

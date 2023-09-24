@@ -23,11 +23,9 @@
 #include "game/rat.h"
 #include "global/vars.h"
 
-
-
-/*
- * Inject function
- */
+ /*
+  * Inject function
+  */
 void Inject_Rat() {
-//	INJECT(0x00438FA0, MouseControl);
+	//	INJECT(0x00438FA0, MouseControl);
 }

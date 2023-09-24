@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 int GetRenderScale(int unit);
 int GetRenderHeightDownscaled();
 int GetRenderWidthDownscaled();
@@ -37,13 +37,13 @@ DWORD S_DumpScreen(); // 0x00450CB0
 void S_ClearScreen(); // 0x00450CF0
 void S_InitialiseScreen(GF_LEVEL_TYPE levelType); // 0x00450D00
 void S_OutputPolyList(); // 0x00450D40
-int S_GetObjectBounds(__int16 *bPtr); // 0x00450D80
+int S_GetObjectBounds(__int16* bPtr); // 0x00450D80
 void S_InsertBackPolygon(int x0, int y0, int x1, int y1); // 0x00450FF0
-void S_PrintShadow(__int16 radius, __int16 *bPtr, ITEM_INFO *item); // 0x00451040
+void S_PrintShadow(__int16 radius, __int16* bPtr, ITEM_INFO* item); // 0x00451040
 void S_CalculateLight(int x, int y, int z, __int16 roomNumber); // 0x00451240
 void S_CalculateStaticLight(__int16 adder); // 0x00451540
-void S_CalculateStaticMeshLight(int x, int y, int z, int shade1, int shade2, ROOM_INFO *room); // 0x00451580
-void S_LightRoom(ROOM_INFO *room); // 0x004516B0
+void S_CalculateStaticMeshLight(int x, int y, int z, int shade1, int shade2, ROOM_INFO* room); // 0x00451580
+void S_LightRoom(ROOM_INFO* room); // 0x004516B0
 void S_DrawHealthBar(int percent); // 0x004518C0
 void S_DrawAirBar(int percent); // 0x00451A90
 void AnimateTextures(int nTicks); // 0x00451C90
@@ -55,13 +55,13 @@ void S_SyncPictureBufferPalette(); // 0x00451FB0
 void S_DontDisplayPicture(); // 0x00452030
 void ScreenDump(); // 0x00452040
 void ScreenPartialDump(); // 0x00452050
-void FadeToPal(int fadeValue, RGB888 *palette); // 0x00452060
+void FadeToPal(int fadeValue, RGB888* palette); // 0x00452060
 void ScreenClear(bool isPhdWinSize); // 0x00452230
 void S_CopyScreenToBuffer(); // 0x00452260
 void S_CopyBufferToScreen(); // 0x00452310
-BOOL DecompPCX(LPCBYTE pcx, DWORD pcxSize, LPBYTE pic, RGB888 *pal); // 0x00452360
+BOOL DecompPCX(LPCBYTE pcx, DWORD pcxSize, LPBYTE pic, RGB888* pal); // 0x00452360
 
 // NOTE: this function is not presented in the original game
-int GetPcxResolution(LPCBYTE pcx, DWORD pcxSize, DWORD *width, DWORD *height);
+int GetPcxResolution(LPCBYTE pcx, DWORD pcxSize, DWORD* width, DWORD* height);
 
 #endif // OUTPUT_H_INCLUDED

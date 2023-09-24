@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 
 void PSX_DrawHealthBar(int x0, int y0, int x1, int y1, int bar, int pixel, int alpha);
 void PSX_DrawAirBar(int x0, int y0, int x1, int y1, int bar, int pixel, int alpha);

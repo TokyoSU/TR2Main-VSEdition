@@ -23,14 +23,12 @@
 #include "game/sphere.h"
 #include "global/vars.h"
 
-
-
-/*
- * Inject function
- */
+ /*
+  * Inject function
+  */
 void Inject_Sphere() {
-//	INJECT(0x0043FA60, TestCollision);
-//	INJECT(0x0043FB90, GetSpheres);
-//	INJECT(0x0043FE70, GetJointAbsPosition);
-//	INJECT(0x00440010, BaddieBiteEffect);
+	//	INJECT(0x0043FA60, TestCollision);
+	//	INJECT(0x0043FB90, GetSpheres);
+	//	INJECT(0x0043FE70, GetJointAbsPosition);
+	//	INJECT(0x00440010, BaddieBiteEffect);
 }

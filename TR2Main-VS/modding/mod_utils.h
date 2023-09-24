@@ -24,13 +24,13 @@
 
 #include "global/types.h"
 
-// Filter is presented by an array of poly index and polys number (starting from the index).
-// The filter must be always terminated by an index 0.
-// If the first item has index=~0 then there are no polys of such type to process.
-// If the first item has index=0 and number=0 then all polys of such type must be processed.
+ // Filter is presented by an array of poly index and polys number (starting from the index).
+ // The filter must be always terminated by an index 0.
+ // If the first item has index=~0 then there are no polys of such type to process.
+ // If the first item has index=0 and number=0 then all polys of such type must be processed.
 #define POLYFILTER_SIZE 256
 
-typedef struct {__int16 idx; __int16 num;} POLYINDEX;
+typedef struct { __int16 idx; __int16 num; } POLYINDEX;
 
 typedef struct {
 	__int16 n_vtx, n_gt4, n_gt3, n_g4, n_g3;
@@ -43,29 +43,29 @@ typedef struct {
 typedef struct PolyfilterNode_t {
 	int id;
 	POLYFILTER filter;
-	struct PolyfilterNode_t *next;
+	struct PolyfilterNode_t* next;
 } POLYFILTER_NODE;
 
-typedef bool (*ENUM_POLYS_CB) (__int16 *ptrObj, int vtxCount, bool colored, LPVOID param);
+typedef bool (*ENUM_POLYS_CB) (__int16* ptrObj, int vtxCount, bool colored, LPVOID param);
 
 /*
  * Function list
  */
-bool EnumeratePolys(__int16 *ptrObj, bool isRoomMesh, ENUM_POLYS_CB callback, POLYFILTER *filter, LPVOID param);
+bool EnumeratePolys(__int16* ptrObj, bool isRoomMesh, ENUM_POLYS_CB callback, POLYFILTER* filter, LPVOID param);
 
 #ifdef FEATURE_MOD_CONFIG
 bool IsModConfigLoaded();
 bool IsModBarefoot();
-const char *GetModLoadingPix();
+const char* GetModLoadingPix();
 DWORD GetModWaterColor();
 bool IsModSemitransConfigLoaded();
-POLYINDEX *GetModSemitransAnimtexFilter();
-POLYFILTER_NODE *GetModSemitransRoomsFilter();
-POLYFILTER_NODE *GetModSemitransStaticsFilter();
-POLYFILTER_NODE **GetModSemitransObjectsFilter();
+POLYINDEX* GetModSemitransAnimtexFilter();
+POLYFILTER_NODE* GetModSemitransRoomsFilter();
+POLYFILTER_NODE* GetModSemitransStaticsFilter();
+POLYFILTER_NODE** GetModSemitransObjectsFilter();
 bool IsModReflectConfigLoaded();
-POLYFILTER_NODE *GetModReflectStaticsFilter();
-POLYFILTER_NODE **GetModReflectObjectsFilter();
+POLYFILTER_NODE* GetModReflectStaticsFilter();
+POLYFILTER_NODE** GetModReflectObjectsFilter();
 
 void UnloadModConfiguration();
 bool LoadModConfiguration(LPCTSTR levelFilePath);

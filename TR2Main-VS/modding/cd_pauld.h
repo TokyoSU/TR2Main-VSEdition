@@ -25,9 +25,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 bool PaulD_CD_Init();
 void PaulD_CD_Cleanup();
 void PaulD_CDLoop();

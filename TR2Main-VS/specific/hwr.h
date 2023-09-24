@@ -24,10 +24,10 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
-// NOTE: this function is absent in the original code
+ /*
+  * Function list
+  */
+  // NOTE: this function is absent in the original code
 HRESULT HWR_DrawPrimitive(D3DPRIMITIVETYPE primitiveType, LPVOID vertices, DWORD vertexCount, bool isNoClip);
 
 void HWR_InitState(); // 0x0044D0B0
@@ -39,7 +39,7 @@ void HWR_EnableColorKey(bool state); // 0x0044D2D0
 void HWR_EnableZBuffer(bool ZWriteEnable, bool ZEnable); // 0x0044D320
 void HWR_BeginScene(); // 0x0044D3B0
 void HWR_DrawPolyList(); // 0x0044D3E0
-void HWR_LoadTexturePages(int pagesCount, LPVOID pagesBuffer, RGB888 *palette); // 0x0044D560
+void HWR_LoadTexturePages(int pagesCount, LPVOID pagesBuffer, RGB888* palette); // 0x0044D560
 void HWR_FreeTexturePages(); // 0x0044D5F0
 void HWR_GetPageHandles(); // 0x0044D640
 bool HWR_VertexBufferFull(); // 0x0044D680

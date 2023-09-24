@@ -33,15 +33,15 @@
 #define STATS_LN_COUNT	(7)
 #define STATS_WIDTH		(304)
 
-// Y coordinates relative to the bottom of the screen
+ // Y coordinates relative to the bottom of the screen
 #ifdef FEATURE_HUD_IMPROVED
 #define STATS_Y_POS		(-44)
 #define REQ_LN_HEIGHT (15)
 
 extern DWORD InvTextBoxMode;
 
-static const char MoreDownString[]	= " \x0F                                        \x0F ";
-static const char MoreUpString[]	= " \x10                                        \x10 ";
+static const char MoreDownString[] = " \x0F                                        \x0F ";
+static const char MoreUpString[] = " \x10                                        \x10 ";
 #else // FEATURE_HUD_IMPROVED
 #define STATS_Y_POS		(-32)
 #define REQ_LN_HEIGHT	(18)
@@ -50,36 +50,36 @@ static const char MoreUpString[]	= " \x10                                       
 // NOTE: gouraud arrays have been taken from PlayStation version of the game.
 // These arrays are not used in the original PC version of the game.
 
-GOURAUD_FILL ReqBgndGour1 = {{
+GOURAUD_FILL ReqBgndGour1 = { {
 	{0x80002000, 0x80002000, 0x80006000, 0x80002000},
 	{0x80002000, 0x80002000, 0x80002000, 0x80006000},
 	{0x80006000, 0x80002000, 0x80002000, 0x80002000},
 	{0x80002000, 0x80006000, 0x80002000, 0x80002000},
-}};
+} };
 GOURAUD_OUTLINE ReqBgndGour2 = {
 	0xFF606060, 0xFF808080, 0xFF202020,
 	0xFF000000, 0xFF000000, 0xFF202020,
 	0xFF404040, 0xFF404040, 0xFF606060,
 };
 
-GOURAUD_FILL ReqMainGour1 = {{
+GOURAUD_FILL ReqMainGour1 = { {
 	{0x80000000, 0x80000000, 0x80108038, 0x80000000},
 	{0x80000000, 0x80000000, 0x80000000, 0x80108038},
 	{0x80108038, 0x80000000, 0x80000000, 0x80000000},
 	{0x80000000, 0x80108038, 0x80000000, 0x80000000},
-}};
+} };
 GOURAUD_OUTLINE ReqMainGour2 = {
 	0xFF000000, 0xFF000000, 0xFF000000,
 	0xFF000000, 0xFF000000, 0xFF000000,
 	0xFF000000, 0xFF000000, 0xFF000000,
 };
 
-GOURAUD_FILL ReqSelGour1 = {{
+GOURAUD_FILL ReqSelGour1 = { {
 	{0x80000000, 0x80000000, 0x8038F080, 0x80000000},
 	{0x80000000, 0x80000000, 0x80000000, 0x8038F080},
 	{0x8038F080, 0x80000000, 0x80000000, 0x80000000},
 	{0x80000000, 0x8038F080, 0x80000000, 0x80000000},
-}};
+} };
 GOURAUD_OUTLINE ReqSelGour2 = {
 	0xFF000000, 0xFFFFFFFF, 0xFF000000,
 	0xFF38F080, 0xFF000000, 0xFFFFFFFF,
@@ -92,9 +92,9 @@ extern int GF_GetNumSecrets(DWORD levelID);
 extern void SaveAssault();
 #endif // FEATURE_ASSAULT_SAVE
 
-void Init_Requester(REQUEST_INFO *req) {
-	req->headingText1  = NULL;
-	req->headingText2  = NULL;
+void Init_Requester(REQUEST_INFO* req) {
+	req->headingText1 = NULL;
+	req->headingText2 = NULL;
 	req->headingFlags1 = 0;
 	req->headingFlags2 = 0;
 
@@ -105,7 +105,7 @@ void Init_Requester(REQUEST_INFO *req) {
 	req->moredownText = NULL;
 	req->moredownFlags = 1;
 
-	for( int i=0; i<24; ++i ) {
+	for (int i = 0; i < 24; ++i) {
 		req->itemTexts1[i] = NULL;
 		req->itemFlags1[i] = 0;
 		req->itemTexts2[i] = NULL;
@@ -116,15 +116,15 @@ void Init_Requester(REQUEST_INFO *req) {
 	req->lpItemFlags1 = RequesterItemFlags1;
 	req->lpItemFlags2 = RequesterItemFlags2;
 #ifdef FEATURE_HUD_IMPROVED
-	req->renderWidth  = GetRenderWidthDownscaled();
+	req->renderWidth = GetRenderWidthDownscaled();
 	req->renderHeight = GetRenderHeightDownscaled();
 #else // !FEATURE_HUD_IMPROVED
-	req->renderWidth  = GetRenderWidth();
+	req->renderWidth = GetRenderWidth();
 	req->renderHeight = GetRenderHeight();
 #endif // FEATURE_HUD_IMPROVED
 }
 
-void Remove_Requester(REQUEST_INFO *req) {
+void Remove_Requester(REQUEST_INFO* req) {
 	T_RemovePrint(req->headingText1);
 	req->headingText1 = NULL;
 	T_RemovePrint(req->headingText2);
@@ -136,7 +136,7 @@ void Remove_Requester(REQUEST_INFO *req) {
 	T_RemovePrint(req->moredownText);
 	req->moredownText = NULL;
 
-	for( int i=0; i<24; ++i ) {
+	for (int i = 0; i < 24; ++i) {
 		T_RemovePrint(req->itemTexts1[i]);
 		req->itemTexts1[i] = NULL;
 		T_RemovePrint(req->itemTexts2[i]);
@@ -144,17 +144,17 @@ void Remove_Requester(REQUEST_INFO *req) {
 	}
 }
 
-void ReqItemCentreAlign(REQUEST_INFO *req, TEXT_STR_INFO *textInfo) {
-	if( textInfo != NULL ) {
+void ReqItemCentreAlign(REQUEST_INFO* req, TEXT_STR_INFO* textInfo) {
+	if (textInfo != NULL) {
 		textInfo->xPos = req->xPos;
 		textInfo->bgndOffX = 0;
 	}
 }
 
-void ReqItemLeftAlign(REQUEST_INFO *req, TEXT_STR_INFO *textInfo) {
+void ReqItemLeftAlign(REQUEST_INFO* req, TEXT_STR_INFO* textInfo) {
 	int bgndOffX;
 
-	if( textInfo == NULL )
+	if (textInfo == NULL)
 		return;
 
 #ifdef FEATURE_HUD_IMPROVED
@@ -167,10 +167,10 @@ void ReqItemLeftAlign(REQUEST_INFO *req, TEXT_STR_INFO *textInfo) {
 	textInfo->bgndOffX = bgndOffX;
 }
 
-void ReqItemRightAlign(REQUEST_INFO *req, TEXT_STR_INFO *textInfo) {
+void ReqItemRightAlign(REQUEST_INFO* req, TEXT_STR_INFO* textInfo) {
 	int bgndOffX;
 
-	if( textInfo == NULL )
+	if (textInfo == NULL)
 		return;
 
 #ifdef FEATURE_HUD_IMPROVED
@@ -183,18 +183,19 @@ void ReqItemRightAlign(REQUEST_INFO *req, TEXT_STR_INFO *textInfo) {
 	textInfo->bgndOffX = -bgndOffX;
 }
 
-int Display_Requester(REQUEST_INFO *req, BOOL removeOnDeselect, BOOL isBackground) {
+int Display_Requester(REQUEST_INFO* req, BOOL removeOnDeselect, BOOL isBackground) {
 	int i, linesCount, boxHeight, boxOff, linesOff;
 	DWORD renderWidth, renderHeight;
 
 	linesCount = req->visibleCount;
 
 #ifdef FEATURE_HUD_IMPROVED
-	if( SavedAppSettings.RenderMode == RM_Hardware && InvTextBoxMode ) {
+	if (SavedAppSettings.RenderMode == RM_Hardware && InvTextBoxMode) {
 		boxHeight = req->lineHeight * linesCount + 42;
 		boxOff = req->yPos - boxHeight + 2;
 		linesOff = boxOff + 30;
-	} else {
+	}
+	else {
 		boxHeight = req->lineHeight * (linesCount + 1) + 22;
 		boxOff = req->yPos - boxHeight + 2;
 		linesOff = boxOff + req->lineHeight + 10;
@@ -211,7 +212,7 @@ int Display_Requester(REQUEST_INFO *req, BOOL removeOnDeselect, BOOL isBackgroun
 	renderHeight = GetRenderHeight();
 #endif // FEATURE_HUD_IMPROVED
 
-	if( renderWidth != req->renderWidth || renderHeight != req->renderHeight ) {
+	if (renderWidth != req->renderWidth || renderHeight != req->renderHeight) {
 		Remove_Requester(req);
 		req->renderWidth = renderWidth;
 		req->renderHeight = renderHeight;
@@ -220,50 +221,50 @@ int Display_Requester(REQUEST_INFO *req, BOOL removeOnDeselect, BOOL isBackgroun
 	req->lpItemFlags1 = RequesterItemFlags1;
 	req->lpItemFlags2 = RequesterItemFlags2;
 
-	if( req->itemsCount < req->visibleCount ) {
+	if (req->itemsCount < req->visibleCount) {
 		linesCount = req->itemsCount;
 	}
 
 	// Heading 1
-	if( CHK_ANY(req->headingFlags1, REQFLAG_ACTIVE) ) {
-		if( req->headingText1 == NULL ) {
+	if (CHK_ANY(req->headingFlags1, REQFLAG_ACTIVE)) {
+		if (req->headingText1 == NULL) {
 			req->headingText1 = T_Print(req->xPos, boxOff, req->zPos, req->headingString1);
 			T_CentreH(req->headingText1, 1);
 			T_BottomAlign(req->headingText1, 1);
-			if( isBackground ) {
+			if (isBackground) {
 				T_AddBackground(req->headingText1, (req->pixWidth - 4), 0, 0, 0, REQ_NEARZ, ICLR_Black, &ReqMainGour1, 2);
 				T_AddOutline(req->headingText1, TRUE, ICLR_Orange, &ReqMainGour2, 0);
 			}
 		}
-		if( CHK_ANY(req->headingFlags1, REQFLAG_LEFT) ) {
+		if (CHK_ANY(req->headingFlags1, REQFLAG_LEFT)) {
 			ReqItemLeftAlign(req, req->headingText1);
 		}
-		if( CHK_ANY(req->headingFlags1, REQFLAG_RIGHT) ) {
+		if (CHK_ANY(req->headingFlags1, REQFLAG_RIGHT)) {
 			ReqItemRightAlign(req, req->headingText1);
 		}
 	}
 
 	// Heading 2
-	if( CHK_ANY(req->headingFlags2, REQFLAG_ACTIVE) ) {
-		if( req->headingText2 == NULL ) {
+	if (CHK_ANY(req->headingFlags2, REQFLAG_ACTIVE)) {
+		if (req->headingText2 == NULL) {
 			req->headingText2 = T_Print(req->xPos, boxOff, req->zPos, req->headingString2);
 			T_CentreH(req->headingText2, 1);
 			T_BottomAlign(req->headingText2, 1);
-			if( isBackground ) {
+			if (isBackground) {
 				T_AddBackground(req->headingText2, (req->pixWidth - 4), 0, 0, 0, REQ_NEARZ, ICLR_Black, &ReqMainGour1, 2);
 				T_AddOutline(req->headingText2, TRUE, ICLR_Orange, &ReqMainGour2, 0);
 			}
 		}
-		if( CHK_ANY(req->headingFlags2, REQFLAG_LEFT) ) {
+		if (CHK_ANY(req->headingFlags2, REQFLAG_LEFT)) {
 			ReqItemLeftAlign(req, req->headingText2);
 		}
-		if( CHK_ANY(req->headingFlags2, REQFLAG_RIGHT) ) {
+		if (CHK_ANY(req->headingFlags2, REQFLAG_RIGHT)) {
 			ReqItemRightAlign(req, req->headingText2);
 		}
 	}
 
 	// Background
-	if( isBackground && req->backgroundText == NULL && CHK_ANY(req->backgroundFlags, REQFLAG_ACTIVE) ) {
+	if (isBackground && req->backgroundText == NULL && CHK_ANY(req->backgroundFlags, REQFLAG_ACTIVE)) {
 		req->backgroundText = T_Print(req->xPos, boxOff - 2, 0, " ");
 		T_CentreH(req->backgroundText, 1);
 		T_BottomAlign(req->backgroundText, 1);
@@ -272,13 +273,13 @@ int Display_Requester(REQUEST_INFO *req, BOOL removeOnDeselect, BOOL isBackgroun
 	}
 
 	// More up
-	if( req->lineOffset == 0 ) {
+	if (req->lineOffset == 0) {
 		T_RemovePrint(req->moreupText);
 		req->moreupText = NULL;
 	}
-	else if( req->moreupText == NULL && CHK_ANY(req->moreupFlags, REQFLAG_ACTIVE) ) {
+	else if (req->moreupText == NULL && CHK_ANY(req->moreupFlags, REQFLAG_ACTIVE)) {
 #ifdef FEATURE_HUD_IMPROVED
-		if( SavedAppSettings.RenderMode == RM_Hardware && InvTextBoxMode ) {
+		if (SavedAppSettings.RenderMode == RM_Hardware && InvTextBoxMode) {
 			req->moreupText = T_Print(req->xPos, boxOff + 15, 0, MoreUpString);
 		}
 #endif // FEATURE_HUD_IMPROVED
@@ -287,13 +288,13 @@ int Display_Requester(REQUEST_INFO *req, BOOL removeOnDeselect, BOOL isBackgroun
 	}
 
 	// More down
-	if( req->itemsCount <= (req->visibleCount + req->lineOffset) ) {
+	if (req->itemsCount <= (req->visibleCount + req->lineOffset)) {
 		T_RemovePrint(req->moredownText);
 		req->moredownText = 0;
 	}
-	else if( req->moredownText == NULL && CHK_ANY(req->moredownFlags, REQFLAG_ACTIVE) ) {
+	else if (req->moredownText == NULL && CHK_ANY(req->moredownFlags, REQFLAG_ACTIVE)) {
 #ifdef FEATURE_HUD_IMPROVED
-		if( SavedAppSettings.RenderMode == RM_Hardware && InvTextBoxMode ) {
+		if (SavedAppSettings.RenderMode == RM_Hardware && InvTextBoxMode) {
 			req->moredownText = T_Print(req->xPos, req->yPos - 12, 0, MoreDownString);
 		}
 #endif // FEATURE_HUD_IMPROVED
@@ -302,43 +303,45 @@ int Display_Requester(REQUEST_INFO *req, BOOL removeOnDeselect, BOOL isBackgroun
 	}
 
 	// Lines init
-	for( i = 0; i < linesCount; ++i ) {
-		if( CHK_ANY(req->lpItemFlags1[req->lineOffset + i], REQFLAG_ACTIVE) ) {
-			if( req->itemTexts1[i] == NULL ) {
+	for (i = 0; i < linesCount; ++i) {
+		if (CHK_ANY(req->lpItemFlags1[req->lineOffset + i], REQFLAG_ACTIVE)) {
+			if (req->itemTexts1[i] == NULL) {
 				// NOTE: here was 0 instead of REQ_NEARZ in the original game
 				req->itemTexts1[i] = T_Print(0, (linesOff + req->lineHeight * i), REQ_NEARZ, &req->lpItemStrings1[(req->lineOffset + i) * req->itemStringLen]);
 				T_CentreH(req->itemTexts1[i], 1);
 				T_BottomAlign(req->itemTexts1[i], 1);
 			}
 
-			if( CHK_ANY(req->reqFlags, REQFLAG_NOCURSOR) || (req->lineOffset + i != req->selected) ) {
+			if (CHK_ANY(req->reqFlags, REQFLAG_NOCURSOR) || (req->lineOffset + i != req->selected)) {
 				req->itemTexts1[i]->zPos = REQ_NEARZ; // NOTE: this line is absent in the original game
 				T_RemoveBackground(req->itemTexts1[i]);
 				T_RemoveOutline(req->itemTexts1[i]);
-			} else {
+			}
+			else {
 				req->itemTexts1[i]->zPos = 0; // NOTE: this line is absent in the original game
 				T_AddBackground(req->itemTexts1[i], (req->pixWidth - 12), 0, 0, 0, REQ_MIDZ, ICLR_Black, &ReqSelGour1, 1);
 				T_AddOutline(req->itemTexts1[i], TRUE, ICLR_Orange, &ReqSelGour2, 0);
 			}
 
-			if( CHK_ANY(req->lpItemFlags1[req->lineOffset + i], REQFLAG_LEFT) ) {
+			if (CHK_ANY(req->lpItemFlags1[req->lineOffset + i], REQFLAG_LEFT)) {
 				ReqItemLeftAlign(req, req->itemTexts1[i]);
 			}
-			else if( CHK_ANY(req->lpItemFlags1[req->lineOffset + i], REQFLAG_RIGHT) ) {
+			else if (CHK_ANY(req->lpItemFlags1[req->lineOffset + i], REQFLAG_RIGHT)) {
 				ReqItemRightAlign(req, req->itemTexts1[i]);
 			}
 			else {
 				ReqItemCentreAlign(req, req->itemTexts1[i]);
 			}
-		} else {
+		}
+		else {
 			T_RemovePrint(req->itemTexts1[i]);
 			T_RemoveBackground(req->itemTexts1[i]);
 			T_RemoveOutline(req->itemTexts1[i]);
 			req->itemTexts1[i] = NULL;
 		}
 
-		if( CHK_ANY(req->lpItemFlags2[req->lineOffset + i], REQFLAG_ACTIVE) ) {
-			if( req->itemTexts2[i] == NULL ) {
+		if (CHK_ANY(req->lpItemFlags2[req->lineOffset + i], REQFLAG_ACTIVE)) {
+			if (req->itemTexts2[i] == NULL) {
 				// NOTE: here was 0 instead of REQ_NEARZ in the original game
 				req->itemTexts2[i] = T_Print(0, (linesOff + req->lineHeight * i), REQ_NEARZ, &req->lpItemStrings2[(req->lineOffset + i) * req->itemStringLen]);
 				T_CentreH(req->itemTexts2[i], 1);
@@ -346,22 +349,24 @@ int Display_Requester(REQUEST_INFO *req, BOOL removeOnDeselect, BOOL isBackgroun
 			}
 
 			// NOTE: this code block is absent in the original game
-			if( CHK_ANY(req->reqFlags, REQFLAG_NOCURSOR) || (req->lineOffset + i != req->selected) ) {
+			if (CHK_ANY(req->reqFlags, REQFLAG_NOCURSOR) || (req->lineOffset + i != req->selected)) {
 				req->itemTexts2[i]->zPos = REQ_NEARZ;
-			} else {
+			}
+			else {
 				req->itemTexts2[i]->zPos = 0;
 			}
 
-			if( CHK_ANY(req->lpItemFlags2[req->lineOffset + i], REQFLAG_LEFT) ) {
+			if (CHK_ANY(req->lpItemFlags2[req->lineOffset + i], REQFLAG_LEFT)) {
 				ReqItemLeftAlign(req, req->itemTexts2[i]);
 			}
-			else if( CHK_ANY(req->lpItemFlags2[req->lineOffset + i], REQFLAG_RIGHT) ) {
+			else if (CHK_ANY(req->lpItemFlags2[req->lineOffset + i], REQFLAG_RIGHT)) {
 				ReqItemRightAlign(req, req->itemTexts2[i]);
 			}
 			else {
 				ReqItemCentreAlign(req, req->itemTexts2[i]);
 			}
-		} else {
+		}
+		else {
 			T_RemovePrint(req->itemTexts2[i]);
 			T_RemoveBackground(req->itemTexts2[i]);
 			T_RemoveOutline(req->itemTexts2[i]);
@@ -370,30 +375,30 @@ int Display_Requester(REQUEST_INFO *req, BOOL removeOnDeselect, BOOL isBackgroun
 	}
 
 	// Lines change
-	if( req->lineOffset != req->lineOldOffset ) {
-		for( i = 0; i < linesCount; ++i ) {
-			if( req->itemTexts1[i] != NULL && CHK_ANY(req->lpItemFlags1[req->lineOffset + i], REQFLAG_ACTIVE) ) {
+	if (req->lineOffset != req->lineOldOffset) {
+		for (i = 0; i < linesCount; ++i) {
+			if (req->itemTexts1[i] != NULL && CHK_ANY(req->lpItemFlags1[req->lineOffset + i], REQFLAG_ACTIVE)) {
 				T_ChangeText(req->itemTexts1[i], &req->lpItemStrings1[(req->lineOffset + i) * req->itemStringLen]);
 			}
 
-			if( CHK_ANY(req->lpItemFlags1[req->lineOffset + i], REQFLAG_LEFT) ) {
+			if (CHK_ANY(req->lpItemFlags1[req->lineOffset + i], REQFLAG_LEFT)) {
 				ReqItemLeftAlign(req, req->itemTexts1[i]);
 			}
-			else if( CHK_ANY(req->lpItemFlags1[req->lineOffset + i], REQFLAG_RIGHT) ) {
+			else if (CHK_ANY(req->lpItemFlags1[req->lineOffset + i], REQFLAG_RIGHT)) {
 				ReqItemRightAlign(req, req->itemTexts1[i]);
 			}
 			else {
 				ReqItemCentreAlign(req, req->itemTexts1[i]);
 			}
 
-			if( req->itemTexts2[i] != NULL && CHK_ANY(req->lpItemFlags2[req->lineOffset + i], REQFLAG_ACTIVE) ) {
+			if (req->itemTexts2[i] != NULL && CHK_ANY(req->lpItemFlags2[req->lineOffset + i], REQFLAG_ACTIVE)) {
 				T_ChangeText(req->itemTexts2[i], &req->lpItemStrings2[(req->lineOffset + i) * req->itemStringLen]);
 			}
 
-			if( CHK_ANY(req->lpItemFlags2[req->lineOffset + i], REQFLAG_LEFT) ) {
+			if (CHK_ANY(req->lpItemFlags2[req->lineOffset + i], REQFLAG_LEFT)) {
 				ReqItemLeftAlign(req, req->itemTexts2[i]);
 			}
-			else if( CHK_ANY(req->lpItemFlags2[req->lineOffset + i], REQFLAG_RIGHT) ) {
+			else if (CHK_ANY(req->lpItemFlags2[req->lineOffset + i], REQFLAG_RIGHT)) {
 				ReqItemRightAlign(req, req->itemTexts2[i]);
 			}
 			else {
@@ -403,19 +408,19 @@ int Display_Requester(REQUEST_INFO *req, BOOL removeOnDeselect, BOOL isBackgroun
 	}
 
 	// Menu down
-	if( CHK_ANY(InputDB, IN_BACK) ) {
-		if( CHK_ANY(req->reqFlags, REQFLAG_NOCURSOR) ) { // Cursor is disabled. Move the list
+	if (CHK_ANY(InputDB, IN_BACK)) {
+		if (CHK_ANY(req->reqFlags, REQFLAG_NOCURSOR)) { // Cursor is disabled. Move the list
 			req->lineOldOffset = req->lineOffset;
-			if( req->lineOffset < (req->itemsCount - req->visibleCount) ) {
+			if (req->lineOffset < (req->itemsCount - req->visibleCount)) {
 				++req->lineOffset;
 			}
 		}
 		else { // Cursor is enabled. Move the cursor
-			if( req->selected < (req->itemsCount - 1) ) {
+			if (req->selected < (req->itemsCount - 1)) {
 				++req->selected;
 			}
 			req->lineOldOffset = req->lineOffset;
-			if( req->lineOffset <= (req->selected - req->visibleCount) ) {
+			if (req->lineOffset <= (req->selected - req->visibleCount)) {
 				++req->lineOffset;
 			}
 		}
@@ -423,20 +428,20 @@ int Display_Requester(REQUEST_INFO *req, BOOL removeOnDeselect, BOOL isBackgroun
 	}
 
 	// Menu Up
-	if( CHK_ANY(InputDB, IN_FORWARD) ) {
-		if( CHK_ANY(req->reqFlags, REQFLAG_NOCURSOR) ) { // Cursor is disabled. Move the list
+	if (CHK_ANY(InputDB, IN_FORWARD)) {
+		if (CHK_ANY(req->reqFlags, REQFLAG_NOCURSOR)) { // Cursor is disabled. Move the list
 			req->lineOldOffset = req->lineOffset;
-			if( req->lineOffset > 0 ) {
+			if (req->lineOffset > 0) {
 				--req->lineOffset;
 			}
 		}
 		else { // Cursor is enabled. Move the cursor
-			if( req->selected > 0 ) {
+			if (req->selected > 0) {
 				--req->selected;
 			}
 
 			req->lineOldOffset = req->lineOffset;
-			if( req->lineOffset > req->selected ) {
+			if (req->lineOffset > req->selected) {
 				--req->lineOffset;
 			}
 		}
@@ -444,20 +449,21 @@ int Display_Requester(REQUEST_INFO *req, BOOL removeOnDeselect, BOOL isBackgroun
 	}
 
 	// Menu Select
-	if( CHK_ANY(InputDB, IN_SELECT) ) {
+	if (CHK_ANY(InputDB, IN_SELECT)) {
 		// This check prevents from loading an empty saved game slot
 		// NOTE: there was an ugly strcmp check in the original game
-		if( req == &LoadGameRequester && InventoryExtraData[0] == 0 && !SaveSlotFlags[req->selected] ) {
+		if (req == &LoadGameRequester && InventoryExtraData[0] == 0 && !SaveSlotFlags[req->selected]) {
 			InputStatus = 0;
 			return 0;
-		} else {
+		}
+		else {
 			Remove_Requester(req);
 			return (req->selected + 1);
 		}
 	}
 
 	// Menu Deselect
-	if( CHK_ANY(InputDB, IN_DESELECT) && removeOnDeselect ) {
+	if (CHK_ANY(InputDB, IN_DESELECT) && removeOnDeselect) {
 		Remove_Requester(req);
 		return -1;
 	}
@@ -465,98 +471,104 @@ int Display_Requester(REQUEST_INFO *req, BOOL removeOnDeselect, BOOL isBackgroun
 	return 0;
 }
 
-void SetRequesterHeading(REQUEST_INFO *req, const char *string1, DWORD flags1, const char *string2, DWORD flags2) {
+void SetRequesterHeading(REQUEST_INFO* req, const char* string1, DWORD flags1, const char* string2, DWORD flags2) {
 	T_RemovePrint(req->headingText1);
 	req->headingText1 = NULL;
 	T_RemovePrint(req->headingText2);
 	req->headingText2 = NULL;
 
-	if( string1 != NULL ) {
+	if (string1 != NULL) {
 		strcpy(req->headingString1, string1);
 		req->headingFlags1 = flags1 | REQFLAG_ACTIVE;
-	} else {
+	}
+	else {
 		strcpy(req->headingString1, "u");
 		req->headingFlags1 = 0;
 	}
 
-	if( string2 != NULL ) {
+	if (string2 != NULL) {
 		strcpy(req->headingString2, string2);
 		req->headingFlags2 = flags2 | REQFLAG_ACTIVE;
-	} else {
+	}
+	else {
 		strcpy(req->headingString2, "u");
 		req->headingFlags2 = 0;
 	}
 }
 
-void RemoveAllReqItems(REQUEST_INFO *req) {
+void RemoveAllReqItems(REQUEST_INFO* req) {
 	req->itemsCount = 0;
 	req->lineOffset = 0;
 	req->selected = 0;
 }
 
-void ChangeRequesterItem(REQUEST_INFO *req, DWORD itemIdx, const char *string1, DWORD flags1, const char *string2, DWORD flags2) {
+void ChangeRequesterItem(REQUEST_INFO* req, DWORD itemIdx, const char* string1, DWORD flags1, const char* string2, DWORD flags2) {
 	T_RemovePrint(req->itemTexts1[itemIdx]);
 	req->itemTexts1[itemIdx] = NULL;
 	T_RemovePrint(req->itemTexts2[itemIdx]);
 	req->itemTexts2[itemIdx] = NULL;
 
-	if( string1 != NULL ) {
+	if (string1 != NULL) {
 		strcpy(&req->lpItemStrings1[itemIdx * req->itemStringLen], string1);
 		req->lpItemFlags1[itemIdx] = flags1 | REQFLAG_ACTIVE;
-	} else {
+	}
+	else {
 		req->lpItemFlags1[itemIdx] = 0;
 	}
 
-	if( string2 != NULL ) {
+	if (string2 != NULL) {
 		strcpy(&req->lpItemStrings2[itemIdx * req->itemStringLen], string2);
 		req->lpItemFlags2[itemIdx] = flags2 | REQFLAG_ACTIVE;
-	} else {
+	}
+	else {
 		req->lpItemFlags2[itemIdx] = 0;
 	}
 }
 
-void AddRequesterItem(REQUEST_INFO *req, const char *string1, DWORD flags1, const char *string2, DWORD flags2) {
+void AddRequesterItem(REQUEST_INFO* req, const char* string1, DWORD flags1, const char* string2, DWORD flags2) {
 	req->lpItemFlags1 = RequesterItemFlags1;
 	req->lpItemFlags2 = RequesterItemFlags2;
 
-	if( string1 != NULL ) {
+	if (string1 != NULL) {
 		strcpy(&req->lpItemStrings1[req->itemsCount * req->itemStringLen], string1);
 		req->lpItemFlags1[req->itemsCount] = flags1 | REQFLAG_ACTIVE;
-	} else {
+	}
+	else {
 		req->lpItemFlags1[req->itemsCount] = 0;
 	}
 
-	if( string2 != NULL ) {
+	if (string2 != NULL) {
 		strcpy(&req->lpItemStrings2[req->itemsCount * req->itemStringLen], string2);
 		req->lpItemFlags2[req->itemsCount] = flags2 | REQFLAG_ACTIVE;
-	} else {
+	}
+	else {
 		req->lpItemFlags2[req->itemsCount] = 0;
 	}
 
 	++req->itemsCount;
 }
 
-void SetPCRequesterSize(REQUEST_INFO *req, int maxLines, __int16 yPos) {
+void SetPCRequesterSize(REQUEST_INFO* req, int maxLines, __int16 yPos) {
 	req->yPos = yPos;
 #ifdef FEATURE_HUD_IMPROVED
 	req->visibleCount = GetRenderHeightDownscaled() / 2 / REQ_LN_HEIGHT;
 #else // !FEATURE_HUD_IMPROVED
 	req->visibleCount = GetRenderHeight() / 2 / REQ_LN_HEIGHT;
 #endif // FEATURE_HUD_IMPROVED
-	if( req->visibleCount > maxLines )
+	if (req->visibleCount > maxLines)
 		req->visibleCount = maxLines;
 }
 
 BOOL AddAssaultTime(DWORD newTime) {
 	int i, j;
 
-	for( i = 0; i < 10; ++i ) {
-		if( Assault.bestTime[i] == 0 || newTime < Assault.bestTime[i] ) {
+	for (i = 0; i < 10; ++i) {
+		if (Assault.bestTime[i] == 0 || newTime < Assault.bestTime[i]) {
 			break;
 		}
 	}
 
-	if( i > 9 ) { // Not best time at all
+	if (i > 9) { // Not best time at all
 		// NOTE: finishCount is not incremented in the original code in case of bad time
 		// but in my opinion, bad finish should be counted here, as well as good.
 		++Assault.finishCount;
@@ -564,7 +576,7 @@ BOOL AddAssaultTime(DWORD newTime) {
 	}
 
 	// Insertion required if the finish slot is not the last one
-	for( j = 9; j > i; --j ) {
+	for (j = 9; j > i; --j) {
 		Assault.bestTime[j] = Assault.bestTime[j - 1];
 		Assault.bestFinish[j] = Assault.bestFinish[j - 1];
 	}
@@ -584,7 +596,7 @@ void ShowGymStatsText() {
 	char statStr1[32];
 	char statStr2[32];
 
-	if( !isStatsTextReady ) {
+	if (!isStatsTextReady) {
 		StatsRequester.reqFlags |= REQFLAG_NOCURSOR;
 		SetPCRequesterSize(&StatsRequester, STATS_LN_COUNT, STATS_Y_POS);
 
@@ -596,16 +608,16 @@ void ShowGymStatsText() {
 		StatsRequester.pixWidth = STATS_WIDTH;
 		StatsRequester.xPos = 0;
 		StatsRequester.zPos = 0;
-		StatsRequester.lpItemStrings1 = (char *)SaveGameStrings1;
-		StatsRequester.lpItemStrings2 = (char *)SaveGameStrings2;
+		StatsRequester.lpItemStrings1 = (char*)SaveGameStrings1;
+		StatsRequester.lpItemStrings2 = (char*)SaveGameStrings2;
 		StatsRequester.itemStringLen = 50;
 
 		Init_Requester(&StatsRequester);
 		SetRequesterHeading(&StatsRequester, GF_GameStringTable[GSI_String_BestTimes], 0, NULL, 0);
 
-		for( int i = 0; i < 10; ++i ) {
-			if( Assault.bestTime[i] == 0 ) {
-				if( i == 0 ) {
+		for (int i = 0; i < 10; ++i) {
+			if (Assault.bestTime[i] == 0) {
+				if (i == 0) {
 					AddRequesterItem(&StatsRequester, GF_GameStringTable[GSI_String_NoTimesSet], 0, NULL, 0);
 				}
 				break;
@@ -620,7 +632,7 @@ void ShowGymStatsText() {
 
 		isStatsTextReady = true;
 	}
-	else if( Display_Requester(&StatsRequester, TRUE, TRUE) ) {
+	else if (Display_Requester(&StatsRequester, TRUE, TRUE)) {
 		isStatsTextReady = false;
 	}
 	else {
@@ -629,13 +641,13 @@ void ShowGymStatsText() {
 	}
 }
 
-void ShowStatsText(char *timeString, BOOL removeOnDeselect) {
+void ShowStatsText(char* timeString, BOOL removeOnDeselect) {
 	static bool isStatsTextReady = false;
 	bool isSecret1, isSecret2, isSecret3;
 	int bufLen, distance;
 	char bufStr[32];
 
-	if( !isStatsTextReady ) {
+	if (!isStatsTextReady) {
 		StatsRequester.reqFlags |= REQFLAG_NOCURSOR;
 		SetPCRequesterSize(&StatsRequester, STATS_LN_COUNT, STATS_Y_POS);
 
@@ -647,8 +659,8 @@ void ShowStatsText(char *timeString, BOOL removeOnDeselect) {
 		StatsRequester.pixWidth = STATS_WIDTH;
 		StatsRequester.xPos = 0;
 		StatsRequester.zPos = 0;
-		StatsRequester.lpItemStrings1 = (char *)SaveGameStrings1;
-		StatsRequester.lpItemStrings2 = (char *)SaveGameStrings2;
+		StatsRequester.lpItemStrings1 = (char*)SaveGameStrings1;
+		StatsRequester.lpItemStrings2 = (char*)SaveGameStrings2;
 		StatsRequester.itemStringLen = 50;
 
 		Init_Requester(&StatsRequester);
@@ -658,40 +670,44 @@ void ShowStatsText(char *timeString, BOOL removeOnDeselect) {
 		AddRequesterItem(&StatsRequester, GF_GameStringTable[GSI_String_TimeTaken], REQFLAG_LEFT, timeString, REQFLAG_RIGHT);
 
 		// Secrets found
-		if( GF_NumSecrets > 0 ) {
+		if (GF_NumSecrets > 0) {
 			isSecret1 = CHK_ANY(SaveGame.statistics.secrets, 1);
 			isSecret2 = CHK_ANY(SaveGame.statistics.secrets, 2);
 			isSecret3 = CHK_ANY(SaveGame.statistics.secrets, 4);
 
-			if( isSecret1 || isSecret2 || isSecret3 ) {
+			if (isSecret1 || isSecret2 || isSecret3) {
 				bufLen = 0;
 
-				if( isSecret1 ) {
+				if (isSecret1) {
 					bufStr[bufLen++] = CHAR_SECRET1;
-				} else {
+				}
+				else {
 					bufStr[bufLen++] = ' ';
 					bufStr[bufLen++] = ' ';
 					bufStr[bufLen++] = ' ';
 				}
 
-				if( isSecret2 ) {
+				if (isSecret2) {
 					bufStr[bufLen++] = CHAR_SECRET2;
-				} else {
+				}
+				else {
 					bufStr[bufLen++] = ' ';
 					bufStr[bufLen++] = ' ';
 					bufStr[bufLen++] = ' ';
 				}
 
-				if( isSecret3 ) {
+				if (isSecret3) {
 					bufStr[bufLen++] = CHAR_SECRET3;
-				} else {
+				}
+				else {
 					bufStr[bufLen++] = ' ';
 					bufStr[bufLen++] = ' ';
 					bufStr[bufLen++] = ' ';
 				}
 
 				bufStr[bufLen] = 0;
-			} else {
+			}
+			else {
 				sprintf(bufStr, GF_GameStringTable[GSI_String_None]);
 			}
 			AddRequesterItem(&StatsRequester, GF_GameStringTable[GSI_String_SecretsFound], REQFLAG_LEFT, bufStr, REQFLAG_RIGHT);
@@ -710,28 +726,32 @@ void ShowStatsText(char *timeString, BOOL removeOnDeselect) {
 		AddRequesterItem(&StatsRequester, GF_GameStringTable[GSI_String_Hits], REQFLAG_LEFT, bufStr, REQFLAG_RIGHT);
 
 		// HealthPacks used
-		if( (SaveGame.statistics.mediPacks % 2) == 0 ) {
-			sprintf(bufStr, "%d.0", (int)(SaveGame.statistics.mediPacks / 2) );
-		} else {
-			sprintf(bufStr, "%d.5", (int)(SaveGame.statistics.mediPacks / 2) );
+		if ((SaveGame.statistics.mediPacks % 2) == 0) {
+			sprintf(bufStr, "%d.0", (int)(SaveGame.statistics.mediPacks / 2));
+		}
+		else {
+			sprintf(bufStr, "%d.5", (int)(SaveGame.statistics.mediPacks / 2));
 		}
 		AddRequesterItem(&StatsRequester, GF_GameStringTable[GSI_String_HealthPacksUsed], REQFLAG_LEFT, bufStr, REQFLAG_RIGHT);
 
 		// Distance travelled
 		distance = SaveGame.statistics.distance / 445;
-		if( distance < 1000 ) {
+		if (distance < 1000) {
 			sprintf(bufStr, "%dm", distance);
-		} else {
+		}
+		else {
 			sprintf(bufStr, "%d.%02dkm", (distance / 1000), (distance % 100));
 		}
 		AddRequesterItem(&StatsRequester, GF_GameStringTable[GSI_String_DistanceTravelled], REQFLAG_LEFT, bufStr, REQFLAG_RIGHT);
 
 		isStatsTextReady = true;
-	} else {
+	}
+	else {
 		ChangeRequesterItem(&StatsRequester, 0, GF_GameStringTable[GSI_String_TimeTaken], REQFLAG_LEFT, timeString, REQFLAG_RIGHT);
-		if( Display_Requester(&StatsRequester, removeOnDeselect, TRUE) ) {
+		if (Display_Requester(&StatsRequester, removeOnDeselect, TRUE)) {
 			isStatsTextReady = false;
-		} else {
+		}
+		else {
 			InputDB = 0;
 			InputStatus = 0;
 		}
@@ -746,9 +766,9 @@ void ShowEndStatsText() {
 	char bufStr[32];
 
 	numLevels = GF_GameFlow.num_Levels - GF_GameFlow.num_Demos;
-	CLAMPG(numLevels, CurrentLevel+1); // NOTE: Fix for Gold. Don't count statistics for bonus levels!
+	CLAMPG(numLevels, CurrentLevel + 1); // NOTE: Fix for Gold. Don't count statistics for bonus levels!
 
-	if( !isStatsTextReady ) {
+	if (!isStatsTextReady) {
 		StatsRequester.reqFlags |= REQFLAG_NOCURSOR;
 		SetPCRequesterSize(&StatsRequester, STATS_LN_COUNT, STATS_Y_POS);
 
@@ -760,8 +780,8 @@ void ShowEndStatsText() {
 		StatsRequester.pixWidth = STATS_WIDTH;
 		StatsRequester.xPos = 0;
 		StatsRequester.zPos = 0;
-		StatsRequester.lpItemStrings1 = (char *)SaveGameStrings1;
-		StatsRequester.lpItemStrings2 = (char *)SaveGameStrings2;
+		StatsRequester.lpItemStrings1 = (char*)SaveGameStrings1;
+		StatsRequester.lpItemStrings2 = (char*)SaveGameStrings2;
 		StatsRequester.itemStringLen = 50;
 
 		Init_Requester(&StatsRequester);
@@ -769,12 +789,12 @@ void ShowEndStatsText() {
 
 		// Time taken
 		total = 0;
-		for( i = 1; i < numLevels; ++i ) {
+		for (i = 1; i < numLevels; ++i) {
 			total += SaveGame.start[i].statistics.timer;
 		}
 		seconds = total / 30 % 60;
 		minutes = total / 30 / 60 % 60;
-		hours   = total / 30 / 60 / 60;
+		hours = total / 30 / 60 / 60;
 		sprintf(bufStr, "%02d:%02d:%02d", hours, minutes, seconds);
 		AddRequesterItem(&StatsRequester, GF_GameStringTable[GSI_String_TimeTaken], REQFLAG_LEFT, bufStr, REQFLAG_RIGHT);
 
@@ -782,7 +802,7 @@ void ShowEndStatsText() {
 		total = 0;
 		maxTotal = 0;
 		// NOTE: In the original code there was hardcode for secrets: for( i = 1; i < (numLevels - 2); ++i )
-		for( i = 1; i < numLevels; ++i ) {
+		for (i = 1; i < numLevels; ++i) {
 			total += CHK_ANY(SaveGame.start[i].statistics.secrets, 1) ? 1 : 0;
 			total += CHK_ANY(SaveGame.start[i].statistics.secrets, 2) ? 1 : 0;
 			total += CHK_ANY(SaveGame.start[i].statistics.secrets, 4) ? 1 : 0;
@@ -791,7 +811,7 @@ void ShowEndStatsText() {
 		sprintf(bufStr, "%d %s %d", total, GF_GameStringTable[GSI_String_Of], maxTotal);
 #ifdef FEATURE_GOLD
 		// NOTE: this check is presented in the "Golden Mask" only
-		if( total == maxTotal ) {
+		if (total == maxTotal) {
 			EnableLevelSelect();
 		}
 #endif // FEATURE_GOLD
@@ -799,7 +819,7 @@ void ShowEndStatsText() {
 
 		// Kills
 		total = 0;
-		for( i = 1; i < numLevels; ++i ) {
+		for (i = 1; i < numLevels; ++i) {
 			total += SaveGame.start[i].statistics.kills;
 		}
 		sprintf(bufStr, "%d", total);
@@ -807,7 +827,7 @@ void ShowEndStatsText() {
 
 		// Ammo used
 		total = 0;
-		for( i = 1; i < numLevels; ++i ) {
+		for (i = 1; i < numLevels; ++i) {
 			total += SaveGame.start[i].statistics.shots;
 		}
 		sprintf(bufStr, "%d", total);
@@ -815,7 +835,7 @@ void ShowEndStatsText() {
 
 		// Hits
 		total = 0;
-		for( i = 1; i < numLevels; ++i ) {
+		for (i = 1; i < numLevels; ++i) {
 			total += SaveGame.start[i].statistics.hits;
 		}
 		sprintf(bufStr, "%d", total);
@@ -823,23 +843,24 @@ void ShowEndStatsText() {
 
 		// HealthPacks used
 		total = 0;
-		for( i = 1; i < numLevels; ++i ) {
+		for (i = 1; i < numLevels; ++i) {
 			total += SaveGame.start[i].statistics.mediPacks;
 		}
-		if( (total % 2) == 0 ) {
+		if ((total % 2) == 0) {
 			sprintf(bufStr, "%d.0", (total / 2));
-		} else {
+		}
+		else {
 			sprintf(bufStr, "%d.5", (total / 2));
 		}
 		AddRequesterItem(&StatsRequester, GF_GameStringTable[GSI_String_HealthPacksUsed], REQFLAG_LEFT, bufStr, REQFLAG_RIGHT);
 
 		// Distance travelled
 		total = 0;
-		for( i = 1; i < numLevels; ++i ) {
+		for (i = 1; i < numLevels; ++i) {
 			total += SaveGame.start[i].statistics.distance;
 		}
 		total /= 445;
-		if( total < 1000 )
+		if (total < 1000)
 			sprintf(bufStr, "%dm", total);
 		else
 			sprintf(bufStr, "%d.%02dkm", total / 1000, total % 100);
@@ -847,9 +868,10 @@ void ShowEndStatsText() {
 
 		isStatsTextReady = true;
 	}
-	else if( Display_Requester(&StatsRequester, FALSE, TRUE) ) {
+	else if (Display_Requester(&StatsRequester, FALSE, TRUE)) {
 		isStatsTextReady = false;
-	} else {
+	}
+	else {
 		InputDB = 0;
 		InputStatus = 0;
 	}

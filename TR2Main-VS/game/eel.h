@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 #define BigEelControl ((void(__cdecl*)(__int16)) 0x0041C120)
 #define EelControl ((void(__cdecl*)(__int16)) 0x0041C2C0)
 

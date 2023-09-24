@@ -36,34 +36,34 @@ void S_DrawSprite(DWORD flags, int x, int y, int z, __int16 spriteIdx, __int16 s
 	int xv, yv, zv, zp, depth;
 	int x1, y1, x2, y2;
 
-	if( CHK_ANY(flags, SPR_ABS) ) { // absolute coords
+	if (CHK_ANY(flags, SPR_ABS)) { // absolute coords
 		x -= MatrixW2V._03;
 		y -= MatrixW2V._13;
 		z -= MatrixW2V._23;
 
-		if( x < -PhdViewDistance || x > PhdViewDistance )
+		if (x < -PhdViewDistance || x > PhdViewDistance)
 			return;
-		if( y < -PhdViewDistance || y > PhdViewDistance)
+		if (y < -PhdViewDistance || y > PhdViewDistance)
 			return;
-		if( z < -PhdViewDistance || z > PhdViewDistance)
+		if (z < -PhdViewDistance || z > PhdViewDistance)
 			return;
 
 		zv = MatrixW2V._20 * x + MatrixW2V._21 * y + MatrixW2V._22 * z;
-		if( zv < PhdNearZ || zv >= PhdFarZ )
+		if (zv < PhdNearZ || zv >= PhdFarZ)
 			return;
 		yv = MatrixW2V._10 * x + MatrixW2V._11 * y + MatrixW2V._12 * z;
 		xv = MatrixW2V._00 * x + MatrixW2V._01 * y + MatrixW2V._02 * z;
-
-	} else if( (x|y|z) == 0 ) { // zero point coords
+	}
+	else if ((x | y | z) == 0) { // zero point coords
 		zv = PhdMatrixPtr->_23;
-		if( zv < PhdNearZ || zv > PhdFarZ )
+		if (zv < PhdNearZ || zv > PhdFarZ)
 			return;
 		yv = PhdMatrixPtr->_13;
 		xv = PhdMatrixPtr->_03;
-
-	} else { // relative coords
+	}
+	else { // relative coords
 		zv = PhdMatrixPtr->_20 * x + PhdMatrixPtr->_21 * y + PhdMatrixPtr->_22 * z + PhdMatrixPtr->_23;
-		if( zv < PhdNearZ || zv > PhdFarZ )
+		if (zv < PhdNearZ || zv > PhdFarZ)
 			return;
 		yv = PhdMatrixPtr->_10 * x + PhdMatrixPtr->_11 * y + PhdMatrixPtr->_12 * z + PhdMatrixPtr->_13;
 		xv = PhdMatrixPtr->_00 * x + PhdMatrixPtr->_01 * y + PhdMatrixPtr->_02 * z + PhdMatrixPtr->_03;
@@ -75,23 +75,25 @@ void S_DrawSprite(DWORD flags, int x, int y, int z, __int16 spriteIdx, __int16 s
 	y2 = PhdSpriteInfo[spriteIdx].y2;
 
 #ifdef FEATURE_VIDEOFX_IMPROVED
-	if( PickupItemMode == 1 && CHK_ALL(flags, SPR_ITEM|SPR_ABS) ) {
-		if( y1 < y2 ) {
+	if (PickupItemMode == 1 && CHK_ALL(flags, SPR_ITEM | SPR_ABS)) {
+		if (y1 < y2) {
 			y1 -= y2;
 			y2 = 0;
-		} else {
+		}
+		else {
 			y2 -= y1;
 			y1 = 0;
 		}
 	}
 #endif // FEATURE_VIDEOFX_IMPROVED
 
-	if( CHK_ANY(flags, SPR_SCALE) ) { // scaling required
+	if (CHK_ANY(flags, SPR_SCALE)) { // scaling required
 		x1 = (x1 * scale) << (W2V_SHIFT - 8);
 		y1 = (y1 * scale) << (W2V_SHIFT - 8);
 		x2 = (x2 * scale) << (W2V_SHIFT - 8);
 		y2 = (y2 * scale) << (W2V_SHIFT - 8);
-	} else { // default scale
+	}
+	else { // default scale
 		x1 <<= W2V_SHIFT;
 		y1 <<= W2V_SHIFT;
 		x2 <<= W2V_SHIFT;
@@ -101,45 +103,46 @@ void S_DrawSprite(DWORD flags, int x, int y, int z, __int16 spriteIdx, __int16 s
 	zp = zv / PhdPersp;
 
 	x1 = (x1 + xv) / zp + PhdWinCenterX;
-	if( x1 >= PhdWinWidth )
+	if (x1 >= PhdWinWidth)
 		return;
 
 	y1 = (y1 + yv) / zp + PhdWinCenterY;
-	if( y1 >= PhdWinHeight )
+	if (y1 >= PhdWinHeight)
 		return;
 
 	x2 = (x2 + xv) / zp + PhdWinCenterX;
-	if( x2 < 0 )
+	if (x2 < 0)
 		return;
 
 	y2 = (y2 + yv) / zp + PhdWinCenterY;
-	if( y2 < 0 )
+	if (y2 < 0)
 		return;
 
-	if( CHK_ANY(flags, SPR_SHADE) ) { // shading required
+	if (CHK_ANY(flags, SPR_SHADE)) { // shading required
 		depth = zv >> W2V_SHIFT;
 #ifdef FEATURE_VIEW_IMPROVED
-		if( depth > PhdViewDistance )
+		if (depth > PhdViewDistance)
 			return;
 
 		shade += CalculateFogShade(depth);
 		CLAMP(shade, 0, 0x1FFF);
 #else // !FEATURE_VIEW_IMPROVED
-		if( depth > DEPTHQ_START ) {
+		if (depth > DEPTHQ_START) {
 			shade += depth - DEPTHQ_START;
-			if( shade > 0x1FFF ) {
+			if (shade > 0x1FFF) {
 				return;
 			}
 		}
 #endif // FEATURE_VIEW_IMPROVED
-	} else {
+	}
+	else {
 		shade = 0x1000;
 	}
 
 #ifdef FEATURE_VIDEOFX_IMPROVED
-	if( CHK_ANY(flags, SPR_TINT) && !CHK_ANY(flags, SPR_SHADE) ) {
+	if (CHK_ANY(flags, SPR_TINT) && !CHK_ANY(flags, SPR_SHADE)) {
 		// NOTE: PS1 tint color brightness must be multiplied by 2 in this case
-		shade = (shade > 0x1000) ? (shade-0x1000)*2 : 0;
+		shade = (shade > 0x1000) ? (shade - 0x1000) * 2 : 0;
 	}
 	ins_sprite(zv, x1, y1, x2, y2, spriteIdx, shade, flags);
 #else // FEATURE_VIDEOFX_IMPROVED
@@ -159,7 +162,7 @@ void S_DrawPickup(int sx, int sy, int scale, __int16 spriteIdx, __int16 shade) {
 	y1 = sy + (PhdSpriteInfo[spriteIdx].y1 * scale / PHD_ONE);
 	y2 = sy + (PhdSpriteInfo[spriteIdx].y2 * scale / PHD_ONE);
 
-	if( x2 >= 0 && y2 >= 0 && x1 < PhdWinWidth && y1 < PhdWinHeight ) {
+	if (x2 >= 0 && y2 >= 0 && x1 < PhdWinWidth && y1 < PhdWinHeight) {
 #ifdef FEATURE_VIDEOFX_IMPROVED
 		ins_sprite(200, x1, y1, x2, y2, spriteIdx, shade, 0);
 #else // FEATURE_VIDEOFX_IMPROVED
@@ -168,15 +171,15 @@ void S_DrawPickup(int sx, int sy, int scale, __int16 spriteIdx, __int16 shade) {
 	}
 }
 
-__int16 *__cdecl ins_room_sprite(__int16 *ptrObj, int vtxCount) {
-	PHD_VBUF *vbuf;
-	PHD_SPRITE *sprite;
+__int16* __cdecl ins_room_sprite(__int16* ptrObj, int vtxCount) {
+	PHD_VBUF* vbuf;
+	PHD_SPRITE* sprite;
 	double zp;
 	int x1, y1, x2, y2;
 
-	for( int i = 0; i < vtxCount; ++i ) {
+	for (int i = 0; i < vtxCount; ++i) {
 		vbuf = &PhdVBuf[*ptrObj];
-		if( (vbuf->clip & 0x80) == 0 ) {
+		if ((vbuf->clip & 0x80) == 0) {
 			sprite = &PhdSpriteInfo[ptrObj[1]];
 			zp = (double)vbuf->zv / (double)PhdPersp;
 
@@ -185,7 +188,7 @@ __int16 *__cdecl ins_room_sprite(__int16 *ptrObj, int vtxCount) {
 			x2 = (int)((vbuf->xv + (double)((int)sprite->x2 << W2V_SHIFT)) / zp) + PhdWinCenterX;
 			y2 = (int)((vbuf->yv + (double)((int)sprite->y2 << W2V_SHIFT)) / zp) + PhdWinCenterY;
 
-			if( x2 >= PhdWinLeft && y2 >= PhdWinTop && x1 < PhdWinRight && y1 < PhdWinBottom ) {
+			if (x2 >= PhdWinLeft && y2 >= PhdWinTop && x1 < PhdWinRight && y1 < PhdWinBottom) {
 #ifdef FEATURE_VIDEOFX_IMPROVED
 				ins_sprite((int)vbuf->zv, x1, y1, x2, y2, ptrObj[1], vbuf->g, 0);
 #else // FEATURE_VIDEOFX_IMPROVED
@@ -200,7 +203,7 @@ __int16 *__cdecl ins_room_sprite(__int16 *ptrObj, int vtxCount) {
 
 void S_DrawScreenSprite2d(int sx, int sy, int sz, int scaleH, int scaleV, __int16 spriteIdx, __int16 shade, UINT16 flags) {
 	int x1, y1, x2, y2, z;
-	PHD_SPRITE *sprite = &PhdSpriteInfo[spriteIdx];
+	PHD_SPRITE* sprite = &PhdSpriteInfo[spriteIdx];
 
 	x1 = sx + sprite->x1 * scaleH / PHD_ONE;
 	y1 = sy + sprite->y1 * scaleV / PHD_ONE;
@@ -208,7 +211,7 @@ void S_DrawScreenSprite2d(int sx, int sy, int sz, int scaleH, int scaleV, __int1
 	y2 = sy + sprite->y2 * scaleV / PHD_ONE;
 	z = PhdNearZ + sz * 8;
 
-	if( x2 >= 0 && y2 >= 0 && x1 < PhdWinWidth && y1 < PhdWinHeight ) {
+	if (x2 >= 0 && y2 >= 0 && x1 < PhdWinWidth && y1 < PhdWinHeight) {
 #ifdef FEATURE_VIDEOFX_IMPROVED
 		ins_sprite(z, x1, y1, x2, y2, spriteIdx, shade, 0);
 #else // FEATURE_VIDEOFX_IMPROVED
@@ -219,7 +222,7 @@ void S_DrawScreenSprite2d(int sx, int sy, int sz, int scaleH, int scaleV, __int1
 
 void S_DrawScreenSprite(int sx, int sy, int sz, int scaleH, int scaleV, __int16 spriteIdx, __int16 shade, UINT16 flags) {
 	int x1, y1, x2, y2, z;
-	PHD_SPRITE *sprite = &PhdSpriteInfo[spriteIdx];
+	PHD_SPRITE* sprite = &PhdSpriteInfo[spriteIdx];
 
 	x1 = sx + (sprite->x1 / 8) * scaleH / PHD_ONE;
 	y1 = sy + (sprite->y1 / 8) * scaleV / PHD_ONE;
@@ -227,7 +230,7 @@ void S_DrawScreenSprite(int sx, int sy, int sz, int scaleH, int scaleV, __int16 
 	y2 = sy + (sprite->y2 / 8) * scaleV / PHD_ONE;
 	z = sz * 8;
 
-	if( x2 >= 0 && y2 >= 0 && x1 < PhdWinWidth && y1 < PhdWinHeight ) {
+	if (x2 >= 0 && y2 >= 0 && x1 < PhdWinWidth && y1 < PhdWinHeight) {
 #ifdef FEATURE_VIDEOFX_IMPROVED
 		ins_sprite(z, x1, y1, x2, y2, spriteIdx, shade, 0);
 #else // FEATURE_VIDEOFX_IMPROVED
@@ -236,7 +239,7 @@ void S_DrawScreenSprite(int sx, int sy, int sz, int scaleH, int scaleV, __int16 
 	}
 }
 
-void draw_scaled_spriteC(__int16 *ptrObj) {
+void draw_scaled_spriteC(__int16* ptrObj) {
 #ifdef FEATURE_NOLEGACY_OPTIONS
 	extern int GetPitchSWR();
 	int pitch = GetPitchSWR();
@@ -247,12 +250,12 @@ void draw_scaled_spriteC(__int16 *ptrObj) {
 	int x1, y1, x2, y2, width, height;
 	int u, uBase, vBase, uAdd, vAdd;
 	__int16 sprIdx, shade;
-	BYTE *srcBase, *src, *dst;
+	BYTE* srcBase, * src, * dst;
 	BYTE pix;
 	int dstAdd;
 	bool isDepthQ;
-	PHD_SPRITE *sprite;
-	DEPTHQ_ENTRY *depthQ;
+	PHD_SPRITE* sprite;
+	DEPTHQ_ENTRY* depthQ;
 
 	x1 = ptrObj[0];
 	y1 = ptrObj[1];
@@ -261,7 +264,7 @@ void draw_scaled_spriteC(__int16 *ptrObj) {
 	sprIdx = ptrObj[4];
 	shade = ptrObj[5];
 
-	if( x1 >= x2 || y1 >= y2 || x2 <= 0 || y2 <= 0 || x1 >= PhdWinMaxX || y1 >= PhdWinMaxY )
+	if (x1 >= x2 || y1 >= y2 || x2 <= 0 || y2 <= 0 || x1 >= PhdWinMaxX || y1 >= PhdWinMaxY)
 		return;
 
 	sprite = &PhdSpriteInfo[sprIdx];
@@ -272,12 +275,12 @@ void draw_scaled_spriteC(__int16 *ptrObj) {
 	uAdd = (sprite->width - 64) * 256 / (x2 - x1);
 	vAdd = (sprite->height - 64) * 256 / (y2 - y1);
 
-	if( x1 < 0 ) {
+	if (x1 < 0) {
 		uBase -= uAdd * x1;
 		x1 = 0;
 	}
 
-	if( y1 < 0 ) {
+	if (y1 < 0) {
 		vBase -= vAdd * y1;
 		y1 = 0;
 	}
@@ -288,7 +291,7 @@ void draw_scaled_spriteC(__int16 *ptrObj) {
 	width = x2 - x1;
 	height = y2 - y1;
 
-	srcBase = (BYTE *)TexturePageBuffer8[sprite->texPage] + sprite->offset;
+	srcBase = (BYTE*)TexturePageBuffer8[sprite->texPage] + sprite->offset;
 	dst = PrintSurfacePtr + (PhdWinMinY + y1) * pitch + (PhdWinMinX + x1);
 	dstAdd = pitch - width;
 
@@ -298,13 +301,13 @@ void draw_scaled_spriteC(__int16 *ptrObj) {
 	isDepthQ = (GameVid_IsWindowedVga || depthQ != &DepthQTable[15]); // NOTE: index was 16 in the original code, this was wrong
 #endif // (DIRECT3D_VERSION >= 0x900)
 
-	for( i = 0; i < height; ++i ) {
+	for (i = 0; i < height; ++i) {
 		u = uBase;
 		src = srcBase + (vBase >> 16) * 256;
-		for( j = 0; j < width; ++j ) {
+		for (j = 0; j < width; ++j) {
 			pix = src[u >> 16];
-			if( pix != 0 ) {
-				*dst = ( isDepthQ ) ? depthQ->index[pix] : pix;
+			if (pix != 0) {
+				*dst = (isDepthQ) ? depthQ->index[pix] : pix;
 			}
 			u += uAdd;
 			++dst;

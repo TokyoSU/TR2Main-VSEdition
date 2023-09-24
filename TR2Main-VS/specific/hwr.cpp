@@ -45,9 +45,9 @@ static BLEND_PARAM Blend[4] = {
 	{D3DBLEND_INVSRCALPHA, D3DBLEND_ONE, 192},
 };
 
-static void SetBlendMode(D3DTLVERTEX *vtxPtr, DWORD vtxCount, DWORD mode) {
-	if( !vtxPtr || !vtxCount || mode >= 4 ) return;
-	for( DWORD i = 0; i < vtxCount; ++i ) {
+static void SetBlendMode(D3DTLVERTEX* vtxPtr, DWORD vtxCount, DWORD mode) {
+	if (!vtxPtr || !vtxCount || mode >= 4) return;
+	for (DWORD i = 0; i < vtxCount; ++i) {
 		vtxPtr[i].color = RGBA_SETALPHA(vtxPtr[i].color, Blend[mode].alpha);
 	}
 #if (DIRECT3D_VERSION >= 0x900)
@@ -59,12 +59,12 @@ static void SetBlendMode(D3DTLVERTEX *vtxPtr, DWORD vtxCount, DWORD mode) {
 #endif // (DIRECT3D_VERSION >= 0x900)
 }
 
-static void DrawAlphaBlended(D3DTLVERTEX *vtxPtr, DWORD vtxCount, DWORD mode) {
+static void DrawAlphaBlended(D3DTLVERTEX* vtxPtr, DWORD vtxCount, DWORD mode) {
 	// do basic blending
 	SetBlendMode(vtxPtr, vtxCount, mode);
 	HWR_DrawPrimitive(D3DPT_TRIANGLEFAN, vtxPtr, vtxCount, true);
 	// do advanced blending
-	if( AlphaBlendMode == 2 && mode == 0 ) {
+	if (AlphaBlendMode == 2 && mode == 0) {
 		SetBlendMode(vtxPtr, vtxCount, 3); // additional quarter-additive blending pass
 		HWR_DrawPrimitive(D3DPT_TRIANGLEFAN, vtxPtr, vtxCount, true);
 	}
@@ -84,21 +84,21 @@ HRESULT HWR_DrawPrimitive(D3DPRIMITIVETYPE primitiveType, LPVOID vertices, DWORD
 #if (DIRECT3D_VERSION >= 0x900)
 	extern LPDIRECT3DVERTEXBUFFER9 D3DVtx;
 	int primitiveCount = 0;
-	switch( primitiveType ) {
-		case D3DPT_POINTLIST:		primitiveCount = vertexCount;   break;
-		case D3DPT_LINELIST:		primitiveCount = vertexCount/2; break;
-		case D3DPT_LINESTRIP:		primitiveCount = vertexCount-1; break;
-		case D3DPT_TRIANGLELIST:	primitiveCount = vertexCount/3; break;
-		case D3DPT_TRIANGLESTRIP:	primitiveCount = vertexCount-2; break;
-		case D3DPT_TRIANGLEFAN:		primitiveCount = vertexCount-2; break;
-		default: break;
+	switch (primitiveType) {
+	case D3DPT_POINTLIST:		primitiveCount = vertexCount;   break;
+	case D3DPT_LINELIST:		primitiveCount = vertexCount / 2; break;
+	case D3DPT_LINESTRIP:		primitiveCount = vertexCount - 1; break;
+	case D3DPT_TRIANGLELIST:	primitiveCount = vertexCount / 3; break;
+	case D3DPT_TRIANGLESTRIP:	primitiveCount = vertexCount - 2; break;
+	case D3DPT_TRIANGLEFAN:		primitiveCount = vertexCount - 2; break;
+	default: break;
 	}
-	if( primitiveCount <= 0 ) {
+	if (primitiveCount <= 0) {
 		return D3DERR_INVALIDCALL;
 	}
 	static DWORD vertexIndex = 0;
 	DWORD flags = D3DLOCK_NOOVERWRITE;
-	if( vertexIndex + vertexCount > VTXBUF_LEN ) {
+	if (vertexIndex + vertexCount > VTXBUF_LEN) {
 		vertexIndex = 0;
 		flags = D3DLOCK_DISCARD;
 	}
@@ -111,7 +111,7 @@ HRESULT HWR_DrawPrimitive(D3DPRIMITIVETYPE primitiveType, LPVOID vertices, DWORD
 	vertexIndex += vertexCount;
 	return res;
 #else // (DIRECT3D_VERSION >= 0x900)
-	return D3DDev->DrawPrimitive(primitiveType, D3DVT_TLVERTEX, vertices, vertexCount, isNoClip ? D3DDP_DONOTUPDATEEXTENTS|D3DDP_DONOTCLIP : 0);
+	return D3DDev->DrawPrimitive(primitiveType, D3DVT_TLVERTEX, vertices, vertexCount, isNoClip ? D3DDP_DONOTUPDATEEXTENTS | D3DDP_DONOTCLIP : 0);
 #endif // (DIRECT3D_VERSION >= 0x900)
 }
 
@@ -194,10 +194,11 @@ void HWR_ResetZBuffer() {
 	D3DDev->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
 	D3DDev->SetRenderState(D3DRS_ZWRITEENABLE, D3DZB_FALSE);
 #else // (DIRECT3D_VERSION >= 0x900)
-	if( ZBufferSurface != NULL ) {
+	if (ZBufferSurface != NULL) {
 		D3DDev->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_ALWAYS);
 		D3DDev->SetRenderState(D3DRENDERSTATE_ZENABLE, SavedAppSettings.ZBuffer ? TRUE : FALSE);
-	} else {
+	}
+	else {
 		D3DDev->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL);
 		D3DDev->SetRenderState(D3DRENDERSTATE_ZENABLE, FALSE);
 	}
@@ -206,7 +207,7 @@ void HWR_ResetZBuffer() {
 }
 
 void HWR_TexSource(HWR_TEXHANDLE texSource) {
-	if( CurrentTexSource != texSource ) {
+	if (CurrentTexSource != texSource) {
 #if (DIRECT3D_VERSION >= 0x900)
 		D3DDev->SetTexture(0, texSource);
 #else // (DIRECT3D_VERSION >= 0x900)
@@ -217,7 +218,7 @@ void HWR_TexSource(HWR_TEXHANDLE texSource) {
 }
 
 void HWR_EnableColorKey(bool state) {
-	if( ColorKeyState != state ) {
+	if (ColorKeyState != state) {
 #if (DIRECT3D_VERSION >= 0x900)
 		D3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, state ? TRUE : FALSE);
 #else // (DIRECT3D_VERSION >= 0x900)
@@ -228,10 +229,10 @@ void HWR_EnableColorKey(bool state) {
 }
 
 void HWR_EnableZBuffer(bool ZWriteEnable, bool ZEnable) {
-	if( !SavedAppSettings.ZBuffer )
+	if (!SavedAppSettings.ZBuffer)
 		return;
 
-	if( ZWriteEnableState != ZWriteEnable ) {
+	if (ZWriteEnableState != ZWriteEnable) {
 #if (DIRECT3D_VERSION >= 0x900)
 		D3DDev->SetRenderState(D3DRS_ZWRITEENABLE, ZWriteEnable ? D3DZB_TRUE : D3DZB_FALSE);
 #else // (DIRECT3D_VERSION >= 0x900)
@@ -240,11 +241,11 @@ void HWR_EnableZBuffer(bool ZWriteEnable, bool ZEnable) {
 		ZWriteEnableState = ZWriteEnable;
 	}
 
-	if( ZEnableState != ZEnable ) {
+	if (ZEnableState != ZEnable) {
 #if (DIRECT3D_VERSION >= 0x900)
 		D3DDev->SetRenderState(D3DRS_ZENABLE, ZEnable ? D3DZB_TRUE : D3DZB_FALSE);
 #else // (DIRECT3D_VERSION >= 0x900)
-		if( ZBufferSurface != NULL )
+		if (ZBufferSurface != NULL)
 			D3DDev->SetRenderState(D3DRENDERSTATE_ZFUNC, ZEnable ? D3DCMP_LESSEQUAL : D3DCMP_ALWAYS);
 		else
 			D3DDev->SetRenderState(D3DRENDERSTATE_ZENABLE, ZEnable ? TRUE : FALSE);
@@ -263,17 +264,17 @@ void HWR_BeginScene() {
 
 void HWR_DrawPolyList() {
 	DWORD alphaState;
-	UINT16 *bufPtr;
+	UINT16* bufPtr;
 	UINT16 polyType, texPage, vtxCount;
-	D3DTLVERTEX *vtxPtr;
+	D3DTLVERTEX* vtxPtr;
 
 	HWR_EnableZBuffer(false, true);
-	for( DWORD i=0; i<SurfaceCount; ++i ) {
-		bufPtr = (UINT16 *)SortBuffer[i]._0;
+	for (DWORD i = 0; i < SurfaceCount; ++i) {
+		bufPtr = (UINT16*)SortBuffer[i]._0;
 
 		polyType = *(bufPtr++);
 #ifdef FEATURE_HUD_IMPROVED
-		if( polyType == POLY_HWR_healthbar || polyType == POLY_HWR_airbar ) {
+		if (polyType == POLY_HWR_healthbar || polyType == POLY_HWR_airbar) {
 			UINT16 x0 = *(bufPtr++);
 			UINT16 y0 = *(bufPtr++);
 			UINT16 x1 = *(bufPtr++);
@@ -281,125 +282,130 @@ void HWR_DrawPolyList() {
 			UINT16 bar = *(bufPtr++);
 			UINT16 pixel = *(bufPtr++);
 			UINT16 alpha = *(bufPtr++);
-			if( polyType == POLY_HWR_healthbar ) {
+			if (polyType == POLY_HWR_healthbar) {
 				PSX_DrawHealthBar(x0, y0, x1, y1, bar, pixel, alpha);
-			} else {
+			}
+			else {
 				PSX_DrawAirBar(x0, y0, x1, y1, bar, pixel, alpha);
 			}
 			continue;
 		}
 #endif // FEATURE_HUD_IMPROVED
 #ifdef FEATURE_VIDEOFX_IMPROVED
-		switch( polyType ) {
-			case POLY_HWR_GTmap:
-			case POLY_HWR_WGTmap:
-			case POLY_HWR_WGTmapHalf:
-			case POLY_HWR_WGTmapAdd:
-			case POLY_HWR_WGTmapSub:
-			case POLY_HWR_WGTmapQrt:
-				texPage = *(bufPtr++);
-				break;
-			default:
-				texPage = 0;
-				break;
+		switch (polyType) {
+		case POLY_HWR_GTmap:
+		case POLY_HWR_WGTmap:
+		case POLY_HWR_WGTmapHalf:
+		case POLY_HWR_WGTmapAdd:
+		case POLY_HWR_WGTmapSub:
+		case POLY_HWR_WGTmapQrt:
+			texPage = *(bufPtr++);
+			break;
+		default:
+			texPage = 0;
+			break;
 		}
 #else // !FEATURE_VIDEOFX_IMPROVED
-		texPage = ( polyType == POLY_HWR_GTmap || polyType == POLY_HWR_WGTmap ) ? *(bufPtr++) : 0;
+		texPage = (polyType == POLY_HWR_GTmap || polyType == POLY_HWR_WGTmap) ? *(bufPtr++) : 0;
 #endif // !FEATURE_VIDEOFX_IMPROVED
 		vtxCount = *(bufPtr++);
-		vtxPtr = *(D3DTLVERTEX **)bufPtr;
+		vtxPtr = *(D3DTLVERTEX**)bufPtr;
 
-		switch( polyType ) {
-			case POLY_HWR_GTmap: // triangle fan (texture)
-			case POLY_HWR_WGTmap: // triangle fan (texture + colorkey)
+		switch (polyType) {
+		case POLY_HWR_GTmap: // triangle fan (texture)
+		case POLY_HWR_WGTmap: // triangle fan (texture + colorkey)
 #ifdef FEATURE_VIDEOFX_IMPROVED
-			case POLY_HWR_WGTmapHalf: // triangle fan (texture + colorkey + PSX half blend)
-			case POLY_HWR_WGTmapAdd: // triangle fan (texture + colorkey + PSX additive blend)
-			case POLY_HWR_WGTmapSub: // triangle fan (texture + colorkey + PSX subtractive blend)
-			case POLY_HWR_WGTmapQrt: // triangle fan (texture + colorkey + PSX quarter blend)
-				HWR_TexSource(texPage == (UINT16)~0 ? GetEnvmapTextureHandle() : HWR_PageHandles[texPage]);
-				HWR_EnableColorKey(polyType != POLY_HWR_GTmap);
-				if( TextureFormat.bpp < 16 || AlphaBlendMode == 0 || polyType == POLY_HWR_GTmap || polyType == POLY_HWR_WGTmap ) {
-					HWR_DrawPrimitive(D3DPT_TRIANGLEFAN, vtxPtr, vtxCount, true);
-				} else {
-					DrawAlphaBlended(vtxPtr, vtxCount, polyType-POLY_HWR_WGTmapHalf);
-				}
-#else // !FEATURE_VIDEOFX_IMPROVED
-				HWR_TexSource(HWR_PageHandles[texPage]);
-				HWR_EnableColorKey(polyType == POLY_HWR_WGTmap);
+		case POLY_HWR_WGTmapHalf: // triangle fan (texture + colorkey + PSX half blend)
+		case POLY_HWR_WGTmapAdd: // triangle fan (texture + colorkey + PSX additive blend)
+		case POLY_HWR_WGTmapSub: // triangle fan (texture + colorkey + PSX subtractive blend)
+		case POLY_HWR_WGTmapQrt: // triangle fan (texture + colorkey + PSX quarter blend)
+			HWR_TexSource(texPage == (UINT16)~0 ? GetEnvmapTextureHandle() : HWR_PageHandles[texPage]);
+			HWR_EnableColorKey(polyType != POLY_HWR_GTmap);
+			if (TextureFormat.bpp < 16 || AlphaBlendMode == 0 || polyType == POLY_HWR_GTmap || polyType == POLY_HWR_WGTmap) {
 				HWR_DrawPrimitive(D3DPT_TRIANGLEFAN, vtxPtr, vtxCount, true);
+			}
+			else {
+				DrawAlphaBlended(vtxPtr, vtxCount, polyType - POLY_HWR_WGTmapHalf);
+			}
+#else // !FEATURE_VIDEOFX_IMPROVED
+			HWR_TexSource(HWR_PageHandles[texPage]);
+			HWR_EnableColorKey(polyType == POLY_HWR_WGTmap);
+			HWR_DrawPrimitive(D3DPT_TRIANGLEFAN, vtxPtr, vtxCount, true);
 #endif // !FEATURE_VIDEOFX_IMPROVED
-				break;
+			break;
 
-			case POLY_HWR_gouraud: // triangle fan (color)
+		case POLY_HWR_gouraud: // triangle fan (color)
 #ifdef FEATURE_VIDEOFX_IMPROVED
-			case POLY_HWR_half: // triangle fan (color + PSX half blend)
-			case POLY_HWR_add: // triangle fan (color + PSX additive blend)
-			case POLY_HWR_sub: // triangle fan (color + PSX subtractive blend)
-			case POLY_HWR_qrt: // triangle fan (color + PSX quarter blend)
-				HWR_TexSource(0);
-				HWR_EnableColorKey(polyType != POLY_HWR_gouraud);
-				if( TextureFormat.bpp < 16 || AlphaBlendMode == 0 || polyType == POLY_HWR_gouraud ) {
-					HWR_DrawPrimitive(D3DPT_TRIANGLEFAN, vtxPtr, vtxCount, true);
-				} else {
-					DrawAlphaBlended(vtxPtr, vtxCount, polyType-POLY_HWR_half);
-				}
+		case POLY_HWR_half: // triangle fan (color + PSX half blend)
+		case POLY_HWR_add: // triangle fan (color + PSX additive blend)
+		case POLY_HWR_sub: // triangle fan (color + PSX subtractive blend)
+		case POLY_HWR_qrt: // triangle fan (color + PSX quarter blend)
+			HWR_TexSource(0);
+			HWR_EnableColorKey(polyType != POLY_HWR_gouraud);
+			if (TextureFormat.bpp < 16 || AlphaBlendMode == 0 || polyType == POLY_HWR_gouraud) {
+				HWR_DrawPrimitive(D3DPT_TRIANGLEFAN, vtxPtr, vtxCount, true);
+			}
+			else {
+				DrawAlphaBlended(vtxPtr, vtxCount, polyType - POLY_HWR_half);
+			}
 #else // !FEATURE_VIDEOFX_IMPROVED
-				HWR_TexSource(0);
-				HWR_EnableColorKey(false);
-				HWR_DrawPrimitive(D3DPT_TRIANGLEFAN, vtxPtr, vtxCount, true);
+			HWR_TexSource(0);
+			HWR_EnableColorKey(false);
+			HWR_DrawPrimitive(D3DPT_TRIANGLEFAN, vtxPtr, vtxCount, true);
 #endif // !FEATURE_VIDEOFX_IMPROVED
-				break;
+			break;
 
-			case POLY_HWR_line: // line strip (color)
-				HWR_TexSource(0);
-				HWR_EnableColorKey(false);
-				HWR_DrawPrimitive(D3DPT_LINESTRIP, vtxPtr, vtxCount, true);
-				break;
+		case POLY_HWR_line: // line strip (color)
+			HWR_TexSource(0);
+			HWR_EnableColorKey(false);
+			HWR_DrawPrimitive(D3DPT_LINESTRIP, vtxPtr, vtxCount, true);
+			break;
 
-			case POLY_HWR_trans: // triangle fan (color + semitransparent)
-				HWR_TexSource(0);
-				D3DDev->GetRenderState(AlphaBlendEnabler, &alphaState);
-				D3DDev->SetRenderState(AlphaBlendEnabler, TRUE);
-				HWR_DrawPrimitive(D3DPT_TRIANGLEFAN, vtxPtr, vtxCount, true);
-				D3DDev->SetRenderState(AlphaBlendEnabler, alphaState);
-				break;
+		case POLY_HWR_trans: // triangle fan (color + semitransparent)
+			HWR_TexSource(0);
+			D3DDev->GetRenderState(AlphaBlendEnabler, &alphaState);
+			D3DDev->SetRenderState(AlphaBlendEnabler, TRUE);
+			HWR_DrawPrimitive(D3DPT_TRIANGLEFAN, vtxPtr, vtxCount, true);
+			D3DDev->SetRenderState(AlphaBlendEnabler, alphaState);
+			break;
 		}
 	}
 }
 
-void HWR_LoadTexturePages(int pagesCount, LPVOID pagesBuffer, RGB888 *palette) {
+void HWR_LoadTexturePages(int pagesCount, LPVOID pagesBuffer, RGB888* palette) {
 	int pageIndex = -1;
-	BYTE *bufferPtr = (BYTE *)pagesBuffer;
+	BYTE* bufferPtr = (BYTE*)pagesBuffer;
 
 	HWR_FreeTexturePages();
 
-	if( palette != NULL )
+	if (palette != NULL)
 		PaletteIndex = CreateTexturePalette(palette);
 
 #if (DIRECT3D_VERSION >= 0x900)
-	char levelName[256] = {0};
-	char texName[256] = {0};
-	strncpy(levelName, PathFindFileName(LevelFileName), sizeof(levelName)-1);
-	char *ext = PathFindExtension(levelName);
-	if( ext != NULL ) *ext = 0;
+	char levelName[256] = { 0 };
+	char texName[256] = { 0 };
+	strncpy(levelName, PathFindFileName(LevelFileName), sizeof(levelName) - 1);
+	char* ext = PathFindExtension(levelName);
+	if (ext != NULL) *ext = 0;
 #endif // (DIRECT3D_VERSION >= 0x900)
 
-	for( int i=0; i<pagesCount; ++i ) {
+	for (int i = 0; i < pagesCount; ++i) {
 #if (DIRECT3D_VERSION >= 0x900)
 		snprintf(texName, sizeof(texName), "./textures/texpages/%s_%d.png", levelName, i);
 #endif // (DIRECT3D_VERSION >= 0x900)
-		if( palette != NULL ) {
+		if (palette != NULL) {
 			pageIndex = AddTexturePage8(256, 256, bufferPtr, PaletteIndex);
-			bufferPtr += 256*256*1;
+			bufferPtr += 256 * 256 * 1;
 #if (DIRECT3D_VERSION >= 0x900)
-		} else if( PathFileExists(texName) ) {
+		}
+		else if (PathFileExists(texName)) {
 			pageIndex = AddExternalTexture(texName, true);
-			bufferPtr += 256*256*2;
+			bufferPtr += 256 * 256 * 2;
 #endif // (DIRECT3D_VERSION >= 0x900)
-		} else {
+		}
+		else {
 			pageIndex = AddTexturePage16(256, 256, bufferPtr);
-			bufferPtr += 256*256*2;
+			bufferPtr += 256 * 256 * 2;
 		}
 		HWR_TexturePageIndexes[i] = (pageIndex < 0) ? -1 : pageIndex;
 	}
@@ -407,22 +413,21 @@ void HWR_LoadTexturePages(int pagesCount, LPVOID pagesBuffer, RGB888 *palette) {
 }
 
 void HWR_FreeTexturePages() {
-
-	for( DWORD i=0; i<ARRAY_SIZE(HWR_TexturePageIndexes); ++i ) {
-		if( HWR_TexturePageIndexes[i] >= 0 ) {
+	for (DWORD i = 0; i < ARRAY_SIZE(HWR_TexturePageIndexes); ++i) {
+		if (HWR_TexturePageIndexes[i] >= 0) {
 			SafeFreeTexturePage(HWR_TexturePageIndexes[i]);
 			HWR_TexturePageIndexes[i] = -1;
 		}
 		HWR_PageHandles[i] = 0;
 	}
-	if( PaletteIndex >= 0 ) {
+	if (PaletteIndex >= 0) {
 		SafeFreePalette(PaletteIndex);
 	}
 }
 
 void HWR_GetPageHandles() {
-	for( DWORD i=0; i<ARRAY_SIZE(HWR_TexturePageIndexes); ++i ) {
-		if( HWR_TexturePageIndexes[i] < 0 )
+	for (DWORD i = 0; i < ARRAY_SIZE(HWR_TexturePageIndexes); ++i) {
+		if (HWR_TexturePageIndexes[i] < 0)
 			HWR_PageHandles[i] = 0;
 		else
 			HWR_PageHandles[i] = GetTexturePageHandle(HWR_TexturePageIndexes[i]);

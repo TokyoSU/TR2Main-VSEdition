@@ -24,14 +24,15 @@
 #include "global/vars.h"
 
 int PathStringCombine(LPSTR destPath, DWORD destSize, LPCSTR filePath, LPCSTR fileName) {
-	if( destPath == NULL || destSize == 0 || fileName == NULL || *fileName == 0 ) {
+	if (destPath == NULL || destSize == 0 || fileName == NULL || *fileName == 0) {
 		return -1;
 	}
-	char *tmpPath = new char[destSize];
+	char* tmpPath = new char[destSize];
 
-	if( filePath == NULL || *filePath == 0 ) {
+	if (filePath == NULL || *filePath == 0) {
 		strncpy(tmpPath, ".", destSize);
-	} else {
+	}
+	else {
 		strncpy(tmpPath, filePath, destSize);
 		PathRemoveBackslash(tmpPath);
 	}
@@ -41,128 +42,129 @@ int PathStringCombine(LPSTR destPath, DWORD destSize, LPCSTR filePath, LPCSTR fi
 	return 0;
 }
 
-int AutoSelectExtension(LPSTR fileName, const STRING_FIXED4 *exts, DWORD num_exts) {
-	if( fileName == NULL ) {
+int AutoSelectExtension(LPSTR fileName, const STRING_FIXED4* exts, DWORD num_exts) {
+	if (fileName == NULL) {
 		return -1;
 	}
 
-	if( exts != NULL && num_exts > 0 ) {
-		char extFileName[256] = {0};
-		char *extension;
+	if (exts != NULL && num_exts > 0) {
+		char extFileName[256] = { 0 };
+		char* extension;
 
-		strncpy(extFileName, fileName, sizeof(extFileName)-1);
+		strncpy(extFileName, fileName, sizeof(extFileName) - 1);
 		extension = PathFindExtension(extFileName);
 
-		if( extension == NULL ) {
+		if (extension == NULL) {
 			extension = strchr(extFileName, 0);
 			*extension = '.';
 		}
 
-		for( DWORD i = 0; i < num_exts; ++i ) {
+		for (DWORD i = 0; i < num_exts; ++i) {
 			memcpy(extension + 1, &exts[i], sizeof(STRING_FIXED4));
-			if( PathFileExists(extFileName) ) {
+			if (PathFileExists(extFileName)) {
 				strcpy(fileName, extFileName);
 				return (i + 1);
 			}
 		}
 	}
 
-	return ( PathFileExists(fileName) ) ? 0 : -1;
+	return (PathFileExists(fileName)) ? 0 : -1;
 }
 
-int AutoSelectPathAndExtension(LPSTR fileName, LPCSTR path, const STRING_FIXED4 *exts, DWORD num_exts) {
-	char checkFileName[MAX_PATH] = {0};
+int AutoSelectPathAndExtension(LPSTR fileName, LPCSTR path, const STRING_FIXED4* exts, DWORD num_exts) {
+	char checkFileName[MAX_PATH] = { 0 };
 	int ext;
 
-	if( fileName == NULL || !*fileName ) {
+	if (fileName == NULL || !*fileName) {
 		return -1;
 	}
 
-	if( path != NULL && *path ) {
+	if (path != NULL && *path) {
 		LPCSTR fname = PathFindFileName(fileName);
 		PathStringCombine(checkFileName, sizeof(checkFileName), path, fname);
 
 		ext = AutoSelectExtension(checkFileName, exts, num_exts);
 
-		if( ext >= 0 ) {
+		if (ext >= 0) {
 			strcpy(fileName, checkFileName);
 			return 1;
 		}
 	}
 
 	ext = AutoSelectExtension(fileName, exts, num_exts);
-	return ( ext >= 0 ) ? 0 : -1;
+	return (ext >= 0) ? 0 : -1;
 }
 
 int CreateDirectories(LPCSTR path, bool isFileName) {
 	char shortPath[MAX_PATH];
 	char fullPath[MAX_PATH];
 
-	strncpy(shortPath, path, sizeof(shortPath)-1);
-	if( isFileName ) {
+	strncpy(shortPath, path, sizeof(shortPath) - 1);
+	if (isFileName) {
 		PathRemoveFileSpec(shortPath);
 	}
 	GetFullPathName(shortPath, MAX_PATH, fullPath, NULL);
 
-	switch( SHCreateDirectoryExA(NULL, fullPath, NULL) ) {
-		case ERROR_ALREADY_EXISTS :
-		case ERROR_FILE_EXISTS :
-		case ERROR_SUCCESS :
-			return 0;
-		default :
-			break;
+	switch (SHCreateDirectoryExA(NULL, fullPath, NULL)) {
+	case ERROR_ALREADY_EXISTS:
+	case ERROR_FILE_EXISTS:
+	case ERROR_SUCCESS:
+		return 0;
+	default:
+		break;
 	}
 	return -1;
 }
 
 int CreateSequenceFilename(LPSTR destName, DWORD destSize, LPCSTR filePath, LPCSTR fileExt, LPCSTR nameBase, int seqDigits, int seqNumber) {
-	char shortName[32] = {0};
+	char shortName[32] = { 0 };
 	int i;
 
-	if( destName == NULL || seqNumber < 0 || seqDigits <= 0 ) {
+	if (destName == NULL || seqNumber < 0 || seqDigits <= 0) {
 		return -1;
 	}
-	if( filePath == NULL ) filePath = "";
-	if( nameBase == NULL ) nameBase = "";
-	if( fileExt  == NULL ) fileExt  = "";
+	if (filePath == NULL) filePath = "";
+	if (nameBase == NULL) nameBase = "";
+	if (fileExt == NULL) fileExt = "";
 
 	int seqMax = 1;
-	for( i = 0; i < seqDigits; ++i ) {
+	for (i = 0; i < seqDigits; ++i) {
 		seqMax *= 10;
 	}
 
-	for( i = seqNumber; i < seqMax; ++i ) { // search first free screenshot slot
+	for (i = seqNumber; i < seqMax; ++i) { // search first free screenshot slot
 		snprintf(shortName, sizeof(shortName), "%s%0*d%s", nameBase, seqDigits, i, fileExt);
 		PathStringCombine(destName, destSize, filePath, shortName);
-		if( INVALID_FILE_ATTRIBUTES == GetFileAttributes(destName) ) {
+		if (INVALID_FILE_ATTRIBUTES == GetFileAttributes(destName)) {
 			return i; // no file with such name - we have found the free slot
 		}
 	}
 	return -2;
 }
 
-int CreateDateTimeFilename(LPSTR destName, DWORD destSize, LPCSTR filePath, LPCSTR fileExt, SYSTEMTIME *lastTime, int *lastIndex) {
-	char shortName[32] = {0};
-	char fileName[32] = {0};
+int CreateDateTimeFilename(LPSTR destName, DWORD destSize, LPCSTR filePath, LPCSTR fileExt, SYSTEMTIME* lastTime, int* lastIndex) {
+	char shortName[32] = { 0 };
+	char fileName[32] = { 0 };
 	SYSTEMTIME sysTime;
 
-	if( destName == NULL ) {
+	if (destName == NULL) {
 		return -1;
 	}
-	if( filePath == NULL ) filePath = "";
-	if( fileExt  == NULL ) fileExt  = "";
+	if (filePath == NULL) filePath = "";
+	if (fileExt == NULL) fileExt = "";
 
 	GetLocalTime(&sysTime);
 	sysTime.wMilliseconds = 0; // we don't use milliseconds
 
 	snprintf(shortName, sizeof(shortName), "%04d%02d%02d_%02d%02d%02d",
-			sysTime.wYear, sysTime.wMonth,  sysTime.wDay,
-			sysTime.wHour, sysTime.wMinute, sysTime.wSecond);
+		sysTime.wYear, sysTime.wMonth, sysTime.wDay,
+		sysTime.wHour, sysTime.wMinute, sysTime.wSecond);
 
-	if( lastTime != NULL && lastIndex != NULL && !memcmp(&sysTime, lastTime, sizeof(SYSTEMTIME)) ) {
-		snprintf(fileName, sizeof(fileName), "%s_%d%s", shortName, ++*lastIndex, fileExt);
-	} else {
-		if( lastTime != NULL && lastIndex != NULL ) {
+	if (lastTime != NULL && lastIndex != NULL && !memcmp(&sysTime, lastTime, sizeof(SYSTEMTIME))) {
+		snprintf(fileName, sizeof(fileName), "%s_%d%s", shortName, ++ * lastIndex, fileExt);
+	}
+	else {
+		if (lastTime != NULL && lastIndex != NULL) {
 			*lastIndex = 0;
 			*lastTime = sysTime;
 		}
@@ -174,25 +176,25 @@ int CreateDateTimeFilename(LPSTR destName, DWORD destSize, LPCSTR filePath, LPCS
 }
 
 int AddFilenameSuffix(LPSTR destName, DWORD destSize, LPCSTR fileName, LPCSTR suffix) {
-		if( destName == NULL || !destSize || fileName == NULL || suffix == NULL ) {
-			return -1;
-		}
+	if (destName == NULL || !destSize || fileName == NULL || suffix == NULL) {
+		return -1;
+	}
 
-		LPCSTR extension = PathFindExtension(fileName);
-		int nameLen = (DWORD)extension - (DWORD)fileName;
+	LPCSTR extension = PathFindExtension(fileName);
+	int nameLen = (DWORD)extension - (DWORD)fileName;
 
-		snprintf(destName, destSize, "%.*s%s%s", nameLen, fileName, suffix, extension);
-		return 0;
+	snprintf(destName, destSize, "%.*s%s%s", nameLen, fileName, suffix, extension);
+	return 0;
 }
 
 LPCVOID GetResourceData(LPCTSTR resName, LPDWORD resSize) {
 	extern HINSTANCE hInstance;
 
 	HRSRC resInfo = FindResource(hInstance, resName, RT_RCDATA);
-	if( !resInfo ) return NULL;
-	if( resSize ) *resSize = SizeofResource(hInstance, resInfo);
+	if (!resInfo) return NULL;
+	if (resSize) *resSize = SizeofResource(hInstance, resInfo);
 
 	HGLOBAL resHandle = LoadResource(hInstance, resInfo);
-	if( !resHandle ) return NULL;
+	if (!resHandle) return NULL;
 	return LockResource(resHandle);
 }

@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 #define DogControl ((void(__cdecl*)(__int16)) 0x00417130)
 #define TigerControl ((void(__cdecl*)(__int16)) 0x004174E0)
 

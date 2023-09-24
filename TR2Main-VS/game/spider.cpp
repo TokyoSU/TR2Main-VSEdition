@@ -23,13 +23,11 @@
 #include "game/spider.h"
 #include "global/vars.h"
 
-
-
-/*
- * Inject function
- */
+ /*
+  * Inject function
+  */
 void Inject_Spider() {
-//	INJECT(0x00440070, SpiderLeap);
-//	INJECT(0x00440120, SpiderControl);
-//	INJECT(0x00440340, BigSpiderControl);
+	//	INJECT(0x00440070, SpiderLeap);
+	//	INJECT(0x00440120, SpiderControl);
+	//	INJECT(0x00440340, BigSpiderControl);
 }

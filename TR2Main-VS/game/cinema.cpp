@@ -47,7 +47,7 @@ int StartCinematic(int levelID) {
 	IsTitleLoaded = FALSE;
 	S_FadeToBlack();
 
-	if( !InitialiseLevel(levelID, GFL_CUTSCENE) ) {
+	if (!InitialiseLevel(levelID, GFL_CUTSCENE)) {
 		return 2;
 	}
 
@@ -61,7 +61,7 @@ int StartCinematic(int levelID) {
 	CineFrameIdx = 0;
 	S_ClearScreen();
 
-	if( !StartSyncedAudio(CineTrackID) ) {
+	if (!StartSyncedAudio(CineTrackID)) {
 		return 1;
 	}
 
@@ -71,11 +71,11 @@ int StartCinematic(int levelID) {
 	do {
 		DrawPhaseCinematic();
 		nTicks = CineCurrentFrame - TICKS_PER_FRAME * (CineFrameIdx - 4);
-		if( nTicks < TICKS_PER_FRAME ) {
+		if (nTicks < TICKS_PER_FRAME) {
 			nTicks = TICKS_PER_FRAME;
 		}
 		result = DoCinematic(nTicks);
-	} while( !result );
+	} while (!result);
 
 	S_CDVolume((MusicVolume > 0) ? (25 * MusicVolume + 5) : 0);
 	S_CDStop();
@@ -87,15 +87,15 @@ int StartCinematic(int levelID) {
 }
 
 void InitCinematicRooms() {
-	for( int i=0; i<RoomCount; ++i ) {
-		if( RoomInfo[i].flippedRoom >= 0 ) {
+	for (int i = 0; i < RoomCount; ++i) {
+		if (RoomInfo[i].flippedRoom >= 0) {
 			RoomInfo[RoomInfo[i].flippedRoom].boundActive = 1;
 		}
 		RoomInfo[i].flags |= ROOM_OUTSIDE;
 	}
 	DrawRoomsCount = 0;
-	for( int i=0; i<RoomCount; ++i ) {
-		if( !RoomInfo[i].boundActive ) {
+	for (int i = 0; i < RoomCount; ++i) {
+		if (!RoomInfo[i].boundActive) {
 			DrawRoomsArray[DrawRoomsCount++] = i;
 		}
 	}
@@ -106,29 +106,29 @@ int DoCinematic(int nTicks) {
 	int id = -1;
 	int next = -1;
 
-	for( tickCount += CineTickRate*nTicks; tickCount >= 0; tickCount -= PHD_ONE ) {
-		if( S_UpdateInput() ) {
+	for (tickCount += CineTickRate * nTicks; tickCount >= 0; tickCount -= PHD_ONE) {
+		if (S_UpdateInput()) {
 			return 3;
 		}
-		if( CHK_ANY(InputStatus, IN_ACTION) ) {
+		if (CHK_ANY(InputStatus, IN_ACTION)) {
 			return 1;
 		}
-		if( CHK_ANY(InputStatus, IN_OPTION) ) {
+		if (CHK_ANY(InputStatus, IN_OPTION)) {
 			return 2;
 		}
 
 		DynamicLightCount = 0;
 
-		for( id = NextItemActive; id >= 0; id = next ) {
+		for (id = NextItemActive; id >= 0; id = next) {
 			next = Items[id].nextActive;
-			if( Objects[Items[id].objectID].control ) {
+			if (Objects[Items[id].objectID].control) {
 				Objects[Items[id].objectID].control(id);
 			}
 		}
 
-		for( id = NextEffectActive; id >= 0; id = next ) {
+		for (id = NextEffectActive; id >= 0; id = next) {
 			next = Effects[id].next_active;
-			if( Objects[Effects[id].object_number].control ) {
+			if (Objects[Effects[id].object_number].control) {
 				Objects[Effects[id].object_number].control(id);
 			}
 		}
@@ -136,12 +136,12 @@ int DoCinematic(int nTicks) {
 		HairControl(1);
 		CalculateCinematicCamera();
 
-		if( ++CineFrameIdx >= CineFramesCount ) {
+		if (++CineFrameIdx >= CineFramesCount) {
 			return 1;
 		}
 	}
 
-	CineCurrentFrame = S_CDGetLoc()*4/5;
+	CineCurrentFrame = S_CDGetLoc() * 4 / 5;
 #ifdef FEATURE_INPUT_IMPROVED
 	UpdateJoyOutput(false);
 #endif // FEATURE_INPUT_IMPROVED
@@ -157,11 +157,11 @@ void Inject_Cinema() {
 	INJECT(0x00412060, InitCinematicRooms);
 	INJECT(0x00412100, DoCinematic);
 
-//	INJECT(0x00412270, CalculateCinematicCamera);
-//	INJECT(0x004123B0, GetCinematicRoom);
-//	INJECT(0x00412430, ControlCinematicPlayer);
-//	INJECT(0x00412510, LaraControlCinematic);
-//	INJECT(0x004125B0, InitialisePlayer1);
-//	INJECT(0x00412640, InitialiseGenPlayer);
-//	INJECT(0x00412680, InGameCinematicCamera);
+	//	INJECT(0x00412270, CalculateCinematicCamera);
+	//	INJECT(0x004123B0, GetCinematicRoom);
+	//	INJECT(0x00412430, ControlCinematicPlayer);
+	//	INJECT(0x00412510, LaraControlCinematic);
+	//	INJECT(0x004125B0, InitialisePlayer1);
+	//	INJECT(0x00412640, InitialiseGenPlayer);
+	//	INJECT(0x00412680, InGameCinematicCamera);
 }

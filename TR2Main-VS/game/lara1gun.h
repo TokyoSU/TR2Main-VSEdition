@@ -24,12 +24,12 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
-//	0x0042BC90:		draw_shotgun_meshes
-//	0x0042BCD0:		undraw_shotgun_meshes
-//	0x0042BD00:		ready_shotgun
+ /*
+  * Function list
+  */
+  //	0x0042BC90:		draw_shotgun_meshes
+  //	0x0042BCD0:		undraw_shotgun_meshes
+  //	0x0042BD00:		ready_shotgun
 
 void RifleHandler(int weaponType); // 0x0042BD70
 void FireShotgun(); // 0x0042BE70

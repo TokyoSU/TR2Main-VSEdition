@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 void IncreaseScreenSize(); // 0x004478C0
 void DecreaseScreenSize(); // 0x00447930
 void setup_screen_size(); // 0x004479A0

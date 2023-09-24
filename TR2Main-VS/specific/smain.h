@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 BOOL GameMain(); // 0x00454B10
 __int16 TitleSequence(); // 0x00454DE0
 void CheckCheatMode(); // 0x00454EF0

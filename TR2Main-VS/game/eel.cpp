@@ -23,12 +23,10 @@
 #include "game/eel.h"
 #include "global/vars.h"
 
-
-
-/*
- * Inject function
- */
+ /*
+  * Inject function
+  */
 void Inject_Eel() {
-//	INJECT(0x0041C120, BigEelControl);
-//	INJECT(0x0041C2C0, EelControl);
+	//	INJECT(0x0041C120, BigEelControl);
+	//	INJECT(0x0041C2C0, EelControl);
 }

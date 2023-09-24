@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 
 void MineControl(__int16 mineID); // 0x00440FC0
 void ControlSpikeWall(__int16 itemID); // 0x004411C0
@@ -66,7 +66,7 @@ void DartEffectControl(__int16 fxID); // 0x00442B90
 void FlameEmitterControl(__int16 item_id); // 0x00442BE0
 void FlameControl(__int16 fx_id); // 0x00442C70
 void LaraBurn(); // 0x00442DE0
-void LavaBurn(ITEM_INFO *item); // 0x00442E30
+void LavaBurn(ITEM_INFO* item); // 0x00442E30
 
 //	0x00442F20:		LavaSpray
 //	0x00442FF0:		ControlLavaBlob

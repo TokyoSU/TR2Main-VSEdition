@@ -23,12 +23,10 @@
 #include "game/dog.h"
 #include "global/vars.h"
 
-
-
-/*
- * Inject function
- */
+ /*
+  * Inject function
+  */
 void Inject_Dog() {
-//	INJECT(0x00417130, DogControl);
-//	INJECT(0x004174E0, TigerControl);
+	//	INJECT(0x00417130, DogControl);
+	//	INJECT(0x004174E0, TigerControl);
 }

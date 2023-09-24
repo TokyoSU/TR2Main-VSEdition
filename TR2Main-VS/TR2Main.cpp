@@ -19,26 +19,26 @@
  * along with TR2Main.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * @file
- * @brief TR2Main interface
- *
- * This file implements TR2Main.DLL exported functions and interfaces
- */
+ /**
+  * @file
+  * @brief TR2Main interface
+  *
+  * This file implements TR2Main.DLL exported functions and interfaces
+  */
 
-/**
- * @defgroup TR2MAIN TR2Main
- * @brief TR2Main interface
- *
- * This module contains TR2Main.DLL exported functions and interfaces
- *
- * @{
- */
+  /**
+   * @defgroup TR2MAIN TR2Main
+   * @brief TR2Main interface
+   *
+   * This module contains TR2Main.DLL exported functions and interfaces
+   *
+   * @{
+   */
 
 #include "precompiled.h"
 #include <windows.h>
 
-/** @cond Doxygen_Suppress */
+   /** @cond Doxygen_Suppress */
 #ifdef TR2MAINVS_EXPORTS
 #define DLL_EXPORT __declspec(dllexport)
 #else
@@ -133,14 +133,14 @@ extern void Inject_WinVid();
 static void Inject() {
 	Log("Injecting new functions from DLL to EXE.");
 	Log("===================================================");
-// 3d system
+	// 3d system
 	Log("Starting 3DSystem Class.");
 	Inject_3Dgen(); Log("- Injected 3DGen");
 	Inject_3Dout(); Log("- Injected 3DOut");
 	Inject_3Dinsert(); Log("- Injected 3DInsert");
 	Inject_PhdMath(); Log("- Injected PhdMath");
 	Inject_ScaleSpr(); Log("- Injected ScaleSpr");
-// game
+	// game
 	Log("Starting Game Class.");
 	Inject_Bird(); Log("- Injected Bird");
 	Inject_Boat(); Log("- Injected Boat");
@@ -190,7 +190,7 @@ static void Inject() {
 	Inject_Text(); Log("- Injected Text");
 	Inject_Traps(); Log("- Injected Traps");
 	Inject_Yeti(); Log("- Injected Yeti");
-// specific
+	// specific
 	Log("Starting Specific Class.");
 	Inject_Background(); Log("- Injected Background");
 	Inject_Display(); Log("- Injected Display");
@@ -235,26 +235,26 @@ extern "C" DLL_EXPORT int DummyFunction() {
  * @note See the MSDN for more information
  */
 extern "C" BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
-	switch( fdwReason ) {
-		case DLL_PROCESS_ATTACH :
-			Log("Process was attached.");
-			// attach to process
-			hInstance = hinstDLL;
-			Inject();
-			break;
+	switch (fdwReason) {
+	case DLL_PROCESS_ATTACH:
+		Log("Process was attached.");
+		// attach to process
+		hInstance = hinstDLL;
+		Inject();
+		break;
 
-		case DLL_PROCESS_DETACH :
-			// detach from process
-			Log("Process was detached.");
-			break;
+	case DLL_PROCESS_DETACH:
+		// detach from process
+		Log("Process was detached.");
+		break;
 
-		case DLL_THREAD_ATTACH :
-			// attach to thread
-			break;
+	case DLL_THREAD_ATTACH:
+		// attach to thread
+		break;
 
-		case DLL_THREAD_DETACH :
-			// detach from thread
-			break;
+	case DLL_THREAD_DETACH:
+		// detach from thread
+		break;
 	}
 	return TRUE; // successful
 }

@@ -47,26 +47,27 @@ static VIBRATION Vib[NUM_MOTORS][NUM_VIBS];
 static DWORD LedColor = 0;
 
 static int BlendLedColor(int c1, int c2) {
-	if( c1 < c2 ) {
+	if (c1 < c2) {
 		c1 += 16;
-		CLAMPG(c1 ,c2);
-	} else if( c1 > c2 ) {
+		CLAMPG(c1, c2);
+	}
+	else if (c1 > c2) {
 		c1 -= 16;
-		CLAMPL(c1 ,c2);
+		CLAMPL(c1, c2);
 	}
 	return c1;
 }
 
 static void SetupVibration(int motor, int inc, int val, int sus, int dec, int len, bool isCamera) {
 	int id = 0;
-	if( !isCamera ) {
+	if (!isCamera) {
 		int id = 1;
-		for( int i=1; i<NUM_VIBS; ++i ) {
-			if( Vib[motor][i].len <= 0 ) {
+		for (int i = 1; i < NUM_VIBS; ++i) {
+			if (Vib[motor][i].len <= 0) {
 				id = i;
 				break;
 			}
-			if( Vib[motor][i].len < Vib[motor][id].len ) {
+			if (Vib[motor][i].len < Vib[motor][id].len) {
 				id = i;
 			}
 		}
@@ -76,7 +77,7 @@ static void SetupVibration(int motor, int inc, int val, int sus, int dec, int le
 	CLAMP(dec, 0, 0xFFFF);
 	Vib[motor][id].inc = inc;
 	Vib[motor][id].val = val;
-	Vib[motor][id].sus = len-sus;
+	Vib[motor][id].sus = len - sus;
 	Vib[motor][id].dec = dec;
 	Vib[motor][id].len = len;
 	Vib[motor][id].stage = 0;
@@ -105,38 +106,38 @@ void JoyRumbleExplode(int x, int y, int z, DWORD range, bool fromLara) {
 	y -= fromLara ? LaraItem->pos.y : Camera.pos.y;
 	z -= fromLara ? LaraItem->pos.z : Camera.pos.z;
 	DWORD dist = SQR(x) + SQR(y) + SQR(z);
-	if( dist < SQR(range) ) {
+	if (dist < SQR(range)) {
 		// it is intended to be non-linear
-		dist = 0xFFFF - (UINT64)dist*0xFFFF/SQR(range);
-		JoyRumble(dist/8, dist, 20, dist/32, 40, false);
+		dist = 0xFFFF - (UINT64)dist * 0xFFFF / SQR(range);
+		JoyRumble(dist / 8, dist, 20, dist / 32, 40, false);
 	}
 }
 
 void UpdateJoyOutput(bool isInGame) {
-	WORD motor[2] = {0, 0};
-	for( int i=0; i<NUM_MOTORS; ++i ) {
-		for( int j=0; j<NUM_VIBS; ++j ) {
-			if( !IsJoyVibrationEnabled() || !isInGame || Vib[i][j].len <= 0 ) {
+	WORD motor[2] = { 0, 0 };
+	for (int i = 0; i < NUM_MOTORS; ++i) {
+		for (int j = 0; j < NUM_VIBS; ++j) {
+			if (!IsJoyVibrationEnabled() || !isInGame || Vib[i][j].len <= 0) {
 				continue;
 			}
-			switch( Vib[i][j].stage ) {
+			switch (Vib[i][j].stage) {
 			case 0:
 				Vib[i][j].value += Vib[i][j].inc;
-				if( Vib[i][j].value < Vib[i][j].val ) {
+				if (Vib[i][j].value < Vib[i][j].val) {
 					break;
 				}
 				Vib[i][j].value = Vib[i][j].val;
 				Vib[i][j].stage = 1;
 				// fall through
 			case 1:
-				if( Vib[i][j].len > Vib[i][j].sus) {
+				if (Vib[i][j].len > Vib[i][j].sus) {
 					break;
 				}
 				Vib[i][j].stage = 2;
 				// fall through
 			case 2:
 				Vib[i][j].value -= Vib[i][j].dec;
-				if( Vib[i][j].value > 0 ) {
+				if (Vib[i][j].value > 0) {
 					break;
 				}
 				Vib[i][j].value = 0;
@@ -151,61 +152,70 @@ void UpdateJoyOutput(bool isInGame) {
 		}
 	}
 
-	int r=0, g=0, b=0;
+	int r = 0, g = 0, b = 0;
 	bool isInjured = false;
-	if( !IsJoyLedColorEnabled() || !isInGame || LaraItem == NULL ) {
-		r = RGB_GETRED  (DEFAULT_JOYSTICK_LED_COLOR);
+	if (!IsJoyLedColorEnabled() || !isInGame || LaraItem == NULL) {
+		r = RGB_GETRED(DEFAULT_JOYSTICK_LED_COLOR);
 		g = RGB_GETGREEN(DEFAULT_JOYSTICK_LED_COLOR);
-		b = RGB_GETBLUE (DEFAULT_JOYSTICK_LED_COLOR);
-	} else {
+		b = RGB_GETBLUE(DEFAULT_JOYSTICK_LED_COLOR);
+	}
+	else {
 		static __int16 hitPoints = 0;
 		isInjured = (LaraItem->hitPoints < hitPoints && Lara.air > 0);
 		hitPoints = LaraItem->hitPoints;
-		if( isInjured ) {
+		if (isInjured) {
 			r = 255;
-			if( hitPoints > HP_50 ) {
+			if (hitPoints > HP_50) {
 				g = 255 * (hitPoints - HP_50) / HP_50;
 			}
-		} else {
-			if( Lara.water_status == LWS_Underwater ) {
-				if( hitPoints > 0 && Lara.air > 0 ) {
-					if( Lara.air > AIR_75 ) {
+		}
+		else {
+			if (Lara.water_status == LWS_Underwater) {
+				if (hitPoints > 0 && Lara.air > 0) {
+					if (Lara.air > AIR_75) {
 						g = 255;
 						b = 128 + 127 * (AIR_100 - Lara.air) / AIR_25;
-					} else if( Lara.air > AIR_25 ) {
+					}
+					else if (Lara.air > AIR_25) {
 						g = 255 * (Lara.air - AIR_25) / AIR_50;
 						b = 255;
-					} else {
+					}
+					else {
 						r = 127 * (AIR_25 - Lara.air) / AIR_25;
 						b = 255;
 					}
-				} else {
+				}
+				else {
 					r = 128 + 127 * (HP_100 - hitPoints) / HP_100;
 					b = 255 * hitPoints / HP_100;
 				}
-			} else {
-				if( hitPoints > HP_50 ) {
+			}
+			else {
+				if (hitPoints > HP_50) {
 					r = 255 * (HP_100 - hitPoints) / HP_50;
 					g = 255;
-				} else {
+				}
+				else {
 					r = 255;
 					g = 255 * hitPoints / HP_50;
 				}
 			}
-			if( hitPoints > 0 && Lara.air > 0 && Lara.gun_status != LGS_Ready ) {
+			if (hitPoints > 0 && Lara.air > 0 && Lara.gun_status != LGS_Ready) {
 				r /= 3;
 				g /= 3;
 				b /= 3;
-			} else {
-				r = r*2/3;
-				g = g*2/3;
-				b = b*2/3;
+			}
+			else {
+				r = r * 2 / 3;
+				g = g * 2 / 3;
+				b = b * 2 / 3;
 			}
 		}
 	}
-	if( isInjured ) {
+	if (isInjured) {
 		LedColor = RGB_MAKE(r, g, b);
-	} else if( LedColor != RGB_MAKE(r, g, b) ) {
+	}
+	else if (LedColor != RGB_MAKE(r, g, b)) {
 		r = BlendLedColor(RGB_GETRED(LedColor), r);
 		g = BlendLedColor(RGB_GETGREEN(LedColor), g);
 		b = BlendLedColor(RGB_GETBLUE(LedColor), b);

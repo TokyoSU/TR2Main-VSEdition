@@ -24,10 +24,10 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
-// NOTE: this function is presented in the "Golden Mask" only
+ /*
+  * Function list
+  */
+  // NOTE: this function is presented in the "Golden Mask" only
 void BearControl(__int16 itemID); // tomb2gold:0x0040C860
 
 #endif // BEAR_H_INCLUDED

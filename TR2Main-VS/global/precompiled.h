@@ -62,7 +62,7 @@
 #pragma comment(lib, "hid")
 #pragma comment(lib, "xinput")
 
-// Some defines are required for DX9 and above
+ // Some defines are required for DX9 and above
 #if (DIRECT3D_VERSION >= 0x900)
 #ifndef FEATURE_NOLEGACY_OPTIONS
 #define FEATURE_NOLEGACY_OPTIONS
@@ -84,7 +84,7 @@
 #endif // (DIRECT3D_VERSION >= 0x900)
 #endif // TR2MAIN_PRECOMPILED_HEADER
 
-#ifdef _MSC_VER 
+#ifdef _MSC_VER
 //not #if defined(_WIN32) || defined(_WIN64) because we have strncasecmp in mingw
 #define strncasecmp _strnicmp
 #define strcasecmp _stricmp

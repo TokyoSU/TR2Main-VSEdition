@@ -26,10 +26,10 @@
 
 #define VOLUME_PCT(x) (DSBVOLUME_MIN + (DSBVOLUME_MAX - DSBVOLUME_MIN) * (x) / 100)
 
-/*
- * Function list
- */
-SOUND_ADAPTER_NODE *__cdecl GetSoundAdapter(GUID *lpGuid); // 0x00447C70
+ /*
+  * Function list
+  */
+SOUND_ADAPTER_NODE* __cdecl GetSoundAdapter(GUID* lpGuid); // 0x00447C70
 void WinSndFreeAllSamples(); // 0x00447CC0
 bool WinSndMakeSample(DWORD sampleIdx, LPWAVEFORMATEX format, const LPVOID data, DWORD dataSize); // 0x00447CF0
 bool WinSndIsChannelPlaying(DWORD channel); // 0x00447E00
@@ -39,10 +39,10 @@ void WinSndAdjustVolumeAndPan(int channel, int volume, int pan); // 0x00447F80
 void WinSndAdjustPitch(int channel, DWORD pitch); // 0x00447FB0
 void WinSndStopSample(int channel); // 0x00447FF0
 bool WinSndInit(); // 0x00448060
-bool DSoundEnumerate(SOUND_ADAPTER_LIST *adapterList); // 0x00448100
+bool DSoundEnumerate(SOUND_ADAPTER_LIST* adapterList); // 0x00448100
 BOOL CALLBACK DSoundEnumCallback(LPGUID lpGuid, LPCTSTR lpcstrDescription, LPCTSTR lpcstrModule, LPVOID lpContext); // 0x00448120
 void WinSndStart(HWND hWnd); // 0x00448210
-bool DSoundCreate(GUID *lpGuid); // 0x00448390
+bool DSoundCreate(GUID* lpGuid); // 0x00448390
 bool DSoundBufferTest(); // 0x004483B0
 void WinSndFinish(); // 0x00448480
 bool WinSndIsSoundEnabled(); // 0x004484B0

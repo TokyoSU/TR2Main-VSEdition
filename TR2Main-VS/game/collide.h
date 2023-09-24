@@ -24,13 +24,13 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
-//	0x004128D0:		GetCollisionInfo
-//	0x00412F90:		FindGridShift
+ /*
+  * Function list
+  */
+  //	0x004128D0:		GetCollisionInfo
+  //	0x00412F90:		FindGridShift
 
-int CollideStaticObjects(COLL_INFO *coll, int x, int y, int z, __int16 roomID, int hite); // 0x00412FC0
+int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, __int16 roomID, int hite); // 0x00412FC0
 void GetNearByRooms(int x, int y, int z, int r, int h, __int16 roomID); // 0x004133B0
 void GetNewRoom(int x, int y, int z, __int16 roomID); // 0x00413480
 

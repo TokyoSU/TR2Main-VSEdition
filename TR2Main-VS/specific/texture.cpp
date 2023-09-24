@@ -34,7 +34,7 @@
 #ifdef FEATURE_EXTENDED_LIMITS
 PHD_TEXTURE PhdTextureInfo[0x2000];
 BYTE LabTextureUVFlags[0x2000];
-BYTE *TexturePageBuffer8[128];
+BYTE* TexturePageBuffer8[128];
 HWR_TEXHANDLE HWR_PageHandles[128];
 int HWR_TexturePageIndexes[128];
 #endif // FEATURE_EXTENDED_LIMITS
@@ -46,7 +46,7 @@ TEXPAGE_DESC TexturePages[32];
 #endif // defined(FEATURE_EXTENDED_LIMITS) || defined(FEATURE_BACKGROUND_IMPROVED)
 
 #if (DIRECT3D_VERSION >= 0x900)
-RGB888 *TexturePalettes[256];
+RGB888* TexturePalettes[256];
 #elif defined(FEATURE_EXTENDED_LIMITS) || defined(FEATURE_BACKGROUND_IMPROVED)
 LPDIRECTDRAWPALETTE TexturePalettes[256];
 #else // defined(FEATURE_EXTENDED_LIMITS) || defined(FEATURE_BACKGROUND_IMPROVED)
@@ -67,35 +67,35 @@ static LPDIRECT3DTEXTURE2 EnvmapTexture = NULL;
 static HWR_TEXHANDLE EnvmapTextureHandle = 0;
 
 static DWORD GetEnvmapSide() {
-	static const DWORD mapside[] = {64, 256, 1024};
-	if( ReflectionMode < 1 || ReflectionMode > 3 ) return 0;
+	static const DWORD mapside[] = { 64, 256, 1024 };
+	if (ReflectionMode < 1 || ReflectionMode > 3) return 0;
 	DWORD side = MIN(mapside[3 - ReflectionMode], GetMaxTextureSize());
 	DWORD sideLimit = MIN(GameVidWidth, GameVidHeight);
-	while( side > sideLimit ) side >>= 1;
+	while (side > sideLimit) side >>= 1;
 	return side;
 }
 
 #if (DIRECT3D_VERSION >= 0x900)
 static bool CreateEnvmapTexture() {
-	if( EnvmapTexture != NULL ) FreeEnvmapTexture();
+	if (EnvmapTexture != NULL) FreeEnvmapTexture();
 	DWORD side = GetEnvmapSide();
-	if( !side ) return false;
-	if( EnvmapTexture ) return true;
+	if (!side) return false;
+	if (EnvmapTexture) return true;
 	return SUCCEEDED(D3DDev->CreateTexture(side, side, 1, D3DUSAGE_RENDERTARGET, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &EnvmapTexture, 0));
 }
 #else // (DIRECT3D_VERSION >= 0x900)
 static bool CreateEnvmapBufferSurface() {
 	DWORD side = GetEnvmapSide();
-	if( !side ) return false;
-	if( EnvmapBufferSurface ) return true;
+	if (!side) return false;
+	if (EnvmapBufferSurface) return true;
 
 	DDSDESC dsp;
 	memset(&dsp, 0, sizeof(dsp));
 	dsp.dwSize = sizeof(dsp);
-	dsp.dwFlags = DDSD_WIDTH|DDSD_HEIGHT|DDSD_CAPS;
+	dsp.dwFlags = DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS;
 	dsp.dwWidth = side;
 	dsp.dwHeight = side;
-	dsp.ddsCaps.dwCaps = DDSCAPS_VIDEOMEMORY|DDSCAPS_TEXTURE;
+	dsp.ddsCaps.dwCaps = DDSCAPS_VIDEOMEMORY | DDSCAPS_TEXTURE;
 
 	if FAILED(DDrawSurfaceCreate(&dsp, &EnvmapBufferSurface))
 		return -1;
@@ -106,7 +106,7 @@ static bool CreateEnvmapBufferSurface() {
 #endif // (DIRECT3D_VERSION >= 0x900)
 
 void FreeEnvmapTexture() {
-	if( EnvmapTexture ) {
+	if (EnvmapTexture) {
 		EnvmapTexture->Release();
 		EnvmapTexture = NULL;
 	}
@@ -121,14 +121,14 @@ bool SetEnvmapTexture(LPDDS surface) {
 	int x = (GameVidWidth - side) / 2;
 	int y = (GameVidHeight - side) / 2;
 	RECT srcRect = {
-		.left	= GameVidRect.left + x,
-		.top	= GameVidRect.top  + y,
-		.right	= GameVidRect.left + x + side,
-		.bottom	= GameVidRect.top  + y + side,
+		.left = GameVidRect.left + x,
+		.top = GameVidRect.top + y,
+		.right = GameVidRect.left + x + side,
+		.bottom = GameVidRect.top + y + side,
 	};
 
 #if (DIRECT3D_VERSION >= 0x900)
-	if( EnvmapTexture == NULL && !CreateEnvmapTexture() ) return false;
+	if (EnvmapTexture == NULL && !CreateEnvmapTexture()) return false;
 	LPDDS texSurface = NULL;
 
 	if SUCCEEDED(EnvmapTexture->GetSurfaceLevel(0, &texSurface)) {
@@ -138,21 +138,21 @@ bool SetEnvmapTexture(LPDDS surface) {
 		texSurface->Release();
 	}
 #else // (DIRECT3D_VERSION >= 0x900)
-	if( !CreateEnvmapBufferSurface() ) return false;
-	if( EnvmapTexture ) FreeEnvmapTexture();
+	if (!CreateEnvmapBufferSurface()) return false;
+	if (EnvmapTexture) FreeEnvmapTexture();
 	EnvmapBufferSurface->Blt(NULL, surface, &srcRect, DDBLT_WAIT, NULL);
 	EnvmapTexture = Create3DTexture(EnvmapBufferSurface);
-	if( EnvmapTexture ) {
+	if (EnvmapTexture) {
 		EnvmapTexture->GetHandle(D3DDev, &EnvmapTextureHandle);
 	}
 #endif // (DIRECT3D_VERSION >= 0x900)
 
-	return ( EnvmapTextureHandle != 0 );
+	return (EnvmapTextureHandle != 0);
 }
 
 HWR_TEXHANDLE GetEnvmapTextureHandle() {
 #if (DIRECT3D_VERSION < 0x900)
-	if( EnvmapTextureHandle ) return EnvmapTextureHandle;
+	if (EnvmapTextureHandle) return EnvmapTextureHandle;
 	SetEnvmapTexture(CaptureBufferSurface ? CaptureBufferSurface : PrimaryBufferSurface);
 #endif // (DIRECT3D_VERSION < 0x900)
 	return EnvmapTextureHandle;
@@ -168,22 +168,22 @@ DWORD GetMaxTextureSize() {
 }
 
 int GetTextureSideByPage(int page) {
-	if( page < 0 ) return 256;
+	if (page < 0) return 256;
 	page = HWR_TexturePageIndexes[page];
-	if( page < 0 ) return 256;
+	if (page < 0) return 256;
 	return TexturePages[page].width;
 }
 
 int GetTextureSideByHandle(HWR_TEXHANDLE handle) {
-	for( DWORD i=0; i<ARRAY_SIZE(HWR_TexturePageIndexes); ++i ) {
-		if( HWR_TexturePageIndexes[i] >= 0 && HWR_PageHandles[i] == handle ) {
+	for (DWORD i = 0; i < ARRAY_SIZE(HWR_TexturePageIndexes); ++i) {
+		if (HWR_TexturePageIndexes[i] >= 0 && HWR_PageHandles[i] == handle) {
 			return TexturePages[HWR_TexturePageIndexes[i]].width;
 		}
 	}
 	return 256;
 }
 
-void CopyBitmapPalette(RGB888 *srcPal, BYTE *srcBitmap, int bitmapSize, RGB888 *destPal) {
+void CopyBitmapPalette(RGB888* srcPal, BYTE* srcBitmap, int bitmapSize, RGB888* destPal) {
 	int i, j;
 #if (DIRECT3D_VERSION < 0x900)
 	HDC hdc;
@@ -191,12 +191,12 @@ void CopyBitmapPalette(RGB888 *srcPal, BYTE *srcBitmap, int bitmapSize, RGB888 *
 	PALETTEENTRY lastSysPalEntries[10];
 #endif // (DIRECT3D_VERSION < 0x900)
 
-	for( i=0; i<256; ++i ) {
+	for (i = 0; i < 256; ++i) {
 		SortBuffer[i]._0 = i;
 		SortBuffer[i]._1 = 0;
 	}
 
-	for( i=0; i<bitmapSize; ++i ) {
+	for (i = 0; i < bitmapSize; ++i) {
 		SortBuffer[srcBitmap[i]]._1++;
 	}
 
@@ -204,39 +204,39 @@ void CopyBitmapPalette(RGB888 *srcPal, BYTE *srcBitmap, int bitmapSize, RGB888 *
 
 #if (DIRECT3D_VERSION >= 0x900)
 	// middle palette entries
-	for( j=0; j<256; ++j ) {
+	for (j = 0; j < 256; ++j) {
 		destPal[j] = srcPal[SortBuffer[j]._0];
 	}
 #else // (DIRECT3D_VERSION >= 0x900)
 	hdc = GetDC(NULL);
-	GetSystemPaletteEntries(hdc, 0,   10, firstSysPalEntries);
+	GetSystemPaletteEntries(hdc, 0, 10, firstSysPalEntries);
 	GetSystemPaletteEntries(hdc, 246, 10, lastSysPalEntries);
 	ReleaseDC(NULL, hdc);
 
 	// first palette entries
-	for( i=0; i<8; ++i ) {
-		destPal[i].red   = firstSysPalEntries[i].peRed;
+	for (i = 0; i < 8; ++i) {
+		destPal[i].red = firstSysPalEntries[i].peRed;
 		destPal[i].green = firstSysPalEntries[i].peGreen;
-		destPal[i].blue  = firstSysPalEntries[i].peBlue;
+		destPal[i].blue = firstSysPalEntries[i].peBlue;
 	}
-	memset(&destPal[8], 0, 2*sizeof(RGB888));
+	memset(&destPal[8], 0, 2 * sizeof(RGB888));
 
 	// middle palette entries
-	for( i=0, j=10; i<236; ++i, ++j ) {
+	for (i = 0, j = 10; i < 236; ++i, ++j) {
 		destPal[j] = srcPal[SortBuffer[i]._0];
 	}
 
 	// last palette entries
-	memset(&destPal[246], 0, 1*sizeof(RGB888));
-	for( i=1, j=247; i<10; ++i, ++j ) {
-		destPal[j].red   = lastSysPalEntries[i].peRed;
+	memset(&destPal[246], 0, 1 * sizeof(RGB888));
+	for (i = 1, j = 247; i < 10; ++i, ++j) {
+		destPal[j].red = lastSysPalEntries[i].peRed;
 		destPal[j].green = lastSysPalEntries[i].peGreen;
-		destPal[j].blue  = lastSysPalEntries[i].peBlue;
+		destPal[j].blue = lastSysPalEntries[i].peBlue;
 	}
 #endif // (DIRECT3D_VERSION >= 0x900)
 }
 
-BYTE FindNearestPaletteEntry(RGB888 *palette, int red, int green, int blue, bool ignoreSysPalette) {
+BYTE FindNearestPaletteEntry(RGB888* palette, int red, int green, int blue, bool ignoreSysPalette) {
 	int i;
 	int diffRed, diffGreen, diffBlue, diffTotal;
 	int diffMin = INT_MAX;
@@ -245,18 +245,18 @@ BYTE FindNearestPaletteEntry(RGB888 *palette, int red, int green, int blue, bool
 	BYTE result = 0;
 
 #if (DIRECT3D_VERSION < 0x900)
-	if( ignoreSysPalette ) {
+	if (ignoreSysPalette) {
 		palStartIdx += 10;
 		palEndIdx -= 10;
 	}
 #endif // (DIRECT3D_VERSION < 0x900)
 
-	for( i=palStartIdx; i<palEndIdx; ++i ) {
-		diffRed   = red   - palette[i].red;
+	for (i = palStartIdx; i < palEndIdx; ++i) {
+		diffRed = red - palette[i].red;
 		diffGreen = green - palette[i].green;
-		diffBlue  = blue  - palette[i].blue;
-		diffTotal = diffRed*diffRed + diffGreen*diffGreen + diffBlue*diffBlue;
-		if( diffTotal < diffMin ) {
+		diffBlue = blue - palette[i].blue;
+		diffTotal = diffRed * diffRed + diffGreen * diffGreen + diffBlue * diffBlue;
+		if (diffTotal < diffMin) {
 			diffMin = diffTotal;
 			result = i;
 		}
@@ -264,20 +264,20 @@ BYTE FindNearestPaletteEntry(RGB888 *palette, int red, int green, int blue, bool
 	return result;
 }
 
-void SyncSurfacePalettes(void *srcData, int width, int height, int srcPitch, RGB888 *srcPalette, void *dstData, int dstPitch, RGB888 *dstPalette, bool preserveSysPalette) {
+void SyncSurfacePalettes(void* srcData, int width, int height, int srcPitch, RGB888* srcPalette, void* dstData, int dstPitch, RGB888* dstPalette, bool preserveSysPalette) {
 	int i, j;
-	BYTE *src, *dst;
+	BYTE* src, * dst;
 	BYTE bufPalette[256];
 
-	for( i=0; i<256; ++i ) {
+	for (i = 0; i < 256; ++i) {
 		bufPalette[i] = FindNearestPaletteEntry(dstPalette, srcPalette[i].red, srcPalette[i].green, srcPalette[i].blue, preserveSysPalette);
 	}
 
-	src = (BYTE *)srcData;
-	dst = (BYTE *)dstData;
+	src = (BYTE*)srcData;
+	dst = (BYTE*)dstData;
 
-	for( i=0; i<height; ++i ) {
-		for( j=0; j<width; ++j ) {
+	for (i = 0; i < height; ++i) {
+		for (j = 0; j < width; ++j) {
 			*(dst++) = bufPalette[*(src++)];
 		}
 		src += srcPitch - width;
@@ -285,14 +285,14 @@ void SyncSurfacePalettes(void *srcData, int width, int height, int srcPitch, RGB
 	}
 }
 
-int CreateTexturePalette(RGB888 *pal) {
+int CreateTexturePalette(RGB888* pal) {
 #if (DIRECT3D_VERSION >= 0x900)
 	int palIndex = GetFreePaletteIndex();
-	if( palIndex < 0 )
+	if (palIndex < 0)
 		return -1;
 
-	TexturePalettes[palIndex] = (RGB888 *)malloc(sizeof(RGB888) * 256);
-	if( TexturePalettes[palIndex] == NULL )
+	TexturePalettes[palIndex] = (RGB888*)malloc(sizeof(RGB888) * 256);
+	if (TexturePalettes[palIndex] == NULL)
 		return -1;
 
 	memcpy(TexturePalettes[palIndex], pal, sizeof(RGB888) * 256);
@@ -302,17 +302,17 @@ int CreateTexturePalette(RGB888 *pal) {
 	PALETTEENTRY palEntries[256];
 
 	palIndex = GetFreePaletteIndex();
-	if( palIndex < 0 )
+	if (palIndex < 0)
 		return -1;
 
-	for( int i=0; i<256; ++i ) {
-		palEntries[i].peRed   = pal[i].red;
+	for (int i = 0; i < 256; ++i) {
+		palEntries[i].peRed = pal[i].red;
 		palEntries[i].peGreen = pal[i].green;
-		palEntries[i].peBlue  = pal[i].blue;
+		palEntries[i].peBlue = pal[i].blue;
 		palEntries[i].peFlags = 0;
 	}
 
-	if FAILED(DDraw->CreatePalette(DDPCAPS_ALLOW256|DDPCAPS_8BIT, palEntries, &TexturePalettes[palIndex], NULL))
+	if FAILED(DDraw->CreatePalette(DDPCAPS_ALLOW256 | DDPCAPS_8BIT, palEntries, &TexturePalettes[palIndex], NULL))
 		return -1;
 
 	return palIndex;
@@ -320,15 +320,15 @@ int CreateTexturePalette(RGB888 *pal) {
 }
 
 int GetFreePaletteIndex() {
-	for( DWORD i=0; i<ARRAY_SIZE(TexturePalettes); ++i ) {
-		if( TexturePalettes[i] == NULL )
+	for (DWORD i = 0; i < ARRAY_SIZE(TexturePalettes); ++i) {
+		if (TexturePalettes[i] == NULL)
 			return i;
 	}
 	return -1;
 }
 
 void FreePalette(int paletteIndex) {
-	if( TexturePalettes[paletteIndex] != NULL ) {
+	if (TexturePalettes[paletteIndex] != NULL) {
 #if (DIRECT3D_VERSION >= 0x900)
 		free(TexturePalettes[paletteIndex]);
 #else // (DIRECT3D_VERSION >= 0x900)
@@ -339,7 +339,7 @@ void FreePalette(int paletteIndex) {
 }
 
 void SafeFreePalette(int paletteIndex) {
-	if( paletteIndex >= 0 ) {
+	if (paletteIndex >= 0) {
 		FreePalette(paletteIndex);
 	}
 }
@@ -351,7 +351,7 @@ int CreateTexturePage(int width, int height, LPDIRECTDRAWPALETTE palette)
 #endif // (DIRECT3D_VERSION >= 0x900)
 {
 	int pageIndex = GetFreeTexturePageIndex();
-	if( pageIndex < 0 )
+	if (pageIndex < 0)
 		return -1;
 
 	memset(&TexturePages[pageIndex], 0, sizeof(TEXPAGE_DESC));
@@ -363,7 +363,7 @@ int CreateTexturePage(int width, int height, LPDIRECTDRAWPALETTE palette)
 		return -1;
 #else // (DIRECT3D_VERSION >= 0x900)
 	TexturePages[pageIndex].palette = palette;
-	if( !CreateTexturePageSurface(&TexturePages[pageIndex]) )
+	if (!CreateTexturePageSurface(&TexturePages[pageIndex]))
 		return -1;
 
 	TexturePageInit(&TexturePages[pageIndex]);
@@ -372,53 +372,53 @@ int CreateTexturePage(int width, int height, LPDIRECTDRAWPALETTE palette)
 }
 
 #if (DIRECT3D_VERSION < 0x900)
-bool CreateTexturePageSurface(TEXPAGE_DESC *desc) {
+bool CreateTexturePageSurface(TEXPAGE_DESC* desc) {
 	DDSDESC dsp;
 
 	memset(&dsp, 0, sizeof(dsp));
 	dsp.dwSize = sizeof(dsp);
-	dsp.dwFlags = DDSD_PIXELFORMAT|DDSD_WIDTH|DDSD_HEIGHT|DDSD_CAPS;
-	dsp.dwWidth  = desc->width;
+	dsp.dwFlags = DDSD_PIXELFORMAT | DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS;
+	dsp.dwWidth = desc->width;
 	dsp.dwHeight = desc->height;
 	dsp.ddpfPixelFormat = TextureFormat.pixelFmt;
-	dsp.ddsCaps.dwCaps = DDSCAPS_TEXTURE|DDSCAPS_SYSTEMMEMORY;
+	dsp.ddsCaps.dwCaps = DDSCAPS_TEXTURE | DDSCAPS_SYSTEMMEMORY;
 	if FAILED(DDrawSurfaceCreate(&dsp, &desc->sysMemSurface))
 		return false;
 
-	return ( (desc->palette == NULL) || SUCCEEDED(desc->sysMemSurface->SetPalette(desc->palette)) );
+	return ((desc->palette == NULL) || SUCCEEDED(desc->sysMemSurface->SetPalette(desc->palette)));
 }
 #endif // (DIRECT3D_VERSION < 0x900)
 
 int GetFreeTexturePageIndex() {
-	for( DWORD i=0; i<ARRAY_SIZE(TexturePages); ++i ) {
-		if( (TexturePages[i].status & 1) == 0 )
+	for (DWORD i = 0; i < ARRAY_SIZE(TexturePages); ++i) {
+		if ((TexturePages[i].status & 1) == 0)
 			return i;
 	}
 	return -1;
 }
 
 #if (DIRECT3D_VERSION < 0x900)
-bool TexturePageInit(TEXPAGE_DESC *page) {
+bool TexturePageInit(TEXPAGE_DESC* page) {
 	DDSDESC dsp;
 	DDCOLORKEY colorKey;
 
 	memset(&dsp, 0, sizeof(dsp));
 	dsp.dwSize = sizeof(dsp);
-	dsp.dwFlags = DDSD_PIXELFORMAT|DDSD_WIDTH|DDSD_HEIGHT|DDSD_CAPS;
+	dsp.dwFlags = DDSD_PIXELFORMAT | DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS;
 	dsp.dwWidth = page->width;;
 	dsp.dwHeight = page->height;
 	dsp.ddpfPixelFormat = TextureFormat.pixelFmt;
-	dsp.ddsCaps.dwCaps = DDSCAPS_ALLOCONLOAD|DDSCAPS_VIDEOMEMORY|DDSCAPS_TEXTURE;
+	dsp.ddsCaps.dwCaps = DDSCAPS_ALLOCONLOAD | DDSCAPS_VIDEOMEMORY | DDSCAPS_TEXTURE;
 
-	if( FAILED(DDrawSurfaceCreate(&dsp, &page->vidMemSurface)) || page->vidMemSurface == NULL ) {
+	if (FAILED(DDrawSurfaceCreate(&dsp, &page->vidMemSurface)) || page->vidMemSurface == NULL) {
 		return false;
 	}
 
-	if( page->palette ) {
+	if (page->palette) {
 		colorKey.dwColorSpaceLowValue = 0;
 		colorKey.dwColorSpaceHighValue = 0;
-		if( FAILED(page->vidMemSurface->SetPalette(page->palette)) ||
-			FAILED(page->vidMemSurface->SetColorKey(DDCKEY_SRCBLT, &colorKey)) )
+		if (FAILED(page->vidMemSurface->SetPalette(page->palette)) ||
+			FAILED(page->vidMemSurface->SetColorKey(DDCKEY_SRCBLT, &colorKey)))
 		{
 			page->vidMemSurface->Release();
 			page->vidMemSurface = NULL;
@@ -427,7 +427,7 @@ bool TexturePageInit(TEXPAGE_DESC *page) {
 	}
 
 	page->texture3d = Create3DTexture(page->vidMemSurface);
-	if( page->texture3d == NULL ) {
+	if (page->texture3d == NULL) {
 		page->vidMemSurface->Release();
 		page->vidMemSurface = NULL;
 		return false;
@@ -449,7 +449,7 @@ bool TexturePageInit(TEXPAGE_DESC *page) {
 
 LPDIRECT3DTEXTURE2 Create3DTexture(LPDDS surface) {
 	LPDIRECT3DTEXTURE2 texture3d = NULL;
-	if FAILED(surface->QueryInterface(IID_IDirect3DTexture2, (LPVOID *)&texture3d)) {
+	if FAILED(surface->QueryInterface(IID_IDirect3DTexture2, (LPVOID*)&texture3d)) {
 		return NULL;
 	}
 	return texture3d;
@@ -457,21 +457,21 @@ LPDIRECT3DTEXTURE2 Create3DTexture(LPDDS surface) {
 #endif // (DIRECT3D_VERSION < 0x900)
 
 void SafeFreeTexturePage(int pageIndex) {
-	if( pageIndex >= 0 && (TexturePages[pageIndex].status & 1) != 0 ) {
+	if (pageIndex >= 0 && (TexturePages[pageIndex].status & 1) != 0) {
 		FreeTexturePage(pageIndex);
 	}
 }
 
 void FreeTexturePage(int pageIndex) {
 #if (DIRECT3D_VERSION >= 0x900)
-	if( TexturePages[pageIndex].texture != NULL ) {
+	if (TexturePages[pageIndex].texture != NULL) {
 		TexturePages[pageIndex].texture->Release();
 		TexturePages[pageIndex].texture = NULL;
 	}
 #else // (DIRECT3D_VERSION >= 0x900)
 	TexturePageReleaseVidMemSurface(&TexturePages[pageIndex]);
 
-	if( TexturePages[pageIndex].sysMemSurface != NULL ) {
+	if (TexturePages[pageIndex].sysMemSurface != NULL) {
 		TexturePages[pageIndex].sysMemSurface->Release();
 		TexturePages[pageIndex].sysMemSurface = NULL;
 	}
@@ -480,14 +480,14 @@ void FreeTexturePage(int pageIndex) {
 }
 
 #if (DIRECT3D_VERSION < 0x900)
-void TexturePageReleaseVidMemSurface(TEXPAGE_DESC *page) {
+void TexturePageReleaseVidMemSurface(TEXPAGE_DESC* page) {
 	HWR_ResetTexSource();
 	page->texHandle = 0;
-	if( page->texture3d ) {
+	if (page->texture3d) {
 		page->texture3d->Release();
 		page->texture3d = NULL;
 	}
-	if( page->vidMemSurface ) {
+	if (page->vidMemSurface) {
 		page->vidMemSurface->Release();
 		page->vidMemSurface = NULL;
 	}
@@ -496,8 +496,8 @@ void TexturePageReleaseVidMemSurface(TEXPAGE_DESC *page) {
 bool ReloadTextures(bool reset) {
 	bool result = true;
 
-	for( DWORD i=0; i<ARRAY_SIZE(TexturePages); ++i ) {
-		if( (TexturePages[i].status & 1) != 0 )
+	for (DWORD i = 0; i < ARRAY_SIZE(TexturePages); ++i) {
+		if ((TexturePages[i].status & 1) != 0)
 			result &= LoadTexturePage(i, reset);
 	}
 	return result;
@@ -511,8 +511,8 @@ void FreeTexturePages() {
 #ifdef FEATURE_BACKGROUND_IMPROVED
 	BGND2_CleanupCaptureTextures();
 #endif // FEATURE_BACKGROUND_IMPROVED
-	for( DWORD i=0; i<ARRAY_SIZE(TexturePages); ++i ) {
-		if( (TexturePages[i].status & 1) != 0 )
+	for (DWORD i = 0; i < ARRAY_SIZE(TexturePages); ++i) {
+		if ((TexturePages[i].status & 1) != 0)
 			FreeTexturePage(i);
 	}
 }
@@ -521,25 +521,25 @@ void FreeTexturePages() {
 bool LoadTexturePage(int pageIndex, bool reset) {
 	bool rc = false;
 
-	if( pageIndex < 0 )
+	if (pageIndex < 0)
 		return false;
 
-	if( reset || TexturePages[pageIndex].vidMemSurface == NULL ) {
+	if (reset || TexturePages[pageIndex].vidMemSurface == NULL) {
 		rc = SUCCEEDED(DDrawSurfaceRestoreLost(TexturePages[pageIndex].vidMemSurface, NULL, false));
 	}
 
-	if( !rc ) {
+	if (!rc) {
 		TexturePageReleaseVidMemSurface(&TexturePages[pageIndex]);
 		rc = TexturePageInit(&TexturePages[pageIndex]);
 	}
 
-	if( !rc )
+	if (!rc)
 		return false;
 
 	DDrawSurfaceRestoreLost(TexturePages[pageIndex].sysMemSurface, NULL, false);
 	LPDIRECT3DTEXTURE2 sysMemTexture = Create3DTexture(TexturePages[pageIndex].sysMemSurface);
 
-	if( sysMemTexture == NULL )
+	if (sysMemTexture == NULL)
 		return false;
 
 	rc = SUCCEEDED(TexturePages[pageIndex].texture3d->Load(sysMemTexture));
@@ -549,16 +549,15 @@ bool LoadTexturePage(int pageIndex, bool reset) {
 }
 #endif // (DIRECT3D_VERSION < 0x900)
 
-
 HWR_TEXHANDLE GetTexturePageHandle(int pageIndex) {
-	if( pageIndex < 0 )
+	if (pageIndex < 0)
 		return 0;
 
 #if (DIRECT3D_VERSION >= 0x900)
 	return TexturePages[pageIndex].texture;
 #else // (DIRECT3D_VERSION >= 0x900)
-	if( TexturePages[pageIndex].vidMemSurface &&
-		TexturePages[pageIndex].vidMemSurface->IsLost() == DDERR_SURFACELOST )
+	if (TexturePages[pageIndex].vidMemSurface &&
+		TexturePages[pageIndex].vidMemSurface->IsLost() == DDERR_SURFACELOST)
 	{
 		LoadTexturePage(pageIndex, 1);
 	}
@@ -567,26 +566,27 @@ HWR_TEXHANDLE GetTexturePageHandle(int pageIndex) {
 #endif // (DIRECT3D_VERSION >= 0x900)
 }
 
-int AddTexturePage8(int width, int height, BYTE *pageBuffer, int palIndex) {
+int AddTexturePage8(int width, int height, BYTE* pageBuffer, int palIndex) {
 #if (DIRECT3D_VERSION >= 0x900)
 	int pageIndex = CreateTexturePage(width, height, true);
-	if( pageIndex < 0 )
+	if (pageIndex < 0)
 		return -1;
 
 	DDSDESC desc;
 	if FAILED(TexturePages[pageIndex].texture->LockRect(0, &desc, NULL, 0)) {
 		return -1;
 	}
-	BYTE *src = pageBuffer;
-	for( int i=0; i<height; ++i ) {
-		DWORD *dst = (DWORD *)((BYTE *)desc.pBits + desc.Pitch * i);
-		for( int j=0; j<width; ++j ) {
-			if( *src ) {
+	BYTE* src = pageBuffer;
+	for (int i = 0; i < height; ++i) {
+		DWORD* dst = (DWORD*)((BYTE*)desc.pBits + desc.Pitch * i);
+		for (int j = 0; j < width; ++j) {
+			if (*src) {
 				BYTE r = TexturePalettes[palIndex][*src].red;
 				BYTE g = TexturePalettes[palIndex][*src].green;
 				BYTE b = TexturePalettes[palIndex][*src].blue;
 				*dst++ = RGBA_MAKE(r, g, b, 0xFF);
-			} else {
+			}
+			else {
 				*dst++ = 0;
 			}
 			++src;
@@ -597,22 +597,22 @@ int AddTexturePage8(int width, int height, BYTE *pageBuffer, int palIndex) {
 	return pageIndex;
 #else // (DIRECT3D_VERSION >= 0x900)
 	int pageIndex;
-	BYTE *src, *dst;
+	BYTE* src, * dst;
 	DDSDESC desc;
 
-	if( palIndex < 0 )
+	if (palIndex < 0)
 		return -1;
 
 	pageIndex = CreateTexturePage(width, height, TexturePalettes[palIndex]);
-	if( pageIndex < 0 )
+	if (pageIndex < 0)
 		return -1;
 
-	if FAILED(WinVidBufferLock(TexturePages[pageIndex].sysMemSurface, &desc, DDLOCK_WRITEONLY|DDLOCK_WAIT))
+	if FAILED(WinVidBufferLock(TexturePages[pageIndex].sysMemSurface, &desc, DDLOCK_WRITEONLY | DDLOCK_WAIT))
 		return -1;
 
 	src = pageBuffer;
-	dst = (BYTE *)desc.lpSurface;
-	for( int i=0; i<height; ++i ) {
+	dst = (BYTE*)desc.lpSurface;
+	for (int i = 0; i < height; ++i) {
 		memcpy(dst, src, width);
 		src += width;
 		dst += desc.lPitch;
@@ -624,23 +624,23 @@ int AddTexturePage8(int width, int height, BYTE *pageBuffer, int palIndex) {
 #endif // (DIRECT3D_VERSION >= 0x900)
 }
 
-int AddTexturePage16(int width, int height, BYTE *pageBuffer) {
+int AddTexturePage16(int width, int height, BYTE* pageBuffer) {
 #if (DIRECT3D_VERSION >= 0x900)
 	int pageIndex = CreateTexturePage(width, height, true);
-	if( pageIndex < 0 )
+	if (pageIndex < 0)
 		return -1;
 
 	DDSDESC desc;
 	if FAILED(TexturePages[pageIndex].texture->LockRect(0, &desc, NULL, 0)) {
 		return -1;
 	}
-	UINT16 *src = (UINT16 *)pageBuffer;
-	for( int i=0; i<height; ++i ) {
-		DWORD *dst = (DWORD *)((BYTE *)desc.pBits + desc.Pitch * i);
-		for( int j=0; j<width; ++j ) {
+	UINT16* src = (UINT16*)pageBuffer;
+	for (int i = 0; i < height; ++i) {
+		DWORD* dst = (DWORD*)((BYTE*)desc.pBits + desc.Pitch * i);
+		for (int j = 0; j < width; ++j) {
 			BYTE r = ((*src >> 7) & 0xF8) | ((*src >> 13) & 0x07);
-			BYTE g = ((*src >> 2) & 0xF8) | ((*src >>  7) & 0x07);
-			BYTE b = ((*src << 3) & 0xF8) | ((*src >>  2) & 0x07);
+			BYTE g = ((*src >> 2) & 0xF8) | ((*src >> 7) & 0x07);
+			BYTE b = ((*src << 3) & 0xF8) | ((*src >> 2) & 0x07);
 			BYTE a = (*src & 0x8000) ? 0xFF : 0;
 			*dst++ = RGBA_MAKE(r, g, b, a);
 			++src;
@@ -652,39 +652,40 @@ int AddTexturePage16(int width, int height, BYTE *pageBuffer) {
 #else // (DIRECT3D_VERSION >= 0x900)
 	int i, j, k;
 	int pageIndex, bytesPerPixel;
-	BYTE *src, *dst, *subdst;
+	BYTE* src, * dst, * subdst;
 	BYTE srcRed, srcGreen, srcBlue, srcAlpha;
 	DWORD compatibleColor;
 	DDSDESC desc;
 
 	pageIndex = CreateTexturePage(width, height, NULL);
-	if( pageIndex < 0 )
+	if (pageIndex < 0)
 		return -1;
 
-	if FAILED(WinVidBufferLock(TexturePages[pageIndex].sysMemSurface, &desc, DDLOCK_WRITEONLY|DDLOCK_WAIT))
+	if FAILED(WinVidBufferLock(TexturePages[pageIndex].sysMemSurface, &desc, DDLOCK_WRITEONLY | DDLOCK_WAIT))
 		return -1;
 
-	if( TexturesHaveCompatibleMasks ) {
-		src = (BYTE *)pageBuffer;
-		dst = (BYTE *)desc.lpSurface;
-		for( i=0; i<height; ++i ) {
-			memcpy(dst, src, width*2);
-			src += width*2;
+	if (TexturesHaveCompatibleMasks) {
+		src = (BYTE*)pageBuffer;
+		dst = (BYTE*)desc.lpSurface;
+		for (i = 0; i < height; ++i) {
+			memcpy(dst, src, width * 2);
+			src += width * 2;
 			dst += desc.lPitch;
 		}
-	} else {
+	}
+	else {
 		src = pageBuffer;
-		dst = (BYTE *)desc.lpSurface;
+		dst = (BYTE*)desc.lpSurface;
 		bytesPerPixel = (TextureFormat.bpp + 7) / 8;
-		for( i=0; i<height; ++i ) {
+		for (i = 0; i < height; ++i) {
 			subdst = dst;
-			for( j=0; j<width; ++j ) {
-				srcRed   = (*(UINT16 *)src >>  7) & 0xF8;
-				srcGreen = (*(UINT16 *)src >>  2) & 0xF8;
-				srcBlue  = (*(UINT16 *)src <<  3) & 0xF8;
-				srcAlpha = (*(UINT16 *)src >> 15) & 1;
+			for (j = 0; j < width; ++j) {
+				srcRed = (*(UINT16*)src >> 7) & 0xF8;
+				srcGreen = (*(UINT16*)src >> 2) & 0xF8;
+				srcBlue = (*(UINT16*)src << 3) & 0xF8;
+				srcAlpha = (*(UINT16*)src >> 15) & 1;
 				compatibleColor = CalculateCompatibleColor(&TextureFormat.colorBitMasks, srcRed, srcGreen, srcBlue, srcAlpha);
-				for( k=0; k<bytesPerPixel; ++k ) {
+				for (k = 0; k < bytesPerPixel; ++k) {
 					*(subdst++) = compatibleColor & 0xFF;
 					compatibleColor >>= 8;
 				}
@@ -703,18 +704,18 @@ int AddTexturePage16(int width, int height, BYTE *pageBuffer) {
 
 #if (DIRECT3D_VERSION >= 0x900)
 // NOTE: this function is not presented in the original game
-int AddTexturePage32(int width, int height, BYTE *pageBuffer, bool alpha) {
+int AddTexturePage32(int width, int height, BYTE* pageBuffer, bool alpha) {
 	int pageIndex = CreateTexturePage(width, height, alpha);
-	if( pageIndex < 0 )
+	if (pageIndex < 0)
 		return -1;
 
 	DDSDESC desc;
 	if FAILED(TexturePages[pageIndex].texture->LockRect(0, &desc, NULL, 0)) {
 		return -1;
 	}
-	DWORD *src = (DWORD *)pageBuffer;
-	for( int i=0; i<height; ++i ) {
-		DWORD *dst = (DWORD *)((BYTE *)desc.pBits + desc.Pitch * i);
+	DWORD* src = (DWORD*)pageBuffer;
+	for (int i = 0; i < height; ++i) {
+		DWORD* dst = (DWORD*)((BYTE*)desc.pBits + desc.Pitch * i);
 		memcpy(dst, src, sizeof(DWORD) * width);
 		src += width;
 	}
@@ -726,13 +727,13 @@ int AddTexturePage32(int width, int height, BYTE *pageBuffer, bool alpha) {
 // NOTE: this function is not presented in the original game
 int AddExternalTexture(LPCTSTR fileName, bool alpha) {
 	int pageIndex = GetFreeTexturePageIndex();
-	if( pageIndex < 0 )
+	if (pageIndex < 0)
 		return -1;
 
 	memset(&TexturePages[pageIndex], 0, sizeof(TEXPAGE_DESC));
 	HRESULT res = D3DXCreateTextureFromFileEx(D3DDev, fileName, D3DX_DEFAULT, D3DX_DEFAULT, 0,
-								0, alpha ? D3DFMT_A8R8G8B8 : D3DFMT_X8R8G8B8, D3DPOOL_MANAGED,
-								D3DX_DEFAULT, D3DX_DEFAULT, 0, NULL, NULL, &TexturePages[pageIndex].texture);
+		0, alpha ? D3DFMT_A8R8G8B8 : D3DFMT_X8R8G8B8, D3DPOOL_MANAGED,
+		D3DX_DEFAULT, D3DX_DEFAULT, 0, NULL, NULL, &TexturePages[pageIndex].texture);
 	if FAILED(res)
 		return -1;
 
@@ -743,7 +744,7 @@ int AddExternalTexture(LPCTSTR fileName, bool alpha) {
 		return -1;
 	}
 
-	TexturePages[pageIndex].status = 1|2;
+	TexturePages[pageIndex].status = 1 | 2;
 	TexturePages[pageIndex].width = desc.Width;
 	TexturePages[pageIndex].height = desc.Height;
 	return pageIndex;
@@ -758,40 +759,41 @@ bool IsExternalTexture(int page) {
 	if (page < 0 || page >= (int)ARRAY_SIZE(TexturePages))
 		return false;
 
-	return CHK_ALL(TexturePages[page].status, 1|2);
+	return CHK_ALL(TexturePages[page].status, 1 | 2);
 }
 
 #else // (DIRECT3D_VERSION >= 0x900)
 HRESULT CALLBACK EnumTextureFormatsCallback(LPDDSDESC lpDdsd, LPVOID lpContext) {
 	LPDDPIXELFORMAT lpDDPixFmt = &lpDdsd->ddpfPixelFormat;
 
-	if( lpDDPixFmt->dwRGBBitCount < 8 )
+	if (lpDDPixFmt->dwRGBBitCount < 8)
 		return D3DENUMRET_OK;
 
-	if( SavedAppSettings.Disable16BitTextures || lpDDPixFmt->dwRGBBitCount < 16 ) {
-		if( CHK_ANY(lpDDPixFmt->dwFlags, DDPF_PALETTEINDEXED8) ) {
+	if (SavedAppSettings.Disable16BitTextures || lpDDPixFmt->dwRGBBitCount < 16) {
+		if (CHK_ANY(lpDDPixFmt->dwFlags, DDPF_PALETTEINDEXED8)) {
 			TextureFormat.pixelFmt = *lpDDPixFmt;
 			TextureFormat.bpp = 8;
 			TexturesAlphaChannel = false;
-			if( SavedAppSettings.Disable16BitTextures ) {
+			if (SavedAppSettings.Disable16BitTextures) {
 				TexturesHaveCompatibleMasks = false;
 				return D3DENUMRET_CANCEL; // NOTE: not presented in the original code
 			}
 		}
-	} else if( CHK_ANY(lpDDPixFmt->dwFlags, DDPF_RGB) ) {
+	}
+	else if (CHK_ANY(lpDDPixFmt->dwFlags, DDPF_RGB)) {
 		TextureFormat.pixelFmt = *lpDDPixFmt;
 		TextureFormat.bpp = 16;
 		TexturesAlphaChannel = CHK_ANY(lpDDPixFmt->dwFlags, DDPF_ALPHAPIXELS);
 		WinVidGetColorBitMasks(&TextureFormat.colorBitMasks, lpDDPixFmt);
-		if( TextureFormat.bpp == 16 &&
-			TextureFormat.colorBitMasks.dwRGBAlphaBitDepth	== 1  &&
-			TextureFormat.colorBitMasks.dwRBitDepth			== 5  &&
-			TextureFormat.colorBitMasks.dwGBitDepth			== 5  &&
-			TextureFormat.colorBitMasks.dwBBitDepth			== 5  &&
-			TextureFormat.colorBitMasks.dwRGBAlphaBitOffset	== 15 &&
-			TextureFormat.colorBitMasks.dwRBitOffset		== 10 &&
-			TextureFormat.colorBitMasks.dwGBitOffset		== 5  &&
-			TextureFormat.colorBitMasks.dwBBitOffset		== 0 )
+		if (TextureFormat.bpp == 16 &&
+			TextureFormat.colorBitMasks.dwRGBAlphaBitDepth == 1 &&
+			TextureFormat.colorBitMasks.dwRBitDepth == 5 &&
+			TextureFormat.colorBitMasks.dwGBitDepth == 5 &&
+			TextureFormat.colorBitMasks.dwBBitDepth == 5 &&
+			TextureFormat.colorBitMasks.dwRGBAlphaBitOffset == 15 &&
+			TextureFormat.colorBitMasks.dwRBitOffset == 10 &&
+			TextureFormat.colorBitMasks.dwGBitOffset == 5 &&
+			TextureFormat.colorBitMasks.dwBBitOffset == 0)
 		{
 			TexturesHaveCompatibleMasks = true;
 			return D3DENUMRET_CANCEL;
@@ -806,7 +808,7 @@ HRESULT EnumerateTextureFormats() {
 	memset(&TextureFormat, 0, sizeof(TEXTURE_FORMAT));
 	HRESULT ret = D3DDev->EnumTextureFormats(EnumTextureFormatsCallback, NULL);
 	// NOTE: there is no such check in the original code
-	if( SavedAppSettings.Disable16BitTextures && TextureFormat.bpp < 8 ) {
+	if (SavedAppSettings.Disable16BitTextures && TextureFormat.bpp < 8) {
 		SavedAppSettings.Disable16BitTextures = false;
 		ret = D3DDev->EnumTextureFormats(EnumTextureFormatsCallback, NULL);
 	}
@@ -816,14 +818,14 @@ HRESULT EnumerateTextureFormats() {
 
 void CleanupTextures() {
 	FreeTexturePages();
-	for( DWORD i=0; i<ARRAY_SIZE(TexturePalettes); ++i ) {
-		if( TexturePalettes[i] != NULL )
+	for (DWORD i = 0; i < ARRAY_SIZE(TexturePalettes); ++i) {
+		if (TexturePalettes[i] != NULL)
 			FreePalette(i);
 	}
 }
 
 bool InitTextures() {
-	memset(TexturePages,  0, sizeof(TexturePages));
+	memset(TexturePages, 0, sizeof(TexturePages));
 	memset(TexturePalettes, 0, sizeof(TexturePalettes));
 	return true;
 }

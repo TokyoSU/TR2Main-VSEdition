@@ -24,25 +24,25 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
-//	0x0042D8F0:		lara_as_climbleft
-//	0x0042D930:		lara_as_climbright
-//	0x0042D970:		lara_as_climbstnc
-//	0x0042D9F0:		lara_as_climbing
-//	0x0042DA10:		lara_as_climbend
-//	0x0042DA30:		lara_as_climbdown
-//	0x0042DA50:		lara_col_climbleft
-//	0x0042DAB0:		lara_col_climbright
-//	0x0042DB10:		lara_col_climbstnc
-//	0x0042DD20:		lara_col_climbing
-//	----------:		lara_col_climbend
-//	0x0042DE70:		lara_col_climbdown
-//	0x0042E010:		LaraCheckForLetGo
-//	0x0042E0C0:		LaraTestClimb
-//	0x0042E330:		LaraTestClimbPos
-//	0x0042E400:		LaraDoClimbLeftRight
-//	0x0042E4F0:		LaraTestClimbUpPos
+ /*
+  * Function list
+  */
+  //	0x0042D8F0:		lara_as_climbleft
+  //	0x0042D930:		lara_as_climbright
+  //	0x0042D970:		lara_as_climbstnc
+  //	0x0042D9F0:		lara_as_climbing
+  //	0x0042DA10:		lara_as_climbend
+  //	0x0042DA30:		lara_as_climbdown
+  //	0x0042DA50:		lara_col_climbleft
+  //	0x0042DAB0:		lara_col_climbright
+  //	0x0042DB10:		lara_col_climbstnc
+  //	0x0042DD20:		lara_col_climbing
+  //	----------:		lara_col_climbend
+  //	0x0042DE70:		lara_col_climbdown
+  //	0x0042E010:		LaraCheckForLetGo
+  //	0x0042E0C0:		LaraTestClimb
+  //	0x0042E330:		LaraTestClimbPos
+  //	0x0042E400:		LaraDoClimbLeftRight
+  //	0x0042E4F0:		LaraTestClimbUpPos
 
 #endif // _H_INCLUDED

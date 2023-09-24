@@ -24,14 +24,14 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
-void SE_ReleaseBitmapResource(BITMAP_RESOURCE *bmpRsrc); // 0x00456FC0
-void SE_LoadBitmapResource(BITMAP_RESOURCE *bmpRsrc, LPCTSTR lpName); // 0x00457000
-void SE_DrawBitmap(BITMAP_RESOURCE *bmpRsrc, HDC hdc, int x, int y); // 0x004570D0
-void SE_UpdateBitmapPalette(BITMAP_RESOURCE *bmpRsrc, HWND hWnd, HWND hSender); // 0x00457140
-void SE_ChangeBitmapPalette(BITMAP_RESOURCE *bmpRsrc, HWND hWnd); // 0x00457160
+ /*
+  * Function list
+  */
+void SE_ReleaseBitmapResource(BITMAP_RESOURCE* bmpRsrc); // 0x00456FC0
+void SE_LoadBitmapResource(BITMAP_RESOURCE* bmpRsrc, LPCTSTR lpName); // 0x00457000
+void SE_DrawBitmap(BITMAP_RESOURCE* bmpRsrc, HDC hdc, int x, int y); // 0x004570D0
+void SE_UpdateBitmapPalette(BITMAP_RESOURCE* bmpRsrc, HWND hWnd, HWND hSender); // 0x00457140
+void SE_ChangeBitmapPalette(BITMAP_RESOURCE* bmpRsrc, HWND hWnd); // 0x00457160
 bool SE_RegisterSetupWindowClass(); // 0x004571C0
 LRESULT CALLBACK SE_SetupWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam); // 0x00457230
 void SE_PassMessageToImage(HWND hWnd, UINT uMsg, WPARAM wParam); // 0x00457470

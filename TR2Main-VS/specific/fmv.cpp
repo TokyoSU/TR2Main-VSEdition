@@ -27,7 +27,7 @@
 #include "specific/sndpc.h"
 #include "global/vars.h"
 
-// GetProcAddress Macro
+ // GetProcAddress Macro
 #define GET_DLL_PROC(dll, proc) { \
 	*(FARPROC *)&(proc) = GetProcAddress((dll), #proc); \
 	if( proc == NULL ) throw #proc; \
@@ -40,32 +40,32 @@
 static HMODULE hEscapePlay = NULL;
 
 // Imports from winplay.dll
-static int (__cdecl *Movie_GetCurrentFrame)(LPVOID);
-static int (__cdecl *Movie_GetFormat)(LPVOID);
-static int (__cdecl *Movie_GetSoundChannels)(LPVOID);
-static int (__cdecl *Movie_GetSoundPrecision)(LPVOID);
-static int (__cdecl *Movie_GetSoundRate)(LPVOID);
-static int (__cdecl *Movie_GetTotalFrames)(LPVOID);
-static int (__cdecl *Movie_GetXSize)(LPVOID);
-static int (__cdecl *Movie_GetYSize)(LPVOID);
-static int (__cdecl *Movie_SetSyncAdjust)(LPVOID, LPVOID, DWORD);
-static int (__cdecl *Player_BlankScreen)(DWORD, DWORD, DWORD, DWORD);
-static int (__cdecl *Player_GetDSErrorCode)();
-static int (__cdecl *Player_InitMovie)(LPVOID, DWORD, DWORD, LPCTSTR, DWORD);
-static int (__cdecl *Player_InitMoviePlayback)(LPVOID, LPVOID, LPVOID);
-static int (__cdecl *Player_InitPlaybackMode)(HWND, LPVOID, DWORD, DWORD);
-static int (__cdecl *Player_InitSound)(LPVOID, DWORD, DWORD, BOOL, DWORD, DWORD, DWORD, DWORD, DWORD);
-static int (__cdecl *Player_InitSoundSystem)(HWND);
-static int (__cdecl *Player_InitVideo)(LPVOID, LPVOID, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD);
-static int (__cdecl *Player_PassInDirectDrawObject)(LPDIRECTDRAW2);
-static int (__cdecl *Player_PlayFrame)(LPVOID, LPVOID, LPVOID, DWORD, LPRECT, DWORD, DWORD, DWORD);
-static int (__cdecl *Player_ReturnPlaybackMode)(BOOL);
-static int (__cdecl *Player_ShutDownMovie)(LPVOID);
-static int (__cdecl *Player_ShutDownSound)(LPVOID);
-static int (__cdecl *Player_ShutDownSoundSystem)();
-static int (__cdecl *Player_ShutDownVideo)(LPVOID);
-static int (__cdecl *Player_StartTimer)(LPVOID);
-static int (__cdecl *Player_StopTimer)(LPVOID);
+static int(__cdecl* Movie_GetCurrentFrame)(LPVOID);
+static int(__cdecl* Movie_GetFormat)(LPVOID);
+static int(__cdecl* Movie_GetSoundChannels)(LPVOID);
+static int(__cdecl* Movie_GetSoundPrecision)(LPVOID);
+static int(__cdecl* Movie_GetSoundRate)(LPVOID);
+static int(__cdecl* Movie_GetTotalFrames)(LPVOID);
+static int(__cdecl* Movie_GetXSize)(LPVOID);
+static int(__cdecl* Movie_GetYSize)(LPVOID);
+static int(__cdecl* Movie_SetSyncAdjust)(LPVOID, LPVOID, DWORD);
+static int(__cdecl* Player_BlankScreen)(DWORD, DWORD, DWORD, DWORD);
+static int(__cdecl* Player_GetDSErrorCode)();
+static int(__cdecl* Player_InitMovie)(LPVOID, DWORD, DWORD, LPCTSTR, DWORD);
+static int(__cdecl* Player_InitMoviePlayback)(LPVOID, LPVOID, LPVOID);
+static int(__cdecl* Player_InitPlaybackMode)(HWND, LPVOID, DWORD, DWORD);
+static int(__cdecl* Player_InitSound)(LPVOID, DWORD, DWORD, BOOL, DWORD, DWORD, DWORD, DWORD, DWORD);
+static int(__cdecl* Player_InitSoundSystem)(HWND);
+static int(__cdecl* Player_InitVideo)(LPVOID, LPVOID, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD);
+static int(__cdecl* Player_PassInDirectDrawObject)(LPDIRECTDRAW2);
+static int(__cdecl* Player_PlayFrame)(LPVOID, LPVOID, LPVOID, DWORD, LPRECT, DWORD, DWORD, DWORD);
+static int(__cdecl* Player_ReturnPlaybackMode)(BOOL);
+static int(__cdecl* Player_ShutDownMovie)(LPVOID);
+static int(__cdecl* Player_ShutDownSound)(LPVOID);
+static int(__cdecl* Player_ShutDownSoundSystem)();
+static int(__cdecl* Player_ShutDownVideo)(LPVOID);
+static int(__cdecl* Player_StartTimer)(LPVOID);
+static int(__cdecl* Player_StopTimer)(LPVOID);
 #endif // (DIRECT3D_VERSION <= 0x500)
 
 #ifdef FEATURE_FFPLAY
@@ -73,9 +73,9 @@ static int (__cdecl *Player_StopTimer)(LPVOID);
 static HMODULE hFFplay = NULL;
 
 // Imports from ffplay.dll
-static int (__stdcall *ffplay_init)(HWND, int, const char*);
-static int (__stdcall *ffplay_play_video)(const char*, int, int, int, int);
-static int (__stdcall *ffplay_cleanup)(void);
+static int(__stdcall* ffplay_init)(HWND, int, const char*);
+static int(__stdcall* ffplay_play_video)(const char*, int, int, int, int);
+static int(__stdcall* ffplay_cleanup)(void);
 
 static const char videoExts[][4] = {
 	"MP4",
@@ -84,12 +84,12 @@ static const char videoExts[][4] = {
 };
 
 static bool FFplayInit() {
-	if( hFFplay != NULL ) {
+	if (hFFplay != NULL) {
 		return true;
 	}
 
 	hFFplay = LoadLibrary(FFPLAY_DLL_NAME);
-	if( hFFplay == NULL ) {
+	if (hFFplay == NULL) {
 		// failed to load DLL
 		return false;
 	}
@@ -98,14 +98,15 @@ static bool FFplayInit() {
 		GET_DLL_PROC(hFFplay, ffplay_init);
 		GET_DLL_PROC(hFFplay, ffplay_play_video);
 		GET_DLL_PROC(hFFplay, ffplay_cleanup);
-	} catch (LPCTSTR procName) {
+	}
+	catch (LPCTSTR procName) {
 		// failed to load one of the procs
 		FreeLibrary(hFFplay);
 		hFFplay = NULL;
 		return false;
 	}
 
-	if( 0 != ffplay_init(HGameWindow, 2, "winmm") ) {
+	if (0 != ffplay_init(HGameWindow, 2, "winmm")) {
 		// failed to init FFplay
 		FreeLibrary(hFFplay);
 		hFFplay = NULL;
@@ -116,7 +117,7 @@ static bool FFplayInit() {
 }
 
 void FFplayCleanup() {
-	if( hFFplay != NULL ) {
+	if (hFFplay != NULL) {
 		ffplay_cleanup();
 		FreeLibrary(hFFplay);
 		hFFplay = NULL;
@@ -126,19 +127,19 @@ void FFplayCleanup() {
 
 bool FMV_Init() {
 #ifdef FEATURE_FFPLAY
-	if( FFplayInit() ) {
+	if (FFplayInit()) {
 		return true;
 	}
 #endif // FEATURE_FFPLAY
 #if (DIRECT3D_VERSION > 0x500)
 	return false;
 #else // (DIRECT3D_VERSION > 0x500)
-	if( hEscapePlay != NULL ) {
+	if (hEscapePlay != NULL) {
 		return true;
 	}
 
 	hEscapePlay = LoadLibrary(ESCAPE_DLL_NAME);
-	if( hEscapePlay == NULL ) {
+	if (hEscapePlay == NULL) {
 		// failed to load DLL
 		return false;
 	}
@@ -170,7 +171,8 @@ bool FMV_Init() {
 		GET_DLL_PROC(hEscapePlay, Player_ShutDownVideo);
 		GET_DLL_PROC(hEscapePlay, Player_StartTimer);
 		GET_DLL_PROC(hEscapePlay, Player_StopTimer);
-	} catch (LPCTSTR procName) {
+	}
+	catch (LPCTSTR procName) {
 		// failed to load one of the procs
 		FreeLibrary(hEscapePlay);
 		hEscapePlay = NULL;
@@ -186,7 +188,7 @@ void FMV_Cleanup() {
 	FFplayCleanup();
 #endif // FEATURE_FFPLAY
 #if (DIRECT3D_VERSION <= 0x500)
-	if( hEscapePlay != NULL ) {
+	if (hEscapePlay != NULL) {
 		FreeLibrary(hEscapePlay);
 		hEscapePlay = NULL;
 	}
@@ -196,7 +198,7 @@ void FMV_Cleanup() {
 bool PlayFMV(LPCTSTR fileName) {
 	LPCTSTR fullPath;
 
-	if( SavedAppSettings.DisableFMV )
+	if (SavedAppSettings.DisableFMV)
 		return IsGameToExit;
 
 	S_CDStop();
@@ -209,7 +211,7 @@ bool PlayFMV(LPCTSTR fileName) {
 	WinStopFMV(true);
 
 	IsFmvPlaying = FALSE;
-	if( !IsGameToExit )
+	if (!IsGameToExit)
 		FmvBackToGame();
 	ShowCursor(TRUE);
 
@@ -218,19 +220,19 @@ bool PlayFMV(LPCTSTR fileName) {
 
 void WinPlayFMV(LPCTSTR fileName, bool isPlayback) {
 #ifdef FEATURE_FFPLAY
-	if( hFFplay != NULL ) {
-		char extFileName[256] = {0};
-		char *extension;
+	if (hFFplay != NULL) {
+		char extFileName[256] = { 0 };
+		char* extension;
 
-		strncpy(extFileName, fileName, sizeof(extFileName)-1);
+		strncpy(extFileName, fileName, sizeof(extFileName) - 1);
 		extension = PathFindExtension(extFileName);
-		if( extension == NULL ) {
+		if (extension == NULL) {
 			extension = strchr(extFileName, 0);
 			*extension = '.';
 		}
-		for( unsigned int i = 0; i < sizeof(videoExts)/4; ++i ) {
+		for (unsigned int i = 0; i < sizeof(videoExts) / 4; ++i) {
 			memcpy(extension + 1, videoExts[i], 4);
-			if( INVALID_FILE_ATTRIBUTES != GetFileAttributes(extFileName) ) {
+			if (INVALID_FILE_ATTRIBUTES != GetFileAttributes(extFileName)) {
 				ffplay_play_video(extFileName, 0, 0, 0, 100);
 				return;
 			}
@@ -243,15 +245,15 @@ void WinPlayFMV(LPCTSTR fileName, bool isPlayback) {
 	int xSize, ySize, xOffset, yOffset;
 	int soundPrecision, soundRate, soundChannels, soundFormat;
 	bool isUncompressed;
-	RECT rect = {0, 0, 640, 480};
+	RECT rect = { 0, 0, 640, 480 };
 
-	if( hEscapePlay == NULL ) {
+	if (hEscapePlay == NULL) {
 		return;
 	}
 
-	if( 0 != Player_PassInDirectDrawObject(DDraw) ||
+	if (0 != Player_PassInDirectDrawObject(DDraw) ||
 		0 != Player_InitMovie(&MovieContext, 0, 0, fileName, 0x200000) ||
-		130 != Movie_GetFormat(MovieContext) )
+		130 != Movie_GetFormat(MovieContext))
 	{
 		return;
 	}
@@ -261,16 +263,16 @@ void WinPlayFMV(LPCTSTR fileName, bool isPlayback) {
 	xOffset = 320 - xSize;
 	yOffset = 240 - ySize;
 
-	if( 0 != Player_InitVideo(&FmvContext, MovieContext, xSize, ySize, xOffset, yOffset, 0, 0, 640, 480, 0, 1, 13) ||
-		(isPlayback && 0 != Player_InitPlaybackMode(HGameWindow, FmvContext, 1, 0)) )
+	if (0 != Player_InitVideo(&FmvContext, MovieContext, xSize, ySize, xOffset, yOffset, 0, 0, 640, 480, 0, 1, 13) ||
+		(isPlayback && 0 != Player_InitPlaybackMode(HGameWindow, FmvContext, 1, 0)))
 	{
 		return;
 	}
 
 	Player_BlankScreen(rect.left, rect.top, rect.right, rect.bottom);
 
-	if( 0 != Player_InitSoundSystem(HGameWindow) ||
-		Player_GetDSErrorCode() < 0 )
+	if (0 != Player_InitSoundSystem(HGameWindow) ||
+		Player_GetDSErrorCode() < 0)
 	{
 		return;
 	}
@@ -278,15 +280,15 @@ void WinPlayFMV(LPCTSTR fileName, bool isPlayback) {
 	soundPrecision = Movie_GetSoundPrecision(MovieContext);
 	soundRate = Movie_GetSoundRate(MovieContext);
 	soundChannels = Movie_GetSoundChannels(MovieContext);
-	isUncompressed = ( soundPrecision != 4 );
+	isUncompressed = (soundPrecision != 4);
 	soundFormat = isUncompressed ? 1 : 4;
-	if( 0 != Player_InitSound(&FmvSoundContext, 16384, soundFormat, isUncompressed, 4096, soundChannels, soundRate, soundPrecision, 2) ) {
+	if (0 != Player_InitSound(&FmvSoundContext, 16384, soundFormat, isUncompressed, 4096, soundChannels, soundRate, soundPrecision, 2)) {
 		return;
 	}
 
 	Movie_SetSyncAdjust(MovieContext, FmvSoundContext, 4);
 
-	if( 0 != Player_InitMoviePlayback(MovieContext, FmvContext, FmvSoundContext) ) {
+	if (0 != Player_InitMoviePlayback(MovieContext, FmvContext, FmvSoundContext)) {
 		return;
 	}
 
@@ -295,10 +297,10 @@ void WinPlayFMV(LPCTSTR fileName, bool isPlayback) {
 	Player_BlankScreen(rect.left, rect.top, rect.right, rect.bottom);
 	S_UpdateInput(); // NOTE: should use WinVidSpinMessageLoop(false) instead
 
-	while( Movie_GetCurrentFrame(MovieContext) < Movie_GetTotalFrames(MovieContext) ) {
-		if( 0 != Player_PlayFrame(MovieContext, FmvContext, FmvSoundContext, 0, &rect, 0, 0, 0) )
+	while (Movie_GetCurrentFrame(MovieContext) < Movie_GetTotalFrames(MovieContext)) {
+		if (0 != Player_PlayFrame(MovieContext, FmvContext, FmvSoundContext, 0, &rect, 0, 0, 0))
 			return;
-		if( S_UpdateInput() || CHK_ANY(InputStatus, IN_OPTION) )
+		if (S_UpdateInput() || CHK_ANY(InputStatus, IN_OPTION))
 			break;
 	}
 #endif // (DIRECT3D_VERSION <= 0x500)
@@ -306,7 +308,7 @@ void WinPlayFMV(LPCTSTR fileName, bool isPlayback) {
 
 void WinStopFMV(bool isPlayback) {
 #if (DIRECT3D_VERSION <= 0x500)
-	if( hEscapePlay == NULL ) {
+	if (hEscapePlay == NULL) {
 		return;
 	}
 	Player_StopTimer(MovieContext);
@@ -314,7 +316,7 @@ void WinStopFMV(bool isPlayback) {
 	Player_ShutDownVideo(&FmvContext);
 	Player_ShutDownMovie(&MovieContext);
 	Player_ShutDownSoundSystem();
-	if( isPlayback ) {
+	if (isPlayback) {
 		Player_ReturnPlaybackMode(isPlayback);
 	}
 #endif // (DIRECT3D_VERSION <= 0x500)
@@ -323,7 +325,7 @@ void WinStopFMV(bool isPlayback) {
 bool IntroFMV(LPCTSTR fileName1, LPCTSTR fileName2) {
 	LPCTSTR fullPath;
 
-	if( SavedAppSettings.DisableFMV )
+	if (SavedAppSettings.DisableFMV)
 		return IsGameToExit;
 
 	ShowCursor(FALSE);
@@ -339,7 +341,7 @@ bool IntroFMV(LPCTSTR fileName1, LPCTSTR fileName2) {
 	WinStopFMV(true);
 
 	IsFmvPlaying = FALSE;
-	if( !IsGameToExit )
+	if (!IsGameToExit)
 		FmvBackToGame();
 	ShowCursor(TRUE);
 

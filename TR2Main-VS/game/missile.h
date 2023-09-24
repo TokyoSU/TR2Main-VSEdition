@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 
 void ControlMissile(__int16 fxID); // 0x00433090
 

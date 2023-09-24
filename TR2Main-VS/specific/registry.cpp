@@ -27,24 +27,25 @@ static const BYTE GuidMask[] = { '{',3,2,1,0,'-',5,4,'-',7,6,'-',8,9,10,11,12,13
 static const char HexChars[] = "0123456789ABCDEF";
 
 static inline BYTE HexChar(char c) {
-	if( c>='0' && c<='9' )
-		return c-'0';
-	if( c>='A' && c<='F' )
-		return c-'A'+10;
-	if( c>='a' && c<='f' )
-		return c-'a'+10;
+	if (c >= '0' && c <= '9')
+		return c - '0';
+	if (c >= 'A' && c <= 'F')
+		return c - 'A' + 10;
+	if (c >= 'a' && c <= 'f')
+		return c - 'a' + 10;
 	return 0xFF;
 }
 
-LPCTSTR GuidBinaryToString(GUID *guid) {
+LPCTSTR GuidBinaryToString(GUID* guid) {
 	static char guidStringBuffer[GUID_STRING_SIZE];
 	LPTSTR strPtr = guidStringBuffer;
 
-	for( DWORD i=0; i<sizeof(GuidMask); ++i ) {
-		if( GuidMask[i] >= 16 ) {
+	for (DWORD i = 0; i < sizeof(GuidMask); ++i) {
+		if (GuidMask[i] >= 16) {
 			*(strPtr++) = GuidMask[i];
-		} else {
-			BYTE code = ((BYTE *)guid)[GuidMask[i]];
+		}
+		else {
+			BYTE code = ((BYTE*)guid)[GuidMask[i]];
 			*(strPtr++) = HexChars[code >> 4];
 			*(strPtr++) = HexChars[code & 0xF];
 		}
@@ -53,29 +54,30 @@ LPCTSTR GuidBinaryToString(GUID *guid) {
 	return guidStringBuffer;
 }
 
-bool GuidStringToBinary(LPCTSTR lpString, GUID *guid) {
-	for( DWORD i=0; i<sizeof(GuidMask); ++i ) {
-		if( GuidMask[i] >= 16 ) {
-			if( *(lpString++) != GuidMask[i] )
+bool GuidStringToBinary(LPCTSTR lpString, GUID* guid) {
+	for (DWORD i = 0; i < sizeof(GuidMask); ++i) {
+		if (GuidMask[i] >= 16) {
+			if (*(lpString++) != GuidMask[i])
 				return false;
-		} else {
+		}
+		else {
 			BYTE hex1 = HexChar(*(lpString++));
 			BYTE hex2 = HexChar(*(lpString++));
-			if( hex1 >= 16 || hex2 >= 16 )
+			if (hex1 >= 16 || hex2 >= 16)
 				return false;
 
-			((BYTE *)guid)[GuidMask[i]] = (hex1 << 4)|(hex2 & 0xF);
+			((BYTE*)guid)[GuidMask[i]] = (hex1 << 4) | (hex2 & 0xF);
 		}
 	}
-	return ( *lpString == 0 ); // check if the string ends with zero
+	return (*lpString == 0); // check if the string ends with zero
 }
 
 BOOL OpenRegistryKey(LPCTSTR lpSubKey) {
-	return ( ERROR_SUCCESS == RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &HKey, &RegKeyDisposition) );
+	return (ERROR_SUCCESS == RegCreateKeyEx(HKEY_CURRENT_USER, lpSubKey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &HKey, &RegKeyDisposition));
 }
 
 bool IsNewRegistryKeyCreated() {
-	return ( RegKeyDisposition == REG_CREATED_NEW_KEY );
+	return (RegKeyDisposition == REG_CREATED_NEW_KEY);
 }
 
 LONG CloseRegistryKey() {
@@ -83,12 +85,12 @@ LONG CloseRegistryKey() {
 }
 
 LONG SetRegistryDwordValue(LPCTSTR lpValueName, DWORD value) {
-	return RegSetValueEx(HKey, lpValueName, 0, REG_DWORD, (const BYTE *)&value, sizeof(DWORD));
+	return RegSetValueEx(HKey, lpValueName, 0, REG_DWORD, (const BYTE*)&value, sizeof(DWORD));
 }
 
 LONG SetRegistryBoolValue(LPCTSTR lpValueName, bool value) {
 	DWORD dwValue = value;
-	return RegSetValueEx(HKey, lpValueName, 0, REG_DWORD, (const BYTE *)&dwValue, sizeof(DWORD));
+	return RegSetValueEx(HKey, lpValueName, 0, REG_DWORD, (const BYTE*)&dwValue, sizeof(DWORD));
 }
 
 LONG SetRegistryFloatValue(LPCTSTR lpValueName, double value) {
@@ -100,32 +102,32 @@ LONG SetRegistryFloatValue(LPCTSTR lpValueName, double value) {
 }
 
 LONG SetRegistryBinaryValue(LPCTSTR lpValueName, LPBYTE value, DWORD valueSize) {
-	if( value != NULL )
+	if (value != NULL)
 		return RegSetValueEx(HKey, lpValueName, 0, REG_BINARY, value, valueSize);
 	else
 		return RegDeleteValue(HKey, lpValueName);
 }
 
 LONG SetRegistryStringValue(LPCTSTR lpValueName, LPCTSTR value, int length) {
-	if( value == NULL )
+	if (value == NULL)
 		return RegDeleteValue(HKey, lpValueName);
 
-	if( length < 0 )
+	if (length < 0)
 		length = lstrlen(value);
 
-	return RegSetValueEx(HKey, lpValueName, 0, REG_SZ, (const BYTE *)value, length+1);
+	return RegSetValueEx(HKey, lpValueName, 0, REG_SZ, (const BYTE*)value, length + 1);
 }
 
 LONG DeleteRegistryValue(LPCTSTR lpValueName) {
 	return RegDeleteValue(HKey, lpValueName);
 }
 
-bool GetRegistryDwordValue(LPCTSTR lpValueName, DWORD *pValue, DWORD defaultValue) {
+bool GetRegistryDwordValue(LPCTSTR lpValueName, DWORD* pValue, DWORD defaultValue) {
 	DWORD dwType;
 	DWORD dwSize = sizeof(DWORD);
 
-	if( ERROR_SUCCESS == RegQueryValueEx(HKey, lpValueName, 0, &dwType, (LPBYTE)pValue, &dwSize) &&
-		dwType == REG_DWORD && dwSize == sizeof(DWORD) )
+	if (ERROR_SUCCESS == RegQueryValueEx(HKey, lpValueName, 0, &dwType, (LPBYTE)pValue, &dwSize) &&
+		dwType == REG_DWORD && dwSize == sizeof(DWORD))
 	{
 		return true;
 	}
@@ -135,12 +137,12 @@ bool GetRegistryDwordValue(LPCTSTR lpValueName, DWORD *pValue, DWORD defaultValu
 	return false;
 }
 
-bool GetRegistryBoolValue(LPCTSTR lpValueName, bool *pValue, bool defaultValue) {
+bool GetRegistryBoolValue(LPCTSTR lpValueName, bool* pValue, bool defaultValue) {
 	DWORD dwType, dwValue;
 	DWORD dwSize = sizeof(DWORD);
 
-	if( ERROR_SUCCESS == RegQueryValueEx(HKey, lpValueName, 0, &dwType, (LPBYTE)&dwValue, &dwSize) &&
-		dwType == REG_DWORD && dwSize == sizeof(DWORD) )
+	if (ERROR_SUCCESS == RegQueryValueEx(HKey, lpValueName, 0, &dwType, (LPBYTE)&dwValue, &dwSize) &&
+		dwType == REG_DWORD && dwSize == sizeof(DWORD))
 	{
 		*pValue = dwValue ? true : false;
 		return true;
@@ -151,10 +153,10 @@ bool GetRegistryBoolValue(LPCTSTR lpValueName, bool *pValue, bool defaultValue) 
 	return false;
 }
 
-bool GetRegistryFloatValue(LPCTSTR lpValueName, double *value, double defaultValue) {
+bool GetRegistryFloatValue(LPCTSTR lpValueName, double* value, double defaultValue) {
 	char stringBuf[64];
 
-	if( GetRegistryStringValue(lpValueName, stringBuf, sizeof(stringBuf), NULL) ) {
+	if (GetRegistryStringValue(lpValueName, stringBuf, sizeof(stringBuf), NULL)) {
 		*value = atof(stringBuf);
 		return true;
 	}
@@ -168,13 +170,13 @@ bool GetRegistryBinaryValue(LPCTSTR lpValueName, LPBYTE value, DWORD valueSize, 
 	DWORD dwType;
 	DWORD dwSize = valueSize;
 
-	if( ERROR_SUCCESS == RegQueryValueEx(HKey, lpValueName, 0, &dwType, value, &dwSize) &&
-		dwType == REG_BINARY && dwSize == valueSize )
+	if (ERROR_SUCCESS == RegQueryValueEx(HKey, lpValueName, 0, &dwType, value, &dwSize) &&
+		dwType == REG_BINARY && dwSize == valueSize)
 	{
 		return true;
 	}
 
-	if( defaultValue != NULL )
+	if (defaultValue != NULL)
 		SetRegistryBinaryValue(lpValueName, defaultValue, valueSize);
 	else
 		RegDeleteValue(HKey, lpValueName);
@@ -186,41 +188,43 @@ bool GetRegistryStringValue(LPCTSTR lpValueName, LPTSTR value, DWORD maxSize, LP
 	DWORD dwType;
 	DWORD dwSize = maxSize;
 
-	if( ERROR_SUCCESS == RegQueryValueEx(HKey, lpValueName, 0, &dwType, (LPBYTE)value, &dwSize) &&
-		dwType == REG_SZ )
+	if (ERROR_SUCCESS == RegQueryValueEx(HKey, lpValueName, 0, &dwType, (LPBYTE)value, &dwSize) &&
+		dwType == REG_SZ)
 	{
 		return true;
 	}
 
-	if( defaultValue != NULL ) {
+	if (defaultValue != NULL) {
 		SetRegistryStringValue(lpValueName, defaultValue, -1);
 		dwSize = lstrlen(defaultValue) + 1;
-		if( dwSize > maxSize ) {
-			dwSize = maxSize-1;
+		if (dwSize > maxSize) {
+			dwSize = maxSize - 1;
 			value[dwSize] = 0;
 		}
 		memcpy(value, defaultValue, dwSize);
-	} else {
+	}
+	else {
 		RegDeleteValue(HKey, lpValueName);
 	}
 	return false;
 }
 
-bool GetRegistryGuidValue(LPCTSTR lpValueName, GUID *value, GUID *defaultValue) {
+bool GetRegistryGuidValue(LPCTSTR lpValueName, GUID* value, GUID* defaultValue) {
 	LPCTSTR guidString;
 	char guidStringBuffer[GUID_STRING_SIZE];
 
-	if( GetRegistryStringValue(lpValueName, guidStringBuffer, GUID_STRING_SIZE, NULL) &&
-		GuidStringToBinary(guidStringBuffer, value) )
+	if (GetRegistryStringValue(lpValueName, guidStringBuffer, GUID_STRING_SIZE, NULL) &&
+		GuidStringToBinary(guidStringBuffer, value))
 	{
 		return true;
 	}
 
-	if( defaultValue != NULL ) {
+	if (defaultValue != NULL) {
 		guidString = GuidBinaryToString(defaultValue);
-		SetRegistryStringValue(lpValueName, guidString, GUID_STRING_SIZE-1);
+		SetRegistryStringValue(lpValueName, guidString, GUID_STRING_SIZE - 1);
 		*value = *defaultValue;
-	} else {
+	}
+	else {
 		RegDeleteValue(HKey, lpValueName);
 	}
 

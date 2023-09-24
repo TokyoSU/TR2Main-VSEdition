@@ -27,7 +27,7 @@
 #include "global/vars.h"
 #include <time.h>
 
-// related to GAMEALLOC_BUFFER enum
+ // related to GAMEALLOC_BUFFER enum
 static LPCTSTR BufferNames[] = {
 	"Temp Alloc",
 	"Texture Pages",
@@ -94,7 +94,7 @@ BOOL S_InitialiseSystem() {
 }
 
 void ShutdownGame() {
-	if( GameMemoryPointer != NULL ) {
+	if (GameMemoryPointer != NULL) {
 		GlobalFree(GameMemoryPointer);
 		GameMemoryPointer = NULL;
 	}
@@ -106,15 +106,15 @@ void init_game_malloc() {
 	GameAllocMemUsed = 0;
 }
 
-void *__cdecl game_malloc(DWORD allocSize, DWORD bufIndex) {
+void* __cdecl game_malloc(DWORD allocSize, DWORD bufIndex) {
 	DWORD alignedSize = (allocSize + 3) & ~3;
-	if( alignedSize > GameAllocMemFree ) {
+	if (alignedSize > GameAllocMemFree) {
 		wsprintf(StringToShow, "game_malloc(): OUT OF MEMORY %s %d", BufferNames[bufIndex], alignedSize);
 		S_ExitSystem(StringToShow);
 		return NULL; // the app is terminated here
 	}
 
-	void *result = GameAllocMemPointer;
+	void* result = GameAllocMemPointer;
 	GameAllocMemFree -= alignedSize;
 	GameAllocMemUsed += alignedSize;
 	GameAllocMemPointer += alignedSize;
@@ -131,19 +131,19 @@ void game_free(DWORD freeSize) {
 
 void CalculateWibbleTable() {
 	// This function calculates water effect tables
-	for( int i=0; i < WIBBLE_SIZE; ++i ) {
+	for (int i = 0; i < WIBBLE_SIZE; ++i) {
 		int sine = phd_sin(i * PHD_360 / WIBBLE_SIZE); // 360 degrees divided by wibble number
 		WibbleTable[i] = sine * MAX_WIBBLE >> W2V_SHIFT;
-		ShadesTable[i] = sine * MAX_SHADE  >> W2V_SHIFT;
+		ShadesTable[i] = sine * MAX_SHADE >> W2V_SHIFT;
 		RandomTable[i] = (GetRandomDraw() >> 5) - 0x01FF;
-		for( int j=0; j < WIBBLE_SIZE; ++j )
-			RoomLightTables[i].table[j] = (j - (WIBBLE_SIZE/2)) * i * MAX_ROOMLIGHT_UNIT / (WIBBLE_SIZE-1);
+		for (int j = 0; j < WIBBLE_SIZE; ++j)
+			RoomLightTables[i].table[j] = (j - (WIBBLE_SIZE / 2)) * i * MAX_ROOMLIGHT_UNIT / (WIBBLE_SIZE - 1);
 	}
 }
 
 void S_SeedRandom() {
 	time_t t = time(NULL);
-	struct tm *ltm = localtime(&t);
+	struct tm* ltm = localtime(&t);
 
 	SeedRandomControl(ltm->tm_sec + 57 * ltm->tm_min + 3543 * ltm->tm_hour);
 	SeedRandomDraw(ltm->tm_sec + 43 * ltm->tm_min + 3477 * ltm->tm_hour);

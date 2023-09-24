@@ -25,9 +25,9 @@
 #include "global/types.h"
 #define DEFAULT_JOYSTICK_LED_COLOR (0x303030)
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 void JoyOutputReset();
 void JoyVibrationMute();
 void JoyVibrate(int acc, int lev, int sus, int dec, int len, bool isCamera);

@@ -43,12 +43,12 @@ bool IsJoyLedColorSupported();
 bool DInputCreate(); // 0x004472A0
 void DInputRelease(); // 0x004472D0
 void WinInReadKeyboard(LPVOID lpInputData); // 0x004472F0
-DWORD WinInReadJoystick(int *xPos, int *yPos); // 0x00447350
+DWORD WinInReadJoystick(int* xPos, int* yPos); // 0x00447350
 bool WinInputInit(); // 0x00447460
-bool DInputEnumDevices(JOYSTICK_LIST *joystickList); // 0x004474E0
+bool DInputEnumDevices(JOYSTICK_LIST* joystickList); // 0x004474E0
 BOOL CALLBACK DInputEnumDevicesCallback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef); // 0x00447510
-void FlaggedStringCreate(STRING_FLAGGED *item, DWORD dwSize); // 0x00447600
-JOYSTICK_NODE *__cdecl GetJoystick(GUID *lpGuid); // 0x00447620
+void FlaggedStringCreate(STRING_FLAGGED* item, DWORD dwSize); // 0x00447600
+JOYSTICK_NODE* __cdecl GetJoystick(GUID* lpGuid); // 0x00447620
 void DInputKeyboardCreate(); // 0x00447670
 void DInputKeyboardRelease(); // 0x00447740
 bool DInputJoystickCreate(); // 0x00447770

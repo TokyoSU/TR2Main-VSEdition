@@ -26,7 +26,7 @@
 
 using namespace Gdiplus;
 
-static const WCHAR *GDI_Encoders[] = {
+static const WCHAR* GDI_Encoders[] = {
 	L"image/bmp",
 	L"image/jpeg",
 	L"image/png",
@@ -34,20 +34,20 @@ static const WCHAR *GDI_Encoders[] = {
 
 static ULONG_PTR GDI_Token = 0;
 
-static int GetEncoderClsid(const WCHAR *format, CLSID *pClsid) {
+static int GetEncoderClsid(const WCHAR* format, CLSID* pClsid) {
 	unsigned int num = 0, nSize = 0;
 	GetImageEncodersSize(&num, &nSize);
-	if( nSize == 0 ) {
+	if (nSize == 0) {
 		return -1;
 	}
-	ImageCodecInfo *pImageCodecInfo = (ImageCodecInfo *)malloc(nSize);
-	if( pImageCodecInfo == NULL ) {
+	ImageCodecInfo* pImageCodecInfo = (ImageCodecInfo*)malloc(nSize);
+	if (pImageCodecInfo == NULL) {
 		return -1;
 	}
 	GetImageEncoders(num, nSize, pImageCodecInfo);
 
-	for( DWORD j = 0; j < num; ++j) {
-		if(wcscmp(pImageCodecInfo[j].MimeType, format) == 0) {
+	for (DWORD j = 0; j < num; ++j) {
+		if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0) {
 			*pClsid = pImageCodecInfo[j].Clsid;
 			free(pImageCodecInfo);
 			return j;
@@ -57,20 +57,20 @@ static int GetEncoderClsid(const WCHAR *format, CLSID *pClsid) {
 	return -1;
 }
 
-HBITMAP CreateBitmapFromDC(HDC dc, RECT *rect, LPVOID *lpBits, PALETTEENTRY *pal) {
-	if( dc == NULL || rect == NULL || lpBits == NULL ) {
+HBITMAP CreateBitmapFromDC(HDC dc, RECT* rect, LPVOID* lpBits, PALETTEENTRY* pal) {
+	if (dc == NULL || rect == NULL || lpBits == NULL) {
 		return NULL; // wrong parameters
 	}
 
 	WORD nBPP = GetDeviceCaps(dc, BITSPIXEL);
-	int width  = ABS(rect->right  - rect->left);
+	int width = ABS(rect->right - rect->left);
 	int height = ABS(rect->bottom - rect->top);
 
 	HDC hdcDestination = CreateCompatibleDC(dc);
 	DWORD infoSize = sizeof(BITMAPINFOHEADER) + 256 * sizeof(RGBQUAD);
-	BITMAPINFO *info = (BITMAPINFO *)malloc(infoSize);
+	BITMAPINFO* info = (BITMAPINFO*)malloc(infoSize);
 
-	if( info == NULL ) {
+	if (info == NULL) {
 		DeleteDC(hdcDestination);
 		return NULL; // failed to create bitmap info
 	}
@@ -83,18 +83,18 @@ HBITMAP CreateBitmapFromDC(HDC dc, RECT *rect, LPVOID *lpBits, PALETTEENTRY *pal
 	info->bmiHeader.biBitCount = nBPP;
 	info->bmiHeader.biCompression = BI_RGB;
 
-	if( pal != NULL ) {
-		for( int i = 0; i < 256; ++i ) {
-			info->bmiColors[i].rgbRed   = pal[i].peRed;
+	if (pal != NULL) {
+		for (int i = 0; i < 256; ++i) {
+			info->bmiColors[i].rgbRed = pal[i].peRed;
 			info->bmiColors[i].rgbGreen = pal[i].peGreen;
-			info->bmiColors[i].rgbBlue  = pal[i].peBlue;
+			info->bmiColors[i].rgbBlue = pal[i].peBlue;
 		}
 	}
 
 	HBITMAP hbmDestination = CreateDIBSection(dc, info, DIB_RGB_COLORS, lpBits, NULL, 0);
 	free(info);
 
-	if( hbmDestination == NULL ) {
+	if (hbmDestination == NULL) {
 		DeleteDC(hdcDestination);
 		return NULL; // failed to create bitmap
 	}
@@ -109,42 +109,42 @@ HBITMAP CreateBitmapFromDC(HDC dc, RECT *rect, LPVOID *lpBits, PALETTEENTRY *pal
 }
 
 bool GDI_Init() {
-	if( !GDI_Token ) {
+	if (!GDI_Token) {
 		GdiplusStartupInput gdiplusStartupInput;
 		GdiplusStartup(&GDI_Token, &gdiplusStartupInput, NULL);
 	}
-	return ( GDI_Token != 0 );
+	return (GDI_Token != 0);
 }
 
 void GDI_Cleanup() {
-	if( GDI_Token ) {
+	if (GDI_Token) {
 		GdiplusShutdown(GDI_Token);
 		GDI_Token = 0;
 	}
 }
 
 int GDI_SaveImageFile(LPCSTR filename, GDI_FILEFMT format, DWORD quality, HBITMAP hbmBitmap) {
-	if( filename == NULL || !*filename || hbmBitmap == NULL ) {
+	if (filename == NULL || !*filename || hbmBitmap == NULL) {
 		return -1; // wrong parameters
 	}
 
-	if( format < 0 || format >= ARRAY_SIZE(GDI_Encoders) ) {
+	if (format < 0 || format >= ARRAY_SIZE(GDI_Encoders)) {
 		return -1; // wrong format
 	}
 
 	Status status = Ok;
 
 	CLSID imageCLSID;
-	Bitmap *gdi_bitmap = new Bitmap(hbmBitmap, (HPALETTE)NULL);
-	if( gdi_bitmap == NULL ) {
+	Bitmap* gdi_bitmap = new Bitmap(hbmBitmap, (HPALETTE)NULL);
+	if (gdi_bitmap == NULL) {
 		return -1;
 	}
 
 	EncoderParameters encoderParams;
 	encoderParams.Count = 1;
 	encoderParams.Parameter[0].NumberOfValues = 1;
-	encoderParams.Parameter[0].Guid  = EncoderQuality;
-	encoderParams.Parameter[0].Type  = EncoderParameterValueTypeLong;
+	encoderParams.Parameter[0].Guid = EncoderQuality;
+	encoderParams.Parameter[0].Type = EncoderParameterValueTypeLong;
 	encoderParams.Parameter[0].Value = &quality;
 	GetEncoderClsid(GDI_Encoders[format], &imageCLSID);
 
@@ -152,8 +152,8 @@ int GDI_SaveImageFile(LPCSTR filename, GDI_FILEFMT format, DWORD quality, HBITMA
 	status = gdi_bitmap->Save(filename, &imageCLSID, &encoderParams);
 #else // !UNICODE
 	{
-		WCHAR wc_fname[MAX_PATH] = {0};
-		if( !MultiByteToWideChar(CP_ACP, 0, filename, strlen(filename), wc_fname, MAX_PATH) ) {
+		WCHAR wc_fname[MAX_PATH] = { 0 };
+		if (!MultiByteToWideChar(CP_ACP, 0, filename, strlen(filename), wc_fname, MAX_PATH)) {
 			delete gdi_bitmap;
 			return -1;
 		}
@@ -162,44 +162,43 @@ int GDI_SaveImageFile(LPCSTR filename, GDI_FILEFMT format, DWORD quality, HBITMA
 #endif // UNICODE
 
 	delete gdi_bitmap;
-	return ( status == Ok ) ? 0 : -1;
+	return (status == Ok) ? 0 : -1;
 }
 
-
-int GDI_LoadImageFile(LPCSTR filename, BYTE **bmPtr, DWORD *width, DWORD *height, DWORD bpp) {
-	if( filename == NULL || !*filename || bmPtr == NULL || width == NULL || height == NULL ) {
+int GDI_LoadImageFile(LPCSTR filename, BYTE** bmPtr, DWORD* width, DWORD* height, DWORD bpp) {
+	if (filename == NULL || !*filename || bmPtr == NULL || width == NULL || height == NULL) {
 		return -1; // wrong parameters
 	}
 
 	DWORD i;
 	int result = 0;
 	DWORD bmSize = 0;
-	BYTE *src = NULL;
-	BYTE *dst = NULL;
-	Bitmap *gdi_bitmap = NULL;
+	BYTE* src = NULL;
+	BYTE* dst = NULL;
+	Bitmap* gdi_bitmap = NULL;
 	BitmapData bmData;
 	Status status;
 	PixelFormat pixelFmt;
 
-	switch( bpp ) {
-		case 32 :
-			pixelFmt = PixelFormat32bppARGB;
-			break;
-		case 16 :
-			pixelFmt = PixelFormat16bppARGB1555;
-			break;
-		default :
-			// unsupported pixel format;
-			return -1;
-			break;
+	switch (bpp) {
+	case 32:
+		pixelFmt = PixelFormat32bppARGB;
+		break;
+	case 16:
+		pixelFmt = PixelFormat16bppARGB1555;
+		break;
+	default:
+		// unsupported pixel format;
+		return -1;
+		break;
 	}
 
 #ifdef UNICODE
 	gdi_bitmap = new Bitmap(filename);
 #else // !UNICODE
 	{
-		WCHAR wc_fname[MAX_PATH] = {0};
-		if( !MultiByteToWideChar(CP_ACP, 0, filename, strlen(filename), wc_fname, MAX_PATH) ) {
+		WCHAR wc_fname[MAX_PATH] = { 0 };
+		if (!MultiByteToWideChar(CP_ACP, 0, filename, strlen(filename), wc_fname, MAX_PATH)) {
 			// failed to get UNICODE filename
 			result = -1;
 			goto CLEANUP;
@@ -208,7 +207,7 @@ int GDI_LoadImageFile(LPCSTR filename, BYTE **bmPtr, DWORD *width, DWORD *height
 	}
 #endif // UNICODE
 
-	if( gdi_bitmap == NULL ) {
+	if (gdi_bitmap == NULL) {
 		// failed to create gdi_bitmap
 		result = -1;
 		goto CLEANUP;
@@ -217,9 +216,9 @@ int GDI_LoadImageFile(LPCSTR filename, BYTE **bmPtr, DWORD *width, DWORD *height
 	*width = gdi_bitmap->GetWidth();
 	*height = gdi_bitmap->GetHeight();
 
-	bmSize = (*width) * (*height) * (bpp/8);
-	*bmPtr = (BYTE *)malloc(bmSize * (bpp/8));
-	if( *bmPtr == NULL ) {
+	bmSize = (*width) * (*height) * (bpp / 8);
+	*bmPtr = (BYTE*)malloc(bmSize * (bpp / 8));
+	if (*bmPtr == NULL) {
 		// failed to allocate output bitmap
 		result = -1;
 		goto CLEANUP;
@@ -230,29 +229,29 @@ int GDI_LoadImageFile(LPCSTR filename, BYTE **bmPtr, DWORD *width, DWORD *height
 		status = gdi_bitmap->LockBits(&rect, ImageLockModeRead, pixelFmt, &bmData);
 	}
 
-	if( status != Ok ) {
+	if (status != Ok) {
 		// failed to lock the bitmap
 		free(bmPtr);
 		result = -1;
 		goto CLEANUP;
 	}
 
-	src = (BYTE *)bmData.Scan0;
-	if( bmData.Stride < 0 ) {
+	src = (BYTE*)bmData.Scan0;
+	if (bmData.Stride < 0) {
 		src += ABS(bmData.Stride) * (*height - 1);
 	}
 
 	dst = *bmPtr;
-	for( i = 0; i < *height; ++i ) {
-		memcpy(dst, src, (*width) * (bpp/8));
-		dst += (*width) * (bpp/8);
+	for (i = 0; i < *height; ++i) {
+		memcpy(dst, src, (*width) * (bpp / 8));
+		dst += (*width) * (bpp / 8);
 		src += bmData.Stride;
 	}
 
 	gdi_bitmap->UnlockBits(&bmData);
 
-CLEANUP :
-	if( gdi_bitmap != NULL ) {
+CLEANUP:
+	if (gdi_bitmap != NULL) {
 		delete gdi_bitmap;
 		gdi_bitmap = NULL;
 	}

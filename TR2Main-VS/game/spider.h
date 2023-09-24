@@ -24,10 +24,10 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
-//	0x00440070:		SpiderLeap
+ /*
+  * Function list
+  */
+  //	0x00440070:		SpiderLeap
 
 #define SpiderControl ((void(__cdecl*)(__int16)) 0x00440120)
 #define BigSpiderControl ((void(__cdecl*)(__int16)) 0x00440340)

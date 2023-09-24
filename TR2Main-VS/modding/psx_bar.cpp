@@ -28,19 +28,19 @@
 extern DWORD HealthBarMode;
 
 static D3DCOLOR InterpolateColor(D3DCOLOR color0, D3DCOLOR color1, DWORD value, DWORD range) {
-	if( value == 0 )
+	if (value == 0)
 		return color0;
 
-	if( value == range )
+	if (value == range)
 		return color1;
 
 	D3DCOLOR result = 0;
-	BYTE *c0  = (BYTE *)&color0;
-	BYTE *c1  = (BYTE *)&color1;
-	BYTE *res = (BYTE *)&result;
+	BYTE* c0 = (BYTE*)&color0;
+	BYTE* c1 = (BYTE*)&color1;
+	BYTE* res = (BYTE*)&result;
 
-	for( int i=0; i<4; ++i ) {
-		res[i] = (DWORD)c0[i]*(range-value)/range + (DWORD)c1[i]*value/range;
+	for (int i = 0; i < 4; ++i) {
+		res[i] = (DWORD)c0[i] * (range - value) / range + (DWORD)c1[i] * value / range;
 	}
 	return result;
 }
@@ -49,10 +49,10 @@ static void DrawCololoredRect(float sx0, float sy0, float sx1, float sy1, float 
 	double sz, rhw;
 	D3DTLVERTEX vertex[4];
 
-	if( z > PhdFarZ ) {
+	if (z > PhdFarZ) {
 		return;
 	}
-	if( z < PhdNearZ ) {
+	if (z < PhdNearZ) {
 		z = PhdNearZ;
 	}
 
@@ -75,7 +75,7 @@ static void DrawCololoredRect(float sx0, float sy0, float sx1, float sy1, float 
 	vertex[3].sy = sy1;
 	vertex[3].color = RGBA_SETALPHA(color3, alpha);
 
-	for( int i=0; i<4; ++i ) {
+	for (int i = 0; i < 4; ++i) {
 		vertex[i].sz = sz;
 		vertex[i].rhw = rhw;
 		vertex[i].specular = 0;
@@ -86,61 +86,62 @@ static void DrawCololoredRect(float sx0, float sy0, float sx1, float sy1, float 
 	HWR_DrawPrimitive(D3DPT_TRIANGLESTRIP, &vertex, 4, true);
 }
 
-static void PSX_DrawBar(int x0, int y0, int x1, int y1, int bar, int pixel, D3DCOLOR *left, D3DCOLOR *right, D3DCOLOR *frame, BYTE alpha) {
+static void PSX_DrawBar(int x0, int y0, int x1, int y1, int bar, int pixel, D3DCOLOR* left, D3DCOLOR* right, D3DCOLOR* frame, BYTE alpha) {
 	// Extra frame (dark gray)
-	if( HealthBarMode != 1 ) // skip extra frame if required
-		DrawCololoredRect(x0-pixel*3, y0-pixel*1, x1+pixel*3, y1+pixel*1, PhdNearZ + 40, frame[4], frame[5], frame[5], frame[4], 255);
+	if (HealthBarMode != 1) // skip extra frame if required
+		DrawCololoredRect(x0 - pixel * 3, y0 - pixel * 1, x1 + pixel * 3, y1 + pixel * 1, PhdNearZ + 40, frame[4], frame[5], frame[5], frame[4], 255);
 	// Outer frame (light gray)
-	DrawCololoredRect(x0-pixel*2, y0-pixel*2, x1+pixel*2, y1+pixel*2, PhdNearZ + 30, frame[2], frame[3], frame[3], frame[2], 255);
+	DrawCololoredRect(x0 - pixel * 2, y0 - pixel * 2, x1 + pixel * 2, y1 + pixel * 2, PhdNearZ + 30, frame[2], frame[3], frame[3], frame[2], 255);
 	// Inner frame (black)
-	DrawCololoredRect(x0-pixel*1, y0-pixel*1, x1+pixel*1, y1+pixel*1, PhdNearZ + 20, frame[0], frame[1], frame[1], frame[0], 255);
+	DrawCololoredRect(x0 - pixel * 1, y0 - pixel * 1, x1 + pixel * 1, y1 + pixel * 1, PhdNearZ + 20, frame[0], frame[1], frame[1], frame[0], 255);
 
 	// The bar
-	if( bar > 0 ) {
+	if (bar > 0) {
 		int i;
 		int dy[4];
 		D3DCOLOR dl[4], dr[4];
 		int dh = (y1 - y0) - pixel * 2;
 
-		for( i=0; i<4; ++i ) {
+		for (i = 0; i < 4; ++i) {
 			dy[i] = dh * i / 3;
-			if( i>0 && i<3 ) {
-				dl[i] = InterpolateColor(left[i-1],  left[i],  dy[i], dh);
-				dr[i] = InterpolateColor(right[i-1], right[i], dy[i], dh);
-			} else {
+			if (i > 0 && i < 3) {
+				dl[i] = InterpolateColor(left[i - 1], left[i], dy[i], dh);
+				dr[i] = InterpolateColor(right[i - 1], right[i], dy[i], dh);
+			}
+			else {
 				dl[i] = left[i];
 				dr[i] = right[i];
 			}
 		}
 
-		for( i=0; i<3; ++i ) {
-			DrawCololoredRect(x0, y1-dy[i+1], x0+bar, y1-dy[i], PhdNearZ + 10, dl[i+1], dr[i+1], dl[i], dr[i], alpha);
+		for (i = 0; i < 3; ++i) {
+			DrawCololoredRect(x0, y1 - dy[i + 1], x0 + bar, y1 - dy[i], PhdNearZ + 10, dl[i + 1], dr[i + 1], dl[i], dr[i], alpha);
 		}
 
-		DrawCololoredRect(x0, y0+pixel*0, x0+bar, y0+pixel*1, PhdNearZ + 10, left[2], right[2], left[3], right[3], alpha);
-		DrawCololoredRect(x0, y0+pixel*1, x0+bar, y0+pixel*2, PhdNearZ + 10, left[5], right[5], left[4], right[4], alpha);
+		DrawCololoredRect(x0, y0 + pixel * 0, x0 + bar, y0 + pixel * 1, PhdNearZ + 10, left[2], right[2], left[3], right[3], alpha);
+		DrawCololoredRect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, left[5], right[5], left[4], right[4], alpha);
 	}
 }
 
 void PSX_DrawHealthBar(int x0, int y0, int x1, int y1, int bar, int pixel, int alpha) {
-	D3DCOLOR left[6]  = {0xFF680000, 0xFF700000, 0xFF980000, 0xFFD80000, 0xFFE40000, 0xFFF00000};
-	D3DCOLOR right[6] = {0xFF004400, 0xFF007400, 0xFF009C00, 0xFF00D400, 0xFF00E800, 0xFF00FC00};
-	D3DCOLOR frame[6] = {0xFF000000, 0xFF000000, 0xFF508484, 0xFFA0A0A0, 0xFF284242, 0xFF505050};
+	D3DCOLOR left[6] = { 0xFF680000, 0xFF700000, 0xFF980000, 0xFFD80000, 0xFFE40000, 0xFFF00000 };
+	D3DCOLOR right[6] = { 0xFF004400, 0xFF007400, 0xFF009C00, 0xFF00D400, 0xFF00E800, 0xFF00FC00 };
+	D3DCOLOR frame[6] = { 0xFF000000, 0xFF000000, 0xFF508484, 0xFFA0A0A0, 0xFF284242, 0xFF505050 };
 
-	for( int i=0; i<6; ++i )
-		right[i] = InterpolateColor(left[i], right[i], bar, x1-x0);
+	for (int i = 0; i < 6; ++i)
+		right[i] = InterpolateColor(left[i], right[i], bar, x1 - x0);
 
 	CLAMP(alpha, 0, 255);
 	PSX_DrawBar(x0, y0, x1, y1, bar, pixel, left, right, frame, alpha);
 }
 
 void PSX_DrawAirBar(int x0, int y0, int x1, int y1, int bar, int pixel, int alpha) {
-	D3DCOLOR left[6]  = {0xFF004054, 0xFF005064, 0xFF006874, 0xFF007884, 0xFF00848E, 0xFF009098};
-	D3DCOLOR right[6] = {0xFF004000, 0xFF005000, 0xFF006800, 0xFF007800, 0xFF008400, 0xFF009000};
-	D3DCOLOR frame[6] = {0xFF000000, 0xFF000000, 0xFF508484, 0xFFA0A0A0, 0xFF284242, 0xFF505050};
+	D3DCOLOR left[6] = { 0xFF004054, 0xFF005064, 0xFF006874, 0xFF007884, 0xFF00848E, 0xFF009098 };
+	D3DCOLOR right[6] = { 0xFF004000, 0xFF005000, 0xFF006800, 0xFF007800, 0xFF008400, 0xFF009000 };
+	D3DCOLOR frame[6] = { 0xFF000000, 0xFF000000, 0xFF508484, 0xFFA0A0A0, 0xFF284242, 0xFF505050 };
 
-	for( int i=0; i<6; ++i )
-		right[i] = InterpolateColor(left[i], right[i], bar, x1-x0);
+	for (int i = 0; i < 6; ++i)
+		right[i] = InterpolateColor(left[i], right[i], bar, x1 - x0);
 
 	CLAMP(alpha, 0, 255);
 	PSX_DrawBar(x0, y0, x1, y1, bar, pixel, left, right, frame, alpha);

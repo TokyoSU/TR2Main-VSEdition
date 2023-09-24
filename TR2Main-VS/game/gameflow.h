@@ -24,13 +24,13 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 BOOL GF_LoadScriptFile(LPCTSTR fileName); // 0x0041FA40
 BOOL GF_DoFrontEndSequence(); // 0x0041FC30
 int GF_DoLevelSequence(DWORD levelID, GF_LEVEL_TYPE levelType); // 0x0041FC50
-int GF_InterpretSequence(__int16 *seq, GF_LEVEL_TYPE levelType, int seqType); // 0x0041FCC0
+int GF_InterpretSequence(__int16* seq, GF_LEVEL_TYPE levelType, int seqType); // 0x0041FCC0
 void GF_ModifyInventory(int levelID, BOOL isSecret); // 0x004201A0
 int GF_CurrentEvent(); // NOTE: not presented in the original game
 

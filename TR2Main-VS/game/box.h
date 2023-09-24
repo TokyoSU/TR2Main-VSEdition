@@ -24,12 +24,12 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 #define InitialiseCreature ((void(__cdecl*)(__int16)) 0x0040E190)
 
-//	0x0040E1C0:		CreatureActive
+  //	0x0040E1C0:		CreatureActive
 
 #define CreatureAIInfo ((void(__cdecl*)(ITEM_INFO *, AI_INFO *)) 0x0040E210)
 
@@ -61,7 +61,7 @@ void CreatureDie(__int16 itemID, BOOL explode); // 0x0040F440
 
 //	0x004100F0:		CreatureVault
 
-void CreatureKill(ITEM_INFO *item, int killAnim, int killState, int laraKillState); // 0x00410230
+void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillState); // 0x00410230
 
 //	0x004103A0:		GetBaddieTarget
 

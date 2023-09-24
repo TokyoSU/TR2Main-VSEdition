@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 bool FMV_Init();
 void FMV_Cleanup();
 bool PlayFMV(LPCTSTR fileName); // 0x0044BE50

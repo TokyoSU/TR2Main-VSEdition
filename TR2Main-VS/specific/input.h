@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 BOOL Key(KEYMAP keyMap); // 0x0044D9B0
 bool S_UpdateInput(); // 0x0044DAD0
 

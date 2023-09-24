@@ -23,12 +23,10 @@
 #include "game/yeti.h"
 #include "global/vars.h"
 
-
-
-/*
- * Inject function
- */
+ /*
+  * Inject function
+  */
 void Inject_Yeti() {
-//	INJECT(0x00443100, GiantYetiControl);
-//	INJECT(0x00443400, YetiControl);
+	//	INJECT(0x00443100, GiantYetiControl);
+	//	INJECT(0x00443400, YetiControl);
 }

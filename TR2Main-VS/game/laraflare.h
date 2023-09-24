@@ -24,13 +24,13 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
-//	0x0042F840:		DoFlareLight
-//	0x0042F8E0:		DoFlareInHand
+ /*
+  * Function list
+  */
+  //	0x0042F840:		DoFlareLight
+  //	0x0042F8E0:		DoFlareInHand
 
-void DrawFlareInAir(ITEM_INFO *item);
+void DrawFlareInAir(ITEM_INFO* item);
 
 //	0x0042FAC0:		CreateFlare
 //	0x0042FCA0:		set_flare_arm

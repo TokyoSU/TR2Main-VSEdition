@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 int GetRealTrack(int trackID); // 0x0043F430
 
 #define PlaySoundEffect ((void(__cdecl*)(DWORD, PHD_3DPOS *, DWORD)) 0x0043F470)

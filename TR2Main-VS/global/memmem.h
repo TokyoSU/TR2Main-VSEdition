@@ -33,10 +33,10 @@
 extern "C" {
 #endif
 
-/*
- * Find the first occurrence of the byte string s in byte string l.
- */
-void *memmem(const void *l, size_t l_len, const void *s, size_t s_len);
+	/*
+	 * Find the first occurrence of the byte string s in byte string l.
+	 */
+	void* memmem(const void* l, size_t l_len, const void* s, size_t s_len);
 
 #ifdef __cplusplus
 } /* extern "C" */

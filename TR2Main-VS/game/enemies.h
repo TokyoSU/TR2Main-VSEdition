@@ -24,10 +24,10 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
-//	0x0041DB30:		Knife
+ /*
+  * Function list
+  */
+  //	0x0041DB30:		Knife
 
 #define Cult2Control ((void(__cdecl*)(__int16)) 0x0041DBB0)
 #define MonkControl ((void(__cdecl*)(__int16)) 0x0041DFE0)

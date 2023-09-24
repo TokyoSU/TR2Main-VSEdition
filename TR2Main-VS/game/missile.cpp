@@ -32,11 +32,11 @@
 #include "global/vars.h"
 
 void ControlMissile(__int16 fxID) {
-	FX_INFO *fx = &Effects[fxID];
+	FX_INFO* fx = &Effects[fxID];
 
-	if( Effects[fxID].object_number == ID_MISSILE_HARPOON
+	if (Effects[fxID].object_number == ID_MISSILE_HARPOON
 		&& !CHK_ANY(RoomInfo[fx->room_number].flags, ROOM_UNDERWATER)
-		&& fx->pos.rotX > -PHD_90*3/4 )
+		&& fx->pos.rotX > -PHD_90 * 3 / 4)
 	{
 		fx->pos.rotX -= PHD_DEGREE;
 	}
@@ -46,48 +46,51 @@ void ControlMissile(__int16 fxID) {
 	fx->pos.x += speed * phd_sin(fx->pos.rotY) >> W2V_SHIFT;
 
 	__int16 roomNumber = fx->room_number;
-	FLOOR_INFO *floor = GetFloor(fx->pos.x, fx->pos.y, fx->pos.z, &roomNumber);
-	if( fx->pos.y >= GetHeight(floor, fx->pos.x, fx->pos.y, fx->pos.z)
-		|| (fx->pos.y <= GetCeiling(floor, fx->pos.x, fx->pos.y, fx->pos.z)) )
+	FLOOR_INFO* floor = GetFloor(fx->pos.x, fx->pos.y, fx->pos.z, &roomNumber);
+	if (fx->pos.y >= GetHeight(floor, fx->pos.x, fx->pos.y, fx->pos.z)
+		|| (fx->pos.y <= GetCeiling(floor, fx->pos.x, fx->pos.y, fx->pos.z)))
 	{
-		if( fx->object_number == ID_MISSILE_KNIFE || fx->object_number == ID_MISSILE_HARPOON ) {
+		if (fx->object_number == ID_MISSILE_KNIFE || fx->object_number == ID_MISSILE_HARPOON) {
 			fx->speed = 0;
-			fx->frame_number = -GetRandomControl()/11000;
+			fx->frame_number = -GetRandomControl() / 11000;
 			fx->counter = 6;
 			fx->object_number = ID_RICOCHET;
 			PlaySoundEffect(258, &fx->pos, 0);
-		} else if( fx->object_number == ID_MISSILE_FLAME ) {
+		}
+		else if (fx->object_number == ID_MISSILE_FLAME) {
 			AddDynamicLight(fx->pos.x, fx->pos.y, fx->pos.z, 14, 11);
 			KillEffect(fxID);
 		}
 		return;
 	}
 
-	if( roomNumber != fx->room_number ) {
+	if (roomNumber != fx->room_number) {
 		EffectNewRoom(fxID, roomNumber);
 	}
-	if( fx->object_number == ID_MISSILE_FLAME ) {
-		if( ItemNearLara(&fx->pos, 350) ) {
+	if (fx->object_number == ID_MISSILE_FLAME) {
+		if (ItemNearLara(&fx->pos, 350)) {
 			LaraItem->hitPoints -= 3;
 			LaraItem->hit_status = 1;
 			LaraBurn();
 			return;
 		}
-	} else if( ItemNearLara(&fx->pos, 200) ) {
+	}
+	else if (ItemNearLara(&fx->pos, 200)) {
 		LaraItem->hit_status = 1;
 		fx->pos.rotY = LaraItem->pos.rotY;
 		fx->counter = 0;
 		fx->speed = LaraItem->speed;
 		fx->frame_number = 0;
-		if( fx->object_number == ID_MISSILE_KNIFE || fx->object_number == ID_MISSILE_HARPOON ) {
+		if (fx->object_number == ID_MISSILE_KNIFE || fx->object_number == ID_MISSILE_HARPOON) {
 			LaraItem->hitPoints -= 50;
 #ifdef FEATURE_CHEAT
-			if( Lara.water_status == LWS_Cheat ) {
-				fx->frame_number = -GetRandomControl()/11000;
+			if (Lara.water_status == LWS_Cheat) {
+				fx->frame_number = -GetRandomControl() / 11000;
 				fx->counter = 6;
 				fx->object_number = ID_RICOCHET;
 				PlaySoundEffect(258, &fx->pos, 0);
-			} else {
+			}
+			else {
 				fx->object_number = ID_BLOOD;
 				PlaySoundEffect(317, &fx->pos, 0);
 			}
@@ -98,14 +101,16 @@ void ControlMissile(__int16 fxID) {
 		}
 	}
 
-	if( fx->object_number == ID_MISSILE_HARPOON && CHK_ANY(RoomInfo[fx->room_number].flags, ROOM_UNDERWATER) ) {
+	if (fx->object_number == ID_MISSILE_HARPOON && CHK_ANY(RoomInfo[fx->room_number].flags, ROOM_UNDERWATER)) {
 		CreateBubble(&fx->pos, fx->room_number);
-	} else if( fx->object_number == ID_MISSILE_FLAME && !fx->counter-- ) {
+	}
+	else if (fx->object_number == ID_MISSILE_FLAME && !fx->counter--) {
 		AddDynamicLight(fx->pos.x, fx->pos.y, fx->pos.z, 14, 11);
 		PlaySoundEffect(305, &fx->pos, 0);
 		KillEffect(fxID);
-	} else if( fx->object_number == ID_MISSILE_KNIFE ) {
-		fx->pos.rotZ += 30*PHD_DEGREE;
+	}
+	else if (fx->object_number == ID_MISSILE_KNIFE) {
+		fx->pos.rotZ += 30 * PHD_DEGREE;
 	}
 }
 
@@ -115,7 +120,7 @@ void ControlMissile(__int16 fxID) {
 void Inject_Missile() {
 	INJECT(0x00433090, ControlMissile);
 
-//	INJECT(0x00433360, ShootAtLara);
-//	INJECT(0x00433410, ExplodingDeath);
-//	INJECT(0x004337A0, ControlBodyPart);
+	//	INJECT(0x00433360, ShootAtLara);
+	//	INJECT(0x00433410, ExplodingDeath);
+	//	INJECT(0x004337A0, ControlBodyPart);
 }

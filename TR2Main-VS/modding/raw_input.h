@@ -23,25 +23,25 @@
 #define RAW_INPUT_H_INCLUDED
 
 #include "global/types.h"
-/*
- * This whole RawInput implementation is created for Sony DualShock 4 / DualSense, so it uses PlayStation button names
- */
+ /*
+  * This whole RawInput implementation is created for Sony DualShock 4 / DualSense, so it uses PlayStation button names
+  */
 typedef struct {
 	LONG dPad; // -1 if unpressed, and 0-36000 if pressed
 	float axisLX, axisLY, axisRX, axisRY, axisL2, axisR2;
-	WORD btnSquare:1, btnCross:1, btnCircle:1, btnTriangle:1;
-	WORD btnL1:1, btnR1:1, btnL2:1, btnR2:1, btnL3:1, btnR3:1;
-	WORD btnShare:1, btnOptions:1, btnPS:1, btnTouch:1, btnReserved:2;
+	WORD btnSquare : 1, btnCross : 1, btnCircle : 1, btnTriangle : 1;
+	WORD btnL1 : 1, btnR1 : 1, btnL2 : 1, btnR2 : 1, btnL3 : 1, btnR3 : 1;
+	WORD btnShare : 1, btnOptions : 1, btnPS : 1, btnTouch : 1, btnReserved : 2;
 } RINPUT_STATE;
 
 /*
  * Function list
  */
 LPCTSTR GetRawInputName(WORD vid, WORD pid, BOOL bt);
-bool RawInputEnumerate(BOOL(CALLBACK *callback)(LPGUID, LPCTSTR, LPCTSTR, WORD, WORD, LPVOID), LPVOID lpContext);
+bool RawInputEnumerate(BOOL(CALLBACK* callback)(LPGUID, LPCTSTR, LPCTSTR, WORD, WORD, LPVOID), LPVOID lpContext);
 bool RawInputStart(LPCTSTR lpName);
 void RawInputStop();
 bool RawInputSetState(WORD leftMotor, WORD rightMotor, DWORD color);
-bool RawInputGetState(RINPUT_STATE *pState);
+bool RawInputGetState(RINPUT_STATE* pState);
 
 #endif // RAW_INPUT_H_INCLUDED

@@ -24,13 +24,13 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 bool OpenGameRegistryKey(LPCTSTR key); // 0x00452480
 LONG CloseGameRegistryKey(); // 0x004524D0
-bool SE_WriteAppSettings(APP_SETTINGS *settings); // 0x004524E0
-int SE_ReadAppSettings(APP_SETTINGS *settings); // 0x00452760
+bool SE_WriteAppSettings(APP_SETTINGS* settings); // 0x004524E0
+int SE_ReadAppSettings(APP_SETTINGS* settings); // 0x00452760
 bool SE_GraphicsTestStart(); // 0x00452AC0
 void SE_GraphicsTestFinish(); // 0x00452B90
 int SE_GraphicsTestExecute(); // 0x00452BB0
@@ -45,20 +45,20 @@ LRESULT CALLBACK SE_NewPropSheetWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 bool SE_ShowSetupDialog(HWND hParent, bool isDefault); // 0x00452F80
 INT_PTR CALLBACK SE_GraphicsDlgProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam); // 0x00453150
 void SE_GraphicsDlgFullScreenModesUpdate(HWND hwndDlg); // 0x00453560
-void SE_GraphicsAdapterSet(HWND hwndDlg, DISPLAY_ADAPTER_NODE *adapter); // 0x00453750
+void SE_GraphicsAdapterSet(HWND hwndDlg, DISPLAY_ADAPTER_NODE* adapter); // 0x00453750
 void SE_GraphicsDlgUpdate(HWND hwndDlg); // 0x00453770
 void SE_GraphicsDlgInit(HWND hwndDlg); // 0x00453EB0
 INT_PTR CALLBACK SE_SoundDlgProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam); // 0x00454030
-void SE_SoundAdapterSet(HWND hwndDlg, SOUND_ADAPTER_NODE *adapter); // 0x004541C0
+void SE_SoundAdapterSet(HWND hwndDlg, SOUND_ADAPTER_NODE* adapter); // 0x004541C0
 void SE_SoundDlgUpdate(HWND hwndDlg); // 0x004541D0
 void SE_SoundDlgInit(HWND hwndDlg); // 0x004542F0
 INT_PTR CALLBACK SE_ControlsDlgProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam); // 0x004543B0
-void SE_ControlsJoystickSet(HWND hwndDlg, JOYSTICK_NODE *joystick); // 0x004544C0
+void SE_ControlsJoystickSet(HWND hwndDlg, JOYSTICK_NODE* joystick); // 0x004544C0
 void SE_ControlsDlgUpdate(HWND hwndDlg); // 0x004544D0
 void SE_ControlsDlgInit(HWND hwndDlg); // 0x00454540
 INT_PTR CALLBACK SE_OptionsDlgProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam); // 0x00454600
 void SE_OptionsDlgUpdate(HWND hwndDlg); // 0x00454690
-void SE_OptionsStrCat(LPTSTR *dstString, bool isEnabled, bool *isNext, const LPCTSTR srcString); // 0x004548D0
+void SE_OptionsStrCat(LPTSTR* dstString, bool isEnabled, bool* isNext, const LPCTSTR srcString); // 0x004548D0
 INT_PTR CALLBACK SE_AdvancedDlgProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam); // 0x00454920
 void SE_AdvancedDlgUpdate(HWND hwndDlg); // 0x00454A30
 void SE_AdvancedDlgInit(HWND hwndDlg); // 0x00454AE0

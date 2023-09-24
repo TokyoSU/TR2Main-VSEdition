@@ -22,9 +22,9 @@
 #ifndef GLOBAL_TYPES_H_INCLUDED
 #define GLOBAL_TYPES_H_INCLUDED
 
-/*
- * Inject macro
- */
+ /*
+  * Inject macro
+  */
 
 #pragma pack(push, 1)
 typedef struct {
@@ -50,7 +50,7 @@ typedef struct {
 /*
  * Defined values
  */
-// General values
+ // General values
 #define REQ_LEVEL_VERSION	(45)
 #define ARRAY_SIZE(a) (sizeof(a)/sizeof(*(a)))
 
@@ -276,13 +276,13 @@ typedef struct {
 	D3DVALUE sx, sy, sz, rhw;
 	D3DCOLOR color, specular;
 	D3DVALUE tu, tv;
-} D3DTLVERTEX, *LPD3DTLVERTEX;
+} D3DTLVERTEX, * LPD3DTLVERTEX;
 
-typedef D3DLOCKED_RECT DDSDESC, *LPDDSDESC;
+typedef D3DLOCKED_RECT DDSDESC, * LPDDSDESC;
 typedef LPDIRECT3DSURFACE9 LPDDS;
 typedef LPDIRECT3DTEXTURE9 HWR_TEXHANDLE;
 #else // (DIRECT3D_VERSION >= 0x900)
-typedef DDSURFACEDESC DDSDESC, *LPDDSDESC;
+typedef DDSURFACEDESC DDSDESC, * LPDDSDESC;
 typedef LPDIRECTDRAWSURFACE3 LPDDS;
 typedef D3DTEXTUREHANDLE HWR_TEXHANDLE;
 #endif // (DIRECT3D_VERSION >= 0x900)
@@ -794,7 +794,7 @@ typedef enum {
 } DRAWTYPE;
 
 typedef enum {
-// Software renderer
+	// Software renderer
 	POLY_GTmap,			// gouraud shaded poly (texture)
 	POLY_WGTmap,		// gouraud shaded poly (texture + colorkey)
 	POLY_GTmap_persp,	// gouraud shaded poly (texture + perspective)
@@ -804,7 +804,7 @@ typedef enum {
 	POLY_gouraud,		// gouraud shaded poly (color)
 	POLY_trans,			// shadow poly (color + semitransparent)
 	POLY_sprite,		// scaled sprite (texture + colorkey)
-// Hardware renderer
+	// Hardware renderer
 	POLY_HWR_GTmap,		// gouraud shaded poly (texture)
 	POLY_HWR_WGTmap,	// gouraud shaded poly (texture + colorkey)
 	POLY_HWR_gouraud,	// gouraud shaded poly (color)
@@ -1161,9 +1161,9 @@ typedef enum {
  */
 #pragma pack(push, 1)
 
-// NOTE: there were int items in the original code,
-// but it's more important to have wider range
-// since negative numbers are not used anyway
+ // NOTE: there were int items in the original code,
+ // but it's more important to have wider range
+ // since negative numbers are not used anyway
 typedef struct SortItem_t {
 #ifdef FEATURE_VIEW_IMPROVED
 	UINT64 _0;
@@ -1204,14 +1204,14 @@ typedef struct DisplayMode_t {
 } DISPLAY_MODE;
 
 typedef struct DisplayModeNode_t {
-	struct DisplayModeNode_t *next;
-	struct DisplayModeNode_t *previous;
+	struct DisplayModeNode_t* next;
+	struct DisplayModeNode_t* previous;
 	struct DisplayMode_t body;
 } DISPLAY_MODE_NODE;
 
 typedef struct DisplayModeList_t {
-	struct DisplayModeNode_t *head;
-	struct DisplayModeNode_t *tail;
+	struct DisplayModeNode_t* head;
+	struct DisplayModeNode_t* tail;
 	DWORD dwCount;
 } DISPLAY_MODE_LIST;
 
@@ -1255,38 +1255,38 @@ typedef struct DisplayAdapter_t {
 } DISPLAY_ADAPTER;
 
 typedef struct DisplayAdapterNode_t {
-	struct DisplayAdapterNode_t *next;
-	struct DisplayAdapterNode_t *previous;
+	struct DisplayAdapterNode_t* next;
+	struct DisplayAdapterNode_t* previous;
 	struct DisplayAdapter_t body;
 } DISPLAY_ADAPTER_NODE;
 
 typedef struct DisplayAdapterList_t {
-	struct DisplayAdapterNode_t *head;
-	struct DisplayAdapterNode_t *tail;
+	struct DisplayAdapterNode_t* head;
+	struct DisplayAdapterNode_t* tail;
 	DWORD dwCount;
 } DISPLAY_ADAPTER_LIST;
 
 typedef struct SoundAdapter_t {
-	GUID *lpAdapterGuid;
+	GUID* lpAdapterGuid;
 	GUID adapterGuid;
 	STRING_FLAGGED description;
 	STRING_FLAGGED module;
 } SOUND_ADAPTER;
 
 typedef struct SoundAdapterNode_t {
-	struct SoundAdapterNode_t *next;
-	struct SoundAdapterNode_t *previous;
+	struct SoundAdapterNode_t* next;
+	struct SoundAdapterNode_t* previous;
 	SOUND_ADAPTER body;
 } SOUND_ADAPTER_NODE;
 
 typedef struct SoundAdapterList_t {
-	struct SoundAdapterNode_t *head;
-	struct SoundAdapterNode_t *tail;
+	struct SoundAdapterNode_t* head;
+	struct SoundAdapterNode_t* tail;
 	DWORD dwCount;
 } SOUND_ADAPTER_LIST;
 
 typedef struct Joystick_t {
-	GUID *lpJoystickGuid;
+	GUID* lpJoystickGuid;
 	GUID joystickGuid;
 	STRING_FLAGGED productName;
 	STRING_FLAGGED instanceName;
@@ -1296,22 +1296,22 @@ typedef struct Joystick_t {
 } JOYSTICK;
 
 typedef struct JoystickNode_t {
-	struct JoystickNode_t *next;
-	struct JoystickNode_t *previous;
+	struct JoystickNode_t* next;
+	struct JoystickNode_t* previous;
 	JOYSTICK body;
 } JOYSTICK_NODE;
 
 typedef struct JoystickList_t {
-	struct JoystickNode_t *head;
-	struct JoystickNode_t *tail;
+	struct JoystickNode_t* head;
+	struct JoystickNode_t* tail;
 	DWORD dwCount;
 } JOYSTICK_LIST;
 
 typedef struct AppSettings_t {
-	DISPLAY_ADAPTER_NODE *PreferredDisplayAdapter;
-	SOUND_ADAPTER_NODE *PreferredSoundAdapter;
-	JOYSTICK_NODE *PreferredJoystick;
-	DISPLAY_MODE_NODE *VideoMode;
+	DISPLAY_ADAPTER_NODE* PreferredDisplayAdapter;
+	SOUND_ADAPTER_NODE* PreferredSoundAdapter;
+	JOYSTICK_NODE* PreferredJoystick;
+	DISPLAY_MODE_NODE* VideoMode;
 	RENDER_MODE RenderMode;
 	int WindowWidth;
 	int WindowHeight;
@@ -1399,9 +1399,9 @@ typedef struct TextStrInfo_t {
 	__int16 flashRate;
 	__int16 flashCount;
 	__int16 bgndColor;
-	GOURAUD_FILL *bgndGour;
+	GOURAUD_FILL* bgndGour;
 	__int16 outlColour;
-	GOURAUD_OUTLINE *outlGour;
+	GOURAUD_OUTLINE* outlGour;
 	__int16 bgndSizeX;
 	__int16 bgndSizeY;
 	__int16 bgndOffX;
@@ -1409,7 +1409,7 @@ typedef struct TextStrInfo_t {
 	__int16 bgndOffZ;
 	int scaleH;
 	int scaleV;
-	char *pString;
+	char* pString;
 } TEXT_STR_INFO;
 
 typedef struct StringFixed4_t {
@@ -1462,7 +1462,7 @@ typedef struct TgaHeader_t {
 
 typedef struct BitmapResource_t {
 	LPBITMAPINFO bmpInfo;
-	void *bmpData;
+	void* bmpData;
 	HPALETTE hPalette;
 	DWORD flags;
 } BITMAP_RESOURCE;
@@ -1541,10 +1541,10 @@ typedef struct RequestInfo_t {
 	__int16 yPos;
 	__int16 zPos;
 	UINT16 itemStringLen;
-	char *lpItemStrings1;
-	char *lpItemStrings2;
-	DWORD *lpItemFlags1;
-	DWORD *lpItemFlags2;
+	char* lpItemStrings1;
+	char* lpItemStrings2;
+	DWORD* lpItemFlags1;
+	DWORD* lpItemFlags2;
 	DWORD headingFlags1;
 	DWORD headingFlags2;
 	DWORD backgroundFlags;
@@ -1552,22 +1552,21 @@ typedef struct RequestInfo_t {
 	DWORD moredownFlags;
 	DWORD itemFlags1[24];
 	DWORD itemFlags2[24];
-	TEXT_STR_INFO *headingText1;
-	TEXT_STR_INFO *headingText2;
-	TEXT_STR_INFO *backgroundText;
-	TEXT_STR_INFO *moreupText;
-	TEXT_STR_INFO *moredownText;
-	TEXT_STR_INFO *itemTexts1[24];
-	TEXT_STR_INFO *itemTexts2[24];
+	TEXT_STR_INFO* headingText1;
+	TEXT_STR_INFO* headingText2;
+	TEXT_STR_INFO* backgroundText;
+	TEXT_STR_INFO* moreupText;
+	TEXT_STR_INFO* moredownText;
+	TEXT_STR_INFO* itemTexts1[24];
+	TEXT_STR_INFO* itemTexts2[24];
 	char headingString1[32];
 	char headingString2[32];
 	DWORD renderWidth;
 	DWORD renderHeight;
-
 } REQUEST_INFO;
 
 typedef struct InventoryItem_t {
-	char *lpString;
+	char* lpString;
 	__int16 objectID;
 	__int16 framesTotal;
 	__int16 currentFrame;
@@ -1590,7 +1589,7 @@ typedef struct InventoryItem_t {
 	int meshesSel;
 	int meshesDrawn;
 	__int16 invPos;
-	void *sprites;
+	void* sprites;
 	DWORD reserved1;
 	DWORD reserved2;
 	DWORD reserved3;
@@ -1748,9 +1747,9 @@ typedef struct CameraInfo_t {
 	__int16 last;
 	__int16 timer;
 	__int16 speed;
-	ITEM_INFO *item;
-	ITEM_INFO *last_item;
-	OBJECT_VECTOR *fixed;
+	ITEM_INFO* item;
+	ITEM_INFO* last_item;
+	OBJECT_VECTOR* fixed;
 	BOOL isLaraMic;
 	PHD_VECTOR micPos;
 } CAMERA_INFO;
@@ -1778,7 +1777,7 @@ typedef struct CollInfo_t {
 	__int16 facing;
 	__int16 quadrant;
 	__int16 collType;
-	__int16 *trigger;
+	__int16* trigger;
 	char xTilt;
 	char zTilt;
 	char hitByBaddie;
@@ -1790,13 +1789,13 @@ typedef struct ObjectInfo_t {
 	__int16 nMeshes;
 	__int16 meshIndex;
 	int boneIndex;
-	__int16 *frameBase;
-	void (__cdecl *initialise)(__int16 itemNumber);
-	void (__cdecl *control)(__int16 itemNumber);
-	void (__cdecl *floor)(ITEM_INFO *item, int x, int y, int z, __int16 *height);
-	void (__cdecl *ceiling)(ITEM_INFO *item, int x, int y, int z, __int16 *height);
-	void (__cdecl *drawRoutine)(ITEM_INFO *item);
-	void (__cdecl *collision)(__int16 itemNum, ITEM_INFO *laraItem, COLL_INFO *coll);
+	__int16* frameBase;
+	void(__cdecl* initialise)(__int16 itemNumber);
+	void(__cdecl* control)(__int16 itemNumber);
+	void(__cdecl* floor)(ITEM_INFO* item, int x, int y, int z, __int16* height);
+	void(__cdecl* ceiling)(ITEM_INFO* item, int x, int y, int z, __int16* height);
+	void(__cdecl* drawRoutine)(ITEM_INFO* item);
+	void(__cdecl* collision)(__int16 itemNum, ITEM_INFO* laraItem, COLL_INFO* coll);
 	__int16 animIndex;
 	__int16 hitPoints;
 	__int16 pivotLength;
@@ -1862,11 +1861,11 @@ typedef struct MeshInfo_t {
 } MESH_INFO;
 
 typedef struct RoomInfo_t {
-	__int16 *data;
-	DOOR_INFOS *doors;
-	FLOOR_INFO *floor;
-	LIGHT_INFO *light;
-	MESH_INFO *mesh;
+	__int16* data;
+	DOOR_INFOS* doors;
+	FLOOR_INFO* floor;
+	LIGHT_INFO* light;
+	MESH_INFO* mesh;
 	int x;
 	int y;
 	int z;
@@ -1939,7 +1938,7 @@ typedef struct RoomVertexInfo_t {
 } ROOM_VERTEX_INFO;
 
 typedef struct AnimStruct_t {
-	__int16 *framePtr;
+	__int16* framePtr;
 	__int16 interpolation;
 	__int16 currentAnimState;
 	int velocity;
@@ -2068,7 +2067,7 @@ typedef struct InvMotionInfo_t {
 } INV_MOTION_INFO;
 
 typedef struct RingInfo_t {
-	INVENTORY_ITEM **itemList;
+	INVENTORY_ITEM** itemList;
 	__int16 type;
 	__int16 radius;
 	__int16 cameraPitch;
@@ -2084,7 +2083,7 @@ typedef struct RingInfo_t {
 	PHD_3DPOS ringPos;
 	PHD_3DPOS camera;
 	PHD_VECTOR light;
-	INV_MOTION_INFO *motionInfo;
+	INV_MOTION_INFO* motionInfo;
 } RING_INFO;
 
 typedef struct BoxNode_t {
@@ -2095,7 +2094,7 @@ typedef struct BoxNode_t {
 } BOX_NODE;
 
 typedef struct LotInfo_t {
-	BOX_NODE *node;
+	BOX_NODE* node;
 	__int16 head;
 	__int16 tail;
 	UINT16 search_number;
@@ -2131,7 +2130,7 @@ typedef struct CreatureInfo_t {
 	MOOD_TYPE mood;
 	LOT_INFO LOT;
 	PHD_VECTOR target;
-	ITEM_INFO *enemy;
+	ITEM_INFO* enemy;
 } CREATURE_INFO;
 
 typedef struct BoatInfo_t {
@@ -2155,7 +2154,7 @@ typedef struct SkidooInfo_t {
 } SKIDOO_INFO;
 
 typedef struct LaraArm_t {
-	__int16 *frame_base;
+	__int16* frame_base;
 	__int16 frame_number;
 	__int16 anim_number;
 	__int16 lock;
@@ -2197,10 +2196,10 @@ typedef struct LaraInfo_t {
 	UINT16 pad : 9;
 	int water_surface_dist;
 	PHD_VECTOR last_pos;
-	FX_INFO *spaz_effect;
+	FX_INFO* spaz_effect;
 	DWORD mesh_effects;
-	__int16 *mesh_ptrs[15];
-	ITEM_INFO *target;
+	__int16* mesh_ptrs[15];
+	ITEM_INFO* target;
 	__int16 target_angles[2];
 	__int16 turn_rate;
 	__int16 move_angle;
@@ -2219,7 +2218,7 @@ typedef struct LaraInfo_t {
 	DWORD harpoon_ammo;
 	DWORD grenade_ammo;
 	DWORD m16_ammo;
-	CREATURE_INFO *creature;
+	CREATURE_INFO* creature;
 } LARA_INFO;
 
 typedef struct BiteInfo_t {
@@ -2228,7 +2227,6 @@ typedef struct BiteInfo_t {
 	int z;
 	int meshIndex;
 } BITE_INFO;
-
 
 typedef struct AIInfo_t {
 	__int16 zone_number;

@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 int ControlPhase(int nTicks, BOOL demoMode);
 
 #define AnimateItem ((void(__cdecl*)(ITEM_INFO*)) 0x004146C0)

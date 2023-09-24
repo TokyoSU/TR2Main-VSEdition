@@ -24,7 +24,7 @@
 
 #define RESOURCE_H_INCLUDED
 
-// String table
+ // String table
 #define IDS_DX5_REQUIRED				1
 
 // Icon groups

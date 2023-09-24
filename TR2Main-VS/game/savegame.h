@@ -24,16 +24,16 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 void InitialiseStartInfo(); // 0x00439190
 void ModifyStartInfo(int levelIdx); // 0x00439200
 void CreateStartInfo(int levelID); // 0x004392E0
 void CreateSaveGameInfo(); // 0x004394F0
 void ExtractSaveGameInfo(); // 0x00439A20
 void ResetSG(); // 0x0043A280
-void WriteSG(void *ptr, int len); // 0x0043A2A0
-void ReadSG(void *ptr, int len); // 0x0043A2F0
+void WriteSG(void* ptr, int len); // 0x0043A2A0
+void ReadSG(void* ptr, int len); // 0x0043A2F0
 
 #endif // SAVEGAME_H_INCLUDED

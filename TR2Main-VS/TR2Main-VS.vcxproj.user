@@ -5,22 +5,22 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerCommand>tomb2.exe</LocalDebuggerCommand>
-    <LocalDebuggerWorkingDirectory>C:\GOG Games\Tomb Raider 2\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>C:\Users\TokyoSU-PC\Desktop\Binaries\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DX9|Win32'">
     <LocalDebuggerCommand>tomb2.exe</LocalDebuggerCommand>
-    <LocalDebuggerWorkingDirectory>C:\GOG Games\Tomb Raider 2\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>C:\Users\TokyoSU-PC\Desktop\Binaries\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LocalDebuggerCommand>tomb2.exe</LocalDebuggerCommand>
-    <LocalDebuggerWorkingDirectory>C:\GOG Games\Tomb Raider 2\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>C:\Users\TokyoSU-PC\Desktop\Binaries\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_DX9|Win32'">
     <LocalDebuggerCommand>tomb2.exe</LocalDebuggerCommand>
-    <LocalDebuggerWorkingDirectory>C:\GOG Games\Tomb Raider 2\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>C:\Users\TokyoSU-PC\Desktop\Binaries\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

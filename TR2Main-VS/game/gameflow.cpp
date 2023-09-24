@@ -41,59 +41,60 @@ bool LoadingScreensEnabled = true;
 static int CurrentEvent = GFE_END_SEQ; // NOTE: not presented in the original game
 
 // NOTE: there is no such function in the original code
-static bool GF_GetSequenceValue(DWORD levelID, GF_EVENTS event, __int16 *pValue, __int16 defValue) {
-	if( levelID >= GF_GameFlow.num_Levels ) {
+static bool GF_GetSequenceValue(DWORD levelID, GF_EVENTS event, __int16* pValue, __int16 defValue) {
+	if (levelID >= GF_GameFlow.num_Levels) {
 		return false;
 	}
-	__int16 *seq = GF_ScriptTable[levelID];
+	__int16* seq = GF_ScriptTable[levelID];
 	__int16 operand = 0;
 	bool result = false;
 
-	if( pValue != NULL) {
+	if (pValue != NULL) {
 		*pValue = defValue; // set default value just in case
 	}
 
-	while( *seq != GFE_END_SEQ ) {
+	while (*seq != GFE_END_SEQ) {
 		__int16 seqCode = *seq;
-		switch( seqCode ) {
-			case GFE_STARTLEVEL :
-			case GFE_LOADINGPIC :
-			case GFE_DEMOPLAY :
-			case GFE_CUTANGLE :
-			case GFE_CUTSCENE :
-			case GFE_PLAYFMV :
-			case GFE_PICTURE :
-			case GFE_JUMPTO_SEQ :
-			case GFE_SETTRACK :
-			case GFE_NOFLOOR :
-			case GFE_STARTANIM :
-			case GFE_NUMSECRETS :
-			case GFE_ADD2INV :
-				operand = seq[1];
-				seq += 2;
-				break;
-			case GFE_LEVCOMPLETE :
-			case GFE_GAMECOMPLETE :
-			case GFE_SUNSET :
-			case GFE_DEADLY_WATER :
-			case GFE_REMOVE_WEAPONS :
-			case GFE_REMOVE_AMMO :
-			case GFE_KILL2COMPLETE :
-			case GFE_LIST_START :
-			case GFE_LIST_END :
-				operand = 0;
-				++seq;
-				break;
-			default :
-				return result;
+		switch (seqCode) {
+		case GFE_STARTLEVEL:
+		case GFE_LOADINGPIC:
+		case GFE_DEMOPLAY:
+		case GFE_CUTANGLE:
+		case GFE_CUTSCENE:
+		case GFE_PLAYFMV:
+		case GFE_PICTURE:
+		case GFE_JUMPTO_SEQ:
+		case GFE_SETTRACK:
+		case GFE_NOFLOOR:
+		case GFE_STARTANIM:
+		case GFE_NUMSECRETS:
+		case GFE_ADD2INV:
+			operand = seq[1];
+			seq += 2;
+			break;
+		case GFE_LEVCOMPLETE:
+		case GFE_GAMECOMPLETE:
+		case GFE_SUNSET:
+		case GFE_DEADLY_WATER:
+		case GFE_REMOVE_WEAPONS:
+		case GFE_REMOVE_AMMO:
+		case GFE_KILL2COMPLETE:
+		case GFE_LIST_START:
+		case GFE_LIST_END:
+			operand = 0;
+			++seq;
+			break;
+		default:
+			return result;
 		}
 
-		if( seqCode == event ) {
+		if (seqCode == event) {
 			// the event is found in the sequence
-			if( pValue == NULL) {
+			if (pValue == NULL) {
 				// if we don't need operand value, just return here
 				return true;
-			} else {
+			}
+			else {
 				// if we need the value, search until the end, the last value is correct one
 				result = true;
 				*pValue = operand;
@@ -118,53 +119,53 @@ bool GF_IsFinalLevel(DWORD levelID) {
 BOOL GF_LoadScriptFile(LPCTSTR fileName) {
 	GF_SunsetEnabled = 0;
 
-	if( !S_LoadGameFlow(fileName) )
+	if (!S_LoadGameFlow(fileName))
 		return FALSE;
 
 	GF_GameFlow.levelCompleteTrack = 41; // "level complete" track is hardcoded for some reason
 
-	InvCompassOption.lpString		= GF_GameStringTable[GSI_InvItem_Statistics];
+	InvCompassOption.lpString = GF_GameStringTable[GSI_InvItem_Statistics];
 
-	InvPistolOption.lpString		= GF_GameStringTable[GSI_InvItem_Pistols];
-	InvShotgunOption.lpString		= GF_GameStringTable[GSI_InvItem_Shotgun];
-	InvMagnumOption.lpString		= GF_GameStringTable[GSI_InvItem_Magnums];
-	InvUziOption.lpString			= GF_GameStringTable[GSI_InvItem_Uzis];
-	InvHarpoonOption.lpString		= GF_GameStringTable[GSI_InvItem_Harpoon];
-	InvM16Option.lpString			= GF_GameStringTable[GSI_InvItem_M16];
-	InvGrenadeOption.lpString		= GF_GameStringTable[GSI_InvItem_Grenade];
+	InvPistolOption.lpString = GF_GameStringTable[GSI_InvItem_Pistols];
+	InvShotgunOption.lpString = GF_GameStringTable[GSI_InvItem_Shotgun];
+	InvMagnumOption.lpString = GF_GameStringTable[GSI_InvItem_Magnums];
+	InvUziOption.lpString = GF_GameStringTable[GSI_InvItem_Uzis];
+	InvHarpoonOption.lpString = GF_GameStringTable[GSI_InvItem_Harpoon];
+	InvM16Option.lpString = GF_GameStringTable[GSI_InvItem_M16];
+	InvGrenadeOption.lpString = GF_GameStringTable[GSI_InvItem_Grenade];
 
-	InvFlareOption.lpString			= GF_GameStringTable[GSI_InvItem_Flare];
+	InvFlareOption.lpString = GF_GameStringTable[GSI_InvItem_Flare];
 
-	InvPistolAmmoOption.lpString	= GF_GameStringTable[GSI_InvItem_PistolAmmo];
-	InvShotgunAmmoOption.lpString	= GF_GameStringTable[GSI_InvItem_ShotgunAmmo];
-	InvMagnumAmmoOption.lpString	= GF_GameStringTable[GSI_InvItem_MagnumAmmo];
-	InvUziAmmoOption.lpString		= GF_GameStringTable[GSI_InvItem_UziAmmo];
-	InvHarpoonAmmoOption.lpString	= GF_GameStringTable[GSI_InvItem_HarpoonAmmo];
-	InvM16AmmoOption.lpString		= GF_GameStringTable[GSI_InvItem_M16Ammo];
-	InvGrenadeAmmoOption.lpString	= GF_GameStringTable[GSI_InvItem_GrenadeAmmo];
+	InvPistolAmmoOption.lpString = GF_GameStringTable[GSI_InvItem_PistolAmmo];
+	InvShotgunAmmoOption.lpString = GF_GameStringTable[GSI_InvItem_ShotgunAmmo];
+	InvMagnumAmmoOption.lpString = GF_GameStringTable[GSI_InvItem_MagnumAmmo];
+	InvUziAmmoOption.lpString = GF_GameStringTable[GSI_InvItem_UziAmmo];
+	InvHarpoonAmmoOption.lpString = GF_GameStringTable[GSI_InvItem_HarpoonAmmo];
+	InvM16AmmoOption.lpString = GF_GameStringTable[GSI_InvItem_M16Ammo];
+	InvGrenadeAmmoOption.lpString = GF_GameStringTable[GSI_InvItem_GrenadeAmmo];
 
-	InvSmallMedipackOption.lpString	= GF_GameStringTable[GSI_InvItem_SmallMedipack];
-	InvLargeMedipackOption.lpString	= GF_GameStringTable[GSI_InvItem_LargeMedipack];
+	InvSmallMedipackOption.lpString = GF_GameStringTable[GSI_InvItem_SmallMedipack];
+	InvLargeMedipackOption.lpString = GF_GameStringTable[GSI_InvItem_LargeMedipack];
 
-	InvPickup1Option.lpString		= GF_GameStringTable[GSI_InvItem_Pickup];
-	InvPickup2Option.lpString		= GF_GameStringTable[GSI_InvItem_Pickup];
+	InvPickup1Option.lpString = GF_GameStringTable[GSI_InvItem_Pickup];
+	InvPickup2Option.lpString = GF_GameStringTable[GSI_InvItem_Pickup];
 
-	InvPuzzle1Option.lpString		= GF_GameStringTable[GSI_InvItem_Puzzle];
-	InvPuzzle2Option.lpString		= GF_GameStringTable[GSI_InvItem_Puzzle];
-	InvPuzzle3Option.lpString		= GF_GameStringTable[GSI_InvItem_Puzzle];
-	InvPuzzle4Option.lpString		= GF_GameStringTable[GSI_InvItem_Puzzle];
+	InvPuzzle1Option.lpString = GF_GameStringTable[GSI_InvItem_Puzzle];
+	InvPuzzle2Option.lpString = GF_GameStringTable[GSI_InvItem_Puzzle];
+	InvPuzzle3Option.lpString = GF_GameStringTable[GSI_InvItem_Puzzle];
+	InvPuzzle4Option.lpString = GF_GameStringTable[GSI_InvItem_Puzzle];
 
-	InvKey1Option.lpString			= GF_GameStringTable[GSI_InvItem_Key];
-	InvKey2Option.lpString			= GF_GameStringTable[GSI_InvItem_Key];
-	InvKey3Option.lpString			= GF_GameStringTable[GSI_InvItem_Key];
-	InvKey4Option.lpString			= GF_GameStringTable[GSI_InvItem_Key];
+	InvKey1Option.lpString = GF_GameStringTable[GSI_InvItem_Key];
+	InvKey2Option.lpString = GF_GameStringTable[GSI_InvItem_Key];
+	InvKey3Option.lpString = GF_GameStringTable[GSI_InvItem_Key];
+	InvKey4Option.lpString = GF_GameStringTable[GSI_InvItem_Key];
 
-	InvPassportOption.lpString		= GF_GameStringTable[GSI_InvItem_Game];
-	InvPhotoOption.lpString			= GF_GameStringTable[GSI_InvItem_LaraHome];
+	InvPassportOption.lpString = GF_GameStringTable[GSI_InvItem_Game];
+	InvPhotoOption.lpString = GF_GameStringTable[GSI_InvItem_LaraHome];
 
-	InvDetailOption.lpString		= GF_SpecificStringTable[SSI_DetailLevels];
-	InvSoundOption.lpString			= GF_SpecificStringTable[SSI_Sound];
-	InvControlOption.lpString		= GF_SpecificStringTable[SSI_Controls];
+	InvDetailOption.lpString = GF_SpecificStringTable[SSI_DetailLevels];
+	InvSoundOption.lpString = GF_SpecificStringTable[SSI_Sound];
+	InvControlOption.lpString = GF_SpecificStringTable[SSI_Controls];
 
 	SetRequesterHeading(&LoadGameRequester, GF_GameStringTable[GSI_Passport_SelectLevel], 0, NULL, 0);
 	SetRequesterHeading(&SaveGameRequester, GF_GameStringTable[GSI_Passport_SelectLevel], 0, NULL, 0);
@@ -173,15 +174,15 @@ BOOL GF_LoadScriptFile(LPCTSTR fileName) {
 }
 
 BOOL GF_DoFrontEndSequence() {
-	return ( GF_EXIT_GAME == GF_InterpretSequence(GF_ScriptBuffer, GFL_NORMAL, 1) );
+	return (GF_EXIT_GAME == GF_InterpretSequence(GF_ScriptBuffer, GFL_NORMAL, 1));
 }
 
 int GF_DoLevelSequence(DWORD levelID, GF_LEVEL_TYPE levelType) {
-	for( DWORD i = levelID; i < GF_GameFlow.num_Levels; ++i ) {
+	for (DWORD i = levelID; i < GF_GameFlow.num_Levels; ++i) {
 		int direction = GF_InterpretSequence(GF_ScriptTable[i], levelType, 0);
 
-		if( GF_GameFlow.singleLevel >= 0 ||
-			(direction & ~0xFFu) != GF_LEVEL_COMPLETE )
+		if (GF_GameFlow.singleLevel >= 0 ||
+			(direction & ~0xFFu) != GF_LEVEL_COMPLETE)
 		{
 			return direction;
 		}
@@ -190,7 +191,7 @@ int GF_DoLevelSequence(DWORD levelID, GF_LEVEL_TYPE levelType) {
 	return GF_EXIT_TO_TITLE;
 }
 
-int GF_InterpretSequence(__int16 *seq, GF_LEVEL_TYPE levelType, int seqType) {
+int GF_InterpretSequence(__int16* seq, GF_LEVEL_TYPE levelType, int seqType) {
 	int result = GF_EXIT_TO_TITLE;
 	int trackIndex = 0;
 	char str[80];
@@ -210,206 +211,209 @@ int GF_InterpretSequence(__int16 *seq, GF_LEVEL_TYPE levelType, int seqType) {
 	CineTargetAngle = 0x4000;
 	GF_NumSecrets = 3;
 
-	while( *seq != GFE_END_SEQ ) {
+	while (*seq != GFE_END_SEQ) {
 		CurrentEvent = *seq;
-		switch( *seq ) {
-			case GFE_STARTLEVEL :
-				if( seq[1] > GF_GameFlow.num_Levels ) {
-					sprintf(str, "INVALID LEVEL %d", seq[1]);
-					result = GF_EXIT_TO_TITLE;
-				} else if( levelType != GFL_STORY ) {
-					if( levelType == GFL_MIDSTORY ) {
-						return GF_EXIT_TO_TITLE;
-					}
-					result = StartGame(seq[1], levelType);
-					GF_StartGame = false;
-					if( levelType == GFL_SAVED ) {
-						levelType = GFL_NORMAL;
-					}
-					if( (result & ~0xff) != GF_LEVEL_COMPLETE ) {
-						return result;
-					}
+		switch (*seq) {
+		case GFE_STARTLEVEL:
+			if (seq[1] > GF_GameFlow.num_Levels) {
+				sprintf(str, "INVALID LEVEL %d", seq[1]);
+				result = GF_EXIT_TO_TITLE;
+			}
+			else if (levelType != GFL_STORY) {
+				if (levelType == GFL_MIDSTORY) {
+					return GF_EXIT_TO_TITLE;
 				}
-				seq += 2;
-				break;
-
-			case GFE_LOADINGPIC :
-				seq += 2;
-				break;
-
-			case GFE_DEMOPLAY :
-				if( levelType != GFL_SAVED && levelType != GFL_STORY && levelType != GFL_MIDSTORY ) {
-					return StartDemo(seq[1]);
+				result = StartGame(seq[1], levelType);
+				GF_StartGame = false;
+				if (levelType == GFL_SAVED) {
+					levelType = GFL_NORMAL;
 				}
-				seq += 2;
-				break;
-
-			case GFE_CUTANGLE :
-				if( levelType != GFL_SAVED ) {
-					CineTargetAngle = seq[1];
+				if ((result & ~0xff) != GF_LEVEL_COMPLETE) {
+					return result;
 				}
-				seq += 2;
-				break;
+			}
+			seq += 2;
+			break;
 
-			case GFE_CUTSCENE :
-				if( levelType != GFL_SAVED ) {
-					sprintf(str, "CUTSCENE %d %s", seq[1], GF_CutsFilesStringTable[seq[1]]);
-					__int16 storedLevel = CurrentLevel;
-					int cine_ret = StartCinematic(seq[1]);
-					CurrentLevel = storedLevel;
-					if( cine_ret == 2 && (levelType == GFL_STORY || levelType == GFL_MIDSTORY) ) {
-						return GF_EXIT_TO_TITLE;
+		case GFE_LOADINGPIC:
+			seq += 2;
+			break;
+
+		case GFE_DEMOPLAY:
+			if (levelType != GFL_SAVED && levelType != GFL_STORY && levelType != GFL_MIDSTORY) {
+				return StartDemo(seq[1]);
+			}
+			seq += 2;
+			break;
+
+		case GFE_CUTANGLE:
+			if (levelType != GFL_SAVED) {
+				CineTargetAngle = seq[1];
+			}
+			seq += 2;
+			break;
+
+		case GFE_CUTSCENE:
+			if (levelType != GFL_SAVED) {
+				sprintf(str, "CUTSCENE %d %s", seq[1], GF_CutsFilesStringTable[seq[1]]);
+				__int16 storedLevel = CurrentLevel;
+				int cine_ret = StartCinematic(seq[1]);
+				CurrentLevel = storedLevel;
+				if (cine_ret == 2 && (levelType == GFL_STORY || levelType == GFL_MIDSTORY)) {
+					return GF_EXIT_TO_TITLE;
+				}
+				if (cine_ret == 3) {
+					return GF_EXIT_GAME;
+				}
+			}
+			seq += 2;
+			break;
+
+		case GFE_PLAYFMV:
+			if (levelType != GFL_SAVED) {
+				if (seq[2] == GFE_PLAYFMV) {
+					if (S_IntroFMV(GF_FmvFilesStringTable[seq[1]], GF_FmvFilesStringTable[seq[3]])) {
+						return GF_EXIT_GAME;
 					}
-					if( cine_ret == 3 ) {
+					seq += 2;
+				}
+				else {
+					if (S_PlayFMV(GF_FmvFilesStringTable[seq[1]])) {
 						return GF_EXIT_GAME;
 					}
 				}
-				seq += 2;
-				break;
+			}
+			seq += 2;
+			break;
 
-			case GFE_PLAYFMV :
-				if( levelType != GFL_SAVED ) {
-					if( seq[2] == GFE_PLAYFMV ) {
-						if( S_IntroFMV(GF_FmvFilesStringTable[seq[1]], GF_FmvFilesStringTable[seq[3]]) ) {
-							return GF_EXIT_GAME;
-						}
-						seq += 2;
-					} else {
-						if( S_PlayFMV(GF_FmvFilesStringTable[seq[1]]) ) {
-							return GF_EXIT_GAME;
-						}
-					}
-				}
-				seq += 2;
-				break;
-
-			case GFE_LEVCOMPLETE :
-				if( levelType != GFL_STORY && levelType != GFL_MIDSTORY ) {
-					if( LevelStats(CurrentLevel) ) {
-						return GF_EXIT_TO_TITLE;
-					}
-					result = GF_START_GAME | (CurrentLevel + 1);
-				}
-				++seq;
-				break;
-
-			case GFE_GAMECOMPLETE :
-				DisplayCredits();
-				if( GameStats(CurrentLevel) ) {
+		case GFE_LEVCOMPLETE:
+			if (levelType != GFL_STORY && levelType != GFL_MIDSTORY) {
+				if (LevelStats(CurrentLevel)) {
 					return GF_EXIT_TO_TITLE;
 				}
-				result = GF_EXIT_TO_TITLE;
-				++seq;
-				break;
+				result = GF_START_GAME | (CurrentLevel + 1);
+			}
+			++seq;
+			break;
 
-			case GFE_PICTURE :
-				if( levelType != GFL_SAVED ) {
-					sprintf(str, "PICTURE %s", GF_PictureFilesStringTable[seq[1]]);
-				}
+		case GFE_GAMECOMPLETE:
+			DisplayCredits();
+			if (GameStats(CurrentLevel)) {
+				return GF_EXIT_TO_TITLE;
+			}
+			result = GF_EXIT_TO_TITLE;
+			++seq;
+			break;
+
+		case GFE_PICTURE:
+			if (levelType != GFL_SAVED) {
+				sprintf(str, "PICTURE %s", GF_PictureFilesStringTable[seq[1]]);
+			}
 #ifdef FEATURE_BACKGROUND_IMPROVED
-				if( LoadingScreensEnabled && seq[1] < GF_GameFlow.num_Pictures && (levelType == GFL_NORMAL || levelType == GFL_SAVED) ) {
-					RGB888 palette[256];
-					memcpy(palette, GamePalette8, sizeof(GamePalette8));
-					if( !BGND2_LoadPicture(GF_PictureFilesStringTable[seq[1]], FALSE, FALSE) ) {
-						BGND2_ShowPicture(30, 90, 10, 2, TRUE);
-						S_DontDisplayPicture();
-					}
-					memcpy(GamePalette8, palette, sizeof(GamePalette8));
+			if (LoadingScreensEnabled && seq[1] < GF_GameFlow.num_Pictures && (levelType == GFL_NORMAL || levelType == GFL_SAVED)) {
+				RGB888 palette[256];
+				memcpy(palette, GamePalette8, sizeof(GamePalette8));
+				if (!BGND2_LoadPicture(GF_PictureFilesStringTable[seq[1]], FALSE, FALSE)) {
+					BGND2_ShowPicture(30, 90, 10, 2, TRUE);
+					S_DontDisplayPicture();
 				}
+				memcpy(GamePalette8, palette, sizeof(GamePalette8));
+			}
 #endif // FEATURE_BACKGROUND_IMPROVED
-				seq += 2;
-				break;
+			seq += 2;
+			break;
 
-			case GFE_JUMPTO_SEQ :
-				sprintf(str, "JUMPSEQ %d", seq[1]);
-				seq += 2;
-				break;
+		case GFE_JUMPTO_SEQ:
+			sprintf(str, "JUMPSEQ %d", seq[1]);
+			seq += 2;
+			break;
 
-			case GFE_SETTRACK :
-				TrackIDs[trackIndex++] = seq[1];
-				SetCutsceneTrack(seq[1]);
-				seq += 2;
-				break;
+		case GFE_SETTRACK:
+			TrackIDs[trackIndex++] = seq[1];
+			SetCutsceneTrack(seq[1]);
+			seq += 2;
+			break;
 
-			case GFE_SUNSET :
-				if( levelType != GFL_STORY && levelType != GFL_MIDSTORY ) {
-					GF_SunsetEnabled = 1;
+		case GFE_SUNSET:
+			if (levelType != GFL_STORY && levelType != GFL_MIDSTORY) {
+				GF_SunsetEnabled = 1;
+			}
+			++seq;
+			break;
+
+		case GFE_DEADLY_WATER:
+			if (levelType != GFL_STORY && levelType != GFL_MIDSTORY) {
+				GF_DeadlyWater = 1;
+			}
+			++seq;
+			break;
+
+		case GFE_NOFLOOR:
+			if (levelType != GFL_STORY && levelType != GFL_MIDSTORY) {
+				GF_NoFloor = seq[1];
+			}
+			seq += 2;
+			break;
+
+		case GFE_STARTANIM:
+			if (levelType != GFL_STORY && levelType != GFL_MIDSTORY) {
+				GF_LaraStartAnim = seq[1];
+			}
+			seq += 2;
+			break;
+
+		case GFE_NUMSECRETS:
+			if (levelType != GFL_STORY && levelType != GFL_MIDSTORY) {
+				GF_NumSecrets = seq[1];
+			}
+			seq += 2;
+			break;
+
+		case GFE_ADD2INV:
+			if (levelType != GFL_STORY && levelType != GFL_MIDSTORY) {
+				if (seq[1] < 1000) {
+					++GF_SecretInvItems[seq[1]];
 				}
-				++seq;
-				break;
-
-			case GFE_DEADLY_WATER :
-				if( levelType != GFL_STORY && levelType != GFL_MIDSTORY ) {
-					GF_DeadlyWater = 1;
+				else if (levelType != GFL_SAVED) {
+					++GF_Add2InvItems[seq[1] - 1000];
 				}
-				++seq;
-				break;
+			}
+			seq += 2;
+			break;
 
-			case GFE_NOFLOOR :
-				if( levelType != GFL_STORY && levelType != GFL_MIDSTORY ) {
-					GF_NoFloor = seq[1];
-				}
-				seq += 2;
-				break;
+		case GFE_REMOVE_WEAPONS:
+			if (levelType != GFL_STORY && levelType != GFL_MIDSTORY && levelType != GFL_SAVED) {
+				GF_RemoveWeapons = 1;
+			}
+			++seq;
+			break;
 
-			case GFE_STARTANIM :
-				if( levelType != GFL_STORY && levelType != GFL_MIDSTORY ) {
-					GF_LaraStartAnim = seq[1];
-				}
-				seq += 2;
-				break;
+		case GFE_REMOVE_AMMO:
+			if (levelType != GFL_STORY && levelType != GFL_MIDSTORY && levelType != GFL_SAVED) {
+				GF_RemoveAmmo = 1;
+			}
+			++seq;
+			break;
 
-			case GFE_NUMSECRETS :
-				if( levelType != GFL_STORY && levelType != GFL_MIDSTORY ) {
-					GF_NumSecrets = seq[1];
-				}
-				seq += 2;
-				break;
+		case GFE_KILL2COMPLETE:
+			if (levelType != GFL_STORY && levelType != GFL_MIDSTORY) {
+				GF_Kill2Complete = 1;
+			}
+			++seq;
+			break;
 
-			case GFE_ADD2INV :
-				if( levelType != GFL_STORY && levelType != GFL_MIDSTORY ) {
-					if( seq[1] < 1000 ) {
-						++GF_SecretInvItems[seq[1]];
-					} else if( levelType != GFL_SAVED ) {
-						++GF_Add2InvItems[seq[1] - 1000];
-					}
-				}
-				seq += 2;
-				break;
+		case GFE_LIST_START:
+		case GFE_LIST_END:
+			++seq;
+			break;
 
-			case GFE_REMOVE_WEAPONS :
-				if( levelType != GFL_STORY && levelType != GFL_MIDSTORY && levelType != GFL_SAVED ) {
-					GF_RemoveWeapons = 1;
-				}
-				++seq;
-				break;
-
-			case GFE_REMOVE_AMMO :
-				if( levelType != GFL_STORY && levelType != GFL_MIDSTORY && levelType != GFL_SAVED ) {
-					GF_RemoveAmmo = 1;
-				}
-				++seq;
-				break;
-
-			case GFE_KILL2COMPLETE :
-				if( levelType != GFL_STORY && levelType != GFL_MIDSTORY ) {
-					GF_Kill2Complete = 1;
-				}
-				++seq;
-				break;
-
-			case GFE_LIST_START :
-			case GFE_LIST_END :
-				++seq;
-				break;
-
-			default :
-				return GF_EXIT_GAME;
+		default:
+			return GF_EXIT_GAME;
 		}
 	}
 	CurrentEvent = GFE_END_SEQ;
 
-	if( levelType == GFL_STORY || levelType == GFL_MIDSTORY ) {
+	if (levelType == GFL_STORY || levelType == GFL_MIDSTORY) {
 		result = GF_START_GAME;
 	}
 	return result;
@@ -417,390 +421,421 @@ int GF_InterpretSequence(__int16 *seq, GF_LEVEL_TYPE levelType, int seqType) {
 
 void GF_ModifyInventory(int levelID, BOOL isSecret) {
 	int i;
-	START_INFO *start = &SaveGame.start[levelID];
+	START_INFO* start = &SaveGame.start[levelID];
 
 	// NOTE: additional weapon availability checks not presented in the original game
-	if( !Objects[ID_PISTOL_OPTION].loaded ) {
+	if (!Objects[ID_PISTOL_OPTION].loaded) {
 		GF_Add2InvItems[ADDINV_PISTOL] = 0;
 		GF_SecretInvItems[ADDINV_PISTOL] = 0;
 	}
-	if( !Objects[ID_UZI_OPTION].loaded ) {
+	if (!Objects[ID_UZI_OPTION].loaded) {
 		GF_Add2InvItems[ADDINV_UZI] = 0;
 		GF_SecretInvItems[ADDINV_UZI] = 0;
 	}
-	if( !Objects[ID_MAGNUM_OPTION].loaded ) {
+	if (!Objects[ID_MAGNUM_OPTION].loaded) {
 		GF_Add2InvItems[ADDINV_MAGNUM] = 0;
 		GF_SecretInvItems[ADDINV_MAGNUM] = 0;
 	}
-	if( !Objects[ID_SHOTGUN_OPTION].loaded ) {
+	if (!Objects[ID_SHOTGUN_OPTION].loaded) {
 		GF_Add2InvItems[ADDINV_SHOTGUN] = 0;
 		GF_SecretInvItems[ADDINV_SHOTGUN] = 0;
 	}
-	if( !Objects[ID_GRENADE_OPTION].loaded ) {
+	if (!Objects[ID_GRENADE_OPTION].loaded) {
 		GF_Add2InvItems[ADDINV_GRENADE] = 0;
 		GF_SecretInvItems[ADDINV_GRENADE] = 0;
 	}
-	if( !Objects[ID_M16_OPTION].loaded ) {
+	if (!Objects[ID_M16_OPTION].loaded) {
 		GF_Add2InvItems[ADDINV_M16] = 0;
 		GF_SecretInvItems[ADDINV_M16] = 0;
 	}
-	if( !Objects[ID_HARPOON_OPTION].loaded ) {
+	if (!Objects[ID_HARPOON_OPTION].loaded) {
 		GF_Add2InvItems[ADDINV_HARPOON] = 0;
 		GF_SecretInvItems[ADDINV_HARPOON] = 0;
 	}
 
 	// NOTE: additional ammo availability checks not presented in the original game
-	if( !start->has_pistols && !Objects[ID_PISTOL_AMMO_OPTION].loaded ) {
+	if (!start->has_pistols && !Objects[ID_PISTOL_AMMO_OPTION].loaded) {
 		GF_Add2InvItems[ADDINV_PISTOL_AMMO] = 0;
 		GF_SecretInvItems[ADDINV_PISTOL_AMMO] = 0;
 	}
-	if( !start->has_uzis && !Objects[ID_UZI_AMMO_OPTION].loaded ) {
+	if (!start->has_uzis && !Objects[ID_UZI_AMMO_OPTION].loaded) {
 		GF_Add2InvItems[ADDINV_UZI_AMMO] = 0;
 		GF_SecretInvItems[ADDINV_UZI_AMMO] = 0;
 	}
-	if( !start->has_magnums && !Objects[ID_MAGNUM_AMMO_OPTION].loaded ) {
+	if (!start->has_magnums && !Objects[ID_MAGNUM_AMMO_OPTION].loaded) {
 		GF_Add2InvItems[ADDINV_MAGNUM_AMMO] = 0;
 		GF_SecretInvItems[ADDINV_MAGNUM_AMMO] = 0;
 	}
-	if( !start->has_shotgun && !Objects[ID_SHOTGUN_AMMO_OPTION].loaded ) {
+	if (!start->has_shotgun && !Objects[ID_SHOTGUN_AMMO_OPTION].loaded) {
 		GF_Add2InvItems[ADDINV_SHOTGUN_AMMO] = 0;
 		GF_SecretInvItems[ADDINV_SHOTGUN_AMMO] = 0;
 	}
-	if( !start->has_grenade && !Objects[ID_GRENADE_AMMO_OPTION].loaded ) {
+	if (!start->has_grenade && !Objects[ID_GRENADE_AMMO_OPTION].loaded) {
 		GF_Add2InvItems[ADDINV_GRENADE_AMMO] = 0;
 		GF_SecretInvItems[ADDINV_GRENADE_AMMO] = 0;
 	}
-	if( !start->has_m16 && !Objects[ID_M16_AMMO_OPTION].loaded ) {
+	if (!start->has_m16 && !Objects[ID_M16_AMMO_OPTION].loaded) {
 		GF_Add2InvItems[ADDINV_M16_AMMO] = 0;
 		GF_SecretInvItems[ADDINV_M16_AMMO] = 0;
 	}
-	if( !start->has_harpoon && !Objects[ID_HARPOON_AMMO_OPTION].loaded ) {
+	if (!start->has_harpoon && !Objects[ID_HARPOON_AMMO_OPTION].loaded) {
 		GF_Add2InvItems[ADDINV_HARPOON_AMMO] = 0;
 		GF_SecretInvItems[ADDINV_HARPOON_AMMO] = 0;
 	}
 
 	// Pistols
-	if( !start->has_pistols && GF_Add2InvItems[ADDINV_PISTOL] ) {
+	if (!start->has_pistols && GF_Add2InvItems[ADDINV_PISTOL]) {
 		start->has_pistols = 1;
 		Inv_AddItem(ID_PISTOL_ITEM);
 	}
 
 	// Shotgun
-	if( Inv_RequestItem(ID_SHOTGUN_ITEM) ) {
-		if( isSecret ) {
+	if (Inv_RequestItem(ID_SHOTGUN_ITEM)) {
+		if (isSecret) {
 			Lara.shotgun_ammo += 12 * GF_SecretInvItems[ADDINV_SHOTGUN_AMMO];
-			for( i = 0; i < GF_SecretInvItems[ADDINV_SHOTGUN_AMMO]; ++i ) {
+			for (i = 0; i < GF_SecretInvItems[ADDINV_SHOTGUN_AMMO]; ++i) {
 				AddDisplayPickup(ID_SHOTGUN_AMMO_ITEM);
 			}
-		} else {
+		}
+		else {
 			Lara.shotgun_ammo += 12 * GF_Add2InvItems[ADDINV_SHOTGUN_AMMO];
 		}
-	} else if( (!isSecret && GF_Add2InvItems[ADDINV_SHOTGUN]) || (isSecret && GF_SecretInvItems[ADDINV_SHOTGUN]) ) {
+	}
+	else if ((!isSecret && GF_Add2InvItems[ADDINV_SHOTGUN]) || (isSecret && GF_SecretInvItems[ADDINV_SHOTGUN])) {
 		start->has_shotgun = 1;
 		Inv_AddItem(ID_SHOTGUN_ITEM);
-		if( isSecret ) {
+		if (isSecret) {
 			AddDisplayPickup(ID_SHOTGUN_ITEM);
 			Lara.shotgun_ammo += 12 * GF_SecretInvItems[ADDINV_SHOTGUN_AMMO];
 			// NOTE: This loop is absent in the original code
-			for( i = 0; i < GF_SecretInvItems[ADDINV_SHOTGUN_AMMO]; ++i ) {
+			for (i = 0; i < GF_SecretInvItems[ADDINV_SHOTGUN_AMMO]; ++i) {
 				AddDisplayPickup(ID_SHOTGUN_AMMO_ITEM);
 			}
-		} else {
+		}
+		else {
 			Lara.shotgun_ammo += 12 * GF_Add2InvItems[ADDINV_SHOTGUN_AMMO];
 		}
-	} else {
-		if( isSecret ) {
-			for( i = 0; i < GF_SecretInvItems[ADDINV_SHOTGUN_AMMO]; ++i ) {
+	}
+	else {
+		if (isSecret) {
+			for (i = 0; i < GF_SecretInvItems[ADDINV_SHOTGUN_AMMO]; ++i) {
 				Inv_AddItem(ID_SHOTGUN_AMMO_ITEM);
 				AddDisplayPickup(ID_SHOTGUN_AMMO_ITEM);
 			}
-		} else {
-			for( i = 0; i < GF_Add2InvItems[ADDINV_SHOTGUN_AMMO]; ++i ) {
+		}
+		else {
+			for (i = 0; i < GF_Add2InvItems[ADDINV_SHOTGUN_AMMO]; ++i) {
 				Inv_AddItem(ID_SHOTGUN_AMMO_ITEM);
 			}
 		}
 	}
 
 	// Magnums
-	if( Inv_RequestItem(ID_MAGNUM_ITEM) ) {
-		if( isSecret ) {
+	if (Inv_RequestItem(ID_MAGNUM_ITEM)) {
+		if (isSecret) {
 			Lara.magnum_ammo += 40 * GF_SecretInvItems[ADDINV_MAGNUM_AMMO];
-			for( i = 0; i < GF_SecretInvItems[ADDINV_MAGNUM_AMMO]; ++i ) {
+			for (i = 0; i < GF_SecretInvItems[ADDINV_MAGNUM_AMMO]; ++i) {
 				AddDisplayPickup(ID_MAGNUM_AMMO_ITEM);
 			}
-		} else {
+		}
+		else {
 			Lara.magnum_ammo += 40 * GF_Add2InvItems[ADDINV_MAGNUM_AMMO];
 		}
-	} else if( (!isSecret && GF_Add2InvItems[ADDINV_MAGNUM]) || (isSecret && GF_SecretInvItems[ADDINV_MAGNUM]) ) {
+	}
+	else if ((!isSecret && GF_Add2InvItems[ADDINV_MAGNUM]) || (isSecret && GF_SecretInvItems[ADDINV_MAGNUM])) {
 		start->has_magnums = 1;
 		Inv_AddItem(ID_MAGNUM_ITEM);
-		if( isSecret ) {
+		if (isSecret) {
 			AddDisplayPickup(ID_MAGNUM_ITEM);
 			// NOTE: here was GF_Add2InvItems instead of GF_SecretInvItems in the original code. This is fixed
 			Lara.magnum_ammo += 40 * GF_SecretInvItems[ADDINV_MAGNUM_AMMO];
 			// NOTE: here was ADDINV_MAGNUM instead of ADDINV_MAGNUM_AMMO in the original code. This is fixed
-			for( i = 0; i < GF_SecretInvItems[ADDINV_MAGNUM_AMMO]; ++i ) {
+			for (i = 0; i < GF_SecretInvItems[ADDINV_MAGNUM_AMMO]; ++i) {
 				AddDisplayPickup(ID_MAGNUM_AMMO_ITEM);
 			}
-		} else {
+		}
+		else {
 			Lara.magnum_ammo += 40 * GF_Add2InvItems[ADDINV_MAGNUM_AMMO];
 		}
-	} else {
-		if( isSecret ) {
-			for( i = 0; i < GF_SecretInvItems[ADDINV_MAGNUM_AMMO]; ++i ) {
+	}
+	else {
+		if (isSecret) {
+			for (i = 0; i < GF_SecretInvItems[ADDINV_MAGNUM_AMMO]; ++i) {
 				Inv_AddItem(ID_MAGNUM_AMMO_ITEM);
 				AddDisplayPickup(ID_MAGNUM_AMMO_ITEM);
 			}
-		} else {
-			for( i = 0; i < GF_Add2InvItems[ADDINV_MAGNUM_AMMO]; ++i ) {
+		}
+		else {
+			for (i = 0; i < GF_Add2InvItems[ADDINV_MAGNUM_AMMO]; ++i) {
 				Inv_AddItem(ID_MAGNUM_AMMO_ITEM);
 			}
 		}
 	}
 
 	// Uzis
-	if( Inv_RequestItem(ID_UZI_ITEM) ) {
-		if( isSecret ) {
+	if (Inv_RequestItem(ID_UZI_ITEM)) {
+		if (isSecret) {
 			Lara.uzi_ammo += 80 * GF_SecretInvItems[ADDINV_UZI_AMMO];
-			for( i = 0; i < GF_SecretInvItems[ADDINV_UZI_AMMO]; ++i ) {
+			for (i = 0; i < GF_SecretInvItems[ADDINV_UZI_AMMO]; ++i) {
 				AddDisplayPickup(ID_UZI_AMMO_ITEM);
 			}
-		} else {
+		}
+		else {
 			Lara.uzi_ammo += 80 * GF_Add2InvItems[ADDINV_UZI_AMMO];
 		}
-	} else if( (!isSecret && GF_Add2InvItems[ADDINV_UZI]) || (isSecret && GF_SecretInvItems[ADDINV_UZI]) ) {
+	}
+	else if ((!isSecret && GF_Add2InvItems[ADDINV_UZI]) || (isSecret && GF_SecretInvItems[ADDINV_UZI])) {
 		start->has_uzis = 1;
 		Inv_AddItem(ID_UZI_ITEM);
-		if( isSecret ) {
+		if (isSecret) {
 			AddDisplayPickup(ID_UZI_ITEM);
 			Lara.uzi_ammo += 80 * GF_SecretInvItems[ADDINV_UZI_AMMO];
-			for( i = 0; i < GF_SecretInvItems[ADDINV_UZI_AMMO]; ++i ) {
+			for (i = 0; i < GF_SecretInvItems[ADDINV_UZI_AMMO]; ++i) {
 				AddDisplayPickup(ID_UZI_AMMO_ITEM);
 			}
-		} else {
+		}
+		else {
 			Lara.uzi_ammo += 80 * GF_Add2InvItems[ADDINV_UZI_AMMO];
 		}
-	} else {
-		if( isSecret ) {
-			for( i = 0; i < GF_SecretInvItems[ADDINV_UZI_AMMO]; ++i ) {
+	}
+	else {
+		if (isSecret) {
+			for (i = 0; i < GF_SecretInvItems[ADDINV_UZI_AMMO]; ++i) {
 				Inv_AddItem(ID_UZI_AMMO_ITEM);
 				AddDisplayPickup(ID_UZI_AMMO_ITEM);
 			}
-		} else {
-			for( i = 0; i < GF_Add2InvItems[ADDINV_UZI_AMMO]; ++i ) {
+		}
+		else {
+			for (i = 0; i < GF_Add2InvItems[ADDINV_UZI_AMMO]; ++i) {
 				Inv_AddItem(ID_UZI_AMMO_ITEM);
 			}
 		}
 	}
 
 	// Harpoon
-	if( Inv_RequestItem(ID_HARPOON_ITEM) ) {
-		if( isSecret ) {
+	if (Inv_RequestItem(ID_HARPOON_ITEM)) {
+		if (isSecret) {
 			Lara.harpoon_ammo += 3 * GF_SecretInvItems[ADDINV_HARPOON_AMMO];
-			for( i = 0; i < GF_SecretInvItems[ADDINV_HARPOON_AMMO]; ++i ) {
+			for (i = 0; i < GF_SecretInvItems[ADDINV_HARPOON_AMMO]; ++i) {
 				AddDisplayPickup(ID_HARPOON_AMMO_ITEM);
 			}
-		} else {
+		}
+		else {
 			Lara.harpoon_ammo += 3 * GF_Add2InvItems[ADDINV_HARPOON_AMMO];
 		}
-	} else if( (!isSecret && GF_Add2InvItems[ADDINV_HARPOON]) || (isSecret && GF_SecretInvItems[ADDINV_HARPOON]) ) {
+	}
+	else if ((!isSecret && GF_Add2InvItems[ADDINV_HARPOON]) || (isSecret && GF_SecretInvItems[ADDINV_HARPOON])) {
 		start->has_harpoon = 1;
 		Inv_AddItem(ID_HARPOON_ITEM);
-		if( isSecret ) {
+		if (isSecret) {
 			AddDisplayPickup(ID_HARPOON_ITEM);
 			Lara.harpoon_ammo += 3 * GF_SecretInvItems[ADDINV_HARPOON_AMMO];
-			for( i = 0; i < GF_SecretInvItems[ADDINV_HARPOON_AMMO]; ++i ) {
+			for (i = 0; i < GF_SecretInvItems[ADDINV_HARPOON_AMMO]; ++i) {
 				AddDisplayPickup(ID_HARPOON_AMMO_ITEM);
 			}
-		} else {
+		}
+		else {
 			Lara.harpoon_ammo += 3 * GF_Add2InvItems[ADDINV_HARPOON_AMMO];
 		}
-	} else {
-		if( isSecret ) {
-			for( i = 0; i < GF_SecretInvItems[ADDINV_HARPOON_AMMO]; ++i ) {
+	}
+	else {
+		if (isSecret) {
+			for (i = 0; i < GF_SecretInvItems[ADDINV_HARPOON_AMMO]; ++i) {
 				Inv_AddItem(ID_HARPOON_AMMO_ITEM);
 				AddDisplayPickup(ID_HARPOON_AMMO_ITEM);
 			}
-		} else {
-			for( i = 0; i < GF_Add2InvItems[ADDINV_HARPOON_AMMO]; ++i ) {
+		}
+		else {
+			for (i = 0; i < GF_Add2InvItems[ADDINV_HARPOON_AMMO]; ++i) {
 				Inv_AddItem(ID_HARPOON_AMMO_ITEM);
 			}
 		}
 	}
 
 	// M16
-	if( Inv_RequestItem(ID_M16_ITEM) ) {
-		if( isSecret ) {
+	if (Inv_RequestItem(ID_M16_ITEM)) {
+		if (isSecret) {
 			Lara.m16_ammo += 40 * GF_SecretInvItems[ADDINV_M16_AMMO];
-			for( i = 0; i < GF_SecretInvItems[ADDINV_M16_AMMO]; ++i ) {
+			for (i = 0; i < GF_SecretInvItems[ADDINV_M16_AMMO]; ++i) {
 				AddDisplayPickup(ID_M16_AMMO_ITEM);
 			}
-		} else {
+		}
+		else {
 			Lara.m16_ammo += 40 * GF_Add2InvItems[ADDINV_M16_AMMO];
 		}
-	} else if( (!isSecret && GF_Add2InvItems[ADDINV_M16]) || (isSecret && GF_SecretInvItems[ADDINV_M16]) ) {
+	}
+	else if ((!isSecret && GF_Add2InvItems[ADDINV_M16]) || (isSecret && GF_SecretInvItems[ADDINV_M16])) {
 		start->has_m16 = 1;
 		Inv_AddItem(ID_M16_ITEM);
-		if( isSecret ) {
+		if (isSecret) {
 			AddDisplayPickup(ID_M16_ITEM);
 			Lara.m16_ammo += 40 * GF_SecretInvItems[ADDINV_M16_AMMO];
-			for( i = 0; i < GF_SecretInvItems[ADDINV_M16_AMMO]; ++i ) {
+			for (i = 0; i < GF_SecretInvItems[ADDINV_M16_AMMO]; ++i) {
 				AddDisplayPickup(ID_M16_AMMO_ITEM);
 			}
-		} else {
+		}
+		else {
 			Lara.m16_ammo += 40 * GF_Add2InvItems[ADDINV_M16_AMMO];
 		}
-	} else {
-		if( isSecret ) {
-			for( i = 0; i < GF_SecretInvItems[ADDINV_M16_AMMO]; ++i ) {
+	}
+	else {
+		if (isSecret) {
+			for (i = 0; i < GF_SecretInvItems[ADDINV_M16_AMMO]; ++i) {
 				Inv_AddItem(ID_M16_AMMO_ITEM);
 				AddDisplayPickup(ID_M16_AMMO_ITEM);
 			}
-		} else {
-			for( i = 0; i < GF_Add2InvItems[ADDINV_M16_AMMO]; ++i ) {
+		}
+		else {
+			for (i = 0; i < GF_Add2InvItems[ADDINV_M16_AMMO]; ++i) {
 				Inv_AddItem(ID_M16_AMMO_ITEM);
 			}
 		}
 	}
 
 	// Grenade
-	if( Inv_RequestItem(ID_GRENADE_ITEM) ) {
-		if( isSecret ) {
+	if (Inv_RequestItem(ID_GRENADE_ITEM)) {
+		if (isSecret) {
 			Lara.grenade_ammo += 2 * GF_SecretInvItems[ADDINV_GRENADE_AMMO];
-			for( i = 0; i < GF_SecretInvItems[ADDINV_GRENADE_AMMO]; ++i ) {
+			for (i = 0; i < GF_SecretInvItems[ADDINV_GRENADE_AMMO]; ++i) {
 				AddDisplayPickup(ID_GRENADE_AMMO_ITEM);
 			}
-		} else {
+		}
+		else {
 			Lara.grenade_ammo += 2 * GF_Add2InvItems[ADDINV_GRENADE_AMMO];
 		}
-	} else if( (!isSecret && GF_Add2InvItems[ADDINV_GRENADE]) || (isSecret && GF_SecretInvItems[ADDINV_GRENADE]) ) {
+	}
+	else if ((!isSecret && GF_Add2InvItems[ADDINV_GRENADE]) || (isSecret && GF_SecretInvItems[ADDINV_GRENADE])) {
 		start->has_grenade = 1;
 		Inv_AddItem(ID_GRENADE_ITEM);
-		if( isSecret ) {
+		if (isSecret) {
 			AddDisplayPickup(ID_GRENADE_ITEM);
 			Lara.grenade_ammo += 2 * GF_SecretInvItems[ADDINV_GRENADE_AMMO];
-			for( i = 0; i < GF_SecretInvItems[ADDINV_GRENADE_AMMO]; ++i ) {
+			for (i = 0; i < GF_SecretInvItems[ADDINV_GRENADE_AMMO]; ++i) {
 				AddDisplayPickup(ID_GRENADE_AMMO_ITEM);
 			}
-		} else {
+		}
+		else {
 			Lara.grenade_ammo += 2 * GF_Add2InvItems[ADDINV_GRENADE_AMMO];
 		}
-	} else {
-		if( isSecret ) {
-			for( i = 0; i < GF_SecretInvItems[ADDINV_GRENADE_AMMO]; ++i ) {
+	}
+	else {
+		if (isSecret) {
+			for (i = 0; i < GF_SecretInvItems[ADDINV_GRENADE_AMMO]; ++i) {
 				Inv_AddItem(ID_GRENADE_AMMO_ITEM);
 				AddDisplayPickup(ID_GRENADE_AMMO_ITEM);
 			}
-		} else {
-			for( i = 0; i < GF_Add2InvItems[ADDINV_GRENADE_AMMO]; ++i ) {
+		}
+		else {
+			for (i = 0; i < GF_Add2InvItems[ADDINV_GRENADE_AMMO]; ++i) {
 				Inv_AddItem(ID_GRENADE_AMMO_ITEM);
 			}
 		}
 	}
 
-	if( isSecret ) {
+	if (isSecret) {
 		// Flares (secret bonus)
-		for( i = 0; i < GF_SecretInvItems[ADDINV_FLARE]; ++i ) {
+		for (i = 0; i < GF_SecretInvItems[ADDINV_FLARE]; ++i) {
 			Inv_AddItem(ID_FLARE_ITEM);
 			AddDisplayPickup(ID_FLARE_ITEM);
 		}
 		// Medipacks (secret bonus)
-		for( i = 0; i < GF_SecretInvItems[ADDINV_SMALL_MEDIPACK]; ++i ) {
+		for (i = 0; i < GF_SecretInvItems[ADDINV_SMALL_MEDIPACK]; ++i) {
 			Inv_AddItem(ID_SMALL_MEDIPACK_ITEM);
 			AddDisplayPickup(ID_SMALL_MEDIPACK_ITEM);
 		}
-		for( i = 0; i < GF_SecretInvItems[ADDINV_LARGE_MEDIPACK]; ++i ) {
+		for (i = 0; i < GF_SecretInvItems[ADDINV_LARGE_MEDIPACK]; ++i) {
 			Inv_AddItem(ID_LARGE_MEDIPACK_ITEM);
 			AddDisplayPickup(ID_LARGE_MEDIPACK_ITEM);
 		}
 		// Pickups (secret bonus)
-		for( i = 0; i < GF_SecretInvItems[ADDINV_PICKUP1]; ++i ) {
+		for (i = 0; i < GF_SecretInvItems[ADDINV_PICKUP1]; ++i) {
 			Inv_AddItem(ID_PICKUP_ITEM1);
 			AddDisplayPickup(ID_PICKUP_ITEM1);
 		}
-		for( i = 0; i < GF_SecretInvItems[ADDINV_PICKUP2]; ++i ) {
+		for (i = 0; i < GF_SecretInvItems[ADDINV_PICKUP2]; ++i) {
 			Inv_AddItem(ID_PICKUP_ITEM2);
 			AddDisplayPickup(ID_PICKUP_ITEM2);
 		}
 		// Puzzles (secret bonus)
-		for( i = 0; i < GF_SecretInvItems[ADDINV_PUZZLE1]; ++i ) {
+		for (i = 0; i < GF_SecretInvItems[ADDINV_PUZZLE1]; ++i) {
 			Inv_AddItem(ID_PUZZLE_ITEM1);
 			AddDisplayPickup(ID_PUZZLE_ITEM1);
 		}
-		for( i = 0; i < GF_SecretInvItems[ADDINV_PUZZLE2]; ++i ) {
+		for (i = 0; i < GF_SecretInvItems[ADDINV_PUZZLE2]; ++i) {
 			Inv_AddItem(ID_PUZZLE_ITEM2);
 			AddDisplayPickup(ID_PUZZLE_ITEM2);
 		}
-		for( i = 0; i < GF_SecretInvItems[ADDINV_PUZZLE3]; ++i ) {
+		for (i = 0; i < GF_SecretInvItems[ADDINV_PUZZLE3]; ++i) {
 			Inv_AddItem(ID_PUZZLE_ITEM3);
 			AddDisplayPickup(ID_PUZZLE_ITEM3);
 		}
-		for( i = 0; i < GF_SecretInvItems[ADDINV_PUZZLE4]; ++i ) {
+		for (i = 0; i < GF_SecretInvItems[ADDINV_PUZZLE4]; ++i) {
 			Inv_AddItem(ID_PUZZLE_ITEM4);
 			AddDisplayPickup(ID_PUZZLE_ITEM4);
 		}
 		// Keys (secret bonus)
-		for( i = 0; i < GF_SecretInvItems[ADDINV_KEY1]; ++i ) {
+		for (i = 0; i < GF_SecretInvItems[ADDINV_KEY1]; ++i) {
 			Inv_AddItem(ID_KEY_ITEM1);
 			AddDisplayPickup(ID_KEY_ITEM1);
 		}
-		for( i = 0; i < GF_SecretInvItems[ADDINV_KEY2]; ++i ) {
+		for (i = 0; i < GF_SecretInvItems[ADDINV_KEY2]; ++i) {
 			Inv_AddItem(ID_KEY_ITEM2);
 			AddDisplayPickup(ID_KEY_ITEM2);
 		}
-		for( i = 0; i < GF_SecretInvItems[ADDINV_KEY3]; ++i ) {
+		for (i = 0; i < GF_SecretInvItems[ADDINV_KEY3]; ++i) {
 			Inv_AddItem(ID_KEY_ITEM3);
 			AddDisplayPickup(ID_KEY_ITEM3);
 		}
-		for( i = 0; i < GF_SecretInvItems[ADDINV_KEY4]; ++i ) {
+		for (i = 0; i < GF_SecretInvItems[ADDINV_KEY4]; ++i) {
 			Inv_AddItem(ID_KEY_ITEM4);
 			AddDisplayPickup(ID_KEY_ITEM4);
 		}
 		// Clear the array (secret bonus)
 		memset(GF_SecretInvItems, 0, sizeof(GF_SecretInvItems));
-	} else {
+	}
+	else {
 		// Flares (level start)
-		for( i = 0; i < GF_Add2InvItems[ADDINV_FLARE]; ++i ) {
+		for (i = 0; i < GF_Add2InvItems[ADDINV_FLARE]; ++i) {
 			Inv_AddItem(ID_FLARE_ITEM);
 		}
 		// Medipacks (level start)
-		for( i = 0; i < GF_Add2InvItems[ADDINV_SMALL_MEDIPACK]; ++i ) {
+		for (i = 0; i < GF_Add2InvItems[ADDINV_SMALL_MEDIPACK]; ++i) {
 			Inv_AddItem(ID_SMALL_MEDIPACK_ITEM);
 		}
-		for( i = 0; i < GF_Add2InvItems[ADDINV_LARGE_MEDIPACK]; ++i ) {
+		for (i = 0; i < GF_Add2InvItems[ADDINV_LARGE_MEDIPACK]; ++i) {
 			Inv_AddItem(ID_LARGE_MEDIPACK_ITEM);
 		}
 		// Pickups (level start)
-		for( i = 0; i < GF_Add2InvItems[ADDINV_PICKUP1]; ++i ) {
+		for (i = 0; i < GF_Add2InvItems[ADDINV_PICKUP1]; ++i) {
 			Inv_AddItem(ID_PICKUP_ITEM1);
 		}
-		for( i = 0; i < GF_Add2InvItems[ADDINV_PICKUP2]; ++i ) {
+		for (i = 0; i < GF_Add2InvItems[ADDINV_PICKUP2]; ++i) {
 			Inv_AddItem(ID_PICKUP_ITEM2);
 		}
 		// Puzzles (level start)
-		for( i = 0; i < GF_Add2InvItems[ADDINV_PUZZLE1]; ++i ) {
+		for (i = 0; i < GF_Add2InvItems[ADDINV_PUZZLE1]; ++i) {
 			Inv_AddItem(ID_PUZZLE_ITEM1);
 		}
-		for( i = 0; i < GF_Add2InvItems[ADDINV_PUZZLE2]; ++i ) {
+		for (i = 0; i < GF_Add2InvItems[ADDINV_PUZZLE2]; ++i) {
 			Inv_AddItem(ID_PUZZLE_ITEM2);
 		}
-		for( i = 0; i < GF_Add2InvItems[ADDINV_PUZZLE3]; ++i ) {
+		for (i = 0; i < GF_Add2InvItems[ADDINV_PUZZLE3]; ++i) {
 			Inv_AddItem(ID_PUZZLE_ITEM3);
 		}
-		for( i = 0; i < GF_Add2InvItems[ADDINV_PUZZLE4]; ++i ) {
+		for (i = 0; i < GF_Add2InvItems[ADDINV_PUZZLE4]; ++i) {
 			Inv_AddItem(ID_PUZZLE_ITEM4);
 		}
 		// Keys (level start)
-		for( i = 0; i < GF_Add2InvItems[ADDINV_KEY1]; ++i ) {
+		for (i = 0; i < GF_Add2InvItems[ADDINV_KEY1]; ++i) {
 			Inv_AddItem(ID_KEY_ITEM1);
 		}
-		for( i = 0; i < GF_Add2InvItems[ADDINV_KEY2]; ++i ) {
+		for (i = 0; i < GF_Add2InvItems[ADDINV_KEY2]; ++i) {
 			Inv_AddItem(ID_KEY_ITEM2);
 		}
-		for( i = 0; i < GF_Add2InvItems[ADDINV_KEY3]; ++i ) {
+		for (i = 0; i < GF_Add2InvItems[ADDINV_KEY3]; ++i) {
 			Inv_AddItem(ID_KEY_ITEM3);
 		}
-		for( i = 0; i < GF_Add2InvItems[ADDINV_KEY4]; ++i ) {
+		for (i = 0; i < GF_Add2InvItems[ADDINV_KEY4]; ++i) {
 			Inv_AddItem(ID_KEY_ITEM4);
 		}
 		// Clear the array (level start)

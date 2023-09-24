@@ -33,7 +33,7 @@ DWORD SyncTicks(DWORD skip) {
 	do {
 		UpdateTicks();
 		elapsed = (double)(TIME_Ticks - lastTicks) / TIME_Frequency;
-	} while( elapsed < target );
+	} while (elapsed < target);
 	return (DWORD)elapsed;
 }
 
@@ -48,7 +48,7 @@ void UpdateTicks() {
 bool TIME_Init() {
 	LARGE_INTEGER frequency;
 
-	if( !QueryPerformanceFrequency(&frequency) )
+	if (!QueryPerformanceFrequency(&frequency))
 		return false;
 
 	TIME_Frequency = (double)frequency.QuadPart / (double)TICKS_PER_SECOND;
@@ -65,11 +65,11 @@ DWORD Sync() {
 
 LPVOID UT_LoadResource(LPCTSTR lpName, LPCTSTR lpType) {
 	HRSRC hRes = FindResource(GameModule, lpName, lpType);
-	if( hRes == NULL )
+	if (hRes == NULL)
 		return NULL;
 
 	HGLOBAL hGlb = LoadResource(GameModule, hRes);
-	if( hGlb == NULL )
+	if (hGlb == NULL)
 		return NULL;
 
 	return LockResource(hGlb);;
@@ -78,11 +78,12 @@ LPVOID UT_LoadResource(LPCTSTR lpName, LPCTSTR lpType) {
 // NOTE: redesigned to make it more accurate
 void UT_InitAccurateTimer() {
 	LARGE_INTEGER frequency, counter;
-	if( QueryPerformanceFrequency(&frequency) ) {
+	if (QueryPerformanceFrequency(&frequency)) {
 		TIME_Period_us = 1.0 / (double)frequency.QuadPart; // Tick period for one microsecond
 		QueryPerformanceCounter(&counter);
 		TIME_Start_us = counter.QuadPart;
-	} else {
+	}
+	else {
 		TIME_Period_us = 0.0;
 		TIME_Start_us = 0;
 	}
@@ -105,12 +106,12 @@ BOOL UT_CenterWindow(HWND hWnd) {
 	x = (screenArea.left + screenArea.right) / 2 - (windowArea.right - windowArea.left) / 2;
 	y = (screenArea.top + screenArea.bottom) / 2 - (windowArea.bottom - windowArea.top) / 2;
 
-	return SetWindowPos(hWnd, 0, x, y, -1, -1, SWP_NOACTIVATE|SWP_NOZORDER|SWP_NOSIZE);
+	return SetWindowPos(hWnd, 0, x, y, -1, -1, SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOSIZE);
 }
 
 LPTSTR UT_FindArg(LPCTSTR str) {
 	LPTSTR next = strstr(CommandLinePtr, str);
-	return ( next ) ? next += lstrlen(str) : NULL;
+	return (next) ? next += lstrlen(str) : NULL;
 }
 
 int UT_MessageBox(LPCTSTR lpText, HWND hWnd) {
@@ -120,43 +121,43 @@ int UT_MessageBox(LPCTSTR lpText, HWND hWnd) {
 int UT_ErrorBox(UINT uID, HWND hWnd) {
 	char str[256];
 
-	if( !LoadString(GameModule, uID, str, 256))
+	if (!LoadString(GameModule, uID, str, 256))
 		return 0;
 
 	return UT_MessageBox(str, hWnd);
 }
 
 BOOL CD_NoteAlert(LPCTSTR lpTemplateName, HWND hWndParent) {
-	return ( 0 != DialogBoxParam(GameModule, lpTemplateName, hWndParent, DialogBoxProc, 0) );
+	return (0 != DialogBoxParam(GameModule, lpTemplateName, hWndParent, DialogBoxProc, 0));
 }
 
 INT_PTR CALLBACK DialogBoxProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-	switch( uMsg ) {
-		case WM_INITDIALOG :
-			UT_CenterWindow(hwndDlg);
-			break;
+	switch (uMsg) {
+	case WM_INITDIALOG:
+		UT_CenterWindow(hwndDlg);
+		break;
 
-		case WM_COMMAND :
-			switch( LOWORD(wParam) ) {
-				case IDOK :
-					EndDialog(hwndDlg, 1);
-					return TRUE;
-				case IDCANCEL :
-					EndDialog(hwndDlg, 0);
-					return TRUE;
-			}
-			break;
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDOK:
+			EndDialog(hwndDlg, 1);
+			return TRUE;
+		case IDCANCEL:
+			EndDialog(hwndDlg, 0);
+			return TRUE;
+		}
+		break;
 	}
 	return FALSE;
 }
 
-void UT_MemBlt(BYTE *dstBuf, DWORD dstX, DWORD dstY, DWORD width, DWORD height, DWORD dstPitch,
-					   BYTE *srcBuf, DWORD srcX, DWORD srcY, DWORD srcPitch)
+void UT_MemBlt(BYTE* dstBuf, DWORD dstX, DWORD dstY, DWORD width, DWORD height, DWORD dstPitch,
+	BYTE* srcBuf, DWORD srcX, DWORD srcY, DWORD srcPitch)
 {
-	BYTE *src = srcBuf + srcX + srcY * srcPitch;
-	BYTE *dst = dstBuf + dstX + dstY * dstPitch;
+	BYTE* src = srcBuf + srcX + srcY * srcPitch;
+	BYTE* dst = dstBuf + dstX + dstY * dstPitch;
 
-	for( DWORD i=0; i<height; ++i ) {
+	for (DWORD i = 0; i < height; ++i) {
 		memcpy(dst, src, width);
 		src += srcPitch;
 		dst += dstPitch;

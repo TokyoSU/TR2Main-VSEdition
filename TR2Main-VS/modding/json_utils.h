@@ -25,9 +25,9 @@
 #include "global/types.h"
 #include "json-parser/json.h"
 
-json_value *GetJsonField(json_value *root, json_type fieldType, const char *name, DWORD *pIndex);
-json_value *GetJsonObjectByStringField(json_value *root, const char *name, const char *str, bool caseSensitive, DWORD *pIndex);
-int GetJsonIntegerFieldValue(json_value *root, const char *name, int defaultValue);
-double GetJsonFloatFieldValue(json_value *root, const char *name, double defaultValue);
+json_value* GetJsonField(json_value* root, json_type fieldType, const char* name, DWORD* pIndex);
+json_value* GetJsonObjectByStringField(json_value* root, const char* name, const char* str, bool caseSensitive, DWORD* pIndex);
+int GetJsonIntegerFieldValue(json_value* root, const char* name, int defaultValue);
+double GetJsonFloatFieldValue(json_value* root, const char* name, double defaultValue);
 
 #endif // JSON_UTILS_H_INCLUDED

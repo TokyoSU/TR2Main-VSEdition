@@ -25,7 +25,7 @@
 #include "global/types.h"
 
 #ifdef FEATURE_INPUT_IMPROVED
-// all essential definitions are inside XInput.h, but no static lib linked here
+ // all essential definitions are inside XInput.h, but no static lib linked here
 #include <XInput.h>
 
 #ifndef XINPUT_GAMEPAD_GUIDE

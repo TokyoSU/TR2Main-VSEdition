@@ -23,13 +23,11 @@
 #include "game/shark.h"
 #include "global/vars.h"
 
-
-
-/*
- * Inject function
- */
+ /*
+  * Inject function
+  */
 void Inject_Shark() {
-//	INJECT(0x0043C900, JellyControl);
-//	INJECT(0x0043CA20, BaracuddaControl);
-//	INJECT(0x0043CC50, SharkControl);
+	//	INJECT(0x0043C900, JellyControl);
+	//	INJECT(0x0043CA20, BaracuddaControl);
+	//	INJECT(0x0043CC50, SharkControl);
 }

@@ -23,16 +23,14 @@
 #include "game/lot.h"
 #include "global/vars.h"
 
-
-
-/*
- * Inject function
- */
+ /*
+  * Inject function
+  */
 void Inject_Lot() {
-//	INJECT(0x00432B10, InitialiseLOTarray);
-//	INJECT(0x00432B70, DisableBaddieAI);
-//	INJECT(0x00432BC0, EnableBaddieAI);
-//	INJECT(0x00432D70, InitialiseSlot);
-//	INJECT(0x00432F80, CreateZone);
-//	INJECT(0x00433040, ClearLOT);
+	//	INJECT(0x00432B10, InitialiseLOTarray);
+	//	INJECT(0x00432B70, DisableBaddieAI);
+	//	INJECT(0x00432BC0, EnableBaddieAI);
+	//	INJECT(0x00432D70, InitialiseSlot);
+	//	INJECT(0x00432F80, CreateZone);
+	//	INJECT(0x00433040, ClearLOT);
 }

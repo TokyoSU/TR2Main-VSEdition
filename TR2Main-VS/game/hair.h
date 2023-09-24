@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 #define InitialiseHair ((void(__cdecl*)(void)) 0x00420E80)
 #define HairControl ((void(__cdecl*)(int)) 0x00420F00)
 #define DrawHair ((void(__cdecl*)(void)) 0x00421900)

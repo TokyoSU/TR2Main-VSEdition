@@ -68,11 +68,11 @@ extern void DisplayJoystickHintText(bool isSelect, bool isContinue, bool isDesel
 #include "modding/file_utils.h"
 
 static int GetSaveFileName(LPSTR destName, DWORD destSize, int slotNumber) {
-	if( destName == NULL || destSize == 0 || slotNumber < 0 ) {
+	if (destName == NULL || destSize == 0 || slotNumber < 0) {
 		return -1;
 	}
 #ifdef FEATURE_GOLD
-	snprintf(destName, destSize, ".\\saves%s\\savegame.%d", IsGold()?"Gold":"", slotNumber);
+	snprintf(destName, destSize, ".\\saves%s\\savegame.%d", IsGold() ? "Gold" : "", slotNumber);
 #else // !FEATURE_GOLD
 	snprintf(destName, destSize, ".\\saves\\savegame.%d", slotNumber);
 #endif // !FEATURE_GOLD
@@ -83,18 +83,18 @@ static int GetSaveFileName(LPSTR destName, DWORD destSize, int slotNumber) {
 DWORD SavegameSlots = 16;
 
 __int16 StartGame(int levelID, GF_LEVEL_TYPE levelType) {
-	if( levelType == GFL_NORMAL || levelType == GFL_SAVED || levelType == GFL_DEMO )
+	if (levelType == GFL_NORMAL || levelType == GFL_SAVED || levelType == GFL_DEMO)
 		CurrentLevel = levelID;
 
-	if( levelType != GFL_SAVED )
+	if (levelType != GFL_SAVED)
 		ModifyStartInfo(levelID);
 
 	IsTitleLoaded = FALSE;
 
-	if( levelType != GFL_SAVED )
+	if (levelType != GFL_SAVED)
 		InitialiseLevelFlags();
 
-	if( !InitialiseLevel(levelID, levelType) ) {
+	if (!InitialiseLevel(levelID, levelType)) {
 		CurrentLevel = 0;
 		return GF_EXIT_GAME;
 	}
@@ -107,51 +107,53 @@ __int16 StartGame(int levelID, GF_LEVEL_TYPE levelType) {
 #ifdef FEATURE_INPUT_IMPROVED
 	JoyOutputReset();
 #endif // FEATURE_INPUT_IMPROVED
-	switch( res ) {
-		case GF_EXIT_GAME :
-			CurrentLevel = 0;
-			return GF_EXIT_GAME;
+	switch (res) {
+	case GF_EXIT_GAME:
+		CurrentLevel = 0;
+		return GF_EXIT_GAME;
 
-		case GF_START_DEMO :
-		case GF_EXIT_TO_TITLE :
-			return res;
+	case GF_START_DEMO:
+	case GF_EXIT_TO_TITLE:
+		return res;
 	}
 
-	if( IsLevelComplete ) {
-		if( (GF_GameFlow.flags & GFF_DemoVersion) != 0 && GF_GameFlow.singleLevel )
+	if (IsLevelComplete) {
+		if ((GF_GameFlow.flags & GFF_DemoVersion) != 0 && GF_GameFlow.singleLevel)
 			return GF_EXIT_TO_TITLE;
 
-		if( CurrentLevel == 0 ) { // Assault (Lara Home)
+		if (CurrentLevel == 0) { // Assault (Lara Home)
 			S_FadeToBlack();
 			return GF_EXIT_TO_TITLE;
-		} else { // Normal level
+		}
+		else { // Normal level
 			S_FadeInInventory(TRUE);
 			return GF_LEVEL_COMPLETE | CurrentLevel;
 		}
 	}
 
 	S_FadeToBlack();
-	if( !InventoryChosen )
+	if (!InventoryChosen)
 		return GF_EXIT_TO_TITLE;
 
-	if( InventoryExtraData[0] == 0 ) { // passport page (Load game)
+	if (InventoryExtraData[0] == 0) { // passport page (Load game)
 		S_LoadGame(&SaveGame, sizeof(SAVEGAME_INFO), InventoryExtraData[1]);
 		return GF_START_SAVEDGAME | InventoryExtraData[1]; // saveGame slot
 	}
 
-	if( InventoryExtraData[0] == 1 ) { // passport page (New game | Restart Level)
+	if (InventoryExtraData[0] == 1) { // passport page (New game | Restart Level)
 #ifdef FEATURE_HUD_IMPROVED
-		if( InventoryMode == INV_DeathMode ) {
+		if (InventoryMode == INV_DeathMode) {
 			// check if previous level is not Assault and not a final one (before bonus level)
-			if( CurrentLevel > 1 && !GF_IsFinalLevel(CurrentLevel-1) ) {
-				SaveGame.start[CurrentLevel] = SaveGame.start[CurrentLevel-1];
-			} else {
+			if (CurrentLevel > 1 && !GF_IsFinalLevel(CurrentLevel - 1)) {
+				SaveGame.start[CurrentLevel] = SaveGame.start[CurrentLevel - 1];
+			}
+			else {
 				ModifyStartInfo(CurrentLevel);
 			}
 			return GF_START_GAME | CurrentLevel;
 		}
 #endif // FEATURE_HUD_IMPROVED
-		if( (GF_GameFlow.flags & GFF_SelectAnyLevel) != 0 )
+		if ((GF_GameFlow.flags & GFF_SelectAnyLevel) != 0)
 			return GF_START_GAME | (InventoryExtraData[1] + 1); // selected level
 		else
 			return GF_START_GAME | 1; // first level
@@ -168,7 +170,7 @@ int GameLoop(BOOL demoMode) {
 	NoInputCounter = 0;
 
 	result = ControlPhase(1, demoMode);
-	while( result == 0 ) {
+	while (result == 0) {
 		nTicks = DrawPhaseGame();
 		result = IsGameToExit ? GF_EXIT_GAME : ControlPhase(nTicks, demoMode);
 	}
@@ -177,13 +179,13 @@ int GameLoop(BOOL demoMode) {
 
 #ifdef FEATURE_BACKGROUND_IMPROVED
 	// this fixes issue when the final "bath" cut scene is cut off
-	if( Lara.extra_anim && LaraItem->currentAnimState == EXTRA_FINALANIM ) {
+	if (Lara.extra_anim && LaraItem->currentAnimState == EXTRA_FINALANIM) {
 		S_CopyScreenToBuffer();
 		BGND2_ShowPicture(0, 0, 20, 70, FALSE);
 	}
 #endif // FEATURE_BACKGROUND_IMPROVED
 	S_CDStop();
-	if( MusicVolume > 0 ) {
+	if (MusicVolume > 0) {
 		S_CDVolume(MusicVolume * 25 + 5);
 	}
 	return result;
@@ -195,40 +197,42 @@ int LevelCompleteSequence() {
 
 int LevelStats(int levelID) {
 	int hours, minutes, seconds;
-	char timeString[100] = {0};
+	char timeString[100] = { 0 };
 
 	CreateStartInfo(levelID); // NOTE: this line is absent in the original code, but it's required for "Restart Level" feature
 	SaveGame.start[levelID].statistics = SaveGame.statistics;
 
 	seconds = SaveGame.statistics.timer / 30 % 60;
 	minutes = SaveGame.statistics.timer / 30 / 60 % 60;
-	hours   = SaveGame.statistics.timer / 30 / 60 / 60;
+	hours = SaveGame.statistics.timer / 30 / 60 / 60;
 	sprintf(timeString, "%02d:%02d:%02d", hours, minutes, seconds);
 
 #ifdef FEATURE_BACKGROUND_IMPROVED
 	TempVideoAdjust(HiRes, 1.0);
-	if( SavedAppSettings.RenderMode == RM_Software ) {
+	if (SavedAppSettings.RenderMode == RM_Software) {
 		S_CopyScreenToBuffer();
 		RGB888 gamePal[256];
 		memcpy(gamePal, GamePalette8, sizeof(gamePal));
-		for( int i = 0; i<256; ++i ) {
+		for (int i = 0; i < 256; ++i) {
 			GamePalette8[i] = gamePal[DepthQIndex[i]];
 		}
 		FadeToPal(10, GamePalette8);
 		memcpy(GamePalette8, gamePal, sizeof(gamePal));
 		FadeToPal(0, GamePalette8);
-	} else if( !StatsBackgroundMode ) {
+	}
+	else if (!StatsBackgroundMode) {
 		S_CopyScreenToBuffer();
-		while( !IsGameToExit && BGND2_FadeTo(128, 0) > 128 ) {
+		while (!IsGameToExit && BGND2_FadeTo(128, 0) > 128) {
 			S_InitialisePolyList(FALSE);
 			S_CopyBufferToScreen();
-			if( S_UpdateInput() || IsResetFlag ) {
+			if (S_UpdateInput() || IsResetFlag) {
 				break;
 			}
 			S_OutputPolyList();
 			S_DumpScreen();
 		}
-	} else {
+	}
+	else {
 		S_FadeToBlack();
 	}
 	T_InitPrint();
@@ -243,21 +247,21 @@ int LevelStats(int levelID) {
 	S_CopyScreenToBuffer();
 #endif // FEATURE_BACKGROUND_IMPROVED
 
-	while( CHK_ANY(InputStatus, IN_SELECT) )
+	while (CHK_ANY(InputStatus, IN_SELECT))
 		S_UpdateInput();
 
 #ifdef FEATURE_HUD_IMPROVED
 	DisplayJoystickHintText(false, true, false);
 #endif // FEATURE_HUD_IMPROVED
-	while( !CHK_ANY(InputStatus, IN_SELECT) ) {
+	while (!CHK_ANY(InputStatus, IN_SELECT)) {
 		S_InitialisePolyList(FALSE);
 		S_CopyBufferToScreen();
 		S_UpdateInput();
 		// NOTE: this check is absent in the original game
-		if( IsGameToExit ) {
+		if (IsGameToExit) {
 			break;
 		}
-		if( IsResetFlag ) {
+		if (IsResetFlag) {
 			InputStatus = IN_SELECT;
 		}
 		InputDB = GetDebouncedInput(InputStatus);
@@ -272,7 +276,7 @@ int LevelStats(int levelID) {
 
 	// NOTE: This LevelStats bonusFlag activation is not presented in the original game.
 	// If the level is final, but there no GFE_GAMECOMPLETE in the script, just activate Game+ here.
-	if( levelID == GF_GameFlow.num_Levels-GF_GameFlow.num_Demos-1 ) {
+	if (levelID == GF_GameFlow.num_Levels - GF_GameFlow.num_Demos - 1) {
 		SaveGame.bonusFlag = true;
 	}
 
@@ -291,21 +295,21 @@ int GameStats(int levelID) {
 	TempVideoAdjust(HiRes, 1.0); // NOTE: this line was not in the original code
 	T_InitPrint();
 
-	while( CHK_ANY(InputStatus, IN_SELECT) )
+	while (CHK_ANY(InputStatus, IN_SELECT))
 		S_UpdateInput();
 
 #ifdef FEATURE_HUD_IMPROVED
 	DisplayJoystickHintText(false, true, false);
 #endif // FEATURE_HUD_IMPROVED
-	while( !CHK_ANY(InputStatus, IN_SELECT) ) {
+	while (!CHK_ANY(InputStatus, IN_SELECT)) {
 		S_InitialisePolyList(FALSE);
 		S_CopyBufferToScreen();
 		S_UpdateInput();
 		// NOTE: this check is absent in the original game
-		if( IsGameToExit ) {
+		if (IsGameToExit) {
 			break;
 		}
-		if( IsResetFlag ) {
+		if (IsResetFlag) {
 			InputStatus = IN_SELECT;
 		}
 		InputDB = GetDebouncedInput(InputStatus);
@@ -320,7 +324,7 @@ int GameStats(int levelID) {
 
 	// NOTE: in the original game, there is slightly different bonusFlag activation.
 	// Here removed bonuses initialization, and added the check that the level is final
-	if( CurrentLevel == GF_GameFlow.num_Levels-GF_GameFlow.num_Demos-1 ) {
+	if (CurrentLevel == GF_GameFlow.num_Levels - GF_GameFlow.num_Demos - 1) {
 		SaveGame.bonusFlag = true;
 	}
 
@@ -354,7 +358,7 @@ void SeedRandomDraw(int seed) {
 	RandomDraw = seed;
 }
 
-void GetValidLevelsList(REQUEST_INFO *req) {
+void GetValidLevelsList(REQUEST_INFO* req) {
 	RemoveAllReqItems(req);
 
 	// NOTE: this check fixes original game bug.
@@ -362,15 +366,15 @@ void GetValidLevelsList(REQUEST_INFO *req) {
 	// if the *"Select Level"* option is active.
 	DWORD numLevels = GF_GameFlow.num_Levels - GF_GameFlow.num_Demos;
 
-	for( DWORD i = 1; i < numLevels; ++i )
+	for (DWORD i = 1; i < numLevels; ++i)
 		AddRequesterItem(req, GF_LevelNamesStringTable[i], 0, NULL, 0);
 }
 
-void GetSavedGamesList(REQUEST_INFO *req) {
-	extern void SetPassportRequesterSize(REQUEST_INFO *req);
+void GetSavedGamesList(REQUEST_INFO* req) {
+	extern void SetPassportRequesterSize(REQUEST_INFO * req);
 	SetPassportRequesterSize(req);
 
-	if( req->selected >= req->visibleCount ) {
+	if (req->selected >= req->visibleCount) {
 		req->lineOffset = req->selected - req->visibleCount + 1;
 	}
 	memcpy(RequesterItemFlags1, SaveGameItemFlags1, sizeof(RequesterItemFlags1));
@@ -381,19 +385,19 @@ void DisplayCredits() {
 	int i;
 	RGB888 palette[256];
 #ifdef FEATURE_BACKGROUND_IMPROVED
-	char fileName[64] = {0};
+	char fileName[64] = { 0 };
 #else // !FEATURE_BACKGROUND_IMPROVED
 	DWORD bytesRead;
 	HANDLE hFile;
 #ifdef FEATURE_GOLD
 	DWORD fileSize[10];
-	BYTE *fileData[10];
+	BYTE* fileData[10];
 #else // !FEATURE_GOLD
 	DWORD fileSize[9];
-	BYTE *fileData[9];
+	BYTE* fileData[9];
 #endif // !FEATURE_GOLD
 	DWORD bitmapSize;
-	BYTE *bitmapData;
+	BYTE* bitmapData;
 	LPCSTR fullPath;
 	char fileName[64] = "data\\credit0?.pcx";
 #endif // FEATURE_BACKGROUND_IMPROVED
@@ -402,7 +406,7 @@ void DisplayCredits() {
 	S_UnloadLevelFile();
 	TempVideoAdjust(HiRes, 1.0); // NOTE: this line was not in the original code
 
-	if( !InitialiseLevel(0, 0) ) // init title level
+	if (!InitialiseLevel(0, 0)) // init title level
 		return;
 
 	memcpy(palette, GamePalette8, sizeof(GamePalette8));
@@ -415,23 +419,23 @@ void DisplayCredits() {
 
 	// slideshow loop
 #ifdef FEATURE_GOLD
-	for( i=IsGold()?0:1; i<100; ++i ) {
+	for (i = IsGold() ? 0 : 1; i < 100; ++i) {
 #else // !FEATURE_GOLD
-	for( i=1; i<100; ++i ) {
+	for (i = 1; i < 100; ++i) {
 #endif // !FEATURE_GOLD
 		snprintf(fileName, sizeof(fileName), "data\\credit%02d.pcx", i);
-		if( !BGND2_LoadPicture(fileName, FALSE, FALSE) ) {
+		if (!BGND2_LoadPicture(fileName, FALSE, FALSE)) {
 			BGND2_ShowPicture(30, 225, 10, 2, FALSE);
 		}
 		S_DontDisplayPicture();
 
-		if( IsGameToExit ) {
+		if (IsGameToExit) {
 			return;
 		}
 	}
 	memcpy(GamePalette8, palette, sizeof(GamePalette8));
 	// NOTE: background for final statistics (picture is presented but not used in the original game)
-	if( !BGND2_LoadPicture("data\\end.pcx", TRUE, FALSE) ) {
+	if (!BGND2_LoadPicture("data\\end.pcx", TRUE, FALSE)) {
 		BGND2_ShowPicture(30, 0, 0, 0, FALSE);
 	}
 	IsVidModeLock = false;
@@ -440,42 +444,43 @@ void DisplayCredits() {
 #else // !FEATURE_BACKGROUND_IMPROVED
 	// credit files load loop (preload all files may be reasonable because of CDAudio issues, since PCX are on CD too)
 #ifdef FEATURE_GOLD
-	for( i=0; i<(IsGold()?10:9); ++i ) {
-		fileName[12] = '0'+i+(IsGold()?0:1);
+	for (i = 0; i < (IsGold() ? 10 : 9); ++i) {
+		fileName[12] = '0' + i + (IsGold() ? 0 : 1);
 #else // !FEATURE_GOLD
-	for( i=0; i<9; ++i ) {
-		fileName[12] = '0'+i+1;
+	for (i = 0; i < 9; ++i) {
+		fileName[12] = '0' + i + 1;
 #endif // !FEATURE_GOLD
 		fullPath = GetFullPath(fileName);
 		hFile = CreateFile(fullPath, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		if( hFile != INVALID_HANDLE_VALUE ) {
+		if (hFile != INVALID_HANDLE_VALUE) {
 			fileSize[i] = GetFileSize(hFile, 0);
-			fileData[i] = (BYTE *)game_malloc(fileSize[i], GBUF_LoadPiccyBuffer);
+			fileData[i] = (BYTE*)game_malloc(fileSize[i], GBUF_LoadPiccyBuffer);
 			ReadFile(hFile, fileData[i], fileSize[i], &bytesRead, 0);
 			CloseHandle(hFile);
 		}
 	}
 
-	bitmapSize = 640*480;
-	bitmapData = (BYTE *)game_malloc(bitmapSize, GBUF_LoadPiccyBuffer);
+	bitmapSize = 640 * 480;
+	bitmapData = (BYTE*)game_malloc(bitmapSize, GBUF_LoadPiccyBuffer);
 	S_CDPlay(52, FALSE);
 
 	// slideshow loop
 #ifdef FEATURE_GOLD
-	for( i=0; i<(IsGold()?10:9); ++i ) {
+	for (i = 0; i < (IsGold() ? 10 : 9); ++i) {
 #else // !FEATURE_GOLD
-	for( i=0; i<9; ++i ) {
+	for (i = 0; i < 9; ++i) {
 #endif // !FEATURE_GOLD
 		DecompPCX(fileData[i], fileSize[i], bitmapData, PicPalette);
 
-		if( SavedAppSettings.RenderMode == RM_Software ) {
+		if (SavedAppSettings.RenderMode == RM_Software) {
 #if (DIRECT3D_VERSION >= 0x900)
-			if( PictureBuffer.bitmap != NULL)
+			if (PictureBuffer.bitmap != NULL)
 				memcpy(PictureBuffer.bitmap, bitmapData, PictureBuffer.width * PictureBuffer.height);
 #else // (DIRECT3D_VERSION >= 0x900)
 			WinVidCopyBitmapToBuffer(PictureBufferSurface, bitmapData);
 #endif // (DIRECT3D_VERSION >= 0x900)
-		} else {
+		}
+		else {
 			BGND_Make640x480(bitmapData, PicPalette);
 		}
 
@@ -494,7 +499,7 @@ void DisplayCredits() {
 		S_FadeToBlack(); // fade out 12 frames / 0.4 seconds (software renderer only)
 		S_DontDisplayPicture();
 
-		if( IsGameToExit )
+		if (IsGameToExit)
 			break;
 	}
 
@@ -506,24 +511,24 @@ void DisplayCredits() {
 
 	// NOTE: here is no game_free for game_malloc. Memory will be free in S_DisplayPicture by init_game_malloc call
 #endif // FEATURE_BACKGROUND_IMPROVED
-}
+	}
 
 BOOL S_FrontEndCheck() {
 	HANDLE hFile;
 	DWORD bytesRead;
 	DWORD saveCounter;
-	char levelName[80] = {0};
-	char saveCountStr[16] = {0};
+	char levelName[80] = { 0 };
+	char saveCountStr[16] = { 0 };
 #ifdef FEATURE_SUBFOLDERS
-	char fileName[256] = {0};
+	char fileName[256] = { 0 };
 #else // !FEATURE_SUBFOLDERS
-	char fileName[16] = {0};
+	char fileName[16] = { 0 };
 #endif // !FEATURE_SUBFOLDERS
 
 	Init_Requester(&LoadGameRequester);
 	SavedGamesCount = 0;
 
-	for( DWORD i=0; i<SavegameSlots; ++i ) {
+	for (DWORD i = 0; i < SavegameSlots; ++i) {
 #ifdef FEATURE_SUBFOLDERS
 		GetSaveFileName(fileName, sizeof(fileName), i);
 #else // !FEATURE_SUBFOLDERS
@@ -531,7 +536,7 @@ BOOL S_FrontEndCheck() {
 #endif // !FEATURE_SUBFOLDERS
 		hFile = CreateFile(fileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
-		if( hFile == INVALID_HANDLE_VALUE ) {
+		if (hFile == INVALID_HANDLE_VALUE) {
 			AddRequesterItem(&LoadGameRequester, GF_SpecificStringTable[SSI_EmptySlot], 0, NULL, 0);
 			SaveSlotFlags[i] = 0;
 			continue;
@@ -544,7 +549,7 @@ BOOL S_FrontEndCheck() {
 		wsprintf(saveCountStr, "%d", saveCounter);
 		AddRequesterItem(&LoadGameRequester, levelName, REQFLAG_LEFT, saveCountStr, REQFLAG_RIGHT);
 
-		if( saveCounter > SaveCounter ) {
+		if (saveCounter > SaveCounter) {
 			SaveCounter = saveCounter;
 			LoadGameRequester.selected = i;
 		}
@@ -562,22 +567,22 @@ BOOL S_FrontEndCheck() {
 BOOL S_SaveGame(LPCVOID saveData, DWORD saveSize, int slotNumber) {
 	HANDLE hFile;
 	DWORD bytesWritten;
-	char levelName[80] = {0};
-	char saveCountStr[16] = {0};
+	char levelName[80] = { 0 };
+	char saveCountStr[16] = { 0 };
 
 #ifdef FEATURE_SUBFOLDERS
-	char fileName[256] = {0};
+	char fileName[256] = { 0 };
 	GetSaveFileName(fileName, sizeof(fileName), slotNumber);
-	if( CreateDirectories(fileName, true) ) {
+	if (CreateDirectories(fileName, true)) {
 		return FALSE;
 	}
 #else // !FEATURE_SUBFOLDERS
-	char fileName[16] = {0};
+	char fileName[16] = { 0 };
 	wsprintf(fileName, "savegame.%d", slotNumber);
 #endif // !FEATURE_SUBFOLDERS
 
 	hFile = CreateFile(fileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	if( hFile == INVALID_HANDLE_VALUE )
+	if (hFile == INVALID_HANDLE_VALUE)
 		return FALSE;
 
 	wsprintf(levelName, "%s", GF_LevelNamesStringTable[SaveGame.currentLevel]);
@@ -595,7 +600,7 @@ BOOL S_SaveGame(LPCVOID saveData, DWORD saveSize, int slotNumber) {
 	++SaveCounter;
 
 	// NOTE: There was no such check in the original code. Save files counter incremented anyway
-	if( SaveSlotFlags[slotNumber] == 0 ) {
+	if (SaveSlotFlags[slotNumber] == 0) {
 		SaveSlotFlags[slotNumber] = 1;
 		++SavedGamesCount;
 	}
@@ -607,18 +612,18 @@ BOOL S_LoadGame(LPVOID saveData, DWORD saveSize, int slotNumber) {
 	HANDLE hFile;
 	DWORD bytesRead;
 	DWORD saveCounter;
-	char levelName[80] = {0};
+	char levelName[80] = { 0 };
 
 #ifdef FEATURE_SUBFOLDERS
-	char fileName[256] = {0};
+	char fileName[256] = { 0 };
 	GetSaveFileName(fileName, sizeof(fileName), slotNumber);
 #else // !FEATURE_SUBFOLDERS
-	char fileName[16] = {0};
+	char fileName[16] = { 0 };
 	wsprintf(fileName, "savegame.%d", slotNumber);
 #endif // !FEATURE_SUBFOLDERS
 
 	hFile = CreateFile(fileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if( hFile == INVALID_HANDLE_VALUE )
+	if (hFile == INVALID_HANDLE_VALUE)
 		return FALSE;
 
 	ReadFile(hFile, levelName, 75, &bytesRead, NULL);

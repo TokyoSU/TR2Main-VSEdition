@@ -24,22 +24,22 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
-//	0x004342C0:		EarthQuake
-//	0x004343A0:		ControlCutShotgun
-//	0x004343E0:		InitialiseFinalLevel
-//	0x004344B0:		FinalLevelCounter
-//	0x004346C0:		MiniCopterControl
-//	0x004347A0:		InitialiseDyingMonk
-//	0x00434820:		DyingMonk
-//	0x004348B0:		ControlGongBonger
-//	0x00434970:		DeathSlideCollision
-//	0x00434A30:		ControlDeathSlide
-//	0x00434CC0:		BigBowlControl
-//	0x00434DB0:		BellControl
-//	0x00434E30:		InitialiseWindow
+ /*
+  * Function list
+  */
+  //	0x004342C0:		EarthQuake
+  //	0x004343A0:		ControlCutShotgun
+  //	0x004343E0:		InitialiseFinalLevel
+  //	0x004344B0:		FinalLevelCounter
+  //	0x004346C0:		MiniCopterControl
+  //	0x004347A0:		InitialiseDyingMonk
+  //	0x00434820:		DyingMonk
+  //	0x004348B0:		ControlGongBonger
+  //	0x00434970:		DeathSlideCollision
+  //	0x00434A30:		ControlDeathSlide
+  //	0x00434CC0:		BigBowlControl
+  //	0x00434DB0:		BellControl
+  //	0x00434E30:		InitialiseWindow
 
 #define SmashWindow ((void(__cdecl*)(__int16)) 0x00434EB0)
 

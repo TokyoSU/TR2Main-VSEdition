@@ -83,58 +83,57 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
 
 	// If another game instance is already run, show its window
 	gameWindow = WinVidFindGameWindow();
-	if( gameWindow != NULL ) {
+	if (gameWindow != NULL) {
 		setupDialog = SE_FindSetupDialog();
 		SetForegroundWindow(setupDialog ? setupDialog : gameWindow);
 		exit(0); // NOTE: there may be bugs on some systems if we just return here
 	}
-
-#ifdef _DEBUG
-	fflush(stdout);
-	freopen("./TR2Main.log", "w", stdout);
-#endif // _DEBUG
 
 #if defined(_MSC_VER)
 	_set_se_translator(SEH_TR);
 #endif // _MSC_VER
 
 	try {
-		isSetupRequested = ( UT_FindArg("setup") != NULL );
+		isSetupRequested = (UT_FindArg("setup") != NULL);
 #ifdef FEATURE_GOLD
 		SetGold(UT_FindArg("gold") != NULL);
 #endif
 
+#if _DEBUG
+		SetGold(true);
+#endif
+
 		initStatus = Init(isSetupRequested);
-		if( initStatus == 0 ) {
+		if (initStatus == 0) {
 #if (DIRECT3D_VERSION > 0x500)
-			char msg[256] = {0};
-			snprintf(msg, sizeof(msg), "Tomb Raider II requires Microsoft DirectX %d to be installed.", DIRECT3D_VERSION/0x100);
+			char msg[256] = { 0 };
+			snprintf(msg, sizeof(msg), "Tomb Raider II requires Microsoft DirectX %d to be installed.", DIRECT3D_VERSION / 0x100);
 			UT_MessageBox(msg, NULL);
 #else // (DIRECT3D_VERSION > 0x500)
 			UT_ErrorBox(IDS_DX5_REQUIRED, NULL); // "Tomb Raider II requires Microsoft DirectX 5 to be installed."
 #endif // (DIRECT3D_VERSION > 0x500)
 		}
-		if( initStatus != 1 )
+		if (initStatus != 1)
 			goto EXIT;
 
 		appSettingsStatus = SE_ReadAppSettings(&SavedAppSettings);
 
-		if( appSettingsStatus == 0 )
+		if (appSettingsStatus == 0)
 			goto EXIT;
 
-		if( isSetupRequested || appSettingsStatus == 2) {
-			if( !SE_ShowSetupDialog(NULL, appSettingsStatus == 2) )
+		if (isSetupRequested || appSettingsStatus == 2) {
+			if (!SE_ShowSetupDialog(NULL, appSettingsStatus == 2))
 				goto EXIT;
 			SE_WriteAppSettings(&SavedAppSettings);
-			if( isSetupRequested )
+			if (isSetupRequested)
 				goto EXIT;
 		}
 
-		while( 0 != (rc = WinGameStart()) ) {
+		while (0 != (rc = WinGameStart())) {
 			WinGameFinish();
 			RenderErrorBox(rc);
 
-			if( !SE_ShowSetupDialog(NULL, false) )
+			if (!SE_ShowSetupDialog(NULL, false))
 				goto EXIT;
 			SE_WriteAppSettings(&SavedAppSettings);
 		}
@@ -145,31 +144,31 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
 
 		WinGameFinish();
 		SE_WriteAppSettings(&SavedAppSettings);
-
-	} catch(...) {
+	}
+	catch (...) {
 		WinGameFinish();
 		WinCleanup();
 		abort();
 	}
-EXIT :
+EXIT:
 	WinCleanup();
 	exit(AppResultCode); // NOTE: there may be bugs on some systems if we just return here
 }
 
 int Init(bool skipCDInit) {
-	if( !skipCDInit && !CD_Init() )
+	if (!skipCDInit && !CD_Init())
 		return 2;
 
 	UT_InitAccurateTimer();
 
 #ifdef FEATURE_NOLEGACY_OPTIONS
-	if( OpenGameRegistryKey(REG_SYSTEM_KEY) ) {
+	if (OpenGameRegistryKey(REG_SYSTEM_KEY)) {
 		GetRegistryBoolValue(REG_AVOID_INTERLACED, &AvoidInterlacedVideoModes, false);
 		CloseGameRegistryKey();
 	}
 #endif // FEATURE_NOLEGACY_OPTIONS
 
-	if(
+	if (
 #if defined(FEATURE_SCREENSHOT_IMPROVED) || defined(FEATURE_BACKGROUND_IMPROVED)
 		GDI_Init() &&
 #endif // defined(FEATURE_SCREENSHOT_IMPROVED) || defined(FEATURE_BACKGROUND_IMPROVED)
@@ -181,7 +180,7 @@ int Init(bool skipCDInit) {
 		WinInputInit() &&
 		TIME_Init() &&
 		HWR_Init() &&
-		BGND_Init() )
+		BGND_Init())
 	{
 		FMV_Init(); // FMV Init is not critical to fail whole game
 		return 1;
@@ -204,7 +203,8 @@ int WinGameStart() {
 		RenderStart(true);
 		WinSndStart(NULL);
 		WinInStart();
-	} catch(int error) {
+	}
+	catch (int error) {
 		return error;
 	}
 	return 0;
@@ -216,7 +216,7 @@ void WinGameFinish() {
 	RenderFinish(true);
 	WinVidFinish();
 	WinVidHideGameWindow();
-	if( *StringToShow )
+	if (*StringToShow)
 		MessageBox(NULL, StringToShow, NULL, MB_ICONWARNING);
 }
 

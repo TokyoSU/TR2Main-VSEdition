@@ -24,7 +24,7 @@
 
 #include "global/types.h"
 
-// Registry path
+ // Registry path
 #define REG_TR2_PATH			"Software\\Core Design\\Tomb Raider II"
 
 // Registry keys
@@ -122,8 +122,8 @@
 /*
  * Function list
  */
-LPCTSTR GuidBinaryToString(GUID *guid); // 0x00456A20
-bool GuidStringToBinary(LPCTSTR lpString, GUID *guid); // 0x00456A80
+LPCTSTR GuidBinaryToString(GUID* guid); // 0x00456A20
+bool GuidStringToBinary(LPCTSTR lpString, GUID* guid); // 0x00456A80
 BOOL OpenRegistryKey(LPCTSTR lpSubKey); // 0x00456B30
 bool IsNewRegistryKeyCreated(); // 0x00456B60
 LONG CloseRegistryKey(); // 0x00456B70
@@ -133,11 +133,11 @@ LONG SetRegistryFloatValue(LPCTSTR lpValueName, double value); // 0x00456BD0
 LONG SetRegistryBinaryValue(LPCTSTR lpValueName, LPBYTE value, DWORD valueSize); // 0x00456C10
 LONG SetRegistryStringValue(LPCTSTR lpValueName, LPCTSTR value, int length); // 0x00456C50
 LONG DeleteRegistryValue(LPCTSTR lpValueName); // 0x00456CA0
-bool GetRegistryDwordValue(LPCTSTR lpValueName, DWORD *pValue, DWORD defaultValue); // 0x00456CC0
-bool GetRegistryBoolValue(LPCTSTR lpValueName, bool *pValue, bool defaultValue); // 0x00456D20
-bool GetRegistryFloatValue(LPCTSTR lpValueName, double *value, double defaultValue); // 0x00456DA0
+bool GetRegistryDwordValue(LPCTSTR lpValueName, DWORD* pValue, DWORD defaultValue); // 0x00456CC0
+bool GetRegistryBoolValue(LPCTSTR lpValueName, bool* pValue, bool defaultValue); // 0x00456D20
+bool GetRegistryFloatValue(LPCTSTR lpValueName, double* value, double defaultValue); // 0x00456DA0
 bool GetRegistryBinaryValue(LPCTSTR lpValueName, LPBYTE value, DWORD valueSize, LPBYTE defaultValue); // 0x00456E00
 bool GetRegistryStringValue(LPCTSTR lpValueName, LPTSTR value, DWORD maxSize, LPCTSTR defaultValue); // 0x00456E80
-bool GetRegistryGuidValue(LPCTSTR lpValueName, GUID *value, GUID *defaultValue); // 0x00456F20
+bool GetRegistryGuidValue(LPCTSTR lpValueName, GUID* value, GUID* defaultValue); // 0x00456F20
 
 #endif // REGISTRY_H_INCLUDED

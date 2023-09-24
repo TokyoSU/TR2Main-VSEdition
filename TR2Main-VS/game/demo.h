@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 #define DoDemoSequence ((int(__cdecl*)(int)) 0x004168E0)
 
 int StartDemo(int levelID); // 0x00416940

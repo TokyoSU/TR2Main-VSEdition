@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 __int16 StartGame(int levelID, GF_LEVEL_TYPE levelType); // 0x0044C550
 int GameLoop(BOOL demoMode); // 0x0044C6A0
 int LevelCompleteSequence(); // 0x0044C740
@@ -36,8 +36,8 @@ int GetRandomControl(); // 0x0044CA40
 void SeedRandomControl(int seed); // 0x0044CA60
 int GetRandomDraw(); // 0x0044CA70
 void SeedRandomDraw(int seed); // 0x0044CA90
-void GetValidLevelsList(REQUEST_INFO *req); // 0x0044CAA0
-void GetSavedGamesList(REQUEST_INFO *req); // 0x0044CAF0
+void GetValidLevelsList(REQUEST_INFO* req); // 0x0044CAA0
+void GetSavedGamesList(REQUEST_INFO* req); // 0x0044CAF0
 void DisplayCredits(); // 0x0044CB40
 BOOL S_FrontEndCheck(); // 0x0044CD80
 BOOL S_SaveGame(LPCVOID saveData, DWORD saveSize, int slotNumber); // 0x0044CEF0

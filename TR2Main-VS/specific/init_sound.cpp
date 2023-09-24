@@ -23,21 +23,21 @@
 #include "specific/init_sound.h"
 #include "global/vars.h"
 
-extern void FlaggedStringCreate(STRING_FLAGGED *item, DWORD dwSize);
-extern void FlaggedStringDelete(STRING_FLAGGED *item);
-extern bool FlaggedStringCopy(STRING_FLAGGED *dst, STRING_FLAGGED *src);
+extern void FlaggedStringCreate(STRING_FLAGGED* item, DWORD dwSize);
+extern void FlaggedStringDelete(STRING_FLAGGED* item);
+extern bool FlaggedStringCopy(STRING_FLAGGED* dst, STRING_FLAGGED* src);
 
 #ifdef FEATURE_EXTENDED_LIMITS
 DWORD SampleFreqs[370];
 LPDIRECTSOUNDBUFFER SampleBuffers[370];
 #endif // FEATURE_EXTENDED_LIMITS
 
-SOUND_ADAPTER_NODE *__cdecl GetSoundAdapter(GUID *lpGuid) {
-	SOUND_ADAPTER_NODE *adapter;
+SOUND_ADAPTER_NODE* __cdecl GetSoundAdapter(GUID* lpGuid) {
+	SOUND_ADAPTER_NODE* adapter;
 
-	if( lpGuid != NULL ) {
-		for( adapter = SoundAdapterList.head; adapter; adapter = adapter->next ) {
-			if( !memcmp(&adapter->body.adapterGuid, lpGuid, sizeof(GUID)) )
+	if (lpGuid != NULL) {
+		for (adapter = SoundAdapterList.head; adapter; adapter = adapter->next) {
+			if (!memcmp(&adapter->body.adapterGuid, lpGuid, sizeof(GUID)))
 				return adapter;
 		}
 	}
@@ -45,11 +45,11 @@ SOUND_ADAPTER_NODE *__cdecl GetSoundAdapter(GUID *lpGuid) {
 }
 
 void WinSndFreeAllSamples() {
-	if( !IsSoundEnabled )
+	if (!IsSoundEnabled)
 		return;
 
-	for( DWORD i=0; i<ARRAY_SIZE(SampleBuffers); ++i ) {
-		if( SampleBuffers[i] != NULL ) {
+	for (DWORD i = 0; i < ARRAY_SIZE(SampleBuffers); ++i) {
+		if (SampleBuffers[i] != NULL) {
 			SampleBuffers[i]->Release();
 			SampleBuffers[i] = NULL;
 		}
@@ -61,17 +61,17 @@ bool WinSndMakeSample(DWORD sampleIdx, LPWAVEFORMATEX format, const LPVOID data,
 	DWORD dwAudioBytes;
 	DSBUFFERDESC desc;
 
-	if( DSound == NULL || !IsSoundEnabled || sampleIdx >= ARRAY_SIZE(SampleBuffers) )
+	if (DSound == NULL || !IsSoundEnabled || sampleIdx >= ARRAY_SIZE(SampleBuffers))
 		return false;
 
 	// NOTE: this check is absent in the original game
-	if( SampleBuffers[sampleIdx] != NULL ) {
+	if (SampleBuffers[sampleIdx] != NULL) {
 		SampleBuffers[sampleIdx]->Release();
 		SampleBuffers[sampleIdx] = NULL;
 	}
 
 	desc.dwSize = sizeof(DSBUFFERDESC);
-	desc.dwFlags = DSBCAPS_CTRLVOLUME|DSBCAPS_CTRLPAN|DSBCAPS_CTRLFREQUENCY|DSBCAPS_LOCSOFTWARE;
+	desc.dwFlags = DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLPAN | DSBCAPS_CTRLFREQUENCY | DSBCAPS_LOCSOFTWARE;
 	desc.dwBufferBytes = dataSize;
 	desc.dwReserved = 0;
 	desc.lpwfxFormat = format;
@@ -94,10 +94,10 @@ bool WinSndMakeSample(DWORD sampleIdx, LPWAVEFORMATEX format, const LPVOID data,
 bool WinSndIsChannelPlaying(DWORD channel) {
 	DWORD status;
 
-	if( ChannelBuffers[channel] == NULL || FAILED(ChannelBuffers[channel]->GetStatus(&status)) )
+	if (ChannelBuffers[channel] == NULL || FAILED(ChannelBuffers[channel]->GetStatus(&status)))
 		return false;
 
-	if( (status & DSBSTATUS_PLAYING) == 0 ) {
+	if ((status & DSBSTATUS_PLAYING) == 0) {
 		ChannelBuffers[channel]->Release();
 		ChannelBuffers[channel] = NULL;
 		return false;
@@ -110,15 +110,15 @@ int WinSndPlaySample(DWORD sampleIdx, int volume, DWORD pitch, int pan, DWORD fl
 	LPDIRECTSOUNDBUFFER dsBuffer = NULL;
 	int channel = WinSndGetFreeChannelIndex();
 
-	if( channel < 0 )
+	if (channel < 0)
 		return -1;
 
-	if( FAILED(DSound->DuplicateSoundBuffer(SampleBuffers[sampleIdx], &dsBuffer)) ||
+	if (FAILED(DSound->DuplicateSoundBuffer(SampleBuffers[sampleIdx], &dsBuffer)) ||
 		FAILED(dsBuffer->SetVolume(volume)) ||
 		FAILED(dsBuffer->SetFrequency(SampleFreqs[sampleIdx] * pitch / PHD_ONE)) ||
 		FAILED(dsBuffer->SetPan(pan)) ||
 		FAILED(dsBuffer->SetCurrentPosition(0)) ||
-		FAILED(dsBuffer->Play(0, 0, flags)) )
+		FAILED(dsBuffer->Play(0, 0, flags)))
 	{
 		return -2;
 	}
@@ -130,13 +130,13 @@ int WinSndPlaySample(DWORD sampleIdx, int volume, DWORD pitch, int pan, DWORD fl
 }
 
 int WinSndGetFreeChannelIndex() {
-	for( int i=0; i<32; ++i ) {
-		if( ChannelBuffers[i] == NULL )
+	for (int i = 0; i < 32; ++i) {
+		if (ChannelBuffers[i] == NULL)
 			return i;
 	}
 
-	for( int i=0; i<32; ++i ) {
-		if( !WinSndIsChannelPlaying(i) )
+	for (int i = 0; i < 32; ++i) {
+		if (!WinSndIsChannelPlaying(i))
 			return i;
 	}
 
@@ -144,20 +144,20 @@ int WinSndGetFreeChannelIndex() {
 }
 
 void WinSndAdjustVolumeAndPan(int channel, int volume, int pan) {
-	if( channel >= 0 && ChannelBuffers[channel] != NULL ) {
+	if (channel >= 0 && ChannelBuffers[channel] != NULL) {
 		ChannelBuffers[channel]->SetVolume(volume);
 		ChannelBuffers[channel]->SetPan(pan);
 	}
 }
 
 void WinSndAdjustPitch(int channel, DWORD pitch) {
-	if( channel >= 0 && ChannelBuffers[channel] != NULL ) {
+	if (channel >= 0 && ChannelBuffers[channel] != NULL) {
 		ChannelBuffers[channel]->SetFrequency(SampleFreqs[ChannelSamples[channel]] * pitch / PHD_ONE);
 	}
 }
 
 void WinSndStopSample(int channel) {
-	if( channel >= 0 && ChannelBuffers[channel] != NULL ) {
+	if (channel >= 0 && ChannelBuffers[channel] != NULL) {
 		ChannelBuffers[channel]->Stop();
 		ChannelBuffers[channel]->Release();
 		ChannelBuffers[channel] = NULL;
@@ -165,9 +165,9 @@ void WinSndStopSample(int channel) {
 }
 
 bool WinSndInit() {
-	SOUND_ADAPTER_NODE *node, *nextNode;
+	SOUND_ADAPTER_NODE* node, * nextNode;
 
-	for( node = SoundAdapterList.head; node; node = nextNode ) {
+	for (node = SoundAdapterList.head; node; node = nextNode) {
 		nextNode = node->next;
 		FlaggedStringDelete(&node->body.module);
 		FlaggedStringDelete(&node->body.description);
@@ -180,11 +180,11 @@ bool WinSndInit() {
 
 	PrimarySoundAdapter = NULL;
 
-	if( !DSoundEnumerate(&SoundAdapterList) )
+	if (!DSoundEnumerate(&SoundAdapterList))
 		return false;
 
-	for( node = SoundAdapterList.head; node; node = node->next ) {
-		if( node->body.lpAdapterGuid == NULL ) { // Primary adapter GUID is NULL
+	for (node = SoundAdapterList.head; node; node = node->next) {
+		if (node->body.lpAdapterGuid == NULL) { // Primary adapter GUID is NULL
 			PrimarySoundAdapter = node;
 			break;
 		}
@@ -192,33 +192,34 @@ bool WinSndInit() {
 	return true;
 }
 
-bool DSoundEnumerate(SOUND_ADAPTER_LIST *adapterList) {
+bool DSoundEnumerate(SOUND_ADAPTER_LIST* adapterList) {
 	return SUCCEEDED(DirectSoundEnumerate(DSoundEnumCallback, (LPVOID)adapterList));
 }
 
 BOOL CALLBACK DSoundEnumCallback(LPGUID lpGuid, LPCTSTR lpcstrDescription, LPCTSTR lpcstrModule, LPVOID lpContext) {
-	SOUND_ADAPTER_LIST *adapterList = (SOUND_ADAPTER_LIST *)lpContext;
-	SOUND_ADAPTER_NODE *adapterNode = new SOUND_ADAPTER_NODE;
+	SOUND_ADAPTER_LIST* adapterList = (SOUND_ADAPTER_LIST*)lpContext;
+	SOUND_ADAPTER_NODE* adapterNode = new SOUND_ADAPTER_NODE;
 
-	if( adapterNode == NULL )
+	if (adapterNode == NULL)
 		return TRUE;
 
 	adapterNode->next = NULL;
 	adapterNode->previous = adapterList->tail;
 
-	if( !adapterList->head )
+	if (!adapterList->head)
 		adapterList->head = adapterNode;
 
-	if( adapterList->tail )
+	if (adapterList->tail)
 		adapterList->tail->next = adapterNode;
 
 	adapterList->tail = adapterNode;
 	adapterList->dwCount++;
 
-	if( lpGuid == NULL ) {
+	if (lpGuid == NULL) {
 		memset(&adapterNode->body.adapterGuid, 0, sizeof(GUID));
 		adapterNode->body.lpAdapterGuid = NULL;
-	} else {
+	}
+	else {
 		adapterNode->body.adapterGuid = *lpGuid;
 		adapterNode->body.lpAdapterGuid = &adapterNode->body.adapterGuid;
 	}
@@ -238,29 +239,29 @@ void WinSndStart(HWND hWnd) {
 	Camera.isLaraMic = SavedAppSettings.LaraMic;
 	IsSoundEnabled = false;
 
-	if( !SavedAppSettings.SoundEnabled || SavedAppSettings.PreferredSoundAdapter == NULL )
+	if (!SavedAppSettings.SoundEnabled || SavedAppSettings.PreferredSoundAdapter == NULL)
 		return;
 
-	SOUND_ADAPTER *preferred = &SavedAppSettings.PreferredSoundAdapter->body;
+	SOUND_ADAPTER* preferred = &SavedAppSettings.PreferredSoundAdapter->body;
 	CurrentSoundAdapter = *preferred;
 
 	FlaggedStringCopy(&CurrentSoundAdapter.description, &preferred->description);
 	FlaggedStringCopy(&CurrentSoundAdapter.module, &preferred->module);
 
-	if( !DSoundCreate(CurrentSoundAdapter.lpAdapterGuid) )
+	if (!DSoundCreate(CurrentSoundAdapter.lpAdapterGuid))
 		return;
 
-	if( hWnd == NULL )
+	if (hWnd == NULL)
 		hWnd = HGameWindow;
 
 	if FAILED(DSound->SetCooperativeLevel(hWnd, DSSCL_EXCLUSIVE))
 		throw ERR_CantSetDSCooperativeLevel;
 
-	if( DSoundBufferTest() )
+	if (DSoundBufferTest())
 		IsSoundEnabled = true;
 }
 
-bool DSoundCreate(GUID *lpGuid) {
+bool DSoundCreate(GUID* lpGuid) {
 #if (DIRECTSOUND_VERSION >= 0x800)
 	return SUCCEEDED(DirectSoundCreate8(lpGuid, &DSound, NULL));
 #else // (DIRECTSOUND_VERSION >= 0x800)
@@ -297,7 +298,7 @@ bool DSoundBufferTest() {
 
 void WinSndFinish() {
 	WinSndFreeAllSamples();
-	if( DSound != NULL ) {
+	if (DSound != NULL) {
 		DSound->Release();
 		DSound = NULL;
 	}

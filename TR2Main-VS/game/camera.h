@@ -24,13 +24,13 @@
 
 #include "global/types.h"
 
-typedef void(__cdecl *CB_SMARTCAM)(int*, int*, int*, int, int, int, int, int, int, int);
+typedef void(__cdecl* CB_SMARTCAM)(int*, int*, int*, int, int, int, int, int, int, int);
 
 /*
  * Function list
  */
 void InitialiseCamera(); // 0x00410580
-void MoveCamera(GAME_VECTOR *destination, int speed); // 0x00410630
+void MoveCamera(GAME_VECTOR* destination, int speed); // 0x00410630
 
 #define ClipCamera ((void(__cdecl*)(int*, int*, int*, int, int, int, int, int, int, int)) 0x004109B0)
 #define ShiftCamera ((void(__cdecl*)(int*, int*, int*, int, int, int, int, int, int, int)) 0x00410A90)
@@ -40,7 +40,7 @@ void MoveCamera(GAME_VECTOR *destination, int speed); // 0x00410630
 #define ShiftClamp ((int(__cdecl*)(GAME_VECTOR*, int)) 0x004114C0)
 #define CombatCamera ((void(__cdecl*)(ITEM_INFO*)) 0x00411660)
 
-void LookCamera(ITEM_INFO *item); // 0x004117F0
+void LookCamera(ITEM_INFO* item); // 0x004117F0
 void FixedCamera(); // 0x004119E0
 void CalculateCamera(); // 0x00411A80
 

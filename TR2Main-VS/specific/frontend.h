@@ -24,13 +24,13 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 UINT16 S_COLOUR(int red, int green, int blue); // 0x0044C2A0
-void S_DrawScreenLine(int x, int y, int z, int xLen, int yLen, BYTE colorIdx, D3DCOLOR *gour, UINT16 flags); // 0x0044C2D0
-void S_DrawScreenBox(int sx, int sy, int z, int width, int height, BYTE colorIdx, GOURAUD_OUTLINE *gour, UINT16 flags); // 0x0044C310
-void S_DrawScreenFBox(int sx, int sy, int z, int width, int height, BYTE colorIdx, GOURAUD_FILL *gour, UINT16 flags); // 0x0044C430
+void S_DrawScreenLine(int x, int y, int z, int xLen, int yLen, BYTE colorIdx, D3DCOLOR* gour, UINT16 flags); // 0x0044C2D0
+void S_DrawScreenBox(int sx, int sy, int z, int width, int height, BYTE colorIdx, GOURAUD_OUTLINE* gour, UINT16 flags); // 0x0044C310
+void S_DrawScreenFBox(int sx, int sy, int z, int width, int height, BYTE colorIdx, GOURAUD_FILL* gour, UINT16 flags); // 0x0044C430
 void S_FinishInventory(); // 0x0044C460
 void S_FadeToBlack(); // 0x0044C470
 void S_Wait(int timeout, BOOL inputCheck); // 0x0044C4C0

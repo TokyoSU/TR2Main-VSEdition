@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 int S_SoundPlaySample(int channel, UINT16 volume, int pitch, int pan); // 0x004553B0
 int S_Sound_CalculateSampleVolume(DWORD volume); // 0x00455400
 int S_Sound_CalculateSamplePan(__int16 pan); // 0x00455430

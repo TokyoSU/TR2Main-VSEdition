@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 #ifdef FEATURE_BACKGROUND_IMPROVED
 bool S_Pause();
 #endif // FEATURE_BACKGROUND_IMPROVED

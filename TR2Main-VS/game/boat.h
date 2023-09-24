@@ -24,16 +24,16 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
-//	0x0040CB10:		InitialiseBoat
-//	0x0040CB50:		BoatCheckGeton
-//	0x0040CCC0:		BoatCollision
-//	0x0040CE20:		TestWaterHeight
-//	0x0040CF20:		DoBoatShift
+ /*
+  * Function list
+  */
+  //	0x0040CB10:		InitialiseBoat
+  //	0x0040CB50:		BoatCheckGeton
+  //	0x0040CCC0:		BoatCollision
+  //	0x0040CE20:		TestWaterHeight
+  //	0x0040CF20:		DoBoatShift
 
-void DoWakeEffect(ITEM_INFO *item); // 0x0040D0F0
+void DoWakeEffect(ITEM_INFO* item); // 0x0040D0F0
 
 //	0x0040D270:		DoBoatDynamics
 //	0x0040D2C0:		BoatDynamics

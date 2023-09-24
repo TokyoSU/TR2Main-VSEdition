@@ -24,19 +24,19 @@
 #include "global/vars.h"
 
 #if defined(FEATURE_INPUT_IMPROVED) && !defined(WIN32)
-// Imports from xinput*.dll
+ // Imports from xinput*.dll
 static HMODULE hXInput = NULL;
-static void (WINAPI *_XInputEnable)(BOOL) = NULL;
-static DWORD (WINAPI *_XInputGetCapabilities)(DWORD, DWORD, XINPUT_CAPABILITIES*) = NULL;
-static DWORD (WINAPI *_XInputSetState)(DWORD, XINPUT_VIBRATION*) = NULL;
-static DWORD (WINAPI *_XInputGetState)(DWORD, XINPUT_STATE*) = NULL;
+static void (WINAPI* _XInputEnable)(BOOL) = NULL;
+static DWORD(WINAPI* _XInputGetCapabilities)(DWORD, DWORD, XINPUT_CAPABILITIES*) = NULL;
+static DWORD(WINAPI* _XInputSetState)(DWORD, XINPUT_VIBRATION*) = NULL;
+static DWORD(WINAPI* _XInputGetState)(DWORD, XINPUT_STATE*) = NULL;
 
 static void XInputLibUnlink() {
 	_XInputEnable = NULL;
 	_XInputSetState = NULL;
 	_XInputGetState = NULL;
 	_XInputGetCapabilities = NULL;
-	if( hXInput != NULL ) {
+	if (hXInput != NULL) {
 		FreeLibrary(hXInput);
 		hXInput = NULL;
 	}
@@ -44,25 +44,25 @@ static void XInputLibUnlink() {
 
 static bool XInputLibLink(LPCSTR lpLibFileName, bool advanced) {
 	HMODULE hXInput = LoadLibrary(lpLibFileName);
-	if( hXInput == NULL ) {XInputLibUnlink(); return false;}
+	if (hXInput == NULL) { XInputLibUnlink(); return false; }
 
 	// XInputEnable is optional, so don't check if it's NULL
-	*(FARPROC *)&_XInputEnable = GetProcAddress(hXInput, "XInputEnable");
+	*(FARPROC*)&_XInputEnable = GetProcAddress(hXInput, "XInputEnable");
 
-	*(FARPROC *)&_XInputGetCapabilities = GetProcAddress(hXInput, "XInputGetCapabilities");
-	if( _XInputGetCapabilities == NULL ) {XInputLibUnlink(); return false;}
+	*(FARPROC*)&_XInputGetCapabilities = GetProcAddress(hXInput, "XInputGetCapabilities");
+	if (_XInputGetCapabilities == NULL) { XInputLibUnlink(); return false; }
 
-	*(FARPROC *)&_XInputSetState = GetProcAddress(hXInput, "XInputSetState");
-	if( _XInputSetState == NULL ) {XInputLibUnlink(); return false;}
+	*(FARPROC*)&_XInputSetState = GetProcAddress(hXInput, "XInputSetState");
+	if (_XInputSetState == NULL) { XInputLibUnlink(); return false; }
 
-	if( advanced ) {
+	if (advanced) {
 		// The hack to get XInput Guide button state, works for some xinput*.dll versions
-		*(FARPROC *)&_XInputGetState = GetProcAddress(hXInput, MAKEINTRESOURCE(100));
+		*(FARPROC*)&_XInputGetState = GetProcAddress(hXInput, MAKEINTRESOURCE(100));
 	}
-	if( _XInputGetState == NULL ) {
-		*(FARPROC *)&_XInputGetState = GetProcAddress(hXInput, "XInputGetState");
+	if (_XInputGetState == NULL) {
+		*(FARPROC*)&_XInputGetState = GetProcAddress(hXInput, "XInputGetState");
 	}
-	if( _XInputGetState == NULL ) {XInputLibUnlink(); return false;}
+	if (_XInputGetState == NULL) { XInputLibUnlink(); return false; }
 
 	return true;
 }
@@ -78,13 +78,14 @@ static bool XInputLibInit() {
 		{"xinput1_1.dll", false},
 	};
 	static bool failed = false;
-	if( hXInput != NULL ) {
+	if (hXInput != NULL) {
 		return true;
-	} else if( failed ) {
+	}
+	else if (failed) {
 		return false;
 	}
-	for( DWORD i=0; i<ARRAY_SIZE(libs); ++i ) {
-		if( XInputLibLink(libs[i].name, libs[i].advanced) ) {
+	for (DWORD i = 0; i < ARRAY_SIZE(libs); ++i) {
+		if (XInputLibLink(libs[i].name, libs[i].advanced)) {
 			return true;
 		}
 	}
@@ -93,28 +94,28 @@ static bool XInputLibInit() {
 }
 
 void WINAPI XInputEnable(BOOL enable) {
-	if( !XInputLibInit() || _XInputEnable == NULL ) {
+	if (!XInputLibInit() || _XInputEnable == NULL) {
 		return;
 	}
 	_XInputEnable(enable);
 }
 
-DWORD WINAPI XInputGetCapabilities(DWORD dwUserIndex, DWORD dwFlags, XINPUT_CAPABILITIES *pCapabilities) {
-	if( !XInputLibInit() || _XInputGetCapabilities == NULL ) {
+DWORD WINAPI XInputGetCapabilities(DWORD dwUserIndex, DWORD dwFlags, XINPUT_CAPABILITIES* pCapabilities) {
+	if (!XInputLibInit() || _XInputGetCapabilities == NULL) {
 		return ERROR_DEVICE_NOT_CONNECTED;
 	}
 	return _XInputGetCapabilities(dwUserIndex, dwFlags, pCapabilities);
 }
 
-DWORD WINAPI XInputSetState(DWORD dwUserIndex, XINPUT_VIBRATION *pVibration) {
-	if( !XInputLibInit() || _XInputSetState == NULL ) {
+DWORD WINAPI XInputSetState(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration) {
+	if (!XInputLibInit() || _XInputSetState == NULL) {
 		return ERROR_DEVICE_NOT_CONNECTED;
 	}
 	return _XInputSetState(dwUserIndex, pVibration);
 }
 
-DWORD WINAPI XInputGetState(DWORD dwUserIndex, XINPUT_STATE *pState) {
-	if( !XInputLibInit() || _XInputGetState == NULL ) {
+DWORD WINAPI XInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState) {
+	if (!XInputLibInit() || _XInputGetState == NULL) {
 		return ERROR_DEVICE_NOT_CONNECTED;
 	}
 	return _XInputGetState(dwUserIndex, pState);
@@ -132,7 +133,7 @@ DWORD WINAPI XInputGetState(DWORD dwUserIndex, XINPUT_STATE *pState) {
 BOOL IsXInputDevice(DWORD dwVendorId, DWORD dwProductId) {
 	IWbemLocator* pIWbemLocator = NULL;
 	IEnumWbemClassObject* pEnumDevices = NULL;
-	IWbemClassObject* pDevices[20] = {0};
+	IWbemClassObject* pDevices[20] = { 0 };
 	IWbemServices* pIWbemServices = NULL;
 	BSTR bstrNamespace = NULL;
 	BSTR bstrDeviceID = NULL;
@@ -149,60 +150,60 @@ BOOL IsXInputDevice(DWORD dwVendorId, DWORD dwProductId) {
 
 	// Create WMI
 	hr = CoCreateInstance(__uuidof(WbemLocator), NULL, CLSCTX_INPROC_SERVER,
-						  __uuidof(IWbemLocator), (LPVOID*) &pIWbemLocator);
-	if( FAILED(hr) || pIWbemLocator == NULL ) goto LCleanup;
+		__uuidof(IWbemLocator), (LPVOID*)&pIWbemLocator);
+	if (FAILED(hr) || pIWbemLocator == NULL) goto LCleanup;
 
 	bstrNamespace = SysAllocString(L"\\\\.\\root\\cimv2");
-	if( bstrNamespace == NULL ) goto LCleanup;
+	if (bstrNamespace == NULL) goto LCleanup;
 
 	bstrClassName = SysAllocString(L"Win32_PNPEntity");
-	if( bstrClassName == NULL ) goto LCleanup;
+	if (bstrClassName == NULL) goto LCleanup;
 
 	bstrDeviceID = SysAllocString(L"DeviceID");
-	if( bstrDeviceID == NULL ) goto LCleanup;
+	if (bstrDeviceID == NULL) goto LCleanup;
 
 	// Connect to WMI
 	hr = pIWbemLocator->ConnectServer(bstrNamespace, NULL, NULL, 0L, 0L, NULL, NULL, &pIWbemServices);
-	if( FAILED(hr) || pIWbemServices == NULL ) goto LCleanup;
+	if (FAILED(hr) || pIWbemServices == NULL) goto LCleanup;
 
 	// Switch security level to IMPERSONATE.
 	CoSetProxyBlanket(pIWbemServices, RPC_C_AUTHN_WINNT, RPC_C_AUTHZ_NONE, NULL,
-						RPC_C_AUTHN_LEVEL_CALL, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE);
+		RPC_C_AUTHN_LEVEL_CALL, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE);
 
 	hr = pIWbemServices->CreateInstanceEnum(bstrClassName, 0, NULL, &pEnumDevices);
-	if( FAILED(hr) || pEnumDevices == NULL ) goto LCleanup;
+	if (FAILED(hr) || pEnumDevices == NULL) goto LCleanup;
 
 	// Loop over all devices
-	for( ;; ) {
+	for (;; ) {
 		// Get 20 at a time
 		hr = pEnumDevices->Next(10000, 20, pDevices, &uReturned);
-		if( FAILED(hr) ) goto LCleanup;
-		if( uReturned == 0 ) break;
+		if (FAILED(hr)) goto LCleanup;
+		if (uReturned == 0) break;
 
-		for( iDevice=0; iDevice<uReturned; iDevice++ ) {
+		for (iDevice = 0; iDevice < uReturned; iDevice++) {
 			// For each device, get its device ID
 			hr = pDevices[iDevice]->Get(bstrDeviceID, 0L, &var, NULL, NULL);
-			if( SUCCEEDED(hr) && var.vt == VT_BSTR && var.bstrVal != NULL ) {
+			if (SUCCEEDED(hr) && var.vt == VT_BSTR && var.bstrVal != NULL) {
 				// Check if the device ID contains "IG_".  If it does, then it's an XInput device
-				if( wcsstr(var.bstrVal, L"IG_") ) {
+				if (wcsstr(var.bstrVal, L"IG_")) {
 					// If it does, then get the VID/PID from var.bstrVal
 					DWORD dwPid = 0, dwVid = 0;
-					WCHAR* strVid = wcsstr( var.bstrVal, L"VID_" );
-					if( strVid && swscanf( strVid, L"VID_%4X", &dwVid ) != 1 )
+					WCHAR* strVid = wcsstr(var.bstrVal, L"VID_");
+					if (strVid && swscanf(strVid, L"VID_%4X", &dwVid) != 1)
 						dwVid = 0;
-					WCHAR* strPid = wcsstr( var.bstrVal, L"PID_" );
-					if( strPid && swscanf( strPid, L"PID_%4X", &dwPid ) != 1 )
+					WCHAR* strPid = wcsstr(var.bstrVal, L"PID_");
+					if (strPid && swscanf(strPid, L"PID_%4X", &dwPid) != 1)
 						dwPid = 0;
 
 					// Compare the VID/PID to the DInput device
-					if( dwVendorId == dwVid && dwProductId == dwPid )
+					if (dwVendorId == dwVid && dwProductId == dwPid)
 					{
 						bIsXinputDevice = true;
 						goto LCleanup;
 					}
 				}
 			}
-			if( pDevices[iDevice] ) {
+			if (pDevices[iDevice]) {
 				pDevices[iDevice]->Release();
 				pDevices[iDevice] = NULL;
 			}
@@ -210,15 +211,15 @@ BOOL IsXInputDevice(DWORD dwVendorId, DWORD dwProductId) {
 	}
 
 LCleanup:
-	if( bstrNamespace ) SysFreeString(bstrNamespace);
-	if( bstrDeviceID ) SysFreeString(bstrDeviceID);
-	if( bstrClassName ) SysFreeString(bstrClassName);
-	for( iDevice=0; iDevice<20; iDevice++ ) {
-		if( pDevices[iDevice] ) pDevices[iDevice]->Release();
+	if (bstrNamespace) SysFreeString(bstrNamespace);
+	if (bstrDeviceID) SysFreeString(bstrDeviceID);
+	if (bstrClassName) SysFreeString(bstrClassName);
+	for (iDevice = 0; iDevice < 20; iDevice++) {
+		if (pDevices[iDevice]) pDevices[iDevice]->Release();
 	}
-	if( pEnumDevices ) pEnumDevices->Release();
-	if( pIWbemLocator ) pIWbemLocator->Release();
-	if( pIWbemServices ) pIWbemServices->Release();
-	if( bCleanupCOM ) CoUninitialize();
+	if (pEnumDevices) pEnumDevices->Release();
+	if (pIWbemLocator) pIWbemLocator->Release();
+	if (pIWbemServices) pIWbemServices->Release();
+	if (bCleanupCOM) CoUninitialize();
 	return bIsXinputDevice;
 }

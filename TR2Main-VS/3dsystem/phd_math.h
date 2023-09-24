@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 int __fastcall phd_atan(int x, int y); // 0x00457EA0
 int __fastcall phd_cos(__int16 angle); // 0x00457EE8
 int __fastcall phd_sin(__int16 angle); // 0x00457EEE

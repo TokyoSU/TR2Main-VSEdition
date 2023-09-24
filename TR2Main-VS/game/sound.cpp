@@ -25,12 +25,12 @@
 #include "global/vars.h"
 
 int GetRealTrack(int trackID) {
-	static char vtracks[] = {2, 19, 20, 26, -1};
+	static char vtracks[] = { 2, 19, 20, 26, -1 };
 	int idx = 0;
 	int track = 2;
 
-	for( int i = 2; i < trackID; ++i ) {
-		if( (vtracks[idx] >= 0) && (i == vtracks[idx]) )
+	for (int i = 2; i < trackID; ++i) {
+		if ((vtracks[idx] >= 0) && (i == vtracks[idx]))
 			++idx;
 		else
 			++track;
@@ -41,7 +41,7 @@ int GetRealTrack(int trackID) {
 void SOUND_Init() {
 	S_SoundSetMasterVolume(32); // 50% sfx volume
 
-	for( int i=0; i<32; ++i )
+	for (int i = 0; i < 32; ++i)
 		SfxInfos[i].sampleIdx = -1;
 
 	SoundIsActive = TRUE;
@@ -53,10 +53,10 @@ void SOUND_Init() {
 void Inject_Sound() {
 	INJECT(0x0043F430, GetRealTrack);
 
-//	INJECT(0x0043F470, PlaySoundEffect);
-//	INJECT(0x0043F910, StopSoundEffect);
-//	INJECT(0x0043F970, SOUND_EndScene);
-//	INJECT(0x0043FA00, SOUND_Stop);
+	//	INJECT(0x0043F470, PlaySoundEffect);
+	//	INJECT(0x0043F910, StopSoundEffect);
+	//	INJECT(0x0043F970, SOUND_EndScene);
+	//	INJECT(0x0043FA00, SOUND_Stop);
 
 	INJECT(0x0043FA30, SOUND_Init);
 }

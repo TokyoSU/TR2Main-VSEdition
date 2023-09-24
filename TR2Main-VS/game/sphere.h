@@ -24,11 +24,11 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
-//	0x0043FA60:		TestCollision
-//	0x0043FB90:		GetSpheres
+ /*
+  * Function list
+  */
+  //	0x0043FA60:		TestCollision
+  //	0x0043FB90:		GetSpheres
 
 #define GetJointAbsPosition ((void(__cdecl*)(ITEM_INFO*, PHD_VECTOR*, int)) 0x0043FE70)
 #define BaddieBiteEffect ((void(__cdecl*)(ITEM_INFO*,BITE_INFO*)) 0x00440010)

@@ -29,10 +29,10 @@
 #include "specific/output.h"
 #include "global/vars.h"
 
-void DoWakeEffect(ITEM_INFO *item) {
+void DoWakeEffect(ITEM_INFO* item) {
 	__int16 frame_number, fxID;
 	int i;
-	FX_INFO *fx;
+	FX_INFO* fx;
 
 	PhdMatrixPtr->_23 = 0;
 	S_CalculateLight(item->pos.x, item->pos.y, item->pos.z, item->roomNumber);
@@ -52,7 +52,8 @@ void DoWakeEffect(ITEM_INFO *item) {
 			fx->speed = item->speed >> 2;
 			if (item->speed < 64) {
 				fx->fallspeed = (ABS(item->speed) - 64) * GetRandomDraw() >> 15;
-			} else {
+			}
+			else {
 				fx->fallspeed = 0;
 			}
 			fx->shade = LsAdder - 768;
@@ -62,26 +63,26 @@ void DoWakeEffect(ITEM_INFO *item) {
 }
 
 void GondolaControl(__int16 itemID) {
-	ITEM_INFO *item;
+	ITEM_INFO* item;
 	__int16 roomID;
 
 	item = &Items[itemID];
 	switch (item->currentAnimState) {
-		case 1:
-			if (item->goalAnimState == 2) {
-				item->meshBits = 0xFF;
-				ExplodingDeath(itemID, 0xF0, 0);
-			}
-			break;
-		case 3:
-			item->pos.y += 50;
-			roomID = item->roomNumber;
-			item->floor = GetHeight(GetFloor(item->pos.x, item->pos.y, item->pos.z, &roomID), item->pos.x, item->pos.y, item->pos.z);
-			if (item->pos.y >= item->floor) {
-				item->goalAnimState = 4;
-				item->pos.y = item->floor;
-			}
-			break;
+	case 1:
+		if (item->goalAnimState == 2) {
+			item->meshBits = 0xFF;
+			ExplodingDeath(itemID, 0xF0, 0);
+		}
+		break;
+	case 3:
+		item->pos.y += 50;
+		roomID = item->roomNumber;
+		item->floor = GetHeight(GetFloor(item->pos.x, item->pos.y, item->pos.z, &roomID), item->pos.x, item->pos.y, item->pos.z);
+		if (item->pos.y >= item->floor) {
+			item->goalAnimState = 4;
+			item->pos.y = item->floor;
+		}
+		break;
 	}
 	AnimateItem(item);
 	if (item->status == ITEM_DISABLED)
@@ -92,19 +93,19 @@ void GondolaControl(__int16 itemID) {
  * Inject function
  */
 void Inject_Boat() {
-//	INJECT(0x0040CB10, InitialiseBoat);
-//	INJECT(0x0040CB50, BoatCheckGeton);
-//	INJECT(0x0040CCC0, BoatCollision);
-//	INJECT(0x0040CE20, TestWaterHeight);
-//	INJECT(0x0040CF20, DoBoatShift);
+	//	INJECT(0x0040CB10, InitialiseBoat);
+	//	INJECT(0x0040CB50, BoatCheckGeton);
+	//	INJECT(0x0040CCC0, BoatCollision);
+	//	INJECT(0x0040CE20, TestWaterHeight);
+	//	INJECT(0x0040CF20, DoBoatShift);
 
 	INJECT(0x0040D0F0, DoWakeEffect);
 
-//	INJECT(0x0040D270, DoBoatDynamics);
-//	INJECT(0x0040D2C0, BoatDynamics);
-//	INJECT(0x0040D7A0, BoatUserControl);
-//	INJECT(0x0040D930, BoatAnimation);
-//	INJECT(0x0040DAA0, BoatControl);
+	//	INJECT(0x0040D270, DoBoatDynamics);
+	//	INJECT(0x0040D2C0, BoatDynamics);
+	//	INJECT(0x0040D7A0, BoatUserControl);
+	//	INJECT(0x0040D930, BoatAnimation);
+	//	INJECT(0x0040DAA0, BoatControl);
 
 	INJECT(0x0040E0D0, GondolaControl);
 }

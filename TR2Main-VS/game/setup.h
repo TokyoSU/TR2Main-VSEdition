@@ -24,12 +24,12 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 #define InitialiseLevel ((BOOL(__cdecl*)(int,int)) 0x0043A330)
 
-// 0x0043A490:		InitialiseGameFlags
+  // 0x0043A490:		InitialiseGameFlags
 
 void InitialiseLevelFlags(); // 0x0043A500
 void BaddyObjects(); // 0x0043A530

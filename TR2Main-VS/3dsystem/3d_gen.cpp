@@ -28,8 +28,8 @@
 #include "specific/hwr.h"
 #include "global/vars.h"
 
-// related to POLYTYPE enum
-static void (__cdecl *PolyDrawRoutines[])(__int16 *) = {
+ // related to POLYTYPE enum
+static void(__cdecl* PolyDrawRoutines[])(__int16*) = {
 	draw_poly_gtmap,		// gouraud shaded poly (texture)
 	draw_poly_wgtmap,		// gouraud shaded poly (texture + colorkey)
 	draw_poly_gtmap_persp,	// gouraud shaded poly (texture + perspective)
@@ -73,17 +73,18 @@ int WaterFogEndDepth = DEPTHQ_END;
 int CalculateFogShade(int depth) {
 	int fogBegin, fogEnd;
 
-	if( IsWaterEffect ) {
+	if (IsWaterEffect) {
 		fogBegin = WaterFogBeginDepth;
 		fogEnd = WaterFogEndDepth;
-	} else {
+	}
+	else {
 		fogBegin = FogBeginDepth;
 		fogEnd = FogEndDepth;
 	}
 
-	if( depth < fogBegin )
+	if (depth < fogBegin)
 		return 0;
-	if( depth >= fogEnd )
+	if (depth >= fogEnd)
 		return 0x1FFF;
 
 	return (depth - fogBegin) * 0x1FFF / (fogEnd - fogBegin);
@@ -99,17 +100,17 @@ static D3DCOLOR ReflectTint = 0;
 static bool IsReflect = false;
 
 void ClearMeshReflectState() {
-	memset(&ReflectFilter, 0 , sizeof(ReflectFilter));
-	ReflectTint = RGBA_MAKE(0xFF,0xFF,0xFF,0x80);
+	memset(&ReflectFilter, 0, sizeof(ReflectFilter));
+	ReflectTint = RGBA_MAKE(0xFF, 0xFF, 0xFF, 0x80);
 	IsReflect = false;
 }
 
 void SetMeshReflectState(int objID, int meshIdx) {
 	// Clear poly filters and disable reflection by default
 	ClearMeshReflectState();
-	if( TextureFormat.bpp < 16 || !ReflectionMode ) return;
+	if (TextureFormat.bpp < 16 || !ReflectionMode) return;
 
-	if( objID == ID_NONE ) {
+	if (objID == ID_NONE) {
 		// Reflect all meshes with custom tint instead of mesh index
 		ReflectTint = meshIdx;
 		IsReflect = true;
@@ -118,20 +119,21 @@ void SetMeshReflectState(int objID, int meshIdx) {
 
 #ifdef FEATURE_MOD_CONFIG
 	// Check if config is presented
-	if( IsModReflectConfigLoaded() ) {
-		POLYFILTER_NODE *node = NULL;
-		if( meshIdx < 0 ) {
-			for( node = GetModReflectStaticsFilter(); node != NULL; node = node->next ) {
-				if( node->id == objID ) {
+	if (IsModReflectConfigLoaded()) {
+		POLYFILTER_NODE* node = NULL;
+		if (meshIdx < 0) {
+			for (node = GetModReflectStaticsFilter(); node != NULL; node = node->next) {
+				if (node->id == objID) {
 					ReflectFilter = node->filter;
 					IsReflect = true;
 					break;
 				}
 			}
-		} else if( objID >= 0 && objID < ID_NUMBER_OBJECTS ) {
-			POLYFILTER_NODE **obj = GetModReflectObjectsFilter();
-			for( node = obj[objID]; node != NULL; node = node->next ) {
-				if( node->id == meshIdx ) {
+		}
+		else if (objID >= 0 && objID < ID_NUMBER_OBJECTS) {
+			POLYFILTER_NODE** obj = GetModReflectObjectsFilter();
+			for (node = obj[objID]; node != NULL; node = node->next) {
+				if (node->id == meshIdx) {
 					ReflectFilter = node->filter;
 					IsReflect = true;
 					break;
@@ -143,17 +145,17 @@ void SetMeshReflectState(int objID, int meshIdx) {
 #endif // FEATURE_MOD_CONFIG
 
 	// If config is absent or disabled, use hardcoded params
-	if( objID >= 0 && meshIdx < 0 ) {
+	if (objID >= 0 && meshIdx < 0) {
 		// This is static object mesh
 		return;
 	}
 
 	// This is animated object mesh
-	switch( objID ) {
-	case ID_SKIDOO_FAST :
+	switch (objID) {
+	case ID_SKIDOO_FAST:
 		// This one is a fast showmobile from the Golden Mask
 		// Reflect the windshield only (skidoo body is mesh #0)
-		if( meshIdx == 0 ) {
+		if (meshIdx == 0) {
 			// Set filter conditions
 			ReflectFilter.n_vtx = 59;
 			ReflectFilter.n_gt4 = 14;
@@ -170,10 +172,10 @@ void SetMeshReflectState(int objID, int meshIdx) {
 			IsReflect = true;
 		}
 		break;
-	case ID_SKIDOO_ARMED :
+	case ID_SKIDOO_ARMED:
 		// This one is an armed showmobile
 		// Reflect the windshield only (skidoo body is mesh #0)
-		if( meshIdx == 0 ) {
+		if (meshIdx == 0) {
 			// Set filter conditions
 			ReflectFilter.n_vtx = 88;
 			ReflectFilter.n_gt4 = 45;
@@ -191,9 +193,9 @@ void SetMeshReflectState(int objID, int meshIdx) {
 			IsReflect = true;
 		}
 		break;
-	case ID_WORKER5 :
+	case ID_WORKER5:
 		// Reflect the black glass mask of flamethrower buddy (his head is mesh #15)
-		if( meshIdx == 15 ) {
+		if (meshIdx == 15) {
 			// Set filter conditions
 			ReflectFilter.n_vtx = 38;
 			ReflectFilter.n_gt4 = 30;
@@ -210,75 +212,75 @@ void SetMeshReflectState(int objID, int meshIdx) {
 			IsReflect = true;
 		}
 		break;
-	case ID_SPINNING_BLADE :
-		if( meshIdx == 0 ) {
+	case ID_SPINNING_BLADE:
+		if (meshIdx == 0) {
 			// Reflect only quads, not triangles
 			ReflectFilter.gt3[0].idx = ~0;
 			ReflectFilter.g3[0].idx = ~0;
 			IsReflect = true;
 		}
 		break;
-	case ID_BLADE :
+	case ID_BLADE:
 		// Reflect the blade only (mesh #1)
-		if( meshIdx == 1 ) {
+		if (meshIdx == 1) {
 			IsReflect = true;
 		}
 		break;
-	case ID_KILLER_STATUE :
+	case ID_KILLER_STATUE:
 		// Reflect the sword only (mesh #7)
-		if( meshIdx == 7 ) {
+		if (meshIdx == 7) {
 			IsReflect = true;
 		}
 		break;
 	}
 }
 
-static bool InsertEnvmap(__int16 *ptrObj, int vtxCount, bool colored, LPVOID param) {
-	InsertObjectEM(ptrObj, vtxCount, ReflectTint, (PHD_UV *)param);
+static bool InsertEnvmap(__int16* ptrObj, int vtxCount, bool colored, LPVOID param) {
+	InsertObjectEM(ptrObj, vtxCount, ReflectTint, (PHD_UV*)param);
 	return true;
 }
 
-static void phd_PutEnvmapPolygons(__int16 *ptrEnv) {
-	if( ptrEnv == NULL || !IsReflect
-		|| SavedAppSettings.RenderMode != RM_Hardware ) return;
-	__int16 *ptrObj = ptrEnv;
+static void phd_PutEnvmapPolygons(__int16* ptrEnv) {
+	if (ptrEnv == NULL || !IsReflect
+		|| SavedAppSettings.RenderMode != RM_Hardware) return;
+	__int16* ptrObj = ptrEnv;
 
 	ptrObj += 5; // skip x, y, z, radius, flags
 	__int16 num = *(ptrObj++); // get vertex counter
 	ptrObj += num * 3; // skip vertices
 
 	int vtxCount = *ptrObj++;
-	if( vtxCount <= 0 ) return;
+	if (vtxCount <= 0) return;
 
-	PHD_UV *uv = new PHD_UV[vtxCount];
+	PHD_UV* uv = new PHD_UV[vtxCount];
 
-	for( int i = 0; i < vtxCount; ++i ) {
+	for (int i = 0; i < vtxCount; ++i) {
 		// make sure that reflection will be drawn after normal poly
-		PhdVBuf[i].zv -= (double)(W2V_SCALE/2);
+		PhdVBuf[i].zv -= (double)(W2V_SCALE / 2);
 		// set lighting that depends only from fog distance
 		PhdVBuf[i].g = 0x1000;
 		int depth = PhdMatrixPtr->_23 >> W2V_SHIFT;
 #ifdef FEATURE_VIEW_IMPROVED
 		PhdVBuf[i].g += CalculateFogShade(depth);
 #else // !FEATURE_VIEW_IMPROVED
-		if( depth > DEPTHQ_START ) // fog begin
+		if (depth > DEPTHQ_START) // fog begin
 			PhdVBuf[i].g += depth - DEPTHQ_START;
 #endif // FEATURE_VIEW_IMPROVED
 		CLAMP(PhdVBuf[i].g, 0x1000, 0x1FFF); // reflection can be darker but not brighter
 
 		// rotate normal vectors for X/Y, no translation
 		int x = (PhdMatrixPtr->_00 * ptrObj[0] +
-				 PhdMatrixPtr->_01 * ptrObj[1] +
-				 PhdMatrixPtr->_02 * ptrObj[2]) >> W2V_SHIFT;
+			PhdMatrixPtr->_01 * ptrObj[1] +
+			PhdMatrixPtr->_02 * ptrObj[2]) >> W2V_SHIFT;
 
 		int y = (PhdMatrixPtr->_10 * ptrObj[0] +
-				 PhdMatrixPtr->_11 * ptrObj[1] +
-				 PhdMatrixPtr->_12 * ptrObj[2]) >> W2V_SHIFT;
+			PhdMatrixPtr->_11 * ptrObj[1] +
+			PhdMatrixPtr->_12 * ptrObj[2]) >> W2V_SHIFT;
 
 		CLAMP(x, -PHD_IONE, PHD_IONE);
 		CLAMP(y, -PHD_IONE, PHD_IONE);
-		uv[i].u = PHD_ONE/PHD_IONE * (x + PHD_IONE)/2;
-		uv[i].v = PHD_ONE/PHD_IONE * (y + PHD_IONE)/2;
+		uv[i].u = PHD_ONE / PHD_IONE * (x + PHD_IONE) / 2;
+		uv[i].v = PHD_ONE / PHD_IONE * (y + PHD_IONE) / 2;
 		ptrObj += 3;
 	}
 
@@ -287,7 +289,7 @@ static void phd_PutEnvmapPolygons(__int16 *ptrEnv) {
 }
 #endif // FEATURE_VIDEOFX_IMPROVED
 
-void phd_GenerateW2V(PHD_3DPOS *viewPos) {
+void phd_GenerateW2V(PHD_3DPOS* viewPos) {
 	int sx = phd_sin(viewPos->rotX);
 	int cx = phd_cos(viewPos->rotX);
 	int sy = phd_sin(viewPos->rotY);
@@ -328,26 +330,26 @@ void phd_LookAt(int xsrc, int ysrc, int zsrc, int xtar, int ytar, int ztar, __in
 	phd_GenerateW2V(&viewPos);
 }
 
-void phd_GetVectorAngles(int x, int y, int z, VECTOR_ANGLES *angles) {
+void phd_GetVectorAngles(int x, int y, int z, VECTOR_ANGLES* angles) {
 	__int16 pitch;
 
 	angles->yaw = phd_atan(z, x);
 
-	while( (__int16)x != x || (__int16)y != y || (__int16)z != z ) {
+	while ((__int16)x != x || (__int16)y != y || (__int16)z != z) {
 		x >>= 2;
 		y >>= 2;
 		z >>= 2;
 	}
 	pitch = phd_atan(phd_sqrt(SQR(x) + SQR(z)), y);
 
-	if( (y > 0 && pitch > 0) || (y < 0 && pitch < 0) )
+	if ((y > 0 && pitch > 0) || (y < 0 && pitch < 0))
 		pitch = -pitch;
 
 	angles->pitch = pitch;
 }
 
 void phd_RotX(__int16 angle) {
-	if( angle != 0 ) {
+	if (angle != 0) {
 		int m0, m1;
 		int sx = phd_sin(angle);
 		int cx = phd_cos(angle);
@@ -368,7 +370,7 @@ void phd_RotX(__int16 angle) {
 }
 
 void phd_RotY(__int16 angle) {
-	if( angle != 0 ) {
+	if (angle != 0) {
 		int m0, m1;
 		int sy = phd_sin(angle);
 		int cy = phd_cos(angle);
@@ -389,7 +391,7 @@ void phd_RotY(__int16 angle) {
 }
 
 void phd_RotZ(__int16 angle) {
-	if( angle != 0 ) {
+	if (angle != 0) {
 		int m0, m1;
 		int sz = phd_sin(angle);
 		int cz = phd_cos(angle);
@@ -415,7 +417,7 @@ void phd_RotYXZ(__int16 ry, __int16 rx, __int16 rz) {
 	int sz, cz;
 	int m0, m1;
 
-	if( ry != 0 ) {
+	if (ry != 0) {
 		sy = phd_sin(ry);
 		cy = phd_cos(ry);
 		m0 = PhdMatrixPtr->_00 * cy - PhdMatrixPtr->_02 * sy;
@@ -431,7 +433,7 @@ void phd_RotYXZ(__int16 ry, __int16 rx, __int16 rz) {
 		PhdMatrixPtr->_20 = m0 >> W2V_SHIFT;
 		PhdMatrixPtr->_22 = m1 >> W2V_SHIFT;
 	}
-	if( rx != 0 ) {
+	if (rx != 0) {
 		sx = phd_sin(rx);
 		cx = phd_cos(rx);
 		m0 = PhdMatrixPtr->_01 * cx + PhdMatrixPtr->_02 * sx;
@@ -447,7 +449,7 @@ void phd_RotYXZ(__int16 ry, __int16 rx, __int16 rz) {
 		PhdMatrixPtr->_21 = m0 >> W2V_SHIFT;
 		PhdMatrixPtr->_22 = m1 >> W2V_SHIFT;
 	}
-	if( rz != 0 ) {
+	if (rz != 0) {
 		sz = phd_sin(rz);
 		cz = phd_cos(rz);
 		m0 = PhdMatrixPtr->_00 * cz + PhdMatrixPtr->_01 * sz;
@@ -474,7 +476,7 @@ void phd_RotYXZpack(DWORD rpack) {
 	__int16 ry = ((rpack >> 10) & 0x3FF) << 6;
 	__int16 rz = ((rpack >> 00) & 0x3FF) << 6;
 
-	if( ry != 0 ) {
+	if (ry != 0) {
 		sy = phd_sin(ry);
 		cy = phd_cos(ry);
 		m0 = PhdMatrixPtr->_00 * cy - PhdMatrixPtr->_02 * sy;
@@ -490,7 +492,7 @@ void phd_RotYXZpack(DWORD rpack) {
 		PhdMatrixPtr->_20 = m0 >> W2V_SHIFT;
 		PhdMatrixPtr->_22 = m1 >> W2V_SHIFT;
 	}
-	if( rx != 0 ) {
+	if (rx != 0) {
 		sx = phd_sin(rx);
 		cx = phd_cos(rx);
 		m0 = PhdMatrixPtr->_01 * cx + PhdMatrixPtr->_02 * sx;
@@ -506,7 +508,7 @@ void phd_RotYXZpack(DWORD rpack) {
 		PhdMatrixPtr->_21 = m0 >> W2V_SHIFT;
 		PhdMatrixPtr->_22 = m1 >> W2V_SHIFT;
 	}
-	if( rz != 0 ) {
+	if (rz != 0) {
 		sz = phd_sin(rz);
 		cz = phd_cos(rz);
 		m0 = PhdMatrixPtr->_00 * cz + PhdMatrixPtr->_01 * sz;
@@ -529,9 +531,9 @@ BOOL phd_TranslateRel(int x, int y, int z) {
 	PhdMatrixPtr->_13 += PhdMatrixPtr->_10 * x + PhdMatrixPtr->_11 * y + PhdMatrixPtr->_12 * z;
 	PhdMatrixPtr->_23 += PhdMatrixPtr->_20 * x + PhdMatrixPtr->_21 * y + PhdMatrixPtr->_22 * z;
 
-	if( ABS(PhdMatrixPtr->_03) > PhdFarZ ||
+	if (ABS(PhdMatrixPtr->_03) > PhdFarZ ||
 		ABS(PhdMatrixPtr->_13) > PhdFarZ ||
-		ABS(PhdMatrixPtr->_23) > PhdFarZ )
+		ABS(PhdMatrixPtr->_23) > PhdFarZ)
 	{
 		return FALSE;
 	}
@@ -548,7 +550,7 @@ void phd_TranslateAbs(int x, int y, int z) {
 	PhdMatrixPtr->_23 = x * PhdMatrixPtr->_20 + y * PhdMatrixPtr->_21 + z * PhdMatrixPtr->_22;
 }
 
-void phd_PutPolygons(__int16 *ptrObj, int clip) {
+void phd_PutPolygons(__int16* ptrObj, int clip) {
 	FltWinLeft = (float)PhdWinMinX;
 	FltWinTop = (float)PhdWinMinY;
 	FltWinRight = (float)(PhdWinMinX + PhdWinMaxX + 1);
@@ -556,24 +558,24 @@ void phd_PutPolygons(__int16 *ptrObj, int clip) {
 	FltWinCenterX = (float)(PhdWinMinX + PhdWinCenterX);
 	FltWinCenterY = (float)(PhdWinMinY + PhdWinCenterY);
 #ifdef FEATURE_VIDEOFX_IMPROVED
-	__int16 *ptrEnv = ptrObj;
+	__int16* ptrEnv = ptrObj;
 #endif // FEATURE_VIDEOFX_IMPROVED
 
 	ptrObj += 4; // skip x, y, z, radius
 	ptrObj = calc_object_vertices(ptrObj);
-	if( ptrObj != NULL ) {
+	if (ptrObj != NULL) {
 		ptrObj = calc_vertice_light(ptrObj);
-		ptrObj = ins_objectGT4(ptrObj+1, *ptrObj, ST_AvgZ);
-		ptrObj = ins_objectGT3(ptrObj+1, *ptrObj, ST_AvgZ);
-		ptrObj = ins_objectG4(ptrObj+1, *ptrObj, ST_AvgZ);
-		ptrObj = ins_objectG3(ptrObj+1, *ptrObj, ST_AvgZ);
+		ptrObj = ins_objectGT4(ptrObj + 1, *ptrObj, ST_AvgZ);
+		ptrObj = ins_objectGT3(ptrObj + 1, *ptrObj, ST_AvgZ);
+		ptrObj = ins_objectG4(ptrObj + 1, *ptrObj, ST_AvgZ);
+		ptrObj = ins_objectG3(ptrObj + 1, *ptrObj, ST_AvgZ);
 #ifdef FEATURE_VIDEOFX_IMPROVED
 		phd_PutEnvmapPolygons(ptrEnv);
 #endif // FEATURE_VIDEOFX_IMPROVED
 	}
 }
 
-void S_InsertRoom(__int16 *ptrObj, BOOL isOutside) {
+void S_InsertRoom(__int16* ptrObj, BOOL isOutside) {
 	FltWinLeft = (float)(PhdWinMinX + PhdWinLeft);
 	FltWinTop = (float)(PhdWinMinY + PhdWinTop);
 	FltWinRight = (float)(PhdWinMinX + PhdWinRight + 1);
@@ -581,19 +583,19 @@ void S_InsertRoom(__int16 *ptrObj, BOOL isOutside) {
 	FltWinCenterX = (float)(PhdWinMinX + PhdWinCenterX);
 	FltWinCenterY = (float)(PhdWinMinY + PhdWinCenterY);
 
-	ptrObj = calc_roomvert(ptrObj, isOutside?0x00:0x10);
-	ptrObj = ins_objectGT4(ptrObj+1, *ptrObj, ST_MaxZ);
-	ptrObj = ins_objectGT3(ptrObj+1, *ptrObj, ST_MaxZ);
-	ptrObj = ins_room_sprite(ptrObj+1, *ptrObj);
+	ptrObj = calc_roomvert(ptrObj, isOutside ? 0x00 : 0x10);
+	ptrObj = ins_objectGT4(ptrObj + 1, *ptrObj, ST_MaxZ);
+	ptrObj = ins_objectGT3(ptrObj + 1, *ptrObj, ST_MaxZ);
+	ptrObj = ins_room_sprite(ptrObj + 1, *ptrObj);
 }
 
-__int16 *__cdecl calc_background_light(__int16 *ptrObj) {
+__int16* __cdecl calc_background_light(__int16* ptrObj) {
 	int vtxCount = *ptrObj++;
 
-	if( vtxCount > 0 ) {
+	if (vtxCount > 0) {
 		ptrObj += 3 * vtxCount;
 	}
-	else if( vtxCount < 0 ) {
+	else if (vtxCount < 0) {
 		vtxCount = -vtxCount;
 		ptrObj += vtxCount;
 	}
@@ -602,16 +604,16 @@ __int16 *__cdecl calc_background_light(__int16 *ptrObj) {
 	int shade = 0x0FFF;
 
 	// NOTE: Sunset did not change the skybox brightness in the original game
-	if( GF_SunsetEnabled )
+	if (GF_SunsetEnabled)
 		shade += 0x400 * SunsetTimer / SUNSET_TIMEOUT;
 
-	for( int i = 0; i < vtxCount; ++i )
+	for (int i = 0; i < vtxCount; ++i)
 		PhdVBuf[i].g = shade;
 
 	return ptrObj;
 }
 
-void S_InsertBackground(__int16 *ptrObj) {
+void S_InsertBackground(__int16* ptrObj) {
 	FltWinLeft = (float)(PhdWinMinX + PhdWinLeft);
 	FltWinTop = (float)(PhdWinMinY + PhdWinTop);
 	FltWinRight = (float)(PhdWinMinX + PhdWinRight + 1);
@@ -621,7 +623,7 @@ void S_InsertBackground(__int16 *ptrObj) {
 
 	ptrObj += 4; // skip x, y, z, radius
 	ptrObj = calc_object_vertices(ptrObj);
-	if( ptrObj == NULL ) {
+	if (ptrObj == NULL) {
 		return;
 	}
 	ptrObj = calc_background_light(ptrObj);
@@ -629,14 +631,14 @@ void S_InsertBackground(__int16 *ptrObj) {
 #ifdef FEATURE_VIEW_IMPROVED
 	MidSort = 0xFFFF;
 #endif // FEATURE_VIEW_IMPROVED
-	if( SavedAppSettings.RenderMode == RM_Hardware ) {
+	if (SavedAppSettings.RenderMode == RM_Hardware) {
 		HWR_EnableZBuffer(false, false);
 	}
-	ptrObj = ins_objectGT4(ptrObj+1, *ptrObj, ST_FarZ);
-	ptrObj = ins_objectGT3(ptrObj+1, *ptrObj, ST_FarZ);
-	ptrObj = ins_objectG4(ptrObj+1, *ptrObj, ST_FarZ);
-	ptrObj = ins_objectG3(ptrObj+1, *ptrObj, ST_FarZ);
-	if( SavedAppSettings.RenderMode == RM_Hardware ) {
+	ptrObj = ins_objectGT4(ptrObj + 1, *ptrObj, ST_FarZ);
+	ptrObj = ins_objectGT3(ptrObj + 1, *ptrObj, ST_FarZ);
+	ptrObj = ins_objectG4(ptrObj + 1, *ptrObj, ST_FarZ);
+	ptrObj = ins_objectG3(ptrObj + 1, *ptrObj, ST_FarZ);
+	if (SavedAppSettings.RenderMode == RM_Hardware) {
 		HWR_EnableZBuffer(true, true);
 	}
 #ifdef FEATURE_VIEW_IMPROVED
@@ -644,20 +646,20 @@ void S_InsertBackground(__int16 *ptrObj) {
 #endif // FEATURE_VIEW_IMPROVED
 }
 
-void S_InsertInvBgnd(__int16 *ptrObj) {
+void S_InsertInvBgnd(__int16* ptrObj) {
 	// NOTE: Null function in the PC version.
 	// But there is waving inventory function in the PlayStation version.
 	// Main S_InsertInvBgnd() logic is similar to S_InsertBackground();
 }
 
-__int16 *__cdecl calc_object_vertices(__int16 *ptrObj) {
+__int16* __cdecl calc_object_vertices(__int16* ptrObj) {
 	double xv, yv, zv, persp, baseZ;
 	int vtxCount;
 	BYTE totalClip, clipFlags;
 
 	baseZ = 0.0;
 #ifndef FEATURE_VIEW_IMPROVED
-	if( SavedAppSettings.RenderMode == RM_Software || !SavedAppSettings.ZBuffer ) {
+	if (SavedAppSettings.RenderMode == RM_Software || !SavedAppSettings.ZBuffer) {
 		baseZ = (double)(MidSort << (W2V_SHIFT + 8));
 	}
 #endif // !FEATURE_VIEW_IMPROVED
@@ -667,56 +669,58 @@ __int16 *__cdecl calc_object_vertices(__int16 *ptrObj) {
 	ptrObj++; // skip poly counter
 	vtxCount = *(ptrObj++); // get vertex counter
 
-	if( vtxCount < 0 ) {
+	if (vtxCount < 0) {
 		printf("vtxCount=%d", vtxCount);
 	}
 
-	for( int i = 0; i < vtxCount; ++i ) {
+	for (int i = 0; i < vtxCount; ++i) {
 		xv = (double)(PhdMatrixPtr->_00 * ptrObj[0] +
-					  PhdMatrixPtr->_01 * ptrObj[1] +
-					  PhdMatrixPtr->_02 * ptrObj[2] +
-					  PhdMatrixPtr->_03);
+			PhdMatrixPtr->_01 * ptrObj[1] +
+			PhdMatrixPtr->_02 * ptrObj[2] +
+			PhdMatrixPtr->_03);
 
 		yv = (double)(PhdMatrixPtr->_10 * ptrObj[0] +
-					  PhdMatrixPtr->_11 * ptrObj[1] +
-					  PhdMatrixPtr->_12 * ptrObj[2] +
-					  PhdMatrixPtr->_13);
+			PhdMatrixPtr->_11 * ptrObj[1] +
+			PhdMatrixPtr->_12 * ptrObj[2] +
+			PhdMatrixPtr->_13);
 
 		zv = (double)(PhdMatrixPtr->_20 * ptrObj[0] +
-					  PhdMatrixPtr->_21 * ptrObj[1] +
-					  PhdMatrixPtr->_22 * ptrObj[2] +
-					  PhdMatrixPtr->_23);
+			PhdMatrixPtr->_21 * ptrObj[1] +
+			PhdMatrixPtr->_22 * ptrObj[2] +
+			PhdMatrixPtr->_23);
 
 		PhdVBuf[i].xv = xv;
 		PhdVBuf[i].yv = yv;
 
-		if( zv < FltNearZ ) {
+		if (zv < FltNearZ) {
 			clipFlags = 0x80;
 			PhdVBuf[i].zv = zv;
-		} else {
+		}
+		else {
 			clipFlags = 0;
 
-			if( zv >= FltFarZ ) {
+			if (zv >= FltFarZ) {
 				zv = FltFarZ;
 				PhdVBuf[i].zv = zv;
-			} else {
+			}
+			else {
 				PhdVBuf[i].zv = zv + baseZ;
 			}
 
 			persp = FltPersp / zv;
 
-			PhdVBuf[i].xs  = persp * xv + FltWinCenterX;
-			PhdVBuf[i].ys  = persp * yv + FltWinCenterY;
+			PhdVBuf[i].xs = persp * xv + FltWinCenterX;
+			PhdVBuf[i].ys = persp * yv + FltWinCenterY;
 			PhdVBuf[i].rhw = persp * FltRhwOPersp;
 
-			if( PhdVBuf[i].xs < FltWinLeft )
+			if (PhdVBuf[i].xs < FltWinLeft)
 				clipFlags |= 0x01;
-			else if( PhdVBuf[i].xs > FltWinRight )
+			else if (PhdVBuf[i].xs > FltWinRight)
 				clipFlags |= 0x02;
 
-			if( PhdVBuf[i].ys < FltWinTop )
+			if (PhdVBuf[i].ys < FltWinTop)
 				clipFlags |= 0x04;
-			else if( PhdVBuf[i].ys > FltWinBottom )
+			else if (PhdVBuf[i].ys > FltWinBottom)
 				clipFlags |= 0x08;
 		}
 
@@ -724,42 +728,44 @@ __int16 *__cdecl calc_object_vertices(__int16 *ptrObj) {
 		totalClip &= clipFlags;
 		ptrObj += 3;
 	}
-	return ( totalClip == 0 ) ? ptrObj : NULL;
+	return (totalClip == 0) ? ptrObj : NULL;
 }
 
-__int16 *__cdecl calc_vertice_light(__int16 *ptrObj) {
+__int16* __cdecl calc_vertice_light(__int16* ptrObj) {
 	int i, xv, yv, zv;
 	__int16 shade;
 	int vtxCount = *ptrObj++;
 
-	if( vtxCount > 0 ) {
-		if( LsDivider != 0 ) {
+	if (vtxCount > 0) {
+		if (LsDivider != 0) {
 			xv = (PhdMatrixPtr->_00 * LsVectorView.x +
-				  PhdMatrixPtr->_10 * LsVectorView.y +
-				  PhdMatrixPtr->_20 * LsVectorView.z) / LsDivider;
+				PhdMatrixPtr->_10 * LsVectorView.y +
+				PhdMatrixPtr->_20 * LsVectorView.z) / LsDivider;
 			yv = (PhdMatrixPtr->_01 * LsVectorView.x +
-				  PhdMatrixPtr->_11 * LsVectorView.y +
-				  PhdMatrixPtr->_21 * LsVectorView.z) / LsDivider;
+				PhdMatrixPtr->_11 * LsVectorView.y +
+				PhdMatrixPtr->_21 * LsVectorView.z) / LsDivider;
 			zv = (PhdMatrixPtr->_02 * LsVectorView.x +
-				  PhdMatrixPtr->_12 * LsVectorView.y +
-				  PhdMatrixPtr->_22 * LsVectorView.z) / LsDivider;
+				PhdMatrixPtr->_12 * LsVectorView.y +
+				PhdMatrixPtr->_22 * LsVectorView.z) / LsDivider;
 
-			for( i = 0; i < vtxCount; ++i ) {
-				shade = LsAdder + ((ptrObj[0]*xv + ptrObj[1]*yv + ptrObj[2]*zv) >> 16);
+			for (i = 0; i < vtxCount; ++i) {
+				shade = LsAdder + ((ptrObj[0] * xv + ptrObj[1] * yv + ptrObj[2] * zv) >> 16);
 				CLAMP(shade, 0, 0x1FFF);
 				PhdVBuf[i].g = shade;
 				ptrObj += 3;
 			}
-		} else {
+		}
+		else {
 			shade = LsAdder;
 			CLAMP(shade, 0, 0x1FFF);
-			for( i = 0; i < vtxCount; ++i ) {
+			for (i = 0; i < vtxCount; ++i) {
 				PhdVBuf[i].g = shade;
 			}
-			ptrObj += 3*vtxCount;
+			ptrObj += 3 * vtxCount;
 		}
-	} else {
-		for( i = 0; i < -vtxCount; ++i ) {
+	}
+	else {
+		for (i = 0; i < -vtxCount; ++i) {
 			shade = LsAdder + *ptrObj;
 			CLAMP(shade, 0, 0x1FFF);
 			PhdVBuf[i].g = shade;
@@ -769,66 +775,68 @@ __int16 *__cdecl calc_vertice_light(__int16 *ptrObj) {
 	return ptrObj;
 }
 
-__int16 *__cdecl calc_roomvert(__int16 *ptrObj, BYTE farClip) {
+__int16* __cdecl calc_roomvert(__int16* ptrObj, BYTE farClip) {
 	double xv, yv, zv, persp, baseZ, depth;
 	int vtxCount, zv_int;
 
 	baseZ = 0.0;
 #ifndef FEATURE_VIEW_IMPROVED
-	if( SavedAppSettings.RenderMode == RM_Software || !SavedAppSettings.ZBuffer ) {
+	if (SavedAppSettings.RenderMode == RM_Software || !SavedAppSettings.ZBuffer) {
 		baseZ = (double)(MidSort << (W2V_SHIFT + 8));
 	}
 #endif // !FEATURE_VIEW_IMPROVED
 
 	vtxCount = *(ptrObj++);
 
-	for( int i = 0; i < vtxCount; ++i ) {
+	for (int i = 0; i < vtxCount; ++i) {
 		xv = (double)(PhdMatrixPtr->_00 * ptrObj[0] +
-					  PhdMatrixPtr->_01 * ptrObj[1] +
-					  PhdMatrixPtr->_02 * ptrObj[2] +
-					  PhdMatrixPtr->_03);
+			PhdMatrixPtr->_01 * ptrObj[1] +
+			PhdMatrixPtr->_02 * ptrObj[2] +
+			PhdMatrixPtr->_03);
 
 		yv = (double)(PhdMatrixPtr->_10 * ptrObj[0] +
-					  PhdMatrixPtr->_11 * ptrObj[1] +
-					  PhdMatrixPtr->_12 * ptrObj[2] +
-					  PhdMatrixPtr->_13);
+			PhdMatrixPtr->_11 * ptrObj[1] +
+			PhdMatrixPtr->_12 * ptrObj[2] +
+			PhdMatrixPtr->_13);
 
-		zv_int =	 (PhdMatrixPtr->_20 * ptrObj[0] +
-					  PhdMatrixPtr->_21 * ptrObj[1] +
-					  PhdMatrixPtr->_22 * ptrObj[2] +
-					  PhdMatrixPtr->_23);
+		zv_int = (PhdMatrixPtr->_20 * ptrObj[0] +
+			PhdMatrixPtr->_21 * ptrObj[1] +
+			PhdMatrixPtr->_22 * ptrObj[2] +
+			PhdMatrixPtr->_23);
 
 		zv = (double)zv_int;
 		PhdVBuf[i].xv = xv;
 		PhdVBuf[i].yv = yv;
 
 		PhdVBuf[i].g = ptrObj[5];
-		if( IsWaterEffect != 0 )
+		if (IsWaterEffect != 0)
 			PhdVBuf[i].g += ShadesTable[(WibbleOffset + (BYTE)RandomTable[(vtxCount - i) % WIBBLE_SIZE]) % WIBBLE_SIZE];
 
-		if( zv < FltNearZ ) {
+		if (zv < FltNearZ) {
 			PhdVBuf[i].clip = 0xFF80;
 			PhdVBuf[i].zv = zv;
-		} else {
+		}
+		else {
 			persp = FltPersp / zv;
 			depth = zv_int >> W2V_SHIFT;
 
 #ifdef FEATURE_VIEW_IMPROVED
-			if( depth >= PhdViewDistance ) {
+			if (depth >= PhdViewDistance) {
 				PhdVBuf[i].rhw = persp * FltRhwOPersp;
 				PhdVBuf[i].zv = zv + baseZ;
 #else // !FEATURE_VIEW_IMPROVED
-			if( depth >= DEPTHQ_END ) { // fog end
+			if (depth >= DEPTHQ_END) { // fog end
 				PhdVBuf[i].rhw = 0.0; // NOTE: zero RHW is an invalid value, but the original game sets it.
 				PhdVBuf[i].zv = FltFarZ;
 #endif // FEATURE_VIEW_IMPROVED
 				PhdVBuf[i].g = 0x1FFF;
 				PhdVBuf[i].clip = farClip;
-			} else {
+			}
+			else {
 #ifdef FEATURE_VIEW_IMPROVED
 				PhdVBuf[i].g += CalculateFogShade(depth);
 #else // !FEATURE_VIEW_IMPROVED
-				if( depth > DEPTHQ_START ) { // fog begin
+				if (depth > DEPTHQ_START) { // fog begin
 					PhdVBuf[i].g += depth - DEPTHQ_START;
 				}
 #endif // FEATURE_VIEW_IMPROVED
@@ -840,28 +848,28 @@ __int16 *__cdecl calc_roomvert(__int16 *ptrObj, BYTE farClip) {
 			PhdVBuf[i].xs = persp * xv + FltWinCenterX;
 			PhdVBuf[i].ys = persp * yv + FltWinCenterY;
 
-			if( IsWibbleEffect && ptrObj[4] >= 0 ) {
+			if (IsWibbleEffect && ptrObj[4] >= 0) {
 				PhdVBuf[i].xs += WibbleTable[(WibbleOffset + (BYTE)PhdVBuf[i].ys) % WIBBLE_SIZE];
 				PhdVBuf[i].ys += WibbleTable[(WibbleOffset + (BYTE)PhdVBuf[i].xs) % WIBBLE_SIZE];
 			}
 
-			if( PhdVBuf[i].xs < FltWinLeft )
+			if (PhdVBuf[i].xs < FltWinLeft)
 				PhdVBuf[i].clip |= 0x01;
-			else if( PhdVBuf[i].xs > FltWinRight )
+			else if (PhdVBuf[i].xs > FltWinRight)
 				PhdVBuf[i].clip |= 0x02;
 
-			if( PhdVBuf[i].ys < FltWinTop )
+			if (PhdVBuf[i].ys < FltWinTop)
 				PhdVBuf[i].clip |= 0x04;
-			else if( PhdVBuf[i].ys > FltWinBottom )
+			else if (PhdVBuf[i].ys > FltWinBottom)
 				PhdVBuf[i].clip |= 0x08;
 
 			PhdVBuf[i].clip |= ~(BYTE)(PhdVBuf[i].zv / 0x155555.p0) << 8;
-		}
+			}
 		CLAMP(PhdVBuf[i].g, 0, 0x1FFF);
 		ptrObj += 6;
-	}
+		}
 	return ptrObj;
-}
+	}
 
 void phd_RotateLight(__int16 pitch, __int16 yaw) {
 	int xcos, ysin, wcos, wsin;
@@ -889,19 +897,19 @@ void phd_InitPolyList() {
 	SurfaceCount = 0;
 	Sort3dPtr = SortBuffer;
 	Info3dPtr = Info3dBuffer;
-	if( SavedAppSettings.RenderMode == RM_Hardware )
+	if (SavedAppSettings.RenderMode == RM_Hardware)
 		HWR_VertexPtr = HWR_VertexBuffer;
 }
 
 void phd_SortPolyList() {
-	if( SurfaceCount ) {
-		for( DWORD i=0; i<SurfaceCount; ++i ) {
+	if (SurfaceCount) {
+		for (DWORD i = 0; i < SurfaceCount; ++i) {
 #ifdef FEATURE_VIEW_IMPROVED
 			SortBuffer[i]._1 <<= 16;
 #endif // FEATURE_VIEW_IMPROVED
 			SortBuffer[i]._1 += i;
 		}
-		do_quickysorty(0, SurfaceCount-1);
+		do_quickysorty(0, SurfaceCount - 1);
 	}
 }
 
@@ -917,26 +925,26 @@ void do_quickysorty(int left, int right) {
 	int j = right;
 
 	do {
-		while( (i < right) && (SortBuffer[i]._1 > compare) ) ++i;
-		while( (left <  j) && (compare > SortBuffer[j]._1) ) --j;
-		if( i > j ) break;
+		while ((i < right) && (SortBuffer[i]._1 > compare)) ++i;
+		while ((left < j) && (compare > SortBuffer[j]._1)) --j;
+		if (i > j) break;
 
 		SWAP(SortBuffer[i]._0, SortBuffer[j]._0, swapBuf);
 		SWAP(SortBuffer[i]._1, SortBuffer[j]._1, swapBuf);
-	} while( ++i <= --j );
+	} while (++i <= --j);
 
-	if( left < j )
+	if (left < j)
 		do_quickysorty(left, j);
-	if( i < right )
+	if (i < right)
 		do_quickysorty(i, right);
 }
 
-void phd_PrintPolyList(BYTE *surfacePtr) {
-	__int16 polyType, *bufPtr;
+void phd_PrintPolyList(BYTE * surfacePtr) {
+	__int16 polyType, * bufPtr;
 	PrintSurfacePtr = surfacePtr;
 
-	for( DWORD i=0; i<SurfaceCount; ++i ) {
-		bufPtr = (__int16 *)SortBuffer[i]._0;
+	for (DWORD i = 0; i < SurfaceCount; ++i) {
+		bufPtr = (__int16*)SortBuffer[i]._0;
 		polyType = *(bufPtr++); // poly has type as routine index in first word
 		PolyDrawRoutines[polyType](bufPtr); // send poly data as parameter to routine
 	}
@@ -946,7 +954,7 @@ void AlterFOV(__int16 fov) {
 	fov /= 2; // half fov angle
 
 #ifdef FEATURE_VIEW_IMPROVED
-	int fovWidth = PhdWinHeight*320/(PsxFovEnabled ? 200 : 240);
+	int fovWidth = PhdWinHeight * 320 / (PsxFovEnabled ? 200 : 240);
 	FltViewAspect = 1.0; // must always be 1.0 for unstretched view
 	PhdPersp = (fovWidth / 2) * phd_cos(fov) / phd_sin(fov);
 #else // !FEATURE_VIEW_IMPROVED
@@ -959,7 +967,7 @@ void AlterFOV(__int16 fov) {
 
 #ifndef FEATURE_VIEW_IMPROVED // if feature is not defined!!!
 	double windowAspect = 4.0 / 3.0;
-	if( !SavedAppSettings.FullScreen && SavedAppSettings.AspectMode == AM_16_9 ) {
+	if (!SavedAppSettings.FullScreen && SavedAppSettings.AspectMode == AM_16_9) {
 		windowAspect = 16.0 / 9.0;
 	}
 	FltViewAspect = windowAspect / ((double)PhdWinWidth / (double)PhdWinHeight);
@@ -988,7 +996,6 @@ void phd_SetFarZ(int farZ) {
 	FltResZ = resZ;
 	FltResZORhw = resZ / RhwFactor;
 	FltResZBuf = 0.005 + resZ / FltNearZ;
-
 }
 
 void phd_InitWindow(__int16 x, __int16 y, int width, int height, int nearZ, int farZ, __int16 viewAngle, int screenWidth, int screenHeight) {
@@ -1020,11 +1027,11 @@ void phd_InitWindow(__int16 x, __int16 y, int width, int height, int nearZ, int 
 
 #ifdef FEATURE_VIEW_IMPROVED
 	double baseDistance = (double)farZ;
-	farZ				= (int)(baseDistance * ViewDistanceFactor);
-	FogBeginDepth		= (int)(baseDistance * FogBeginFactor);
-	FogEndDepth			= (int)(baseDistance * FogEndFactor);
-	WaterFogBeginDepth	= (int)(baseDistance * WaterFogBeginFactor);
-	WaterFogEndDepth	= (int)(baseDistance * WaterFogEndFactor);
+	farZ = (int)(baseDistance * ViewDistanceFactor);
+	FogBeginDepth = (int)(baseDistance * FogBeginFactor);
+	FogEndDepth = (int)(baseDistance * FogEndFactor);
+	WaterFogBeginDepth = (int)(baseDistance * WaterFogBeginFactor);
+	WaterFogEndDepth = (int)(baseDistance * WaterFogEndFactor);
 #endif // FEATURE_VIEW_IMPROVED
 
 	PhdNearZ = nearZ << W2V_SHIFT;
@@ -1037,39 +1044,40 @@ void phd_InitWindow(__int16 x, __int16 y, int width, int height, int nearZ, int 
 
 	PhdMatrixPtr = MatrixStack; // reset matrix stack pointer
 
-	if( SavedAppSettings.RenderMode == RM_Software ) {
+	if (SavedAppSettings.RenderMode == RM_Software) {
 		PerspectiveDistance = SavedAppSettings.PerspectiveCorrect ? SW_DETAIL_HIGH : SW_DETAIL_MEDIUM;
 
-		ins_objectGT3	= InsertObjectGT3;
-		ins_objectGT4	= InsertObjectGT4;
-		ins_objectG3	= InsertObjectG3;
-		ins_objectG4	= InsertObjectG4;
-		ins_flat_rect	= InsertFlatRect;
-		ins_line		= InsertLine;
+		ins_objectGT3 = InsertObjectGT3;
+		ins_objectGT4 = InsertObjectGT4;
+		ins_objectG3 = InsertObjectG3;
+		ins_objectG4 = InsertObjectG4;
+		ins_flat_rect = InsertFlatRect;
+		ins_line = InsertLine;
 
-		ins_sprite		= InsertSprite;
-		ins_poly_trans8	= InsertTrans8;
-		ins_trans_quad	= InsertTransQuad;
+		ins_sprite = InsertSprite;
+		ins_poly_trans8 = InsertTrans8;
+		ins_trans_quad = InsertTransQuad;
 	}
-	else if( SavedAppSettings.RenderMode == RM_Hardware ) {
-		if( SavedAppSettings.ZBuffer ) {
-			ins_objectGT3	= InsertObjectGT3_ZBuffered;
-			ins_objectGT4	= InsertObjectGT4_ZBuffered;
-			ins_objectG3	= InsertObjectG3_ZBuffered;
-			ins_objectG4	= InsertObjectG4_ZBuffered;
-			ins_flat_rect	= InsertFlatRect_ZBuffered;
-			ins_line		= InsertLine_ZBuffered;
-		} else {
-			ins_objectGT3	= InsertObjectGT3_Sorted;
-			ins_objectGT4	= InsertObjectGT4_Sorted;
-			ins_objectG3	= InsertObjectG3_Sorted;
-			ins_objectG4	= InsertObjectG4_Sorted;
-			ins_flat_rect	= InsertFlatRect_Sorted;
-			ins_line		= InsertLine_Sorted;
+	else if (SavedAppSettings.RenderMode == RM_Hardware) {
+		if (SavedAppSettings.ZBuffer) {
+			ins_objectGT3 = InsertObjectGT3_ZBuffered;
+			ins_objectGT4 = InsertObjectGT4_ZBuffered;
+			ins_objectG3 = InsertObjectG3_ZBuffered;
+			ins_objectG4 = InsertObjectG4_ZBuffered;
+			ins_flat_rect = InsertFlatRect_ZBuffered;
+			ins_line = InsertLine_ZBuffered;
 		}
-		ins_sprite		= InsertSprite_Sorted;
-		ins_poly_trans8	= InsertTrans8_Sorted;
-		ins_trans_quad	= InsertTransQuad_Sorted;
+		else {
+			ins_objectGT3 = InsertObjectGT3_Sorted;
+			ins_objectGT4 = InsertObjectGT4_Sorted;
+			ins_objectG3 = InsertObjectG3_Sorted;
+			ins_objectG4 = InsertObjectG4_Sorted;
+			ins_flat_rect = InsertFlatRect_Sorted;
+			ins_line = InsertLine_Sorted;
+		}
+		ins_sprite = InsertSprite_Sorted;
+		ins_poly_trans8 = InsertTrans8_Sorted;
+		ins_trans_quad = InsertTransQuad_Sorted;
 	}
 }
 
@@ -1108,7 +1116,7 @@ void Inject_3Dgen() {
 	INJECT(0x00401AE0, S_InsertRoom);
 	INJECT(0x00401BD0, calc_background_light);
 	INJECT(0x00401C10, S_InsertBackground);
-//	INJECT(----------, S_InsertInvBgnd); // NOTE: this is null in the original code
+	//	INJECT(----------, S_InsertInvBgnd); // NOTE: this is null in the original code
 	INJECT(0x00401D50, calc_object_vertices);
 	INJECT(0x00401F30, calc_vertice_light);
 	INJECT(0x004020A0, calc_roomvert);
@@ -1121,7 +1129,7 @@ void Inject_3Dgen() {
 	INJECT(0x00402680, phd_SetNearZ);
 	INJECT(0x004026D0, phd_SetFarZ);
 	INJECT(0x004026F0, phd_InitWindow);
-//	INJECT(----------, phd_PopMatrix); // NOTE: this is inline or macro in the original code
+	//	INJECT(----------, phd_PopMatrix); // NOTE: this is inline or macro in the original code
 	INJECT(0x00457510, phd_PushMatrix);
 	INJECT(0x0045752E, phd_PushUnitMatrix);
 }

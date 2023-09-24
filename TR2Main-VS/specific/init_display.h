@@ -24,9 +24,9 @@
 
 #include "global/types.h"
 
-/*
- * Function list
- */
+ /*
+  * Function list
+  */
 #if (DIRECT3D_VERSION < 0x900)
 void CreateScreenBuffers(); // 0x004484E0
 void CreatePrimarySurface(); // 0x00448620
@@ -49,9 +49,9 @@ void WaitPrimaryBufferFlip(); // 0x00448EB0
 bool RenderInit(); // 0x00448EF0
 void RenderStart(bool isReset); // 0x00448F00
 void RenderFinish(bool needToClearTextures); // 0x004492B0
-bool ApplySettings(APP_SETTINGS *newSettings); // 0x004493A0
+bool ApplySettings(APP_SETTINGS* newSettings); // 0x004493A0
 void FmvBackToGame(); // 0x004495B0
-void GameApplySettings(APP_SETTINGS *newSettings); // 0x004496C0
+void GameApplySettings(APP_SETTINGS* newSettings); // 0x004496C0
 void UpdateGameResolution(); // 0x00449900
 LPCTSTR DecodeErrorMessage(DWORD errorCode); // 0x00449970
 
