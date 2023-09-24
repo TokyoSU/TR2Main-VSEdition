@@ -1,0 +1,624 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="resources">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
+    <None Include="embedded\BUTTONS.JSON" />
+    <None Include="embedded\BUTTONS.PCX" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="specific\background.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\display.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\file.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\fmv.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\frontend.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\game.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\hwr.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\init.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\init_3d.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\init_display.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\init_input.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\init_sound.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\input.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\option.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\output.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\registry.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\screenshot.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\setupdlg.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\setupwnd.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\smain.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\sndpc.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\texture.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\utils.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\winmain.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="specific\winvid.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="TR2Main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="modding\background_new.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="modding\cd_pauld.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="modding\file_utils.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="modding\gdi_utils.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="modding\joy_output.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="modding\json_utils.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="modding\mod_utils.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="modding\pause.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="modding\psx_bar.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="modding\raw_input.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="modding\texture_utils.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="modding\xinput_ex.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="global\md5.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="global\memmem.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bear.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bird.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\boat.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\box.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\camera.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\cinema.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\collide.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\control.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\demo.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\diver.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\dog.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\dragon.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\draw.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\eel.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\effects.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\enemies.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\gameflow.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\hair.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\health.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\inventory.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\invfunc.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\invtext.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\items.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\lara.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\lara1gun.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\lara2gun.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\laraclimb.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\larafire.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\laraflare.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\laramisc.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\larasurf.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\laraswim.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\lot.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\missile.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\moveblock.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\objects.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\people.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\pickup.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\rat.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\savegame.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\setup.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\shark.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\skidoo.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\sound.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\sphere.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\spider.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\text.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\traps.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\wolf.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game\yeti.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="3dsystem\3d_gen.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="3dsystem\3d_out.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="3dsystem\3dinsert.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="3dsystem\phd_math.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="3dsystem\scalespr.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="global\precompiled.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="json-parser\json.c">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="specific\background.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\display.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\file.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\fmv.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\frontend.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\game.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\hwr.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\init.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\init_3d.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\init_display.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\init_input.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\init_sound.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\input.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\option.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\output.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\registry.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\screenshot.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\setupdlg.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\setupwnd.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\smain.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\sndpc.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\texture.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\utils.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\winmain.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\winvid.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="modding\background_new.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="modding\cd_pauld.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="modding\file_utils.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="modding\gdi_utils.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="modding\joy_output.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="modding\json_utils.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="modding\mod_utils.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="modding\pause.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="modding\psx_bar.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="modding\raw_input.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="modding\texture_utils.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="modding\xinput_ex.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="global\md5.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="global\memmem.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="global\precompiled.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="global\resource.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="global\types.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="global\vars.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\bear.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\bird.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\boat.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\box.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\camera.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\cinema.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\collide.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\control.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\demo.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\diver.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\dog.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\dragon.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\draw.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\eel.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\effects.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\enemies.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\gameflow.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\hair.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\health.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\inventory.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\invfunc.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\invtext.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\items.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\lara.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\lara1gun.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\lara2gun.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\laraclimb.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\larafire.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\laraflare.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\laramisc.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\larasurf.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\laraswim.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\lot.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\missile.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\moveblock.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\objects.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\people.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\pickup.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\rat.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\savegame.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\setup.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\shark.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\skidoo.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\sound.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\sphere.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\spider.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\text.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\traps.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\wolf.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\yeti.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="3dsystem\3d_gen.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="3dsystem\3d_out.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="3dsystem\3dinsert.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="3dsystem\phd_math.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="3dsystem\scalespr.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\json.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="logo.png">
+      <Filter>resources</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TR2Main.rc">
+      <Filter>resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

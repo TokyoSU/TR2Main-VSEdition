@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug_DX9|Win32">
+      <Configuration>Debug_DX9</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_DX9|Win32">
+      <Configuration>Release_DX9</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{0b1d052a-052d-450b-8d60-eabedbd17d91}</ProjectGuid>
+    <RootNamespace>TR2MainVS</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DX9|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_DX9|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DX9|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_DX9|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>TR2Main</TargetName>
+    <OutDir>$(SolutionDir)build\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\obj\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DX9|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>TR2Main</TargetName>
+    <OutDir>$(SolutionDir)build\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\obj\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>TR2Main</TargetName>
+    <OutDir>$(SolutionDir)build\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\obj\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_DX9|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>TR2Main</TargetName>
+    <OutDir>$(SolutionDir)build\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\obj\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>D3D_5;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;TR2MAINVS_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\global</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <ExceptionHandling>Async</ExceptionHandling>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>comctl32.lib;shlwapi.lib;winmm.lib;gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\TokyoSU-PC\Documents\GitHub\DX7_SDK\lib</AdditionalLibraryDirectories>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y "$(TargetDir)$(TargetName).dll" "C:\GOG Games\Tomb Raider 2"
+xcopy /y "$(TargetDir)fmtd.dll" "C:\GOG Games\Tomb Raider 2"
+xcopy /y "$(TargetDir)d3dx9d_43.dll" "C:\GOG Games\Tomb Raider 2"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DX9|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>D3D_9;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;TR2MAINVS_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\global</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <ExceptionHandling>Async</ExceptionHandling>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>comctl32.lib;shlwapi.lib;winmm.lib;gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y "$(TargetDir)$(TargetName).dll" "C:\GOG Games\Tomb Raider 2"
+xcopy /y "$(TargetDir)fmtd.dll" "C:\GOG Games\Tomb Raider 2"
+xcopy /y "$(TargetDir)d3dx9d_43.dll" "C:\GOG Games\Tomb Raider 2"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>D3D_5;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;TR2MAINVS_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\global</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <ExceptionHandling>Async</ExceptionHandling>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>comctl32.lib;shlwapi.lib;winmm.lib;gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\TokyoSU-PC\Documents\GitHub\DX7_SDK\lib</AdditionalLibraryDirectories>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y "$(TargetDir)$(TargetName).dll" "C:\GOG Games\Tomb Raider 2"
+xcopy /y "$(TargetDir)fmt.dll" "C:\GOG Games\Tomb Raider 2"
+xcopy /y "$(TargetDir)d3dx9_43.dll" "C:\GOG Games\Tomb Raider 2"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_DX9|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>D3D_9;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;TR2MAINVS_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\global</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <ExceptionHandling>Async</ExceptionHandling>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>comctl32.lib;shlwapi.lib;winmm.lib;gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y "$(TargetDir)$(TargetName).dll" "C:\GOG Games\Tomb Raider 2" 
+xcopy /y "$(TargetDir)fmt.dll" "C:\GOG Games\Tomb Raider 2" 
+xcopy /y "$(TargetDir)d3dx9_43.dll" "C:\GOG Games\Tomb Raider 2"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
+    <None Include="embedded\BUTTONS.JSON" />
+    <None Include="embedded\BUTTONS.PCX" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="3dsystem\3dinsert.cpp" />
+    <ClCompile Include="3dsystem\3d_gen.cpp" />
+    <ClCompile Include="3dsystem\3d_out.cpp" />
+    <ClCompile Include="3dsystem\phd_math.cpp" />
+    <ClCompile Include="3dsystem\scalespr.cpp" />
+    <ClCompile Include="game\bear.cpp" />
+    <ClCompile Include="game\bird.cpp" />
+    <ClCompile Include="game\boat.cpp" />
+    <ClCompile Include="game\box.cpp" />
+    <ClCompile Include="game\camera.cpp" />
+    <ClCompile Include="game\cinema.cpp" />
+    <ClCompile Include="game\collide.cpp" />
+    <ClCompile Include="game\control.cpp" />
+    <ClCompile Include="game\demo.cpp" />
+    <ClCompile Include="game\diver.cpp" />
+    <ClCompile Include="game\dog.cpp" />
+    <ClCompile Include="game\dragon.cpp" />
+    <ClCompile Include="game\draw.cpp" />
+    <ClCompile Include="game\eel.cpp" />
+    <ClCompile Include="game\effects.cpp" />
+    <ClCompile Include="game\enemies.cpp" />
+    <ClCompile Include="game\gameflow.cpp" />
+    <ClCompile Include="game\hair.cpp" />
+    <ClCompile Include="game\health.cpp" />
+    <ClCompile Include="game\inventory.cpp" />
+    <ClCompile Include="game\invfunc.cpp" />
+    <ClCompile Include="game\invtext.cpp" />
+    <ClCompile Include="game\items.cpp" />
+    <ClCompile Include="game\lara.cpp" />
+    <ClCompile Include="game\lara1gun.cpp" />
+    <ClCompile Include="game\lara2gun.cpp" />
+    <ClCompile Include="game\laraclimb.cpp" />
+    <ClCompile Include="game\larafire.cpp" />
+    <ClCompile Include="game\laraflare.cpp" />
+    <ClCompile Include="game\laramisc.cpp" />
+    <ClCompile Include="game\larasurf.cpp" />
+    <ClCompile Include="game\laraswim.cpp" />
+    <ClCompile Include="game\lot.cpp" />
+    <ClCompile Include="game\missile.cpp" />
+    <ClCompile Include="game\moveblock.cpp" />
+    <ClCompile Include="game\objects.cpp" />
+    <ClCompile Include="game\people.cpp" />
+    <ClCompile Include="game\pickup.cpp" />
+    <ClCompile Include="game\rat.cpp" />
+    <ClCompile Include="game\savegame.cpp" />
+    <ClCompile Include="game\setup.cpp" />
+    <ClCompile Include="game\shark.cpp" />
+    <ClCompile Include="game\skidoo.cpp" />
+    <ClCompile Include="game\sound.cpp" />
+    <ClCompile Include="game\sphere.cpp" />
+    <ClCompile Include="game\spider.cpp" />
+    <ClCompile Include="game\text.cpp" />
+    <ClCompile Include="game\traps.cpp" />
+    <ClCompile Include="game\wolf.cpp" />
+    <ClCompile Include="game\yeti.cpp" />
+    <ClCompile Include="global\md5.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_DX9|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_DX9|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="global\memmem.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_DX9|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_DX9|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="global\precompiled.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_DX9|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">precompiled.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug_DX9|Win32'">precompiled.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_DX9|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">precompiled.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release_DX9|Win32'">precompiled.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="json-parser\json.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_DX9|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_DX9|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="modding\background_new.cpp" />
+    <ClCompile Include="modding\cd_pauld.cpp" />
+    <ClCompile Include="modding\file_utils.cpp" />
+    <ClCompile Include="modding\gdi_utils.cpp" />
+    <ClCompile Include="modding\joy_output.cpp" />
+    <ClCompile Include="modding\json_utils.cpp" />
+    <ClCompile Include="modding\mod_utils.cpp" />
+    <ClCompile Include="modding\pause.cpp" />
+    <ClCompile Include="modding\psx_bar.cpp" />
+    <ClCompile Include="modding\raw_input.cpp" />
+    <ClCompile Include="modding\texture_utils.cpp" />
+    <ClCompile Include="modding\xinput_ex.cpp" />
+    <ClCompile Include="specific\background.cpp" />
+    <ClCompile Include="specific\display.cpp" />
+    <ClCompile Include="specific\file.cpp" />
+    <ClCompile Include="specific\fmv.cpp" />
+    <ClCompile Include="specific\frontend.cpp" />
+    <ClCompile Include="specific\game.cpp" />
+    <ClCompile Include="specific\hwr.cpp" />
+    <ClCompile Include="specific\init.cpp" />
+    <ClCompile Include="specific\init_3d.cpp" />
+    <ClCompile Include="specific\init_display.cpp" />
+    <ClCompile Include="specific\init_input.cpp" />
+    <ClCompile Include="specific\init_sound.cpp" />
+    <ClCompile Include="specific\input.cpp" />
+    <ClCompile Include="specific\option.cpp" />
+    <ClCompile Include="specific\output.cpp" />
+    <ClCompile Include="specific\registry.cpp" />
+    <ClCompile Include="specific\screenshot.cpp" />
+    <ClCompile Include="specific\setupdlg.cpp" />
+    <ClCompile Include="specific\setupwnd.cpp" />
+    <ClCompile Include="specific\smain.cpp" />
+    <ClCompile Include="specific\sndpc.cpp" />
+    <ClCompile Include="specific\texture.cpp" />
+    <ClCompile Include="specific\utils.cpp" />
+    <ClCompile Include="specific\winmain.cpp" />
+    <ClCompile Include="specific\winvid.cpp" />
+    <ClCompile Include="TR2Main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="3dsystem\3dinsert.h" />
+    <ClInclude Include="3dsystem\3d_gen.h" />
+    <ClInclude Include="3dsystem\3d_out.h" />
+    <ClInclude Include="3dsystem\phd_math.h" />
+    <ClInclude Include="3dsystem\scalespr.h" />
+    <ClInclude Include="game\bear.h" />
+    <ClInclude Include="game\bird.h" />
+    <ClInclude Include="game\boat.h" />
+    <ClInclude Include="game\box.h" />
+    <ClInclude Include="game\camera.h" />
+    <ClInclude Include="game\cinema.h" />
+    <ClInclude Include="game\collide.h" />
+    <ClInclude Include="game\control.h" />
+    <ClInclude Include="game\demo.h" />
+    <ClInclude Include="game\diver.h" />
+    <ClInclude Include="game\dog.h" />
+    <ClInclude Include="game\dragon.h" />
+    <ClInclude Include="game\draw.h" />
+    <ClInclude Include="game\eel.h" />
+    <ClInclude Include="game\effects.h" />
+    <ClInclude Include="game\enemies.h" />
+    <ClInclude Include="game\gameflow.h" />
+    <ClInclude Include="game\hair.h" />
+    <ClInclude Include="game\health.h" />
+    <ClInclude Include="game\inventory.h" />
+    <ClInclude Include="game\invfunc.h" />
+    <ClInclude Include="game\invtext.h" />
+    <ClInclude Include="game\items.h" />
+    <ClInclude Include="game\lara.h" />
+    <ClInclude Include="game\lara1gun.h" />
+    <ClInclude Include="game\lara2gun.h" />
+    <ClInclude Include="game\laraclimb.h" />
+    <ClInclude Include="game\larafire.h" />
+    <ClInclude Include="game\laraflare.h" />
+    <ClInclude Include="game\laramisc.h" />
+    <ClInclude Include="game\larasurf.h" />
+    <ClInclude Include="game\laraswim.h" />
+    <ClInclude Include="game\lot.h" />
+    <ClInclude Include="game\missile.h" />
+    <ClInclude Include="game\moveblock.h" />
+    <ClInclude Include="game\objects.h" />
+    <ClInclude Include="game\people.h" />
+    <ClInclude Include="game\pickup.h" />
+    <ClInclude Include="game\rat.h" />
+    <ClInclude Include="game\savegame.h" />
+    <ClInclude Include="game\setup.h" />
+    <ClInclude Include="game\shark.h" />
+    <ClInclude Include="game\skidoo.h" />
+    <ClInclude Include="game\sound.h" />
+    <ClInclude Include="game\sphere.h" />
+    <ClInclude Include="game\spider.h" />
+    <ClInclude Include="game\text.h" />
+    <ClInclude Include="game\traps.h" />
+    <ClInclude Include="game\wolf.h" />
+    <ClInclude Include="game\yeti.h" />
+    <ClInclude Include="global\md5.h" />
+    <ClInclude Include="global\memmem.h" />
+    <ClInclude Include="global\precompiled.h" />
+    <ClInclude Include="global\resource.h" />
+    <ClInclude Include="global\types.h" />
+    <ClInclude Include="global\vars.h" />
+    <ClInclude Include="json-parser\json.h" />
+    <ClInclude Include="modding\background_new.h" />
+    <ClInclude Include="modding\cd_pauld.h" />
+    <ClInclude Include="modding\file_utils.h" />
+    <ClInclude Include="modding\gdi_utils.h" />
+    <ClInclude Include="modding\joy_output.h" />
+    <ClInclude Include="modding\json_utils.h" />
+    <ClInclude Include="modding\mod_utils.h" />
+    <ClInclude Include="modding\pause.h" />
+    <ClInclude Include="modding\psx_bar.h" />
+    <ClInclude Include="modding\raw_input.h" />
+    <ClInclude Include="modding\texture_utils.h" />
+    <ClInclude Include="modding\xinput_ex.h" />
+    <ClInclude Include="specific\background.h" />
+    <ClInclude Include="specific\display.h" />
+    <ClInclude Include="specific\file.h" />
+    <ClInclude Include="specific\fmv.h" />
+    <ClInclude Include="specific\frontend.h" />
+    <ClInclude Include="specific\game.h" />
+    <ClInclude Include="specific\hwr.h" />
+    <ClInclude Include="specific\init.h" />
+    <ClInclude Include="specific\init_3d.h" />
+    <ClInclude Include="specific\init_display.h" />
+    <ClInclude Include="specific\init_input.h" />
+    <ClInclude Include="specific\init_sound.h" />
+    <ClInclude Include="specific\input.h" />
+    <ClInclude Include="specific\option.h" />
+    <ClInclude Include="specific\output.h" />
+    <ClInclude Include="specific\registry.h" />
+    <ClInclude Include="specific\screenshot.h" />
+    <ClInclude Include="specific\setupdlg.h" />
+    <ClInclude Include="specific\setupwnd.h" />
+    <ClInclude Include="specific\smain.h" />
+    <ClInclude Include="specific\sndpc.h" />
+    <ClInclude Include="specific\texture.h" />
+    <ClInclude Include="specific\utils.h" />
+    <ClInclude Include="specific\winmain.h" />
+    <ClInclude Include="specific\winvid.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TR2Main.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

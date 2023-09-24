@@ -1,0 +1,43 @@
+/*
+ * Copyright (c) 2017-2020 Michael Chaban. All rights reserved.
+ * Original game is created by Core Design Ltd. in 1997.
+ * Lara Croft and Tomb Raider are trademarks of Embracer Group AB.
+ *
+ * This file is part of TR2Main.
+ *
+ * TR2Main is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * TR2Main is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with TR2Main.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef BACKGROUND_H_INCLUDED
+#define BACKGROUND_H_INCLUDED
+
+#include "global/types.h"
+
+/*
+ * Function list
+ */
+void BGND_Make640x480(BYTE *bitmap, RGB888 *palette); // 0x00443A40
+int BGND_AddTexture(int tileIndex, BYTE *bitmap, int palIndex, RGB888 *bmpPal); // 0x00443C00
+void BGND_GetPageHandles(); // 0x00443CC0
+void BGND_DrawInGameBlack(); // 0x00443D00
+void DrawQuad(float sx, float sy, float width, float height, D3DCOLOR color); // 0x00443D60
+void BGND_DrawInGameBackground(); // 0x00443E40
+void DrawTextureTile(int sx, int sy, int width, int height, HWR_TEXHANDLE texSource,
+							 int tu, int tv, int t_width, int t_height,
+							 D3DCOLOR color0, D3DCOLOR color1, D3DCOLOR color2, D3DCOLOR color3); // 0x00444060
+D3DCOLOR BGND_CenterLighting(int x, int y, int width, int height); // 0x004442C0
+void BGND_Free(); // 0x00444570
+bool BGND_Init(); // 0x004445C0
+
+#endif // BACKGROUND_H_INCLUDED
