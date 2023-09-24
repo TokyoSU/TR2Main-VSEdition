@@ -368,9 +368,9 @@ extern APP_SETTINGS SavedAppSettings;
 #define SampleInfoCount				VAR_U_(0x0051E6C0, DWORD)
 #define SoundIsActive				VAR_U_(0x0051E6C4, BOOL)
 #define SampleInfos					VAR_U_(0x0051E9C4, SAMPLE_INFO*)
-#define SG_Point					VAR_U_(0x0051E9C8, BYTE*)
-#define SaveGame					VAR_U_(0x0051E9E0, SAVEGAME_INFO)
-#define SG_Count					VAR_U_(0x005206A4, DWORD)
+extern SAVEGAME_INFO SaveGame; // 0x0051E9E0: SAVEGAME_INFO struct
+extern BYTE* SG_Point; // 0x0051E9C8: BYTE*
+extern DWORD SG_Count; // 0x005206A4: DWORD
 #define Lara						VAR_U_(0x005206E0, LARA_INFO)
 #define LaraItem					VAR_U_(0x005207BC, ITEM_INFO*)
 #define Effects						VAR_U_(0x005207C0, FX_INFO *)

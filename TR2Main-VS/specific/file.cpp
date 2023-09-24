@@ -772,18 +772,18 @@ BOOL LoadItems(HANDLE hFile) {
 	if (itemsCount == 0)
 		return TRUE;
 
-	if (itemsCount > 256) {
+	if (itemsCount > NUMBER_ITEMS) {
 		lstrcpy(StringToShow, "LoadItems(): Too Many Items being Loaded!!");
 		return FALSE;
 	}
 
-	Items = (ITEM_INFO*)game_malloc(sizeof(ITEM_INFO) * 256, GBUF_Items);
+	Items = (ITEM_INFO*)game_malloc(sizeof(ITEM_INFO) * NUMBER_ITEMS, GBUF_Items);
 	if (Items == NULL) {
 		lstrcpy(StringToShow, "LoadItems(): Unable to allocate memory for 'items'");
 		return FALSE;
 	}
 	LevelItemCount = itemsCount;
-	InitialiseItemArray(256);
+	InitialiseItemArray(NUMBER_ITEMS);
 
 	for (DWORD i = 0; i < itemsCount; ++i) {
 		ReadFileSync(hFile, &Items[i].objectID, sizeof(__int16), &bytesRead, NULL);

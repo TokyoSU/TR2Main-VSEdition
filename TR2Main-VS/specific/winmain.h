@@ -29,7 +29,6 @@
   */
 
 int RenderErrorBox(int errorCode); // 0x0044E5A0
-int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nShowCmd); // 0x0044E5E0
 int Init(bool skipCDInit); // 0x0044E7B0
 void WinCleanup(); // 0x0044E830
 int WinGameStart(); // 0x0044E860

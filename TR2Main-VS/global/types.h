@@ -40,8 +40,7 @@ typedef struct {
 
 #ifdef _DEBUG
 #define TRACE(func,line) { \
-	printf("%s: line %d\n", func, line); \
-	fflush(stdout); \
+	Log("%s: line %d\n", func, line); \
 }
 #else
 #define TRACE(func,line)
@@ -50,9 +49,12 @@ typedef struct {
 /*
  * Defined values
  */
+
  // General values
 #define REQ_LEVEL_VERSION	(45)
 #define ARRAY_SIZE(a) (sizeof(a)/sizeof(*(a)))
+#define NUMBER_ITEMS 1024
+#define MAX_SAVEGAME_BUFFER(bufferSize) ((bufferSize * 1024) + 128) // bufferSize in KB
 
 // FPS values
 #define FRAMES_PER_SECOND	(30)
@@ -1642,7 +1644,7 @@ typedef struct SaveGame_t {
 	BYTE numPuzzle[4];
 	BYTE numKey[4];
 	UINT16 reserved;
-	BYTE buffer[6272];
+	BYTE buffer[MAX_SAVEGAME_BUFFER(16)]; // 16KB for savegame buffer.
 } SAVEGAME_INFO;
 
 typedef struct Pos2D_t {

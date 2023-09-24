@@ -36,6 +36,10 @@
 
 #define SGF_CREATURE (0x80)
 
+SAVEGAME_INFO SaveGame = {};
+BYTE* SG_Point = NULL;
+DWORD SG_Count = 0;
+
 void InitialiseStartInfo() {
 #if 0 // NOTE: this original check is removed, because it breaks game+ logic in case of any level selection
 	// skip initialise if bonus game started
@@ -57,7 +61,6 @@ void InitialiseStartInfo() {
 
 void ModifyStartInfo(int levelIdx) {
 	START_INFO* start = &SaveGame.start[levelIdx];
-
 	start->has_pistols = 1; // Lara has pistols
 	start->gunType = LGT_Pistols; // current weapon is pistols
 	start->pistolAmmo = 1000; // infinite pistols ammo
@@ -342,7 +345,7 @@ void CreateSaveGameInfo() {
 	WriteSG(&IsMonkAngry, sizeof(IsMonkAngry));
 
 	int numFlares = 0;
-	for (int i = LevelItemCount; i < 256; ++i) {
+	for (int i = LevelItemCount; i < NUMBER_ITEMS; ++i) {
 		item = &Items[i];
 		if (item->active && item->objectID == ID_FLARE_ITEM) {
 			++numFlares;
@@ -351,7 +354,7 @@ void CreateSaveGameInfo() {
 
 	WriteSG(&numFlares, sizeof(numFlares));
 
-	for (int i = LevelItemCount; i < 256; ++i) {
+	for (int i = LevelItemCount; i < NUMBER_ITEMS; ++i) {
 		item = &Items[i];
 		if (item->active && item->objectID == ID_FLARE_ITEM) {
 			WriteSG(&item->pos, sizeof(item->pos));
@@ -367,6 +370,7 @@ void CreateSaveGameInfo() {
 void ExtractSaveGameInfo() {
 	ITEM_INFO* item = NULL;
 	InitialiseLaraInventory(CurrentLevel);
+
 	for (int i = 0; i < 2; ++i) {
 		GAME_OBJECT_ID id[] = { ID_PICKUP_ITEM1, ID_PICKUP_ITEM2 };
 		for (int j = 0; j < SaveGame.numPickup[i]; ++j) {

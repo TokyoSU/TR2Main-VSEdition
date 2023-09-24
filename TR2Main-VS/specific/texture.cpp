@@ -84,10 +84,10 @@ static bool CreateEnvmapTexture() {
 	return SUCCEEDED(D3DDev->CreateTexture(side, side, 1, D3DUSAGE_RENDERTARGET, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &EnvmapTexture, 0));
 }
 #else // (DIRECT3D_VERSION >= 0x900)
-static bool CreateEnvmapBufferSurface() {
+static int CreateEnvmapBufferSurface() {
 	DWORD side = GetEnvmapSide();
-	if (!side) return false;
-	if (EnvmapBufferSurface) return true;
+	if (!side) return 0;
+	if (EnvmapBufferSurface) return 1;
 
 	DDSDESC dsp;
 	memset(&dsp, 0, sizeof(dsp));
@@ -96,7 +96,6 @@ static bool CreateEnvmapBufferSurface() {
 	dsp.dwWidth = side;
 	dsp.dwHeight = side;
 	dsp.ddsCaps.dwCaps = DDSCAPS_VIDEOMEMORY | DDSCAPS_TEXTURE;
-
 	if FAILED(DDrawSurfaceCreate(&dsp, &EnvmapBufferSurface))
 		return -1;
 
@@ -138,7 +137,7 @@ bool SetEnvmapTexture(LPDDS surface) {
 		texSurface->Release();
 	}
 #else // (DIRECT3D_VERSION >= 0x900)
-	if (!CreateEnvmapBufferSurface()) return false;
+	if (CreateEnvmapBufferSurface() <= 0) return false;
 	if (EnvmapTexture) FreeEnvmapTexture();
 	EnvmapBufferSurface->Blt(NULL, surface, &srcRect, DDBLT_WAIT, NULL);
 	EnvmapTexture = Create3DTexture(EnvmapBufferSurface);
