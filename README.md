@@ -18,8 +18,8 @@ Learn about [the latest improvements](CHANGELOG.md).
 
 * [Visual studio 2022](https://visualstudio.microsoft.com/)
 * [vcpkg](https://github.com/microsoft/vcpkg) (Required to use this project)
-1) Using dxsdk-d3dx library. (More recent than DX7_SDK)
-2) Using spdlog library. (For logging)
+1) vcpkg install dxsdk-d3dx:x86-windows
+2) vcpkg install spdlog:x86-windows
 
 ## Authors
 
