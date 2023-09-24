@@ -27,7 +27,15 @@ Learn about [the latest improvements](CHANGELOG.md).
 2) go to visual studio (open the project if it's not already opened).
 3) go to the project properties, linker -> general then look for "Additional library directories".
 4) change the configuration to "Debug" then copy the path from DX7_SDK\lib to "Additional library directories" box on the right (replacing the path i set).
-5) do the same for "Release" then your done.
+5) do the same for "Release".
+6) done.
+
+* If you want to debug the game:
+1) go to visual studio (open the project if it's not already opened).
+2) go to your project properties.
+3) go to "Debugging".
+4) change the "Working directory" to your game path (don't forget the '\' at the end of the path if it not exist).
+5) done.
 
 ## Authors
 
