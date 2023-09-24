@@ -6,9 +6,9 @@ The goal of the project is to make 1:1 clone of the original PC game, to fix all
 
 ## Getting Started
 
-You may download patched Tomb2.exe, TR2Main.dll from [releases](https://github.com/Arsunt/TR2Main/releases), put them in your game folder and just launch. Also you may build TR2Main.dll yourself and use it with patched Tomb2.exe from [here](/binaries).
+You may download patched Tomb2.exe, TR2Main.dll from [releases](https://github.com/TokyoSU/TR2Main-VSEdition/releases), put them in your game folder and just launch. Also you may build TR2Main.dll yourself and use it with patched Tomb2.exe from [here](/binaries).
 
-The Golden Mask game is included into a [release pack](https://github.com/Arsunt/TR2Main/releases), since it's freeware. The original game level files must be officially obtained via Steam/GOG/CD/whatever.
+The Golden Mask game is included into a [release pack](https://github.com/TokyoSU/TR2Main-VSEdition/releases), since it's freeware. The original game level files must be officially obtained via Steam/GOG/CD/whatever.
 
 ## Changelog
 
