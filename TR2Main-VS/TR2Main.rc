@@ -20,17 +20,7 @@
  */
 
 #include <windows.h>
-
-#define VER_MAJOR	0
-#define VER_MINOR	9
-#define VER_PATCH	0
-#define VER_BUILD	0
-
-#define STR_(x) #x
-#define STR(x) STR_(x)
-
-#define VER_FULL	STR(VER_MAJOR) "." STR(VER_MINOR) "." STR(VER_PATCH) "." STR(VER_BUILD) "\0"
-#define VER_SHORT	STR(VER_MAJOR) "." STR(VER_MINOR) "\0"
+#include "global/resource.h"
 
  // DLL version information.
 VS_VERSION_INFO		VERSIONINFO
@@ -50,7 +40,7 @@ BLOCK "StringFileInfo"
 BEGIN
 BLOCK "080904b0"
 BEGIN
-VALUE "Comments", "https://github.com/Arsunt/TR2Main"
+VALUE "Comments", "https://github.com/Arsunt/TR2Main and https://github.com/TokyoSU/TR2Main-VSEdition"
 VALUE "CompanyName", "Michael Chaban (arsunt@gmail.com)"
 VALUE "FileDescription", "Tomb Raider II Main Library"
 VALUE "FileVersion", VER_FULL

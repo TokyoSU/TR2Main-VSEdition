@@ -22,7 +22,14 @@
 #ifndef RESOURCE_H_INCLUDED
 #define RESOURCE_H_INCLUDED
 
-#define RESOURCE_H_INCLUDED
+#define VER_MAJOR	0
+#define VER_MINOR	9
+#define VER_PATCH	0
+#define VER_BUILD	1
+#define STR_(x) #x
+#define STR(x) STR_(x)
+#define VER_FULL	STR(VER_MAJOR) "." STR(VER_MINOR) "." STR(VER_PATCH) "." STR(VER_BUILD) "\0"
+#define VER_SHORT	STR(VER_MAJOR) "." STR(VER_MINOR) "\0"
 
  // String table
 #define IDS_DX5_REQUIRED				1

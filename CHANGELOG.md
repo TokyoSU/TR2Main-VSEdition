@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0.1] - 2023-09-24
+
+### Warning:
+
+- Since the items count has been increased, you need to change it in the TrCatalog.xml:
+```
+<limit name="ItemMaxCount" value="256" />
+<limit name="ItemSafeCount" value="256" />
+```
+to
+```
+<limit name="ItemMaxCount" value="1024" />
+<limit name="ItemSafeCount" value="1024" />
+```
+
+### TR2Main bugfixes
+- Fixed gamepad/joystick wrong check, it was only checking for the left motor, not both.
+- Fixed directinput initialize, was using wrong enum type when switching to DX9.
+- Fixed CreateEnvmapBufferSurface() return types.
+- Fixed WinMain argument.
+- Moved SaveGame, SG_Point, SG_Count to DLL to avoid memory overflow.
+
+### New features
+- Increased items count from 256 to 1024.
+- Increased savegame size from 6KB to 16KB to avoid crash with the items count increase feature.
+- Added a new library: spdlog, will be able to logs data to a files more efficiently, will be able to get debug info later one.
+- Using D3DX9 library: more recent than DX7_SDK.
+
 ## [0.9.0] - 2023-06-05
 ### New features
 - The Golden Mask game is included into a release pack, since it's freeware. The original game level files must be officially obtained via Steam/GOG/CD/whatever.

@@ -36,9 +36,9 @@
    */
 
 #include "precompiled.h"
-#include <windows.h>
+#include "resource.h"
 
-   /** @cond Doxygen_Suppress */
+/** @cond Doxygen_Suppress */
 #ifdef TR2MAINVS_EXPORTS
 #define DLL_EXPORT __declspec(dllexport)
 #else
@@ -238,6 +238,7 @@ extern "C" BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpv
 	switch (fdwReason) {
 	case DLL_PROCESS_ATTACH:
 		Log("Process was attached.");
+		Log("DLL version: %s", VER_FULL);
 		// attach to process
 		hInstance = hinstDLL;
 		Inject();
