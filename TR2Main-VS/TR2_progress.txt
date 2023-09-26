@@ -205,9 +205,9 @@ x function is unused / included in another function
 0x004139A0:		TrapCollision
 0x00413A10:		ItemPushLara
 0x00413D20:		TestBoundsCollide
-0x00413DF0:		TestLaraPosition
-0x00413F30:		AlignLaraPosition
-0x00414070:		MoveLaraPosition
+0x00413DF0:	 *	TestLaraPosition
+0x00413F30:	 *	AlignLaraPosition
+0x00414070:	 *	MoveLaraPosition
 0x00414200:		Move3DPosTo3DPos
 
 	game/control.cpp
@@ -218,7 +218,7 @@ x function is unused / included in another function
 0x00414B40:	 *	GetFloor
 0x00414CE0:	 *	GetWaterHeight
 0x00414E50:	 *	GetHeight
-0x004150D0:		RefreshCamera
+0x004150D0:	 *	RefreshCamera
 0x004151C0:	 *	TestTriggers
 0x004158A0:	 *	TriggerActive
 0x00415900:	 *	GetCeiling
@@ -684,7 +684,7 @@ x function is unused / included in another function
 0x0042FCA0:		set_flare_arm
 0x0042FCF0:		draw_flare
 0x0042FE60:		undraw_flare
-0x00430090:		draw_flare_meshes
+0x00430090:	 *	draw_flare_meshes
 0x004300B0:		undraw_flare_meshes
 0x004300D0:		ready_flare
 0x00430110:		FlareControl
@@ -821,14 +821,14 @@ x function is unused / included in another function
 0x00437DA0:	 *	WinstonControl
 
 	game/pickup.cpp
-0x00437F20:	 *	PickUpCollision
+0x00437F20:	+	PickUpCollision
 0x004383A0:		SwitchCollision
 0x004385B0:		SwitchCollision2
 0x004386B0:		DetonatorCollision
 0x004388F0:		KeyHoleCollision
 0x00438B30:	 *	PuzzleHoleCollision
 0x00438DF0:		SwitchControl
-0x00438E30:		SwitchTrigger
+0x00438E30:	 *	SwitchTrigger
 0x00438EF0:		KeyTrigger
 0x00438F30:		PickupTrigger
 0x00438F70:		SecretControl
