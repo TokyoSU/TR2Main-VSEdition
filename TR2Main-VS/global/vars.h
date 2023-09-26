@@ -799,5 +799,9 @@ extern TEXT_STR_INFO* CtrlTextB[ARRAY_SIZE(Layout->key)];
 #define GF_DemoLevels				ARRAY_(0x00521F60, UINT16, [24])
 #define GF_SecretInvItems			ARRAY_(0x00521FA0, char, [27])
 #define GF_Add2InvItems				ARRAY_(0x00521FC0, char, [27])
+#define PickUpBounds				ARRAY_(0x00465FF0, short, [12])
+#define PickUpPosition				VAR_U_(0x00466008, PHD_VECTOR)
+#define PickUpBoundsUW				ARRAY_(0x00466030, short, [12])
+#define PickUpPositionUW			VAR_U_(0x00466048, PHD_VECTOR)
 
 #endif // GLOBAL_VARS_H_INCLUDED

@@ -29,14 +29,12 @@
   */
   //	0x0042F840:		DoFlareLight
   //	0x0042F8E0:		DoFlareInHand
-
 void DrawFlareInAir(ITEM_INFO* item);
-
 //	0x0042FAC0:		CreateFlare
 //	0x0042FCA0:		set_flare_arm
 //	0x0042FCF0:		draw_flare
 //	0x0042FE60:		undraw_flare
-//	0x00430090:		draw_flare_meshes
+#define draw_flare_meshes ((void(__cdecl*)()) 0x00430090)
 //	0x004300B0:		undraw_flare_meshes
 //	0x004300D0:		ready_flare
 //	0x00430110:		FlareControl
