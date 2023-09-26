@@ -139,7 +139,7 @@ void DrawQuad(float sx, float sy, float width, float height, D3DCOLOR color) {
 }
 
 void BGND_DrawInGameBackground() {
-	__int16* meshPtr;
+	short* meshPtr;
 	int numVertices, numNormals, numQuads;
 	DWORD textureIndex;
 	PHD_TEXTURE* textureInfo;

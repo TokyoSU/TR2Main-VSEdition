@@ -29,22 +29,22 @@
   */
 int ItemNearLara(PHD_3DPOS* pos, int distance); // 0x0041C4B0
 void SoundEffects(); // 0x0041C540
-__int16 DoBloodSplat(int x, int y, int z, __int16 speed, __int16 direction, __int16 roomID); // 0x0041C5B0
-void DoLotsOfBlood(int x, int y, int z, __int16 speed, __int16 direction, __int16 roomID, int number); // 0x0041C610
-void ControlBlood1(__int16 fxID); // 0x0041C6C0
-void ControlExplosion1(__int16 fxID); // 0x0041C750
+short DoBloodSplat(int x, int y, int z, short speed, short direction, short roomID); // 0x0041C5B0
+void DoLotsOfBlood(int x, int y, int z, short speed, short direction, short roomID, int number); // 0x0041C610
+void ControlBlood1(short fxID); // 0x0041C6C0
+void ControlExplosion1(short fxID); // 0x0041C750
 void Richochet(GAME_VECTOR* pos); // 0x0041C7D0
-void ControlRichochet1(__int16 fxID); // 0x0041C850
-void CreateBubble(PHD_3DPOS* pos, __int16 roomNumber); // 0x0041C880
+void ControlRichochet1(short fxID); // 0x0041C850
+void CreateBubble(PHD_3DPOS* pos, short roomNumber); // 0x0041C880
 void LaraBubbles(ITEM_INFO* item); // 0x0041C8F0
-void ControlBubble1(__int16 fxID); // 0x0041C970
+void ControlBubble1(short fxID); // 0x0041C970
 void Splash(ITEM_INFO* item); // 0x0041CA70
 void WadeSplash(ITEM_INFO* item, int height);
-void ControlSplash1(__int16 fxID); // 0x0041CB40
-void ControlWaterSprite(__int16 fxID); // 0x0041CBC0
-void ControlSnowSprite(__int16 fxID); // 0x0041CC70
-void ControlHotLiquid(__int16 fxID); // 0x0041CD00
-void WaterFall(__int16 itemID); // 0x0041CDE0
+void ControlSplash1(short fxID); // 0x0041CB40
+void ControlWaterSprite(short fxID); // 0x0041CBC0
+void ControlSnowSprite(short fxID); // 0x0041CC70
+void ControlHotLiquid(short fxID); // 0x0041CD00
+void WaterFall(short itemID); // 0x0041CDE0
 void finish_level_effect(ITEM_INFO* item); // 0x0041CF20
 void turn180_effect(ITEM_INFO* item); // 0x0041CF30
 void floor_shake_effect(ITEM_INFO* item); // 0x0041CF50
@@ -58,14 +58,14 @@ void PistonFX(ITEM_INFO* item); // 0x0041D170
 void CurtainFX(ITEM_INFO* item); // 0x0041D190
 void StatueFX(ITEM_INFO* item); // 0x0041D1B0
 void SetChangeFX(ITEM_INFO* item); // 0x0041D1D0
-void ControlDingDong(__int16 itemID); // 0x0041D1F0
-void ControlLaraAlarm(__int16 itemID); // 0x0041D230
-void ControlAlarmSound(__int16 itemID); // 0x0041D270
-void ControlBirdTweeter(__int16 itemID); // 0x0041D2E0
+void ControlDingDong(short itemID); // 0x0041D1F0
+void ControlLaraAlarm(short itemID); // 0x0041D230
+void ControlAlarmSound(short itemID); // 0x0041D270
+void ControlBirdTweeter(short itemID); // 0x0041D2E0
 void DoChimeSound(ITEM_INFO* item); // 0x0041D340
-void ControlClockChimes(__int16 itemID); // 0x0041D3A0
-void SphereOfDoomCollision(__int16 itemID, ITEM_INFO* laraItem, COLL_INFO* coll); // 0x0041D410
-void SphereOfDoom(__int16 itemID); // 0x0041D540
+void ControlClockChimes(short itemID); // 0x0041D3A0
+void SphereOfDoomCollision(short itemID, ITEM_INFO* laraItem, COLL_INFO* coll); // 0x0041D410
+void SphereOfDoom(short itemID); // 0x0041D540
 void DrawSphereOfDoom(ITEM_INFO* item); // 0x0041D630
 void lara_hands_free(ITEM_INFO* item); // 0x0041D760
 void flip_map_effect(ITEM_INFO* item); // 0x0041D770

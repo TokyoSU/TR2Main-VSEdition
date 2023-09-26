@@ -82,7 +82,7 @@ static int GetSaveFileName(LPSTR destName, DWORD destSize, int slotNumber) {
 
 DWORD SavegameSlots = 16;
 
-__int16 StartGame(int levelID, GF_LEVEL_TYPE levelType) {
+short StartGame(int levelID, GF_LEVEL_TYPE levelType) {
 	if (levelType == GFL_NORMAL || levelType == GFL_SAVED || levelType == GFL_DEMO)
 		CurrentLevel = levelID;
 

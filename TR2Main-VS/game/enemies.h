@@ -29,18 +29,18 @@
   */
   //	0x0041DB30:		Knife
 
-#define Cult2Control ((void(__cdecl*)(__int16)) 0x0041DBB0)
-#define MonkControl ((void(__cdecl*)(__int16)) 0x0041DFE0)
-#define Worker3Control ((void(__cdecl*)(__int16)) 0x0041E4B0)
+#define Cult2Control ((void(__cdecl*)(short)) 0x0041DBB0)
+#define MonkControl ((void(__cdecl*)(short)) 0x0041DFE0)
+#define Worker3Control ((void(__cdecl*)(short)) 0x0041E4B0)
 #define DrawXianLord ((void(__cdecl*)(ITEM_INFO *)) 0x0041EAC0)
 
 //	0x0041EEC0:		XianDamage
 
-#define InitialiseXianLord ((void(__cdecl*)(__int16)) 0x0041EF70)
-#define XianLordControl ((void(__cdecl*)(__int16)) 0x0041EFD0)
+#define InitialiseXianLord ((void(__cdecl*)(short)) 0x0041EF70)
+#define XianLordControl ((void(__cdecl*)(short)) 0x0041EFD0)
 
 //	0x0041F5B0:		WarriorSparkleTrail
 
-#define WarriorControl ((void(__cdecl*)(__int16)) 0x0041F650)
+#define WarriorControl ((void(__cdecl*)(short)) 0x0041F650)
 
 #endif // ENEMIES_H_INCLUDED

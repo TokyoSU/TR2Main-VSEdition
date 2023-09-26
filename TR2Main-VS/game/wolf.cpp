@@ -49,12 +49,12 @@ static const BITE_INFO WolfBite = {
 	0, -14, 174, 6
 };
 
-void InitialiseWolf(__int16 itemID) {
+void InitialiseWolf(short itemID) {
 	Items[itemID].frameNumber = 96; // lying wolf frame (hardcoded thing)
 	InitialiseCreature(itemID);
 }
 
-void WolfControl(__int16 itemID) {
+void WolfControl(short itemID) {
 	ITEM_INFO* item = &Items[itemID];
 
 	if (item->status == ITEM_INVISIBLE) {
@@ -67,9 +67,9 @@ void WolfControl(__int16 itemID) {
 	CREATURE_INFO* wolf = (CREATURE_INFO*)item->data;
 	if (wolf == NULL) return; // NOTE: additional check not presented in the original game
 
-	__int16 angle = 0;
-	__int16 head = 0;
-	__int16 tilt = 0;
+	short angle = 0;
+	short head = 0;
+	short tilt = 0;
 
 	if (item->hitPoints <= 0) {
 		if (item->currentAnimState != WOLF_DEATH) {

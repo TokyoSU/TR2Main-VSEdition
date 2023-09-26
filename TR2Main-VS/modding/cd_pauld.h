@@ -31,7 +31,7 @@
 bool PaulD_CD_Init();
 void PaulD_CD_Cleanup();
 void PaulD_CDLoop();
-void PaulD_CDPlay(__int16 trackID, BOOL isLooped);
+void PaulD_CDPlay(short trackID, BOOL isLooped);
 void PaulD_CDStop();
 BOOL PaulD_StartSyncedAudio(int trackID);
 DWORD PaulD_CDGetLoc();

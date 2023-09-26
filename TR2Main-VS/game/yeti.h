@@ -27,7 +27,7 @@
  /*
   * Function list
   */
-#define GiantYetiControl ((void(__cdecl*)(__int16)) 0x00443100)
-#define YetiControl ((void(__cdecl*)(__int16)) 0x00443400)
+#define GiantYetiControl ((void(__cdecl*)(short)) 0x00443100)
+#define YetiControl ((void(__cdecl*)(short)) 0x00443400)
 
 #endif // YETI_H_INCLUDED

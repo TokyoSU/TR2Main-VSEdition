@@ -1393,22 +1393,22 @@ typedef struct TextStrInfo_t {
 	UINT16 textFlags;
 	UINT16 bgndFlags;
 	UINT16 outlFlags;
-	__int16 xPos;
-	__int16 yPos;
-	__int16 zPos;
-	__int16 letterSpacing;
-	__int16 wordSpacing;
-	__int16 flashRate;
-	__int16 flashCount;
-	__int16 bgndColor;
+	short xPos;
+	short yPos;
+	short zPos;
+	short letterSpacing;
+	short wordSpacing;
+	short flashRate;
+	short flashCount;
+	short bgndColor;
 	GOURAUD_FILL* bgndGour;
-	__int16 outlColour;
+	short outlColour;
 	GOURAUD_OUTLINE* outlGour;
-	__int16 bgndSizeX;
-	__int16 bgndSizeY;
-	__int16 bgndOffX;
-	__int16 bgndOffY;
-	__int16 bgndOffZ;
+	short bgndSizeX;
+	short bgndSizeY;
+	short bgndOffX;
+	short bgndOffY;
+	short bgndOffZ;
 	int scaleH;
 	int scaleV;
 	char* pString;
@@ -1480,19 +1480,19 @@ typedef struct WavePcmHeader_t {
 	DWORD dwFmtSubchunkID;
 	DWORD dwFmtSubchunkSize;
 	UINT16 wFormatTag;
-	__int16 nChannels;
+	short nChannels;
 	int nSamplesPerSec;
 	int nAvgBytesPerSec;
-	__int16 nBlockAlign;
+	short nBlockAlign;
 	UINT16 wBitsPerSample;
 	DWORD dwDataSubchunkID;
 	DWORD dwDataSubchunkSize;
 } WAVEPCM_HEADER;
 
 typedef struct SampleInfo_t {
-	__int16 sfxID;
-	__int16 volume;
-	__int16 randomness;
+	short sfxID;
+	short volume;
+	short randomness;
 	UINT16 flags;
 } SAMPLE_INFO;
 
@@ -1519,7 +1519,7 @@ typedef struct GameFlow_t {
 	UINT16 num_Cutscenes;
 	UINT16 num_Demos;
 	UINT16 titleTrack;
-	__int16 singleLevel;
+	short singleLevel;
 	UINT16 reserved2[16];
 	UINT16 flags;
 	UINT16 reserved3[3];
@@ -1539,9 +1539,9 @@ typedef struct RequestInfo_t {
 	UINT16 lineOldOffset;
 	UINT16 pixWidth;
 	UINT16 lineHeight;
-	__int16 xPos;
-	__int16 yPos;
-	__int16 zPos;
+	short xPos;
+	short yPos;
+	short zPos;
 	UINT16 itemStringLen;
 	char* lpItemStrings1;
 	char* lpItemStrings2;
@@ -1569,28 +1569,28 @@ typedef struct RequestInfo_t {
 
 typedef struct InventoryItem_t {
 	char* lpString;
-	__int16 objectID;
-	__int16 framesTotal;
-	__int16 currentFrame;
-	__int16 goalFrame;
-	__int16 openFrame;
-	__int16 animDirection;
-	__int16 animSpeed;
-	__int16 animCount;
-	__int16 xRotPtSel;
-	__int16 xRotPt;
-	__int16 xRotSel;
-	__int16 xRot;
-	__int16 yRotSel;
-	__int16 yRot;
-	__int16 zRot;
+	short objectID;
+	short framesTotal;
+	short currentFrame;
+	short goalFrame;
+	short openFrame;
+	short animDirection;
+	short animSpeed;
+	short animCount;
+	short xRotPtSel;
+	short xRotPt;
+	short xRotSel;
+	short xRot;
+	short yRotSel;
+	short yRot;
+	short zRot;
 	int yTransSel;
 	int yTrans;
 	int zTransSel;
 	int zTrans;
 	int meshesSel;
 	int meshesDrawn;
-	__int16 invPos;
+	short invPos;
 	void* sprites;
 	DWORD reserved1;
 	DWORD reserved2;
@@ -1638,7 +1638,7 @@ typedef struct StartInfo_t {
 typedef struct SaveGame_t {
 	START_INFO start[24];
 	STATISTICS_INFO statistics;
-	__int16 currentLevel;
+	short currentLevel;
 	bool bonusFlag;
 	BYTE numPickup[2];
 	BYTE numPuzzle[4];
@@ -1648,14 +1648,14 @@ typedef struct SaveGame_t {
 } SAVEGAME_INFO;
 
 typedef struct Pos2D_t {
-	__int16 x;
-	__int16 y;
+	short x;
+	short y;
 } POS_2D;
 
 typedef struct Pos3D_t {
-	__int16 x;
-	__int16 y;
-	__int16 z;
+	short x;
+	short y;
+	short z;
 } POS_3D;
 
 typedef struct PhdVector_t {
@@ -1668,8 +1668,8 @@ typedef struct GameVector_t {
 	int x;
 	int y;
 	int z;
-	__int16 roomNumber;
-	__int16 boxNumber;
+	short roomNumber;
+	short boxNumber;
 } GAME_VECTOR;
 
 typedef struct ObjectVector_t {
@@ -1681,41 +1681,41 @@ typedef struct ObjectVector_t {
 } OBJECT_VECTOR;
 
 typedef struct VectorAngles_t {
-	__int16 yaw;
-	__int16 pitch;
+	short yaw;
+	short pitch;
 } VECTOR_ANGLES;
 
 typedef struct Phd3dPos_t {
 	int x;
 	int y;
 	int z;
-	__int16 rotX;
-	__int16 rotY;
-	__int16 rotZ;
+	short rotX;
+	short rotY;
+	short rotZ;
 } PHD_3DPOS;
 
 typedef struct ItemInfo_t {
 	int floor;
 	DWORD touchBits;
 	DWORD meshBits;
-	__int16 objectID;
-	__int16 currentAnimState;
-	__int16 goalAnimState;
-	__int16 requiredAnimState;
-	__int16 animNumber;
-	__int16 frameNumber;
-	__int16 roomNumber;
-	__int16 nextItem;
-	__int16 nextActive;
-	__int16 speed;
-	__int16 fallSpeed;
-	__int16 hitPoints;
-	__int16 boxNumber;
-	__int16 timer;
+	short objectID;
+	short currentAnimState;
+	short goalAnimState;
+	short requiredAnimState;
+	short animNumber;
+	short frameNumber;
+	short roomNumber;
+	short nextItem;
+	short nextActive;
+	short speed;
+	short fallSpeed;
+	short hitPoints;
+	short boxNumber;
+	short timer;
 	UINT16 flags; // see IFL_* defines
-	__int16 shade1;
-	__int16 shade2;
-	__int16 carriedItem;
+	short shade1;
+	short shade2;
+	short carriedItem;
 	LPVOID data;
 	PHD_3DPOS pos;
 	UINT16 active : 1;
@@ -1741,14 +1741,14 @@ typedef struct CameraInfo_t {
 	int underwater;
 	int targetDistance;
 	int targetSquare;
-	__int16 targetAngle;
-	__int16 actualAngle;
-	__int16 targetElevation;
-	__int16 box;
-	__int16 number;
-	__int16 last;
-	__int16 timer;
-	__int16 speed;
+	short targetAngle;
+	short actualAngle;
+	short targetElevation;
+	short box;
+	short number;
+	short last;
+	short timer;
+	short speed;
 	ITEM_INFO* item;
 	ITEM_INFO* last_item;
 	OBJECT_VECTOR* fixed;
@@ -1773,13 +1773,13 @@ typedef struct CollInfo_t {
 	int badCeiling;
 	PHD_VECTOR shift;
 	PHD_VECTOR old;
-	__int16 oldAnimState;
-	__int16 oldAnimNumber;
-	__int16 oldFrameNumber;
-	__int16 facing;
-	__int16 quadrant;
-	__int16 collType;
-	__int16* trigger;
+	short oldAnimState;
+	short oldAnimNumber;
+	short oldFrameNumber;
+	short facing;
+	short quadrant;
+	short collType;
+	short* trigger;
 	char xTilt;
 	char zTilt;
 	char hitByBaddie;
@@ -1788,21 +1788,21 @@ typedef struct CollInfo_t {
 } COLL_INFO;
 
 typedef struct ObjectInfo_t {
-	__int16 nMeshes;
-	__int16 meshIndex;
+	short nMeshes;
+	short meshIndex;
 	int boneIndex;
-	__int16* frameBase;
-	void(__cdecl* initialise)(__int16 itemNumber);
-	void(__cdecl* control)(__int16 itemNumber);
-	void(__cdecl* floor)(ITEM_INFO* item, int x, int y, int z, __int16* height);
-	void(__cdecl* ceiling)(ITEM_INFO* item, int x, int y, int z, __int16* height);
+	short* frameBase;
+	void(__cdecl* initialise)(short itemNumber);
+	void(__cdecl* control)(short itemNumber);
+	void(__cdecl* floor)(ITEM_INFO* item, int x, int y, int z, short* height);
+	void(__cdecl* ceiling)(ITEM_INFO* item, int x, int y, int z, short* height);
 	void(__cdecl* drawRoutine)(ITEM_INFO* item);
-	void(__cdecl* collision)(__int16 itemNum, ITEM_INFO* laraItem, COLL_INFO* coll);
-	__int16 animIndex;
-	__int16 hitPoints;
-	__int16 pivotLength;
-	__int16 radius;
-	__int16 shadowSize;
+	void(__cdecl* collision)(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll);
+	short animIndex;
+	short hitPoints;
+	short pivotLength;
+	short radius;
+	short shadowSize;
 	UINT16 loaded : 1;
 	UINT16 intelligent : 1;
 	UINT16 save_position : 1;
@@ -1821,21 +1821,21 @@ typedef struct PhdMatrix_t {
 } PHD_MATRIX;
 
 typedef struct DoorInfo_t {
-	__int16 room;
-	__int16 x;
-	__int16 y;
-	__int16 z;
+	short room;
+	short x;
+	short y;
+	short z;
 	POS_3D vertex[4];
 } DOOR_INFO;
 
 typedef struct DoorInfos_t {
-	__int16 wCount;
+	short wCount;
 	DOOR_INFO door[];
 } DOOR_INFOS;
 
 typedef struct FloorInfo_t {
-	__int16 index;
-	__int16 box;
+	short index;
+	short box;
 	char pitRoom;
 	char floor;
 	char skyRoom;
@@ -1846,8 +1846,8 @@ typedef struct LightInfo_t {
 	int x;
 	int y;
 	int z;
-	__int16 intensity1;
-	__int16 intensity2;
+	short intensity1;
+	short intensity2;
 	int fallOff1;
 	int fallOff2;
 } LIGHT_INFO;
@@ -1856,14 +1856,14 @@ typedef struct MeshInfo_t {
 	int x;
 	int y;
 	int z;
-	__int16 yRot;
-	__int16 shade1;
-	__int16 shade2;
-	__int16 staticNumber;
+	short yRot;
+	short shade1;
+	short shade2;
+	short staticNumber;
 } MESH_INFO;
 
 typedef struct RoomInfo_t {
-	__int16* data;
+	short* data;
 	DOOR_INFOS* doors;
 	FLOOR_INFO* floor;
 	LIGHT_INFO* light;
@@ -1873,25 +1873,25 @@ typedef struct RoomInfo_t {
 	int z;
 	int minFloor;
 	int maxCeiling;
-	__int16 xSize;
-	__int16 ySize;
-	__int16 ambient1;
-	__int16 ambient2;
-	__int16 lightMode;
-	__int16 numLights;
-	__int16 numMeshes;
-	__int16 boundLeft;
-	__int16 boundRight;
-	__int16 boundTop;
-	__int16 boundBottom;
+	short xSize;
+	short ySize;
+	short ambient1;
+	short ambient2;
+	short lightMode;
+	short numLights;
+	short numMeshes;
+	short boundLeft;
+	short boundRight;
+	short boundTop;
+	short boundBottom;
 	UINT16 boundActive;
-	__int16 left;
-	__int16 right;
-	__int16 top;
-	__int16 bottom;
-	__int16 itemNumber;
-	__int16 fxNumber;
-	__int16 flippedRoom;
+	short left;
+	short right;
+	short top;
+	short bottom;
+	short itemNumber;
+	short fxNumber;
+	short flippedRoom;
 	UINT16 flags;
 } ROOM_INFO;
 
@@ -1902,10 +1902,10 @@ typedef struct PhdVBuf_t {
 	float rhw;
 	float xs;
 	float ys;
-	__int16 clip;
-	__int16 g;
-	__int16 u;
-	__int16 v;
+	short clip;
+	short g;
+	short u;
+	short v;
 } PHD_VBUF;
 
 typedef struct PointInfo_t {
@@ -1930,55 +1930,55 @@ typedef struct VertexInfo_t {
 } VERTEX_INFO;
 
 typedef struct RoomVertexInfo_t {
-	__int16 x;
-	__int16 y;
-	__int16 z;
-	__int16 lightBase;
+	short x;
+	short y;
+	short z;
+	short lightBase;
 	BYTE lightTableValue;
 	BYTE flags;
-	__int16 lightAdder;
+	short lightAdder;
 } ROOM_VERTEX_INFO;
 
 typedef struct AnimStruct_t {
-	__int16* framePtr;
-	__int16 interpolation;
-	__int16 currentAnimState;
+	short* framePtr;
+	short interpolation;
+	short currentAnimState;
 	int velocity;
 	int acceleration;
-	__int16 frameBase;
-	__int16 frameEnd;
-	__int16 jumpAnimNum;
-	__int16 jumpFrameNum;
-	__int16 numberChanges;
-	__int16 changeIndex;
-	__int16 numberCommands;
-	__int16 commandIndex;
+	short frameBase;
+	short frameEnd;
+	short jumpAnimNum;
+	short jumpFrameNum;
+	short numberChanges;
+	short changeIndex;
+	short numberCommands;
+	short commandIndex;
 } ANIM_STRUCT;
 
 typedef struct ChangeStruct_t {
-	__int16 goalAnimState;
-	__int16 numberRanges;
-	__int16 rangeIndex;
+	short goalAnimState;
+	short numberRanges;
+	short rangeIndex;
 } CHANGE_STRUCT;
 
 typedef struct RangeStruct_t {
-	__int16 startFrame;
-	__int16 endFrame;
-	__int16 linkAnimNum;
-	__int16 linkFrameNum;
+	short startFrame;
+	short endFrame;
+	short linkAnimNum;
+	short linkFrameNum;
 } RANGE_STRUCT;
 
 typedef struct StaticBounds_t {
-	__int16 xMin;
-	__int16 xMax;
-	__int16 yMin;
-	__int16 yMax;
-	__int16 zMin;
-	__int16 zMax;
+	short xMin;
+	short xMax;
+	short yMin;
+	short yMax;
+	short zMin;
+	short zMax;
 } STATIC_BOUNDS;
 
 typedef struct StaticInfo_t {
-	__int16 meshIndex;
+	short meshIndex;
 	UINT16 flags;
 	STATIC_BOUNDS drawBounds;
 	STATIC_BOUNDS collisionBounds;
@@ -1989,10 +1989,10 @@ typedef struct PhdSprite_t {
 	UINT16 offset;
 	UINT16 width;
 	UINT16 height;
-	__int16 x1;
-	__int16 y1;
-	__int16 x2;
-	__int16 y2;
+	short x1;
+	short y1;
+	short x2;
+	short y2;
 } PHD_SPRITE;
 
 typedef struct BoxInfo_t {
@@ -2005,14 +2005,14 @@ typedef struct BoxInfo_t {
 } BOX_INFO;
 
 typedef struct CineFrameInfo_t {
-	__int16 xTarget;
-	__int16 yTarget;
-	__int16 zTarget;
-	__int16 zPos;
-	__int16 yPos;
-	__int16 xPos;
-	__int16 fov;
-	__int16 roll;
+	short xTarget;
+	short yTarget;
+	short zTarget;
+	short zPos;
+	short yPos;
+	short xPos;
+	short fov;
+	short roll;
 } CINE_FRAME_INFO;
 
 typedef struct ControlLayout_t {
@@ -2024,10 +2024,10 @@ typedef struct ControlLayout_t {
 } CONTROL_LAYOUT;
 
 typedef struct InventorySprite_t {
-	__int16 shape;
-	__int16 x;
-	__int16 y;
-	__int16 z;
+	short shape;
+	short x;
+	short y;
+	short z;
 	int param1;
 	int param2;
 	LPVOID gour;
@@ -2041,26 +2041,26 @@ typedef struct AssaultStats_t {
 } ASSAULT_STATS;
 
 typedef struct PickupInfo_t {
-	__int16 timer;
-	__int16 sprite;
+	short timer;
+	short sprite;
 } PICKUP_INFO;
 
 typedef struct InvMotionInfo_t {
-	__int16 framesCount;
-	__int16 status;
-	__int16 statusTarget;
-	__int16 radiusTarget;
-	__int16 radiusRate;
-	__int16 cameraTarget_y;
-	__int16 cameraRate_y;
-	__int16 cameraTarget_pitch;
-	__int16 cameraRate_pitch;
-	__int16 rotateTarget;
-	__int16 rotateRate;
-	__int16 itemTarget_xRotPt;
-	__int16 itemRate_xRotPt;
-	__int16 itemTarget_xRot;
-	__int16 itemRate_xRot;
+	short framesCount;
+	short status;
+	short statusTarget;
+	short radiusTarget;
+	short radiusRate;
+	short cameraTarget_y;
+	short cameraRate_y;
+	short cameraTarget_pitch;
+	short cameraRate_pitch;
+	short rotateTarget;
+	short rotateRate;
+	short itemTarget_xRotPt;
+	short itemRate_xRotPt;
+	short itemTarget_xRot;
+	short itemRate_xRot;
 	int itemTarget_yTrans;
 	int itemRate_yTrans;
 	int itemTarget_zTrans;
@@ -2070,18 +2070,18 @@ typedef struct InvMotionInfo_t {
 
 typedef struct RingInfo_t {
 	INVENTORY_ITEM** itemList;
-	__int16 type;
-	__int16 radius;
-	__int16 cameraPitch;
-	__int16 isRotating;
-	__int16 rotCount;
-	__int16 currentObj;
-	__int16 targetObj;
-	__int16 objCount;
-	__int16 angleAdder;
-	__int16 rotAdder;
-	__int16 rotAdderL;
-	__int16 rotAdderR;
+	short type;
+	short radius;
+	short cameraPitch;
+	short isRotating;
+	short rotCount;
+	short currentObj;
+	short targetObj;
+	short objCount;
+	short angleAdder;
+	short rotAdder;
+	short rotAdderL;
+	short rotAdderR;
 	PHD_3DPOS ringPos;
 	PHD_3DPOS camera;
 	PHD_VECTOR light;
@@ -2089,46 +2089,46 @@ typedef struct RingInfo_t {
 } RING_INFO;
 
 typedef struct BoxNode_t {
-	__int16 exit_box;
+	short exit_box;
 	UINT16 search_number;
-	__int16 next_expansion;
-	__int16 box_number;
+	short next_expansion;
+	short box_number;
 } BOX_NODE;
 
 typedef struct LotInfo_t {
 	BOX_NODE* node;
-	__int16 head;
-	__int16 tail;
+	short head;
+	short tail;
 	UINT16 search_number;
 	UINT16 block_mask;
-	__int16 step;
-	__int16 drop;
-	__int16 fly;
-	__int16 zone_count;
-	__int16 target_box;
-	__int16 required_box;
+	short step;
+	short drop;
+	short fly;
+	short zone_count;
+	short target_box;
+	short required_box;
 	PHD_VECTOR target;
 } LOT_INFO;
 
 typedef struct FxInfo_t {
 	PHD_3DPOS pos;
-	__int16 room_number;
-	__int16 object_number;
-	__int16 next_fx;
-	__int16 next_active;
-	__int16 speed;
-	__int16 fallspeed;
-	__int16 frame_number;
-	__int16 counter;
-	__int16 shade;
+	short room_number;
+	short object_number;
+	short next_fx;
+	short next_active;
+	short speed;
+	short fallspeed;
+	short frame_number;
+	short counter;
+	short shade;
 } FX_INFO;
 
 typedef struct CreatureInfo_t {
-	__int16 head_rotation;
-	__int16 neck_rotation;
-	__int16 maximum_turn;
+	short head_rotation;
+	short neck_rotation;
+	short maximum_turn;
 	UINT16 flags;
-	__int16 item_num;
+	short item_num;
 	MOOD_TYPE mood;
 	LOT_INFO LOT;
 	PHD_VECTOR target;
@@ -2139,55 +2139,55 @@ typedef struct BoatInfo_t {
 	int turn;
 	int leftFallspeed;
 	int rightFallspeed;
-	__int16 tiltAngle;
-	__int16 extraRotation;
+	short tiltAngle;
+	short extraRotation;
 	int water;
 	int pitch;
 } BOAT_INFO;
 
 typedef struct SkidooInfo_t {
-	__int16 trackMesh;
+	short trackMesh;
 	int turn;
 	int leftFallspeed;
 	int rightFallspeed;
-	__int16 tiltAngle;
-	__int16 extraRotation;
+	short tiltAngle;
+	short extraRotation;
 	int pitch;
 } SKIDOO_INFO;
 
 typedef struct LaraArm_t {
-	__int16* frame_base;
-	__int16 frame_number;
-	__int16 anim_number;
-	__int16 lock;
-	__int16 y_rot;
-	__int16 x_rot;
-	__int16 z_rot;
-	__int16 flash_gun;
+	short* frame_base;
+	short frame_number;
+	short anim_number;
+	short lock;
+	short y_rot;
+	short x_rot;
+	short z_rot;
+	short flash_gun;
 } LARA_ARM;
 
 typedef struct LaraInfo_t {
-	__int16 item_number;
-	__int16 gun_status;
-	__int16 gun_type;
-	__int16 request_gun_type;
-	__int16 last_gun_type;
-	__int16 calc_fallspeed;
-	__int16 water_status;
-	__int16 climb_status;
-	__int16 pose_count;
-	__int16 hit_frame;
-	__int16 hit_direction;
-	__int16 air;
-	__int16 dive_count;
-	__int16 death_count;
-	__int16 current_active;
-	__int16 spaz_effect_count;
-	__int16 flare_age;
-	__int16 skidoo;
-	__int16 weapon_item;
-	__int16 back_gun;
-	__int16 flare_frame;
+	short item_number;
+	short gun_status;
+	short gun_type;
+	short request_gun_type;
+	short last_gun_type;
+	short calc_fallspeed;
+	short water_status;
+	short climb_status;
+	short pose_count;
+	short hit_frame;
+	short hit_direction;
+	short air;
+	short dive_count;
+	short death_count;
+	short current_active;
+	short spaz_effect_count;
+	short flare_age;
+	short skidoo;
+	short weapon_item;
+	short back_gun;
+	short flare_frame;
 	UINT16 flare_control_left : 1;
 	UINT16 flare_control_right : 1;
 	UINT16 extra_anim : 1;
@@ -2200,17 +2200,17 @@ typedef struct LaraInfo_t {
 	PHD_VECTOR last_pos;
 	FX_INFO* spaz_effect;
 	DWORD mesh_effects;
-	__int16* mesh_ptrs[15];
+	short* mesh_ptrs[15];
 	ITEM_INFO* target;
-	__int16 target_angles[2];
-	__int16 turn_rate;
-	__int16 move_angle;
-	__int16 head_y_rot;
-	__int16 head_x_rot;
-	__int16 head_z_rot;
-	__int16 torso_y_rot;
-	__int16 torso_x_rot;
-	__int16 torso_z_rot;
+	short target_angles[2];
+	short turn_rate;
+	short move_angle;
+	short head_y_rot;
+	short head_x_rot;
+	short head_z_rot;
+	short torso_y_rot;
+	short torso_x_rot;
+	short torso_z_rot;
 	LARA_ARM left_arm;
 	LARA_ARM right_arm;
 	DWORD pistol_ammo;
@@ -2231,13 +2231,13 @@ typedef struct BiteInfo_t {
 } BITE_INFO;
 
 typedef struct AIInfo_t {
-	__int16 zone_number;
-	__int16 enemy_zone;
+	short zone_number;
+	short enemy_zone;
 	int distance;
 	int ahead;
 	int bite;
-	__int16 angle;
-	__int16 enemy_facing;
+	short angle;
+	short enemy_facing;
 } AI_INFO;
 
 typedef struct Sphere_t {
@@ -2248,17 +2248,17 @@ typedef struct Sphere_t {
 } SPHERE;
 
 typedef struct WeaponInfo_t {
-	__int16 lockAngles[4];
-	__int16 leftAngles[4];
-	__int16 rightAngles[4];
-	__int16 aimSpeed;
-	__int16 shotAccuracy;
+	short lockAngles[4];
+	short leftAngles[4];
+	short rightAngles[4];
+	short aimSpeed;
+	short shotAccuracy;
 	int gunHeight;
 	int damage;
 	int targetDist;
-	__int16 recoilFrame;
-	__int16 flashTime;
-	__int16 sampleNum;
+	short recoilFrame;
+	short flashTime;
+	short sampleNum;
 } WEAPON_INFO;
 
 #pragma pack(pop)

@@ -296,7 +296,7 @@ void DrawPickups(BOOL pickupState) {
 	}
 }
 
-void AddDisplayPickup(__int16 itemID) {
+void AddDisplayPickup(short itemID) {
 	if (itemID == ID_SECRET1 || itemID == ID_SECRET2 || itemID == ID_SECRET3) {
 		S_CDPlay(GF_GameFlow.secretTrack, FALSE);
 	}

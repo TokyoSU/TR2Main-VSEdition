@@ -32,7 +32,7 @@ extern int CalculateFogShade(int depth);
 DWORD PickupItemMode = 1;
 #endif // FEATURE_VIDEOFX_IMPROVED
 
-void S_DrawSprite(DWORD flags, int x, int y, int z, __int16 spriteIdx, __int16 shade, __int16 scale) {
+void S_DrawSprite(DWORD flags, int x, int y, int z, short spriteIdx, short shade, short scale) {
 	int xv, yv, zv, zp, depth;
 	int x1, y1, x2, y2;
 
@@ -150,7 +150,7 @@ void S_DrawSprite(DWORD flags, int x, int y, int z, __int16 spriteIdx, __int16 s
 #endif // FEATURE_VIDEOFX_IMPROVED
 }
 
-void S_DrawPickup(int sx, int sy, int scale, __int16 spriteIdx, __int16 shade) {
+void S_DrawPickup(int sx, int sy, int scale, short spriteIdx, short shade) {
 	int x1, x2, y1, y2;
 
 #ifdef FEATURE_HUD_IMPROVED
@@ -171,7 +171,7 @@ void S_DrawPickup(int sx, int sy, int scale, __int16 spriteIdx, __int16 shade) {
 	}
 }
 
-__int16* __cdecl ins_room_sprite(__int16* ptrObj, int vtxCount) {
+short* __cdecl ins_room_sprite(short* ptrObj, int vtxCount) {
 	PHD_VBUF* vbuf;
 	PHD_SPRITE* sprite;
 	double zp;
@@ -201,7 +201,7 @@ __int16* __cdecl ins_room_sprite(__int16* ptrObj, int vtxCount) {
 	return ptrObj;
 }
 
-void S_DrawScreenSprite2d(int sx, int sy, int sz, int scaleH, int scaleV, __int16 spriteIdx, __int16 shade, UINT16 flags) {
+void S_DrawScreenSprite2d(int sx, int sy, int sz, int scaleH, int scaleV, short spriteIdx, short shade, UINT16 flags) {
 	int x1, y1, x2, y2, z;
 	PHD_SPRITE* sprite = &PhdSpriteInfo[spriteIdx];
 
@@ -220,7 +220,7 @@ void S_DrawScreenSprite2d(int sx, int sy, int sz, int scaleH, int scaleV, __int1
 	}
 }
 
-void S_DrawScreenSprite(int sx, int sy, int sz, int scaleH, int scaleV, __int16 spriteIdx, __int16 shade, UINT16 flags) {
+void S_DrawScreenSprite(int sx, int sy, int sz, int scaleH, int scaleV, short spriteIdx, short shade, UINT16 flags) {
 	int x1, y1, x2, y2, z;
 	PHD_SPRITE* sprite = &PhdSpriteInfo[spriteIdx];
 
@@ -239,7 +239,7 @@ void S_DrawScreenSprite(int sx, int sy, int sz, int scaleH, int scaleV, __int16 
 	}
 }
 
-void draw_scaled_spriteC(__int16* ptrObj) {
+void draw_scaled_spriteC(short* ptrObj) {
 #ifdef FEATURE_NOLEGACY_OPTIONS
 	extern int GetPitchSWR();
 	int pitch = GetPitchSWR();
@@ -249,7 +249,7 @@ void draw_scaled_spriteC(__int16* ptrObj) {
 	int i, j;
 	int x1, y1, x2, y2, width, height;
 	int u, uBase, vBase, uAdd, vAdd;
-	__int16 sprIdx, shade;
+	short sprIdx, shade;
 	BYTE* srcBase, * src, * dst;
 	BYTE pix;
 	int dstAdd;

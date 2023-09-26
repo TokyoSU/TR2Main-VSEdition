@@ -30,7 +30,7 @@
 #include "global/vars.h"
 
 void DoWakeEffect(ITEM_INFO* item) {
-	__int16 frame_number, fxID;
+	short frame_number, fxID;
 	int i;
 	FX_INFO* fx;
 
@@ -62,9 +62,9 @@ void DoWakeEffect(ITEM_INFO* item) {
 	}
 }
 
-void GondolaControl(__int16 itemID) {
+void GondolaControl(short itemID) {
 	ITEM_INFO* item;
-	__int16 roomID;
+	short roomID;
 
 	item = &Items[itemID];
 	switch (item->currentAnimState) {

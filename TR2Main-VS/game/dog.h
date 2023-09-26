@@ -27,7 +27,7 @@
  /*
   * Function list
   */
-#define DogControl ((void(__cdecl*)(__int16)) 0x00417130)
-#define TigerControl ((void(__cdecl*)(__int16)) 0x004174E0)
+#define DogControl ((void(__cdecl*)(short)) 0x00417130)
+#define TigerControl ((void(__cdecl*)(short)) 0x004174E0)
 
 #endif // DOG_H_INCLUDED

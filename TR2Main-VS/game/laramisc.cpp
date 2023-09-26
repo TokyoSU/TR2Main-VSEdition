@@ -35,7 +35,7 @@
 #include "specific/sndpc.h"
 #include "global/vars.h"
 
-void LaraControl(__int16 itemID) {
+void LaraControl(short itemID) {
 	COLL_INFO coll;
 	ITEM_INFO* item = LaraItem;
 
@@ -325,7 +325,7 @@ void LaraControl(__int16 itemID) {
 	Lara.last_pos.z = item->pos.z;
 }
 
-void UseItem(__int16 itemID) {
+void UseItem(short itemID) {
 	if (itemID <= ID_NONE || itemID >= ID_NUMBER_OBJECTS)
 		return;
 
@@ -488,11 +488,11 @@ void LaraCheatGetStuff() {
 #endif // FEATURE_CHEAT
 }
 
-void ControlLaraExtra(__int16 itemID) {
+void ControlLaraExtra(short itemID) {
 	AnimateItem(&Items[itemID]);
 }
 
-void InitialiseLaraLoad(__int16 itemID) {
+void InitialiseLaraLoad(short itemID) {
 	Lara.item_number = itemID;
 	LaraItem = &Items[itemID];
 }

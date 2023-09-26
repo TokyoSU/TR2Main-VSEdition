@@ -41,6 +41,6 @@ void DoWakeEffect(ITEM_INFO* item); // 0x0040D0F0
 //	0x0040D930:		BoatAnimation
 //	0x0040DAA0:		BoatControl
 
-void GondolaControl(__int16 itemID); // 0x0040E0D0
+void GondolaControl(short itemID); // 0x0040E0D0
 
 #endif // BOAT_H_INCLUDED

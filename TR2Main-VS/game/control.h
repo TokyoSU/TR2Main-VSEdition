@@ -34,13 +34,13 @@ int ControlPhase(int nTicks, BOOL demoMode);
 // 0x00414A30:		GetChange
 // 0x00414AE0:		TranslateItem
 
-#define GetFloor ((FLOOR_INFO*(__cdecl*)(int, int, int, __int16*)) 0x00414B40)
-#define GetWaterHeight ((int(__cdecl*)(int, int, int, __int16)) 0x00414CE0)
+#define GetFloor ((FLOOR_INFO*(__cdecl*)(int, int, int, short*)) 0x00414B40)
+#define GetWaterHeight ((int(__cdecl*)(int, int, int, short)) 0x00414CE0)
 #define GetHeight ((int(__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00414E50)
 
 // 0x004150D0:		RefreshCamera
 
-#define TestTriggers ((void(__cdecl*)(__int16*, BOOL)) 0x004151C0)
+#define TestTriggers ((void(__cdecl*)(short*, BOOL)) 0x004151C0)
 #define TriggerActive ((int(__cdecl*)(ITEM_INFO*)) 0x004158A0)
 #define GetCeiling ((int(__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00415900)
 
@@ -58,7 +58,7 @@ int ControlPhase(int nTicks, BOOL demoMode);
 // 0x004166D0:		RemoveRoomFlipItems
 // 0x00416770:		AddRoomFlipItems
 
-void TriggerCDTrack(__int16 value, UINT16 flags, __int16 type); // 0x004167D0
-void TriggerNormalCDTrack(__int16 value, UINT16 flags, __int16 type); // 0x00416800;
+void TriggerCDTrack(short value, UINT16 flags, short type); // 0x004167D0
+void TriggerNormalCDTrack(short value, UINT16 flags, short type); // 0x00416800;
 
 #endif // CONTROL_H_INCLUDED

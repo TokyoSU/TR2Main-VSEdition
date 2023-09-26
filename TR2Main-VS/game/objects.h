@@ -41,7 +41,7 @@
   //	0x00434DB0:		BellControl
   //	0x00434E30:		InitialiseWindow
 
-#define SmashWindow ((void(__cdecl*)(__int16)) 0x00434EB0)
+#define SmashWindow ((void(__cdecl*)(short)) 0x00434EB0)
 
 //	0x00434F80:		WindowControl
 //	0x00435020:		SmashIceControl

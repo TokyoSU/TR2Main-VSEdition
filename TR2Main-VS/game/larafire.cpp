@@ -28,7 +28,7 @@
 #include "specific/game.h"
 #include "global/vars.h"
 
-int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, __int16* angles) {
+int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles) {
 	WEAPON_INFO* weaponInfo = NULL;
 	SPHERE spherelist[33] = {};
 	SPHERE* sphereresult = NULL;

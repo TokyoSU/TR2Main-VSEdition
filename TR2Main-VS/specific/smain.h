@@ -28,7 +28,7 @@
   * Function list
   */
 BOOL GameMain(); // 0x00454B10
-__int16 TitleSequence(); // 0x00454DE0
+short TitleSequence(); // 0x00454DE0
 void CheckCheatMode(); // 0x00454EF0
 void S_SaveSettings(); // 0x00455250
 void S_LoadSettings(); // 0x004552D0

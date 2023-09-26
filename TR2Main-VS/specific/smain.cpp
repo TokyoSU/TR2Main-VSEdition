@@ -124,7 +124,7 @@ void SaveAssault() {
 #endif // FEATURE_ASSAULT_SAVE
 
 BOOL GameMain() {
-	__int16 gfOption, gfDirection, gfParameter;
+	short gfOption, gfDirection, gfParameter;
 	bool isFrontendFail, isLoopContinue, bonusFlag;
 
 	HiRes = 0;
@@ -283,7 +283,7 @@ BOOL GameMain() {
 	return TRUE;
 }
 
-__int16 TitleSequence() {
+short TitleSequence() {
 	T_InitPrint();
 	TempVideoAdjust(1, 1.0);
 	NoInputCounter = 0;
@@ -336,7 +336,7 @@ __int16 TitleSequence() {
 
 	if (InventoryChosen == ID_PASSPORT_OPTION) {
 		if (InventoryExtraData[0] == 0) {
-			__int16 slotNumber = InventoryExtraData[1];
+			short slotNumber = InventoryExtraData[1];
 
 			Inv_RemoveAllItems();
 			S_LoadGame(&SaveGame, sizeof(SAVEGAME_INFO), slotNumber);
@@ -345,7 +345,7 @@ __int16 TitleSequence() {
 		}
 
 		if (InventoryExtraData[0] == 1) {
-			__int16 levelID = 1;
+			short levelID = 1;
 
 			InitialiseStartInfo();
 			if ((GF_GameFlow.flags & GFF_SelectAnyLevel) != 0)
@@ -360,9 +360,9 @@ __int16 TitleSequence() {
 void CheckCheatMode() {
 	static int mode = 0;
 	static int turn = 0;
-	static __int16 angle = 0;
+	static short angle = 0;
 	static bool isFlare = false;
-	__int16 as = LaraItem->currentAnimState;
+	short as = LaraItem->currentAnimState;
 
 	// Cheat is disabled in Lara home and final level
 	if (CurrentLevel == 0 || CurrentLevel == GF_GameFlow.num_Levels - GF_GameFlow.num_Demos - 1)
@@ -407,7 +407,7 @@ void CheckCheatMode() {
 	case 5:
 		// Continue turn left (required at least 518 degrees / 1.44 spins)
 		if (as == AS_TURN_L || as == AS_FASTTURN) {
-			turn += (__int16)(LaraItem->pos.rotY - angle);
+			turn += (short)(LaraItem->pos.rotY - angle);
 			angle = LaraItem->pos.rotY;
 		}
 		else {
@@ -418,7 +418,7 @@ void CheckCheatMode() {
 	case 6:
 		// Continue turn right (required at least 518 degrees / 1.44 spins)
 		if (as == AS_TURN_R || as == AS_FASTTURN) {
-			turn += (__int16)(LaraItem->pos.rotY - angle);
+			turn += (short)(LaraItem->pos.rotY - angle);
 			angle = LaraItem->pos.rotY;
 		}
 		else {

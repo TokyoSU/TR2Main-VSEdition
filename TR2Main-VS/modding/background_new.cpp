@@ -175,7 +175,7 @@ void RenderTexturedFarQuad(VERTEX2D* vtx0, VERTEX2D* vtx1, VERTEX2D* vtx2, VERTE
  * @param[in] longWavePhase Lighting long wave phase in Integer representation
  */
 void PSX_Background(HWR_TEXHANDLE texSource, int tu, int tv, int t_width, int t_height, int halfRowCount,
-	__int16 amplitude, __int16 deformWavePhase, __int16 shortWavePhase, __int16 longWavePhase)
+	short amplitude, short deformWavePhase, short shortWavePhase, short longWavePhase)
 {
 	int halfColCount = MulDiv(halfRowCount, PhdWinWidth * 3, PhdWinHeight * 4) + 1;
 

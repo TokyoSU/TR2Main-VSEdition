@@ -75,12 +75,12 @@ static void FreePolyfilterNodes(POLYFILTER_NODE** root) {
 }
 #endif // FEATURE_MOD_CONFIG
 
-static bool IsCompatibleFilter(__int16* ptrObj, bool isRoomMesh, POLYFILTER* filter) {
+static bool IsCompatibleFilter(short* ptrObj, bool isRoomMesh, POLYFILTER* filter) {
 	if (!ptrObj || !filter || !filter->n_vtx) return true;
 	if (!isRoomMesh) {
 		ptrObj += 5; // skip x, y, z, radius, flags
 	}
-	__int16 num = *(ptrObj++); // get vertex counter
+	short num = *(ptrObj++); // get vertex counter
 	if (num != filter->n_vtx) return false;
 	ptrObj += num * (isRoomMesh ? 6 : 3); // skip vertices
 	if (!isRoomMesh) {
@@ -103,7 +103,7 @@ static bool IsCompatibleFilter(__int16* ptrObj, bool isRoomMesh, POLYFILTER* fil
 	return true;
 }
 
-static __int16* EnumeratePolysSpecific(__int16* ptrObj, int vtxCount, bool colored, ENUM_POLYS_CB callback, POLYINDEX* filter, LPVOID param) {
+static short* EnumeratePolysSpecific(short* ptrObj, int vtxCount, bool colored, ENUM_POLYS_CB callback, POLYINDEX* filter, LPVOID param) {
 	int polyNumber = *ptrObj++;
 	if (filter == NULL || (!filter[0].idx && !filter[0].num)) {
 		for (int i = 0; i < polyNumber; ++i) {
@@ -134,11 +134,11 @@ static __int16* EnumeratePolysSpecific(__int16* ptrObj, int vtxCount, bool color
 	return ptrObj;
 }
 
-bool EnumeratePolys(__int16* ptrObj, bool isRoomMesh, ENUM_POLYS_CB callback, POLYFILTER* filter, LPVOID param) {
+bool EnumeratePolys(short* ptrObj, bool isRoomMesh, ENUM_POLYS_CB callback, POLYFILTER* filter, LPVOID param) {
 	if (ptrObj == NULL || callback == NULL) return false; // wrong parameters
 	if (!IsCompatibleFilter(ptrObj, isRoomMesh, filter)) return false; // filter is not compatible
 
-	__int16 num;
+	short num;
 	if (!isRoomMesh) {
 		ptrObj += 5; // skip x, y, z, radius, flags
 	}

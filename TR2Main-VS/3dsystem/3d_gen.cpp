@@ -29,7 +29,7 @@
 #include "global/vars.h"
 
  // related to POLYTYPE enum
-static void(__cdecl* PolyDrawRoutines[])(__int16*) = {
+static void(__cdecl* PolyDrawRoutines[])(short*) = {
 	draw_poly_gtmap,		// gouraud shaded poly (texture)
 	draw_poly_wgtmap,		// gouraud shaded poly (texture + colorkey)
 	draw_poly_gtmap_persp,	// gouraud shaded poly (texture + perspective)
@@ -43,7 +43,7 @@ static void(__cdecl* PolyDrawRoutines[])(__int16*) = {
 
 #if defined(FEATURE_EXTENDED_LIMITS) || defined(FEATURE_VIEW_IMPROVED)
 SORT_ITEM SortBuffer[16000];
-__int16 Info3dBuffer[480000];
+short Info3dBuffer[480000];
 #endif // defined(FEATURE_EXTENDED_LIMITS) || defined(FEATURE_VIEW_IMPROVED)
 
 #ifdef FEATURE_EXTENDED_LIMITS
@@ -235,18 +235,18 @@ void SetMeshReflectState(int objID, int meshIdx) {
 	}
 }
 
-static bool InsertEnvmap(__int16* ptrObj, int vtxCount, bool colored, LPVOID param) {
+static bool InsertEnvmap(short* ptrObj, int vtxCount, bool colored, LPVOID param) {
 	InsertObjectEM(ptrObj, vtxCount, ReflectTint, (PHD_UV*)param);
 	return true;
 }
 
-static void phd_PutEnvmapPolygons(__int16* ptrEnv) {
+static void phd_PutEnvmapPolygons(short* ptrEnv) {
 	if (ptrEnv == NULL || !IsReflect
 		|| SavedAppSettings.RenderMode != RM_Hardware) return;
-	__int16* ptrObj = ptrEnv;
+	short* ptrObj = ptrEnv;
 
 	ptrObj += 5; // skip x, y, z, radius, flags
-	__int16 num = *(ptrObj++); // get vertex counter
+	short num = *(ptrObj++); // get vertex counter
 	ptrObj += num * 3; // skip vertices
 
 	int vtxCount = *ptrObj++;
@@ -316,7 +316,7 @@ void phd_GenerateW2V(PHD_3DPOS* viewPos) {
 	MatrixW2V._23 = PhdMatrixPtr->_23 = viewPos->z;
 }
 
-void phd_LookAt(int xsrc, int ysrc, int zsrc, int xtar, int ytar, int ztar, __int16 roll) {
+void phd_LookAt(int xsrc, int ysrc, int zsrc, int xtar, int ytar, int ztar, short roll) {
 	PHD_3DPOS viewPos;
 	VECTOR_ANGLES angles;
 
@@ -331,11 +331,11 @@ void phd_LookAt(int xsrc, int ysrc, int zsrc, int xtar, int ytar, int ztar, __in
 }
 
 void phd_GetVectorAngles(int x, int y, int z, VECTOR_ANGLES* angles) {
-	__int16 pitch;
+	short pitch;
 
 	angles->yaw = phd_atan(z, x);
 
-	while ((__int16)x != x || (__int16)y != y || (__int16)z != z) {
+	while ((short)x != x || (short)y != y || (short)z != z) {
 		x >>= 2;
 		y >>= 2;
 		z >>= 2;
@@ -348,7 +348,7 @@ void phd_GetVectorAngles(int x, int y, int z, VECTOR_ANGLES* angles) {
 	angles->pitch = pitch;
 }
 
-void phd_RotX(__int16 angle) {
+void phd_RotX(short angle) {
 	if (angle != 0) {
 		int m0, m1;
 		int sx = phd_sin(angle);
@@ -369,7 +369,7 @@ void phd_RotX(__int16 angle) {
 	}
 }
 
-void phd_RotY(__int16 angle) {
+void phd_RotY(short angle) {
 	if (angle != 0) {
 		int m0, m1;
 		int sy = phd_sin(angle);
@@ -390,7 +390,7 @@ void phd_RotY(__int16 angle) {
 	}
 }
 
-void phd_RotZ(__int16 angle) {
+void phd_RotZ(short angle) {
 	if (angle != 0) {
 		int m0, m1;
 		int sz = phd_sin(angle);
@@ -411,7 +411,7 @@ void phd_RotZ(__int16 angle) {
 	}
 }
 
-void phd_RotYXZ(__int16 ry, __int16 rx, __int16 rz) {
+void phd_RotYXZ(short ry, short rx, short rz) {
 	int sx, cx;
 	int sy, cy;
 	int sz, cz;
@@ -472,9 +472,9 @@ void phd_RotYXZpack(DWORD rpack) {
 	int sy, cy;
 	int sz, cz;
 	int m0, m1;
-	__int16 rx = ((rpack >> 20) & 0x3FF) << 6;
-	__int16 ry = ((rpack >> 10) & 0x3FF) << 6;
-	__int16 rz = ((rpack >> 00) & 0x3FF) << 6;
+	short rx = ((rpack >> 20) & 0x3FF) << 6;
+	short ry = ((rpack >> 10) & 0x3FF) << 6;
+	short rz = ((rpack >> 00) & 0x3FF) << 6;
 
 	if (ry != 0) {
 		sy = phd_sin(ry);
@@ -550,7 +550,7 @@ void phd_TranslateAbs(int x, int y, int z) {
 	PhdMatrixPtr->_23 = x * PhdMatrixPtr->_20 + y * PhdMatrixPtr->_21 + z * PhdMatrixPtr->_22;
 }
 
-void phd_PutPolygons(__int16* ptrObj, int clip) {
+void phd_PutPolygons(short* ptrObj, int clip) {
 	FltWinLeft = (float)PhdWinMinX;
 	FltWinTop = (float)PhdWinMinY;
 	FltWinRight = (float)(PhdWinMinX + PhdWinMaxX + 1);
@@ -558,7 +558,7 @@ void phd_PutPolygons(__int16* ptrObj, int clip) {
 	FltWinCenterX = (float)(PhdWinMinX + PhdWinCenterX);
 	FltWinCenterY = (float)(PhdWinMinY + PhdWinCenterY);
 #ifdef FEATURE_VIDEOFX_IMPROVED
-	__int16* ptrEnv = ptrObj;
+	short* ptrEnv = ptrObj;
 #endif // FEATURE_VIDEOFX_IMPROVED
 
 	ptrObj += 4; // skip x, y, z, radius
@@ -575,7 +575,7 @@ void phd_PutPolygons(__int16* ptrObj, int clip) {
 	}
 }
 
-void S_InsertRoom(__int16* ptrObj, BOOL isOutside) {
+void S_InsertRoom(short* ptrObj, BOOL isOutside) {
 	FltWinLeft = (float)(PhdWinMinX + PhdWinLeft);
 	FltWinTop = (float)(PhdWinMinY + PhdWinTop);
 	FltWinRight = (float)(PhdWinMinX + PhdWinRight + 1);
@@ -589,7 +589,7 @@ void S_InsertRoom(__int16* ptrObj, BOOL isOutside) {
 	ptrObj = ins_room_sprite(ptrObj + 1, *ptrObj);
 }
 
-__int16* __cdecl calc_background_light(__int16* ptrObj) {
+short* __cdecl calc_background_light(short* ptrObj) {
 	int vtxCount = *ptrObj++;
 
 	if (vtxCount > 0) {
@@ -613,7 +613,7 @@ __int16* __cdecl calc_background_light(__int16* ptrObj) {
 	return ptrObj;
 }
 
-void S_InsertBackground(__int16* ptrObj) {
+void S_InsertBackground(short* ptrObj) {
 	FltWinLeft = (float)(PhdWinMinX + PhdWinLeft);
 	FltWinTop = (float)(PhdWinMinY + PhdWinTop);
 	FltWinRight = (float)(PhdWinMinX + PhdWinRight + 1);
@@ -646,13 +646,13 @@ void S_InsertBackground(__int16* ptrObj) {
 #endif // FEATURE_VIEW_IMPROVED
 }
 
-void S_InsertInvBgnd(__int16* ptrObj) {
+void S_InsertInvBgnd(short* ptrObj) {
 	// NOTE: Null function in the PC version.
 	// But there is waving inventory function in the PlayStation version.
 	// Main S_InsertInvBgnd() logic is similar to S_InsertBackground();
 }
 
-__int16* __cdecl calc_object_vertices(__int16* ptrObj) {
+short* __cdecl calc_object_vertices(short* ptrObj) {
 	double xv, yv, zv, persp, baseZ;
 	int vtxCount;
 	BYTE totalClip, clipFlags;
@@ -731,9 +731,9 @@ __int16* __cdecl calc_object_vertices(__int16* ptrObj) {
 	return (totalClip == 0) ? ptrObj : NULL;
 }
 
-__int16* __cdecl calc_vertice_light(__int16* ptrObj) {
+short* __cdecl calc_vertice_light(short* ptrObj) {
 	int i, xv, yv, zv;
-	__int16 shade;
+	short shade;
 	int vtxCount = *ptrObj++;
 
 	if (vtxCount > 0) {
@@ -775,7 +775,7 @@ __int16* __cdecl calc_vertice_light(__int16* ptrObj) {
 	return ptrObj;
 }
 
-__int16* __cdecl calc_roomvert(__int16* ptrObj, BYTE farClip) {
+short* __cdecl calc_roomvert(short* ptrObj, BYTE farClip) {
 	double xv, yv, zv, persp, baseZ, depth;
 	int vtxCount, zv_int;
 
@@ -871,7 +871,7 @@ __int16* __cdecl calc_roomvert(__int16* ptrObj, BYTE farClip) {
 	return ptrObj;
 	}
 
-void phd_RotateLight(__int16 pitch, __int16 yaw) {
+void phd_RotateLight(short pitch, short yaw) {
 	int xcos, ysin, wcos, wsin;
 	int ls_x, ls_y, ls_z;
 
@@ -940,17 +940,17 @@ void do_quickysorty(int left, int right) {
 }
 
 void phd_PrintPolyList(BYTE * surfacePtr) {
-	__int16 polyType, * bufPtr;
+	short polyType, * bufPtr;
 	PrintSurfacePtr = surfacePtr;
 
 	for (DWORD i = 0; i < SurfaceCount; ++i) {
-		bufPtr = (__int16*)SortBuffer[i]._0;
+		bufPtr = (short*)SortBuffer[i]._0;
 		polyType = *(bufPtr++); // poly has type as routine index in first word
 		PolyDrawRoutines[polyType](bufPtr); // send poly data as parameter to routine
 	}
 }
 
-void AlterFOV(__int16 fov) {
+void AlterFOV(short fov) {
 	fov /= 2; // half fov angle
 
 #ifdef FEATURE_VIEW_IMPROVED
@@ -998,7 +998,7 @@ void phd_SetFarZ(int farZ) {
 	FltResZBuf = 0.005 + resZ / FltNearZ;
 }
 
-void phd_InitWindow(__int16 x, __int16 y, int width, int height, int nearZ, int farZ, __int16 viewAngle, int screenWidth, int screenHeight) {
+void phd_InitWindow(short x, short y, int width, int height, int nearZ, int farZ, short viewAngle, int screenWidth, int screenHeight) {
 	PhdWinMinX = x;
 	PhdWinMinY = y;
 	PhdWinMaxX = width - 1;

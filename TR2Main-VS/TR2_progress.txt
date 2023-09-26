@@ -619,9 +619,9 @@ x function is unused / included in another function
 0x0042B970:		GetLJAInt
 
 	game/lara1gun.cpp
-0x0042BC90:		draw_shotgun_meshes
-0x0042BCD0:		undraw_shotgun_meshes
-0x0042BD00:		ready_shotgun
+0x0042BC90:	+	draw_shotgun_meshes
+0x0042BCD0:	+	undraw_shotgun_meshes
+0x0042BD00:	+	ready_shotgun
 0x0042BD70:	+	RifleHandler
 0x0042BE70:	+	FireShotgun
 0x0042BF70:	+	FireM16

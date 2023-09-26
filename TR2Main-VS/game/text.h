@@ -28,11 +28,11 @@
   * Function list
   */
 void T_InitPrint(); // 0x00440500
-TEXT_STR_INFO* __cdecl T_Print(int x, int y, __int16 z, const char* str); // 0x00440530
+TEXT_STR_INFO* __cdecl T_Print(int x, int y, short z, const char* str); // 0x00440530
 void T_ChangeText(TEXT_STR_INFO* textInfo, const char* newString); // 0x00440640
 void T_SetScale(TEXT_STR_INFO* textInfo, int scaleH, int scaleV); // 0x00440680
-void T_FlashText(TEXT_STR_INFO* textInfo, __int16 state, __int16 rate); // 0x004406A0
-void T_AddBackground(TEXT_STR_INFO* textInfo, __int16 xSize, __int16 ySize, __int16 xOff, __int16 yOff, __int16 zOff, INV_COLOURS invColour, GOURAUD_FILL* gour, UINT16 flags); // 0x004406D0
+void T_FlashText(TEXT_STR_INFO* textInfo, short state, short rate); // 0x004406A0
+void T_AddBackground(TEXT_STR_INFO* textInfo, short xSize, short ySize, short xOff, short yOff, short zOff, INV_COLOURS invColour, GOURAUD_FILL* gour, UINT16 flags); // 0x004406D0
 void T_RemoveBackground(TEXT_STR_INFO* textInfo); // 0x00440760
 void T_AddOutline(TEXT_STR_INFO* textInfo, BOOL state, INV_COLOURS invColour, GOURAUD_OUTLINE* gour, UINT16 flags); // 0x00440770
 void T_RemoveOutline(TEXT_STR_INFO* textInfo); // 0x004407A0
@@ -42,7 +42,7 @@ void T_RightAlign(TEXT_STR_INFO* textInfo, bool state); // 0x004407F0
 void T_BottomAlign(TEXT_STR_INFO* textInfo, bool state); // 0x00440810
 DWORD T_GetTextWidth(TEXT_STR_INFO* textInfo); // 0x00440830
 BOOL T_RemovePrint(TEXT_STR_INFO* textInfo); // 0x00440940
-__int16 T_GetStringLen(const char* str); // 0x00440970
+short T_GetStringLen(const char* str); // 0x00440970
 void T_DrawText(); // 0x004409A0
 void T_DrawTextBox(int sx, int sy, int z, int width, int height); // 0x004409D0
 void T_DrawThisText(TEXT_STR_INFO* textInfo); // 0x00440B60
@@ -50,7 +50,7 @@ DWORD GetTextScaleH(DWORD baseScale); // 0x00440F40
 DWORD GetTextScaleV(DWORD baseScale); // 0x00440F80
 
 #ifdef FEATURE_HUD_IMPROVED
-void T_HideText(TEXT_STR_INFO* textInfo, __int16 state);
+void T_HideText(TEXT_STR_INFO* textInfo, short state);
 #endif // FEATURE_HUD_IMPROVED
 
 #endif // TEXT_H_INCLUDED

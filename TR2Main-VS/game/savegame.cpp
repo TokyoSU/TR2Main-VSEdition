@@ -283,7 +283,7 @@ void CreateSaveGameInfo() {
 			WriteSG(&item->hitPoints, sizeof(item->hitPoints));
 		}
 		if (obj->save_flags) {
-			__int16 flags = item->flags;
+			short flags = item->flags;
 			flags |= item->active | (item->status << 1) | (item->gravity << 3) | (item->collidable << 4);
 			if (obj->intelligent && item->data != NULL) {
 				flags |= SGF_CREATURE;
@@ -318,18 +318,18 @@ void CreateSaveGameInfo() {
 	}
 
 	for (DWORD i = 0; i < ARRAY_SIZE(Lara.mesh_ptrs); ++i) {
-		Lara.mesh_ptrs[i] = (__int16*)((long)Lara.mesh_ptrs[i] - (long)Meshes);
+		Lara.mesh_ptrs[i] = (short*)((long)Lara.mesh_ptrs[i] - (long)Meshes);
 	}
-	Lara.left_arm.frame_base = (__int16*)((long)Lara.left_arm.frame_base - (long)AnimFrames);
-	Lara.right_arm.frame_base = (__int16*)((long)Lara.right_arm.frame_base - (long)AnimFrames);
+	Lara.left_arm.frame_base = (short*)((long)Lara.left_arm.frame_base - (long)AnimFrames);
+	Lara.right_arm.frame_base = (short*)((long)Lara.right_arm.frame_base - (long)AnimFrames);
 
 	WriteSG(&Lara, sizeof(Lara));
 
 	for (DWORD i = 0; i < ARRAY_SIZE(Lara.mesh_ptrs); ++i) {
-		Lara.mesh_ptrs[i] = (__int16*)((long)Lara.mesh_ptrs[i] + (long)Meshes);
+		Lara.mesh_ptrs[i] = (short*)((long)Lara.mesh_ptrs[i] + (long)Meshes);
 	}
-	Lara.left_arm.frame_base = (__int16*)((long)Lara.left_arm.frame_base + (long)AnimFrames);
-	Lara.right_arm.frame_base = (__int16*)((long)Lara.right_arm.frame_base + (long)AnimFrames);
+	Lara.left_arm.frame_base = (short*)((long)Lara.left_arm.frame_base + (long)AnimFrames);
+	Lara.right_arm.frame_base = (short*)((long)Lara.right_arm.frame_base + (long)AnimFrames);
 
 	if (Lara.weapon_item >= 0) {
 		item = &Items[Lara.weapon_item];
@@ -415,7 +415,7 @@ void ExtractSaveGameInfo() {
 			AlterFloorHeight(item, 0x400);
 		}
 		if (obj->save_position) {
-			__int16 roomNumber;
+			short roomNumber;
 			ReadSG(&item->pos, sizeof(item->pos));
 			ReadSG(&roomNumber, sizeof(roomNumber));
 			ReadSG(&item->speed, sizeof(item->speed));
@@ -473,7 +473,7 @@ void ExtractSaveGameInfo() {
 					ReadSG(&creature->mood, sizeof(creature->mood));
 				}
 				else {
-					SG_Point += sizeof(__int16) * 4 + sizeof(MOOD_TYPE);
+					SG_Point += sizeof(short) * 4 + sizeof(MOOD_TYPE);
 				}
 			}
 			else if (obj->intelligent) {
@@ -534,10 +534,10 @@ void ExtractSaveGameInfo() {
 	Lara.target = NULL;
 
 	for (DWORD i = 0; i < ARRAY_SIZE(Lara.mesh_ptrs); ++i) {
-		Lara.mesh_ptrs[i] = (__int16*)((long)Lara.mesh_ptrs[i] + (long)Meshes);
+		Lara.mesh_ptrs[i] = (short*)((long)Lara.mesh_ptrs[i] + (long)Meshes);
 	}
-	Lara.left_arm.frame_base = (__int16*)((long)Lara.left_arm.frame_base + (long)AnimFrames);
-	Lara.right_arm.frame_base = (__int16*)((long)Lara.right_arm.frame_base + (long)AnimFrames);
+	Lara.left_arm.frame_base = (short*)((long)Lara.left_arm.frame_base + (long)AnimFrames);
+	Lara.right_arm.frame_base = (short*)((long)Lara.right_arm.frame_base + (long)AnimFrames);
 
 	if (Lara.weapon_item >= 0) {
 		Lara.weapon_item = CreateItem();
@@ -563,7 +563,7 @@ void ExtractSaveGameInfo() {
 	int numFlares = 0;
 	ReadSG(&numFlares, sizeof(numFlares));
 	for (int i = 0; i < numFlares; ++i) {
-		__int16 itemID = CreateItem();
+		short itemID = CreateItem();
 		item = &Items[itemID];
 		item->objectID = ID_FLARE_ITEM;
 		ReadSG(&item->pos, sizeof(item->pos));

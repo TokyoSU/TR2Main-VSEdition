@@ -190,10 +190,10 @@ void FixedCamera() {
 
 void CalculateCamera() {
 	ITEM_INFO* item;
-	__int16* bounds;
+	short* bounds;
 	FLOOR_INFO* floor;
 	int y, shift, fixedCamera;
-	__int16 angle, tilt, rot;
+	short angle, tilt, rot;
 
 	if (CHK_ANY(RoomInfo[Camera.pos.roomNumber].flags, ROOM_UNDERWATER)) {
 		PlaySoundEffect(60, 0, SFX_ALWAYS);

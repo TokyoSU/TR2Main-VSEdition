@@ -31,20 +31,20 @@
   //	0x00435F40:		ControlGlow
   //	0x00435F80:		ControlGunShot
 
-__int16 GunShot(int x, int y, int z, __int16 speed, __int16 rotY, __int16 roomNumber); // 0x00435FD0
-__int16 GunHit(int x, int y, int z, __int16 speed, __int16 rotY, __int16 roomNumber); // 0x00436040
-__int16 GunMiss(int x, int y, int z, __int16 speed, __int16 rotY, __int16 roomNumber); // 0x00436100
+short GunShot(int x, int y, int z, short speed, short rotY, short roomNumber); // 0x00435FD0
+short GunHit(int x, int y, int z, short speed, short rotY, short roomNumber); // 0x00436040
+short GunMiss(int x, int y, int z, short speed, short rotY, short roomNumber); // 0x00436100
 
 //	0x004361B0:		ShotLara
 
-#define InitialiseCult1 ((void(__cdecl*)(__int16)) 0x00436380)
-#define Cult1Control ((void(__cdecl*)(__int16)) 0x004363D0)
-#define InitialiseCult3 ((void(__cdecl*)(__int16)) 0x00436800)
-#define Cult3Control ((void(__cdecl*)(__int16)) 0x00436850)
-#define Worker1Control ((void(__cdecl*)(__int16)) 0x00436DC0)
-#define Worker2Control ((void(__cdecl*)(__int16)) 0x004371C0)
-#define BanditControl ((void(__cdecl*)(__int16)) 0x00437620)
-#define Bandit2Control ((void(__cdecl*)(__int16)) 0x00437960)
-#define WinstonControl ((void(__cdecl*)(__int16)) 0x00437DA0)
+#define InitialiseCult1 ((void(__cdecl*)(short)) 0x00436380)
+#define Cult1Control ((void(__cdecl*)(short)) 0x004363D0)
+#define InitialiseCult3 ((void(__cdecl*)(short)) 0x00436800)
+#define Cult3Control ((void(__cdecl*)(short)) 0x00436850)
+#define Worker1Control ((void(__cdecl*)(short)) 0x00436DC0)
+#define Worker2Control ((void(__cdecl*)(short)) 0x004371C0)
+#define BanditControl ((void(__cdecl*)(short)) 0x00437620)
+#define Bandit2Control ((void(__cdecl*)(short)) 0x00437960)
+#define WinstonControl ((void(__cdecl*)(short)) 0x00437DA0)
 
 #endif // PEOPLE_H_INCLUDED

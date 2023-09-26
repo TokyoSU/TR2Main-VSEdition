@@ -82,7 +82,7 @@ int Display_Inventory(INVENTORY_MODE invMode) {
 	BOOL isDemoNeeded = FALSE;
 	BOOL isPassOpen = FALSE;
 	int itemAnimateFrame = 0;
-	__int16 itemRotation = 0;
+	short itemRotation = 0;
 	INVENTORY_ITEM* item = NULL;
 	RING_INFO ring;
 	PHD_3DPOS viewPos;
@@ -943,9 +943,9 @@ void DrawInventoryItem(INVENTORY_ITEM* invItem) {
 		phd_TranslateRel((int)*(frame[0] + 6), (int)*(frame[0] + 7), (int)*(frame[0] + 8));
 		UINT16* rotation = (UINT16*)(frame[0] + 9);
 		phd_RotYXZsuperpack(&rotation, 0);
-		__int16 mesh = obj->meshIndex;
+		short mesh = obj->meshIndex;
 		int* bones = &AnimBones[obj->boneIndex];
-		__int16 mesh_num = 1;
+		short mesh_num = 1;
 
 		if (mesh_num & invItem->meshesDrawn) {
 #ifdef FEATURE_VIDEOFX_IMPROVED

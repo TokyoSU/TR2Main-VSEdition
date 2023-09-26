@@ -34,10 +34,10 @@ int DoCinematic(int nTicks); // 0x00412100
 
 #define CalculateCinematicCamera ((void(__cdecl*)(void)) 0x00412270)
 #define GetCinematicRoom ((int(__cdecl*)(int, int, int)) 0x004123B0)
-#define ControlCinematicPlayer ((void(__cdecl*)(__int16)) 0x00412430)
-#define LaraControlCinematic ((void(__cdecl*)(__int16)) 0x00412510)
-#define InitialisePlayer1 ((void(__cdecl*)(__int16)) 0x004125B0)
-#define InitialiseGenPlayer ((void(__cdecl*)(__int16)) 0x00412640)
+#define ControlCinematicPlayer ((void(__cdecl*)(short)) 0x00412430)
+#define LaraControlCinematic ((void(__cdecl*)(short)) 0x00412510)
+#define InitialisePlayer1 ((void(__cdecl*)(short)) 0x004125B0)
+#define InitialiseGenPlayer ((void(__cdecl*)(short)) 0x00412640)
 #define InGameCinematicCamera ((void(__cdecl*)(void)) 0x00412680)
 
 #endif // CINEMA_H_INCLUDED

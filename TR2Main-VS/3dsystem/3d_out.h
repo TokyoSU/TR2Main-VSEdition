@@ -27,20 +27,20 @@
  /*
   * Function list
   */
-void draw_poly_line(__int16* bufPtr); // 0x00402960
-void draw_poly_flat(__int16* bufPtr); // 0x00402B00
-void draw_poly_trans(__int16* bufPtr); // 0x00402B40
-void draw_poly_gouraud(__int16* bufPtr); // 0x00402B80
-void draw_poly_gtmap(__int16* bufPtr); // 0x00402BC0
-void draw_poly_wgtmap(__int16* bufPtr); // 0x00402C00
-BOOL xgen_x(__int16* bufPtr); // 0x00402C40
-BOOL xgen_xg(__int16* bufPtr); // 0x00402D20
-BOOL xgen_xguv(__int16* bufPtr); // 0x00402E70
-BOOL xgen_xguvpersp_fp(__int16* bufPtr); // 0x00403090
+void draw_poly_line(short* bufPtr); // 0x00402960
+void draw_poly_flat(short* bufPtr); // 0x00402B00
+void draw_poly_trans(short* bufPtr); // 0x00402B40
+void draw_poly_gouraud(short* bufPtr); // 0x00402B80
+void draw_poly_gtmap(short* bufPtr); // 0x00402BC0
+void draw_poly_wgtmap(short* bufPtr); // 0x00402C00
+BOOL xgen_x(short* bufPtr); // 0x00402C40
+BOOL xgen_xg(short* bufPtr); // 0x00402D20
+BOOL xgen_xguv(short* bufPtr); // 0x00402E70
+BOOL xgen_xguvpersp_fp(short* bufPtr); // 0x00403090
 void gtmap_persp32_fp(int y0, int y1, BYTE* texPage); // 0x00403320
 void wgtmap_persp32_fp(int y0, int y1, BYTE* texPage); // 0x004042F0
-void draw_poly_gtmap_persp(__int16* bufPtr); // 0x004057C0
-void draw_poly_wgtmap_persp(__int16* bufPtr); // 0x00405800
+void draw_poly_gtmap_persp(short* bufPtr); // 0x004057C0
+void draw_poly_wgtmap_persp(short* bufPtr); // 0x00405800
 void __fastcall flatA(int y0, int y1, BYTE colorIdx); // 0x00457564
 void __fastcall transA(int y0, int y1, BYTE depthQ); // 0x004575C5
 void __fastcall gourA(int y0, int y1, BYTE colorIdx); // 0x004576FF

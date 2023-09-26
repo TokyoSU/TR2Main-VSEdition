@@ -115,7 +115,7 @@ void PrepareSWR(int pitch, int height) {
 static int XBuffer[1200 * sizeof(XBUF_XGUVP) / sizeof(int)]; // maximum safe resolution is 1200 pixels
 #endif // FEATURE_NOLEGACY_OPTIONS
 
-void draw_poly_line(__int16* bufPtr) {
+void draw_poly_line(short* bufPtr) {
 	int i, j;
 	int x0, y0, x1, y1;
 	int xSize, ySize, xAdd, yAdd, colAdd, rowAdd;
@@ -218,32 +218,32 @@ void draw_poly_line(__int16* bufPtr) {
 	}
 }
 
-void draw_poly_flat(__int16* bufPtr) {
+void draw_poly_flat(short* bufPtr) {
 	if (xgen_x(bufPtr + 1))
 		flatA(XGen_y0, XGen_y1, *bufPtr);
 }
 
-void draw_poly_trans(__int16* bufPtr) {
+void draw_poly_trans(short* bufPtr) {
 	if (xgen_x(bufPtr + 1))
 		transA(XGen_y0, XGen_y1, *bufPtr);
 }
 
-void draw_poly_gouraud(__int16* bufPtr) {
+void draw_poly_gouraud(short* bufPtr) {
 	if (xgen_xg(bufPtr + 1))
 		gourA(XGen_y0, XGen_y1, *bufPtr);
 }
 
-void draw_poly_gtmap(__int16* bufPtr) {
+void draw_poly_gtmap(short* bufPtr) {
 	if (xgen_xguv(bufPtr + 1))
 		gtmapA(XGen_y0, XGen_y1, TexturePageBuffer8[*bufPtr]);
 }
 
-void draw_poly_wgtmap(__int16* bufPtr) {
+void draw_poly_wgtmap(short* bufPtr) {
 	if (xgen_xguv(bufPtr + 1))
 		wgtmapA(XGen_y0, XGen_y1, TexturePageBuffer8[*bufPtr]);
 }
 
-BOOL xgen_x(__int16* bufPtr) {
+BOOL xgen_x(short* bufPtr) {
 	int ptCount;
 	XGEN_X* pt1, * pt2;
 	int yMin, yMax;
@@ -301,7 +301,7 @@ BOOL xgen_x(__int16* bufPtr) {
 	return TRUE;
 }
 
-BOOL xgen_xg(__int16* bufPtr) {
+BOOL xgen_xg(short* bufPtr) {
 	int ptCount;
 	XGEN_XG* pt1, * pt2;
 	int yMin, yMax;
@@ -371,7 +371,7 @@ BOOL xgen_xg(__int16* bufPtr) {
 	return TRUE;
 }
 
-BOOL xgen_xguv(__int16* bufPtr) {
+BOOL xgen_xguv(short* bufPtr) {
 	int ptCount;
 	XGEN_XGUV* pt1, * pt2;
 	int yMin, yMax;
@@ -461,7 +461,7 @@ BOOL xgen_xguv(__int16* bufPtr) {
 	return TRUE;
 }
 
-BOOL xgen_xguvpersp_fp(__int16* bufPtr) {
+BOOL xgen_xguvpersp_fp(short* bufPtr) {
 	int ptCount;
 	XGEN_XGUVP* pt1, * pt2;
 	int yMin, yMax;
@@ -818,12 +818,12 @@ void wgtmap_persp32_fp(int y0, int y1, BYTE* texPage) {
 	}
 }
 
-void draw_poly_gtmap_persp(__int16* bufPtr) {
+void draw_poly_gtmap_persp(short* bufPtr) {
 	if (xgen_xguvpersp_fp(bufPtr + 1))
 		gtmap_persp32_fp(XGen_y0, XGen_y1, TexturePageBuffer8[*bufPtr]);
 }
 
-void draw_poly_wgtmap_persp(__int16* bufPtr) {
+void draw_poly_wgtmap_persp(short* bufPtr) {
 	if (xgen_xguvpersp_fp(bufPtr + 1))
 		wgtmap_persp32_fp(XGen_y0, XGen_y1, TexturePageBuffer8[*bufPtr]);
 }

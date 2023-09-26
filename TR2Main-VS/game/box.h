@@ -27,7 +27,7 @@
  /*
   * Function list
   */
-#define InitialiseCreature ((void(__cdecl*)(__int16)) 0x0040E190)
+#define InitialiseCreature ((void(__cdecl*)(short)) 0x0040E190)
 
   //	0x0040E1C0:		CreatureActive
 
@@ -46,18 +46,18 @@
 //	0x0040F2B0:		CreatureCreature
 //	0x0040F3B0:		BadFloor
 
-void CreatureDie(__int16 itemID, BOOL explode); // 0x0040F440
+void CreatureDie(short itemID, BOOL explode); // 0x0040F440
 
-#define CreatureAnimation ((int(__cdecl*)(__int16, __int16, __int16)) 0x0040F500)
-#define CreatureTurn ((__int16(__cdecl*)(ITEM_INFO *, __int16)) 0x0040FDD0)
-#define CreatureTilt ((void(__cdecl*)(ITEM_INFO *, __int16)) 0x0040FEB0)
-#define CreatureHead ((void(__cdecl*)(ITEM_INFO *, __int16)) 0x0040FEF0)
+#define CreatureAnimation ((int(__cdecl*)(short, short, short)) 0x0040F500)
+#define CreatureTurn ((short(__cdecl*)(ITEM_INFO *, short)) 0x0040FDD0)
+#define CreatureTilt ((void(__cdecl*)(ITEM_INFO *, short)) 0x0040FEB0)
+#define CreatureHead ((void(__cdecl*)(ITEM_INFO *, short)) 0x0040FEF0)
 
 //	0x0040FF40:		CreatureNeck
 //	0x0040FF90:		CreatureFloat
 //	0x00410040:		CreatureUnderwater
 
-#define CreatureEffect ((__int16(__cdecl*)(ITEM_INFO *, const BITE_INFO *, __int16(__cdecl*)(int, int, int, __int16, __int16, __int16))) 0x00410090)
+#define CreatureEffect ((short(__cdecl*)(ITEM_INFO *, const BITE_INFO *, short(__cdecl*)(int, int, int, short, short, short))) 0x00410090)
 
 //	0x004100F0:		CreatureVault
 

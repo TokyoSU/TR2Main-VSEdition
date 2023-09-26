@@ -99,7 +99,7 @@ INVENTORY_ITEM* InvOptionList[5] = {
 	&InvPhotoOption,
 };
 
-__int16 InvOptionObjectsCount = ARRAY_SIZE(InvOptionList);
+short InvOptionObjectsCount = ARRAY_SIZE(InvOptionList);
 
 bool ConflictLayout[ARRAY_SIZE(Layout->key)];
 TEXT_STR_INFO* CtrlTextA[ARRAY_SIZE(Layout->key)];

@@ -37,7 +37,7 @@ void InitialiseItemArray(int itemCount) {
 	Items[i].nextItem = -1;
 }
 
-void InitialiseItem(__int16 itemIndex) {
+void InitialiseItem(short itemIndex) {
 	ITEM_INFO* item;
 	ROOM_INFO* room;
 	FLOOR_INFO* floor;
@@ -100,7 +100,7 @@ void InitialiseItem(__int16 itemIndex) {
 		Objects[item->objectID].initialise(itemIndex);
 }
 
-void AddActiveItem(__int16 itemIndex) {
+void AddActiveItem(short itemIndex) {
 	ITEM_INFO* item = &Items[itemIndex];
 
 	if (Objects[item->objectID].control == NULL) {

@@ -44,18 +44,18 @@
  */
  // 3D insert function variables
 #define ins_trans_quad		(*(void(__cdecl **)(int,int,int,int,int))				0x00470318)
-#define ins_poly_trans8		(*(void(__cdecl **)(PHD_VBUF*,__int16))					0x0047032C)
+#define ins_poly_trans8		(*(void(__cdecl **)(PHD_VBUF*,short))					0x0047032C)
 #define ins_flat_rect		(*(void(__cdecl **)(int,int,int,int,int,BYTE))			0x0047805C)
 #ifdef FEATURE_VIDEOFX_IMPROVED
-#define ins_sprite			(*(void(__cdecl **)(int,int,int,int,int,int,__int16,DWORD))	0x004B2A10)
+#define ins_sprite			(*(void(__cdecl **)(int,int,int,int,int,int,short,DWORD))	0x004B2A10)
 #else // FEATURE_VIDEOFX_IMPROVED
-#define ins_sprite			(*(void(__cdecl **)(int,int,int,int,int,int,__int16))	0x004B2A10)
+#define ins_sprite			(*(void(__cdecl **)(int,int,int,int,int,int,short))	0x004B2A10)
 #endif // FEATURE_VIDEOFX_IMPROVED
-#define ins_objectGT3		(*(__int16*(__cdecl **)(__int16*,int,SORTTYPE))			0x004B2A1C)
-#define ins_objectGT4		(*(__int16*(__cdecl **)(__int16*,int,SORTTYPE))			0x004B2A20)
+#define ins_objectGT3		(*(short*(__cdecl **)(short*,int,SORTTYPE))			0x004B2A1C)
+#define ins_objectGT4		(*(short*(__cdecl **)(short*,int,SORTTYPE))			0x004B2A20)
 #define ins_line			(*(void(__cdecl **)(int,int,int,int,int,BYTE))			0x004B2AE8)
-#define ins_objectG4		(*(__int16*(__cdecl **)(__int16*,int,SORTTYPE))			0x004BCAF8)
-#define ins_objectG3		(*(__int16*(__cdecl **)(__int16*,int,SORTTYPE))			0x004BCB40)
+#define ins_objectG4		(*(short*(__cdecl **)(short*,int,SORTTYPE))			0x004BCAF8)
+#define ins_objectG3		(*(short*(__cdecl **)(short*,int,SORTTYPE))			0x004BCB40)
 
 #define SfxFunctions		(*(void(__cdecl *(*)[32])(ITEM_INFO*))		0x004641F8)
 
@@ -64,23 +64,23 @@
 #define RhwFactor 					VAR_I_(0x0046408C, float,			0x14000000.p0)
 #define CineTrackID					VAR_I_(0x004640B0, int,				1)
 #define CineTickRate				VAR_I_(0x004640B8, int,				0x8000) // 0x8000 = PHD_ONE/TICKS_PER_FRAME
-#define CD_TrackID					VAR_I_(0x004640BC, __int16,			-1)
+#define CD_TrackID					VAR_I_(0x004640BC, short,			-1)
 #define FlipEffect					VAR_I_(0x004640C4, int,				-1)
 #define AssaultBestTime				VAR_I_(0x004641F0, int,				-1)
-#define GF_NumSecrets				VAR_I_(0x004642E8, __int16,			3)
-#define CineTargetAngle				VAR_I_(0x00464310, __int16,			PHD_90)
+#define GF_NumSecrets				VAR_I_(0x004642E8, short,			3)
+#define CineTargetAngle				VAR_I_(0x00464310, short,			PHD_90)
 #define OverlayStatus				VAR_I_(0x004644E0, int,				1)
-#define InvMainObjectsCount			VAR_I_(0x004654E0, __int16,			8)
+#define InvMainObjectsCount			VAR_I_(0x004654E0, short,			8)
 #ifdef FEATURE_HUD_IMPROVED
-extern __int16 InvOptionObjectsCount;
+extern short InvOptionObjectsCount;
 #else // FEATURE_HUD_IMPROVED
-#define InvOptionObjectsCount		VAR_I_(0x00465604, __int16,			4)
+#define InvOptionObjectsCount		VAR_I_(0x00465604, short,			4)
 #endif // FEATURE_HUD_IMPROVED
 #define GymInvOpenEnabled			VAR_I_(0x00465618, BOOL,			TRUE)
-#define InventoryChosen				VAR_I_(0x00465A50, __int16,			-1)
+#define InventoryChosen				VAR_I_(0x00465A50, short,			-1)
 #define InventoryMode				VAR_I_(0x00465A54, INVENTORY_MODE,	INV_TitleMode)
-#define SoundVolume					VAR_I_(0x00465A5C, __int16,			165) // NOTE: value should be 10
-#define MusicVolume					VAR_I_(0x00465A60, __int16,			255) // NOTE: value should be 10
+#define SoundVolume					VAR_I_(0x00465A5C, short,			165) // NOTE: value should be 10
+#define MusicVolume					VAR_I_(0x00465A60, short,			255) // NOTE: value should be 10
 #define BGND_PaletteIndex			VAR_I_(0x00466400, int,				-1)
 #define ScreenSizer 				VAR_I_(0x00466480, double,			1.0)
 #define GameSizer 					VAR_I_(0x00466488, double,			1.0)
@@ -90,10 +90,10 @@ extern __int16 InvOptionObjectsCount;
 #define RandomControl				VAR_I_(0x00466BB0, int,				RANDOM_SEED)
 #define RandomDraw					VAR_I_(0x00466BB4, int,				RANDOM_SEED)
 #define PaletteIndex				VAR_I_(0x00466BDC, int,				-1)
-#define DumpX						VAR_I_(0x00466BE4, __int16,			25)
-#define DumpY						VAR_I_(0x00466BE6, __int16,			25)
-#define DumpWidth					VAR_I_(0x00466BE8, __int16,			50)
-#define DumpHeight					VAR_I_(0x00466BEA, __int16,			0)
+#define DumpX						VAR_I_(0x00466BE4, short,			25)
+#define DumpY						VAR_I_(0x00466BE6, short,			25)
+#define DumpWidth					VAR_I_(0x00466BE8, short,			50)
+#define DumpHeight					VAR_I_(0x00466BEA, short,			0)
 #define DetailLevel					VAR_I_(0x00467724, DWORD,			1)
 #define MidSort						VAR_I_(0x0046C2F0, DWORD,			0)
 #define FltViewAspect				VAR_I_(0x0046C2F4, float,			0.0)
@@ -109,16 +109,16 @@ extern __int16 InvOptionObjectsCount;
 #define PhdWinHeight				VAR_U_(0x0047031C, int)
 #define PhdWinCenterX				VAR_U_(0x00470320, int)
 #define PhdWinCenterY				VAR_U_(0x00470324, int)
-#define PhdLsYaw					VAR_U_(0x00470328, __int16)
+#define PhdLsYaw					VAR_U_(0x00470328, short)
 #define FltWinTop					VAR_U_(0x00470330, float)
 #define FltWinLeft					VAR_U_(0x00478038, float)
-#define PhdWinMinY					VAR_U_(0x0047803C, __int16)
+#define PhdWinMinY					VAR_U_(0x0047803C, short)
 #define PhdFarZ 					VAR_U_(0x00478048, int)
 #define FltRhwOPersp				VAR_U_(0x0047804C, float)
 #define PhdWinBottom				VAR_U_(0x00478050, int)
 #define PhdPersp					VAR_U_(0x00478054, int)
 #define PhdWinLeft 					VAR_U_(0x00478058, int)
-#define PhdWinMaxX 					VAR_U_(0x004B29E0, __int16)
+#define PhdWinMaxX 					VAR_U_(0x004B29E0, short)
 #define PhdNearZ 					VAR_U_(0x004B29E4, int)
 #define FltResZORhw 				VAR_U_(0x004B29E8, float)
 #define FltFarZ 					VAR_U_(0x004B29EC, float)
@@ -126,18 +126,18 @@ extern __int16 InvOptionObjectsCount;
 #define FltWinCenterY				VAR_U_(0x004B29F4, float)
 #define PhdScreenHeight				VAR_U_(0x004B29F8, int)
 #define PrintSurfacePtr				VAR_U_(0x004B29FC, BYTE*)
-#define PhdWinMinX					VAR_U_(0x004B2A00, __int16)
+#define PhdWinMinX					VAR_U_(0x004B2A00, short)
 #define FltPerspONearZ				VAR_U_(0x004B2A04, float)
 #define FltRhwONearZ				VAR_U_(0x004B2A08, float)
-#define PhdWinMaxY					VAR_U_(0x004B2A0C, __int16)
+#define PhdWinMaxY					VAR_U_(0x004B2A0C, short)
 #define FltNearZ					VAR_U_(0x004B2A14, float)
 #define PhdMatrixPtr				VAR_U_(0x004B2A18, PHD_MATRIX*)
 #define FltPersp					VAR_U_(0x004B2AA8, float)
 #define MatrixW2V					VAR_U_(0x004B2AB0, PHD_MATRIX)
-#define Info3dPtr					VAR_U_(0x004B2AE0, __int16*)
+#define Info3dPtr					VAR_U_(0x004B2AE0, short*)
 #define PhdWinWidth					VAR_U_(0x004B2AE4, int)
 #define PhdViewDistance				VAR_U_(0x004BCAF0, int)
-#define PhdLsPitch					VAR_U_(0x004BCAF4, __int16)
+#define PhdLsPitch					VAR_U_(0x004BCAF4, short)
 #define PhdScreenWidth				VAR_U_(0x004BF3C8, int)
 #define LsDivider					VAR_U_(0x004BF3CC, int)
 #define FltWinRight					VAR_U_(0x004D6B50, float)
@@ -301,8 +301,8 @@ extern SWR_BUFFER PictureBuffer;
 #define ReadFileBytesCounter		VAR_U_(0x004D9BE0, DWORD)
 #define LevelFilePalettesOffset		VAR_U_(0x004D9BE4, LONG)
 #define LevelFileTexPagesOffset		VAR_U_(0x004D9BE8, LONG)
-#define Meshes						VAR_U_(0x004D9D80, __int16*)
-#define FloorData					VAR_U_(0x004D9D84, __int16*)
+#define Meshes						VAR_U_(0x004D9D80, short*)
+#define FloorData					VAR_U_(0x004D9D84, short*)
 #define TextureInfoCount			VAR_U_(0x004D9E88, DWORD)
 #define LevelFileDepthQOffset		VAR_U_(0x004D9E8C, LONG)
 #define DriveLetter					VAR_U_(0x004D9E98, char)
@@ -334,7 +334,7 @@ extern SWR_BUFFER PictureBuffer;
 #define PassportTextInfo			VAR_U_(0x0051A2BC, TEXT_STR_INFO*)
 #define PhdWinRect					VAR_U_(0x0051B908, RECT)
 #define HiRes						VAR_U_(0x0051B918, int)
-#define AnimatedTextureRanges		VAR_U_(0x0051B91C, __int16*)
+#define AnimatedTextureRanges		VAR_U_(0x0051B91C, short*)
 #define WinVidNeedToResetBuffers	VAR_U_(0x0051BC20, bool)
 #define IsWet						VAR_U_(0x0051BC28, BOOL)
 #if defined(FEATURE_NOLEGACY_OPTIONS) || defined(FEATURE_VIDEOFX_IMPROVED)
@@ -364,7 +364,7 @@ extern APP_SETTINGS SavedAppSettings;
 #define TexturesHaveCompatibleMasks	VAR_U_(0x0051C1FD, bool)
 #define HKey						VAR_U_(0x0051C290, HKEY)
 #define RegKeyDisposition			VAR_U_(0x0051C294, DWORD)
-#define TextStringCount				VAR_U_(0x0051D6A0, __int16)
+#define TextStringCount				VAR_U_(0x0051D6A0, short)
 #define SampleInfoCount				VAR_U_(0x0051E6C0, DWORD)
 #define SoundIsActive				VAR_U_(0x0051E6C4, BOOL)
 #define SampleInfos					VAR_U_(0x0051E9C4, SAMPLE_INFO*)
@@ -374,25 +374,25 @@ extern DWORD SG_Count; // 0x005206A4: DWORD
 #define Lara						VAR_U_(0x005206E0, LARA_INFO)
 #define LaraItem					VAR_U_(0x005207BC, ITEM_INFO*)
 #define Effects						VAR_U_(0x005207C0, FX_INFO*)
-#define NextItemFree				VAR_U_(0x005207C6, __int16)
-#define NextItemActive				VAR_U_(0x005207C8, __int16)
-#define NextEffectActive			VAR_U_(0x005207CA, __int16)
-#define PrevItemActive				VAR_U_(0x005207CC, __int16)
+#define NextItemFree				VAR_U_(0x005207C6, short)
+#define NextItemActive				VAR_U_(0x005207C8, short)
+#define NextEffectActive			VAR_U_(0x005207CA, short)
+#define PrevItemActive				VAR_U_(0x005207CC, short)
 #define SoundFxCount				VAR_U_(0x00521FDC, DWORD)
 #define SoundFx						VAR_U_(0x00521FE0, OBJECT_VECTOR*)
-#define AnimFrames					VAR_U_(0x005251B0, __int16*)
-#define MeshPtr						VAR_U_(0x005252B0, __int16**)
+#define AnimFrames					VAR_U_(0x005251B0, short*)
+#define MeshPtr						VAR_U_(0x005252B0, short**)
 #define OutsideCamera				VAR_U_(0x005252B4, int)
 #define DrawRoomsCount				VAR_U_(0x005252B8, int)
 #define Anims						VAR_U_(0x005258F4, ANIM_STRUCT*)
 #define OutsideBottom				VAR_U_(0x00525B00, int)
 #define AnimRanges					VAR_U_(0x00525B04, RANGE_STRUCT*)
-#define AnimCommands				VAR_U_(0x00525B08, __int16*)
+#define AnimCommands				VAR_U_(0x00525B08, short*)
 #define AnimBones					VAR_U_(0x00525BE8, int*)
 #define DynamicLightCount			VAR_U_(0x00525BEC, DWORD)
 #define OutsideLeft					VAR_U_(0x00526178, int)
 #define AnimChanges					VAR_U_(0x0052617C, CHANGE_STRUCT*)
-#define RoomCount					VAR_U_(0x00526180, __int16)
+#define RoomCount					VAR_U_(0x00526180, short)
 #define RoomInfo					VAR_U_(0x0052618C, ROOM_INFO*)
 #define UnderwaterCamera			VAR_U_(0x00526190, int)
 #define SunsetTimer					VAR_U_(0x00526194, DWORD)
@@ -401,20 +401,20 @@ extern DWORD SG_Count; // 0x005206A4: DWORD
 #define DemoPtr						VAR_U_(0x005261B0, LPVOID)
 #define DemoCount					VAR_U_(0x005261B4, int)
 #define FlipStatus					VAR_U_(0x00526240, int)
-#define TriggerPtr					VAR_U_(0x00526288, __int16*)
+#define TriggerPtr					VAR_U_(0x00526288, short*)
 #define Items						VAR_U_(0x005262F0, ITEM_INFO*)
-#define IsCinematicLoaded			VAR_U_(0x005262F4, __int16)
-#define CineFramesCount				VAR_U_(0x005262F6, __int16)
+#define IsCinematicLoaded			VAR_U_(0x005262F4, short)
+#define CineFramesCount				VAR_U_(0x005262F6, short)
 #define CineFrames					VAR_U_(0x005262F8, CINE_FRAME_INFO*)
-#define CineLevelID					VAR_U_(0x00526312, __int16)
-#define CineFrameIdx				VAR_U_(0x00526314, __int16)
+#define CineLevelID					VAR_U_(0x00526312, short)
+#define CineFrameIdx				VAR_U_(0x00526314, short)
 #define Camera						VAR_U_(0x00526320, CAMERA_INFO)
 #define Overlaps					VAR_U_(0x005263C8, UINT16*)
 #define Boxes						VAR_U_(0x005263CC, BOX_INFO*)
 #define BoxesCount					VAR_U_(0x005263D0, DWORD)
 
 // Initialized arrays
-#define TrackIDs					ARRAY_(0x004642F0, __int16, [16]) /* = {2, 0}; */
+#define TrackIDs					ARRAY_(0x004642F0, short, [16]) /* = {2, 0}; */
 #define InvSpriteMusicVolume		ARRAY_(0x00464718, INVENTORY_SPRITE, [9]) /* = {
 	{2, -66, -80, 32, 132,  0, 0x004645DC, ICLR_Gray},
 	{2, -66, -65, 32, 132,  0, 0x004645E0, ICLR_Gray},
@@ -515,7 +515,7 @@ extern DWORD SG_Count; // 0x005206A4: DWORD
 		10*PHD_DEGREE, 8*PHD_DEGREE, 400, 3, 0x2000, 0, 2, 43,
 	},
 }; */
-#define SaveSlotFlags				ARRAY_(0x00466B80, __int16, [16]) /* = {-1, 0}; */
+#define SaveSlotFlags				ARRAY_(0x00466B80, short, [16]) /* = {-1, 0}; */
 #ifdef FEATURE_HUD_IMPROVED
 extern CONTROL_LAYOUT Layout[3];
 #else // FEATURE_HUD_IMPROVED
@@ -564,10 +564,10 @@ extern PHD_SPRITE PhdSpriteInfo[2048];
 #endif // FEATURE_EXTENDED_LIMITS
 #if defined(FEATURE_EXTENDED_LIMITS) || defined(FEATURE_VIEW_IMPROVED)
 extern SORT_ITEM SortBuffer[16000];
-extern __int16 Info3dBuffer[480000];
+extern short Info3dBuffer[480000];
 #else // defined(FEATURE_EXTENDED_LIMITS) || defined(FEATURE_VIEW_IMPROVED)
 #define SortBuffer					ARRAY_(0x00470338, SORT_ITEM, [4000])
-#define Info3dBuffer				ARRAY_(0x00478060, __int16, [120000])
+#define Info3dBuffer				ARRAY_(0x00478060, short, [120000])
 #endif // defined(FEATURE_EXTENDED_LIMITS) || defined(FEATURE_VIEW_IMPROVED)
 #define RandomTable					ARRAY_(0x004B2A28, int, [32])
 #ifdef FEATURE_EXTENDED_LIMITS
@@ -575,7 +575,7 @@ extern PHD_TEXTURE PhdTextureInfo[0x2000];
 #else // FEATURE_EXTENDED_LIMITS
 #define PhdTextureInfo				ARRAY_(0x004B2AF0, PHD_TEXTURE, [0x800])
 #endif // FEATURE_EXTENDED_LIMITS
-#define ShadesTable					ARRAY_(0x004BCB00, __int16, [32])
+#define ShadesTable					ARRAY_(0x004BCB00, short, [32])
 #define MatrixStack					ARRAY_(0x004BCB48, PHD_MATRIX, [40])
 #define DepthQTable					ARRAY_(0x004BD2C8, DEPTHQ_ENTRY, [32])
 #define DepthQIndex					ARRAY_(0x004BF2C8, BYTE, [256])
@@ -637,7 +637,7 @@ extern bool ConflictLayout[ARRAY_SIZE(Layout->key)];
 #define StringToShow				ARRAY_(0x0051BD10, char, [128])
 #define TextInfoTable				ARRAY_(0x0051C820, TEXT_STR_INFO, [64])
 #define TheStrings					ARRAY_(0x0051D6C0, STRING_FIXED64, [64])
-#define SampleLut					ARRAY_(0x0051E6E0, __int16, [370])
+#define SampleLut					ARRAY_(0x0051E6E0, short, [370])
 #define SaveGameStrings1			ARRAY_(0x005207E0, STRING_FIXED50, [24])
 #define RequesterItemFlags2			ARRAY_(0x00520CA0, DWORD, [24])
 #define RequesterItemFlags1			ARRAY_(0x00520D00, DWORD, [24])
@@ -650,18 +650,18 @@ extern bool ConflictLayout[ARRAY_SIZE(Layout->key)];
 #ifdef FEATURE_EXTENDED_LIMITS
 extern LIGHT_INFO DynamicLights[64];
 extern int BoundRooms[1024];
-extern __int16 DrawRoomsArray[1024];
+extern short DrawRoomsArray[1024];
 extern STATIC_INFO StaticObjects[256];
 #else // FEATURE_EXTENDED_LIMITS
 #define DynamicLights				ARRAY_(0x005251C0, LIGHT_INFO, [10])
 #define BoundRooms					ARRAY_(0x00525900, int, [128])
-#define DrawRoomsArray				ARRAY_(0x00525B20, __int16, [100])
+#define DrawRoomsArray				ARRAY_(0x00525B20, short, [100])
 #define StaticObjects				ARRAY_(0x00525C00, STATIC_INFO, [50])
 #endif // FEATURE_EXTENDED_LIMITS
-#define CD_Flags					ARRAY_(0x005261C0, __int16, [64])
+#define CD_Flags					ARRAY_(0x005261C0, short, [64])
 #define FlipMaps					ARRAY_(0x00526260, int, [10])
-#define GroundZones					ARRAY_(0x005263A0, __int16*, [8])
-#define FlyZones					ARRAY_(0x005263C0, __int16*, [2])
+#define GroundZones					ARRAY_(0x005263A0, short*, [8])
+#define FlyZones					ARRAY_(0x005263C0, short*, [2])
 
 /*
  * GameFlow/Inventory Variables
@@ -713,7 +713,7 @@ extern STATIC_INFO StaticObjects[256];
 #define GF_Kill2Complete			VAR_U_(0x004D77F8, bool)
 #define GF_StartGame				VAR_U_(0x004D77FC, bool)
 #define GF_GameFlow					VAR_U_(0x00521DE0, GAME_FLOW)
-#define GF_ScriptBuffer				VAR_U_(0x00521E70, __int16*)
+#define GF_ScriptBuffer				VAR_U_(0x00521E70, short*)
 #define GF_LevelNamesStringTable	VAR_U_(0x00521EC4, char**)
 #define GF_PictureFilesStringTable	VAR_U_(0x00521EA0, char**)
 #define GF_TitleFilesStringTable	VAR_U_(0x00521F48, char**)
@@ -795,7 +795,7 @@ extern TEXT_STR_INFO* CtrlTextB[ARRAY_SIZE(Layout->key)];
 #define CtrlTextA					ARRAY_(0x0051A248, TEXT_STR_INFO*, [14])
 #define CtrlTextB					ARRAY_(0x0051A280, TEXT_STR_INFO*, [14])
 #endif // FEATURE_HUD_IMPROVED
-#define GF_ScriptTable				ARRAY_(0x00521EE0, __int16*, [24])
+#define GF_ScriptTable				ARRAY_(0x00521EE0, short*, [24])
 #define GF_DemoLevels				ARRAY_(0x00521F60, UINT16, [24])
 #define GF_SecretInvItems			ARRAY_(0x00521FA0, char, [27])
 #define GF_Add2InvItems				ARRAY_(0x00521FC0, char, [27])

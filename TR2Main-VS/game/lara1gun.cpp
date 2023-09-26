@@ -43,13 +43,57 @@
 bool IsRunningM16fix = true;
 #endif // FEATURE_GAMEPLAY_FIXES
 
+enum WEAPON_STATE {
+	WS_AIM,
+	WS_DRAW,
+	WS_RECOIL,
+	WS_UNDRAW,
+	WS_UNAIM,
+	WS_RELOAD,
+	WS_UAIM,
+	WS_UUNAIM,
+	WS_URECOIL,
+	WS_SURF_UNDRAW
+};
+
+void draw_shotgun_meshes(int weaponType)
+{
+	Lara.back_gun = 0;
+	Lara.mesh_ptrs[10] = MeshPtr[Objects[WeaponObject(weaponType)].meshIndex + 10];
+}
+
+void undraw_shotgun_meshes(int weaponType)
+{
+	Lara.back_gun = WeaponObject(weaponType);
+	Lara.mesh_ptrs[10] = MeshPtr[Objects[ID_LARA].meshIndex + 10];
+}
+
+void ready_shotgun(int weaponType)
+{
+	Lara.gun_status = LGS_Ready;
+	Lara.left_arm.z_rot = 0;
+	Lara.left_arm.y_rot = 0;
+	Lara.left_arm.x_rot = 0;
+	Lara.right_arm.z_rot = 0;
+	Lara.right_arm.y_rot = 0;
+	Lara.right_arm.x_rot = 0;
+	Lara.right_arm.frame_number = 0;
+	Lara.left_arm.frame_number = 0;
+	Lara.right_arm.lock = 0;
+	Lara.left_arm.lock = 0;
+	Lara.target = 0;
+	Lara.right_arm.frame_base = Objects[WeaponObject(weaponType)].frameBase;
+	Lara.left_arm.frame_base = Lara.right_arm.frame_base;
+}
+
 void RifleHandler(int weaponType) {
 	WEAPON_INFO* weapon = &Weapons[weaponType];
 
-	if (CHK_ANY(InputStatus, IN_ACTION))
+	if (CHK_ANY(InputStatus, IN_ACTION)) {
 		LaraTargetInfo(&Weapons[weaponType]);
+	}
 	else {
-		Lara.target = 0;
+		Lara.target = NULL;
 	}
 
 	if (!Lara.target) {
@@ -75,48 +119,45 @@ void RifleHandler(int weaponType) {
 }
 
 void FireShotgun() {
-	__int16 base[2], angles[2];
-	BOOL isFired = FALSE;
+	WEAPON_INFO* weapon = &Weapons[LGT_Shotgun];
+	short base[2]{}, angles[2]{};
+
 	base[0] = Lara.left_arm.y_rot + LaraItem->pos.rotY;
 	base[1] = Lara.left_arm.x_rot;
-
 	for (int i = 0; i < 6; ++i) {
-		angles[0] = base[0] + 20 * PHD_DEGREE * (GetRandomControl() - PHD_ONE / 4) / PHD_ONE;
-		angles[1] = base[1] + 20 * PHD_DEGREE * (GetRandomControl() - PHD_ONE / 4) / PHD_ONE;
+		angles[0] = base[0] + (20 * PHD_DEGREE) * (GetRandomControl() - PHD_ONE / 4) / PHD_ONE;
+		angles[1] = base[1] + (20 * PHD_DEGREE) * (GetRandomControl() - PHD_ONE / 4) / PHD_ONE;
 		if (FireWeapon(LGT_Shotgun, Lara.target, LaraItem, angles)) {
-			isFired = TRUE;
-		}
-	}
-
-	if (isFired) {
-		Lara.right_arm.flash_gun = Weapons[LGT_Shotgun].flashTime;
-		PlaySoundEffect(Weapons[LGT_Shotgun].sampleNum, &LaraItem->pos, 0);
+			Lara.right_arm.flash_gun = weapon->flashTime;
+			PlaySoundEffect(weapon->sampleNum, &LaraItem->pos, 0);
 #ifdef FEATURE_INPUT_IMPROVED
-		JoyVibrate(0x2000, 0x2000, 2, 0x800, 5, false);
+			JoyVibrate(0x2000, 0x2000, 2, 0x800, 5, false);
 #endif // FEATURE_INPUT_IMPROVED
+		}
 	}
 }
 
 void FireM16(BOOL isRunning) {
-	__int16 angles[2];
+	WEAPON_INFO* weapon = &Weapons[LGT_M16];
+	short angles[2]{};
 
 	angles[0] = Lara.left_arm.y_rot + LaraItem->pos.rotY;
 	angles[1] = Lara.left_arm.x_rot;
 
-	// NOTE: Ther was a bug in the original game - ID_LARA_M16 instead of LGT_M16
+	// NOTE: There was a bug in the original game - ID_LARA_M16 instead of LGT_M16
 #ifdef FEATURE_GAMEPLAY_FIXES
 	if (IsRunningM16fix && isRunning) {
-		Weapons[LGT_M16].shotAccuracy = 12 * PHD_DEGREE;
-		Weapons[LGT_M16].damage = 1;
+		weapon->shotAccuracy = (12 * PHD_DEGREE);
+		weapon->damage = 1;
 	}
 	else {
-		Weapons[LGT_M16].shotAccuracy = 4 * PHD_DEGREE;
-		Weapons[LGT_M16].damage = 3;
+		weapon->shotAccuracy = (4 * PHD_DEGREE);
+		weapon->damage = 3;
 	}
 #endif // FEATURE_GAMEPLAY_FIXES
 
 	if (FireWeapon(LGT_M16, Lara.target, LaraItem, angles)) {
-		Lara.right_arm.flash_gun = Weapons[LGT_M16].flashTime;
+		Lara.right_arm.flash_gun = weapon->flashTime;
 #ifdef FEATURE_INPUT_IMPROVED
 		JoyVibrate(0x400, 0x400, 2, 0x80, 4, false);
 #endif // FEATURE_INPUT_IMPROVED
@@ -124,9 +165,9 @@ void FireM16(BOOL isRunning) {
 }
 
 void FireHarpoon() {
-	GAME_VECTOR pos;
+	GAME_VECTOR pos{};
 	if (Lara.harpoon_ammo <= 0) return;
-	__int16 itemID = CreateItem();
+	short itemID = CreateItem();
 	if (itemID < 0) return;
 
 	ITEM_INFO* item = &Items[itemID];
@@ -163,7 +204,7 @@ void FireHarpoon() {
 #endif // FEATURE_INPUT_IMPROVED
 }
 
-void ControlHarpoonBolt(__int16 itemID)
+void ControlHarpoonBolt(short itemID)
 {
 	FLOOR_INFO* floor = NULL;
 	ITEM_INFO* item = NULL, *target = NULL;
@@ -245,9 +286,9 @@ void ControlHarpoonBolt(__int16 itemID)
 }
 
 void FireRocket() {
-	__int16 itemID;
+	short itemID;
 	ITEM_INFO* item;
-	PHD_VECTOR pos;
+	PHD_VECTOR pos{};
 
 	if (Lara.grenade_ammo > 0) {
 		itemID = CreateItem();
@@ -279,10 +320,10 @@ void FireRocket() {
 	}
 }
 
-void ControlRocket(__int16 itemID) {
+void ControlRocket(short itemID) {
 	ITEM_INFO* item, * link;
 	int oldX, oldY, oldZ, displacement, c, s, r, oldR;
-	__int16 room, linkID, * frame, fxID;
+	short room, linkID, * frame, fxID;
 	FLOOR_INFO* floor;
 	BOOL collision;
 	FX_INFO* fx;
@@ -375,14 +416,225 @@ void ControlRocket(__int16 itemID) {
 	}
 }
 
+void draw_shotgun(int weaponType)
+{
+	ITEM_INFO* item = NULL;
+	if (Lara.weapon_item == -1)
+	{
+		Lara.weapon_item = CreateItem();
+		if (Lara.weapon_item == -1)
+		{
+			Log("Failed to create weapon_item for the back weapon (torso)");
+			return;
+		}
+		item = &Items[Lara.weapon_item];
+		item->objectID = WeaponObject(weaponType);
+		short animIdx = Objects[item->objectID].animIndex;
+		item->animNumber = weaponType == LGT_Grenade ? animIdx : animIdx + 1;
+		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->goalAnimState = 1;
+		item->currentAnimState = 1;
+		item->status = ITEM_ACTIVE;
+		item->roomNumber = 255;
+		Lara.right_arm.frame_base = Objects[item->objectID].frameBase;
+		Lara.left_arm.frame_base = Lara.right_arm.frame_base;
+	}
+	else
+	{
+		item = &Items[Lara.weapon_item];
+	}
+	AnimateItem(item);
+	if (item->currentAnimState != 0 && item->currentAnimState != 6)
+	{
+		if ((item->frameNumber - Anims[item->animNumber].frameBase) == 10)
+			draw_shotgun_meshes(weaponType);
+		else
+			item->goalAnimState = 6;
+	}
+	else
+	{
+		ready_shotgun(weaponType);
+	}
+	Lara.right_arm.frame_base = Anims[item->animNumber].framePtr;
+	Lara.left_arm.frame_base = Lara.right_arm.frame_base;
+	Lara.right_arm.frame_number = item->frameNumber - Anims[item->animNumber].frameBase;
+	Lara.left_arm.frame_number = Lara.right_arm.frame_number;
+	Lara.right_arm.anim_number = item->animNumber;
+	Lara.left_arm.anim_number = Lara.right_arm.anim_number;
+}
+
+void undraw_shotgun(int weaponType)
+{
+	if (Lara.weapon_item == -1)
+	{
+		Log("Failed to undraw back weapon, it not exist !");
+		return;
+	}
+	ITEM_INFO* item = &Items[Lara.weapon_item];
+	if (Lara.water_status == LWS_Surface)
+		item->goalAnimState = 9;
+	else
+		item->goalAnimState = 3;
+	AnimateItem(item);
+	if (item->status == ITEM_DISABLED)
+	{
+		Lara.gun_status = LGS_Armless;
+		Lara.target = NULL;
+		Lara.right_arm.lock = FALSE;
+		Lara.left_arm.lock = FALSE;
+		KillItem(Lara.weapon_item);
+		Lara.weapon_item = -1;
+		Lara.right_arm.frame_number = 0;
+		Lara.left_arm.frame_number = 0;
+	}
+	else if (item->currentAnimState == 3 && (item->frameNumber - Anims[item->animNumber].frameBase) == 21)
+	{
+		undraw_shotgun_meshes(weaponType);
+	}
+	Lara.right_arm.frame_base = Anims[item->animNumber].framePtr;
+	Lara.left_arm.frame_base = Lara.right_arm.frame_base;
+	Lara.right_arm.frame_number = item->frameNumber - Anims[item->animNumber].frameBase;
+	Lara.left_arm.frame_number = Lara.right_arm.frame_number;
+	Lara.right_arm.anim_number = item->animNumber;
+	Lara.left_arm.anim_number = Lara.right_arm.anim_number;
+}
+
+void AnimateShotgun(int weaponType)
+{
+	static BOOL m16_firing = FALSE, harpoon_fired = FALSE;
+	ITEM_INFO* item = NULL;
+	BOOL running = FALSE;
+
+	item = &Items[Lara.weapon_item];
+	running = (weaponType == LGT_M16 && LaraItem->speed != 0);
+
+	switch (item->currentAnimState)
+	{
+	case WS_AIM: // Aim
+		m16_firing = FALSE;
+
+		if (harpoon_fired)
+		{
+			item->goalAnimState = WS_RELOAD;
+			harpoon_fired = FALSE;
+		}
+		else if (Lara.water_status == LWS_Underwater || running)
+			item->goalAnimState = WS_UAIM;
+		else if ((CHK_ANY(InputStatus, IN_ACTION) && Lara.target == NULL) || Lara.left_arm.lock)
+			item->goalAnimState = WS_RECOIL;
+		else
+			item->goalAnimState = WS_UNAIM;
+
+		break;
+	case WS_RECOIL:
+		if (item->frameNumber == Anims[item->animNumber].frameBase)
+		{
+			item->goalAnimState = WS_UNAIM;
+			if (Lara.water_status != LWS_Underwater && !running && !harpoon_fired)
+			{
+				if (CHK_ANY(InputStatus, IN_ACTION) && (Lara.target == NULL || Lara.left_arm.lock))
+				{
+					switch (weaponType)
+					{
+					case LGT_Harpoon:
+						FireHarpoon();
+						if (!(Lara.harpoon_ammo & 3))
+							harpoon_fired = TRUE;
+						break;
+					case LGT_M16:
+						FireM16(FALSE);
+						PlaySoundEffect(78, &LaraItem->pos, 0);
+						m16_firing = TRUE;
+						break;
+					case LGT_Grenade:
+						FireRocket();
+						break;
+					case LGT_Shotgun:
+						FireShotgun();
+						break;
+					}
+					item->goalAnimState = WS_RECOIL;
+				}
+				else if (Lara.left_arm.lock)
+				{
+					item->goalAnimState = WS_AIM;
+				}
+			}
+			if (item->goalAnimState != WS_RECOIL && m16_firing)
+			{
+				PlaySoundEffect(104, &LaraItem->pos, 0);
+				m16_firing = FALSE;
+			}
+		}
+		else if (m16_firing)
+			PlaySoundEffect(78, &LaraItem->pos, 0);
+		else if (weaponType == LGT_Shotgun && !CHK_ANY(InputStatus, IN_ACTION) && !Lara.left_arm.lock)
+			item->goalAnimState = WS_UNAIM;
+
+		break;
+	case WS_UAIM:
+		m16_firing = FALSE;
+
+		if (harpoon_fired)
+		{
+			item->goalAnimState = WS_RELOAD;
+			harpoon_fired = FALSE;
+		}
+		else if (Lara.water_status != LWS_Underwater && !running)
+			item->goalAnimState = WS_AIM;
+		else if ((CHK_ANY(InputStatus, IN_ACTION) && Lara.target == NULL) || Lara.left_arm.lock)
+			item->goalAnimState = WS_URECOIL;
+		else
+			item->goalAnimState = WS_UUNAIM;
+		break;
+	case WS_URECOIL:
+		if ((item->frameNumber - Anims[item->animNumber].frameBase) == 0)
+		{
+			item->goalAnimState = WS_UUNAIM;
+			if ((Lara.water_status == LWS_Underwater || running) && !harpoon_fired)
+			{
+				if (CHK_ANY(InputStatus, IN_ACTION) && (Lara.target == NULL || Lara.left_arm.lock))
+				{
+					if (weaponType == LGT_Harpoon)
+					{
+						FireHarpoon();
+						if (!(Lara.harpoon_ammo & 3))
+							harpoon_fired = TRUE;
+					}
+					else
+					{
+						FireM16(TRUE);
+					}
+					item->goalAnimState = WS_URECOIL;
+				}
+				else if (Lara.left_arm.lock)
+				{
+					item->goalAnimState = WS_UAIM;
+				}
+			}
+		}
+		if (weaponType == LGT_M16 && item->goalAnimState == WS_URECOIL)
+			PlaySoundEffect(78, &LaraItem->pos, 0);
+		break;
+
+	}
+
+	AnimateItem(item);
+	Lara.right_arm.frame_base = Anims[item->animNumber].framePtr;
+	Lara.left_arm.frame_base = Lara.right_arm.frame_base;
+	Lara.right_arm.frame_number = item->frameNumber - Anims[item->animNumber].frameBase;
+	Lara.left_arm.frame_number = Lara.right_arm.frame_number;
+	Lara.right_arm.anim_number = item->animNumber;
+	Lara.left_arm.anim_number = Lara.right_arm.anim_number;
+}
+
 /*
  * Inject function
  */
 void Inject_Lara1Gun() {
-	//	INJECT(0x0042BC90, draw_shotgun_meshes);
-	//	INJECT(0x0042BCD0, undraw_shotgun_meshes);
-	//	INJECT(0x0042BD00, ready_shotgun);
-
+	INJECT(0x0042BC90, draw_shotgun_meshes);
+	INJECT(0x0042BCD0, undraw_shotgun_meshes);
+	INJECT(0x0042BD00, ready_shotgun);
 	INJECT(0x0042BD70, RifleHandler);
 	INJECT(0x0042BE70, FireShotgun);
 	INJECT(0x0042BF70, FireM16);
@@ -390,8 +642,7 @@ void Inject_Lara1Gun() {
 	INJECT(0x0042C180, ControlHarpoonBolt);
 	INJECT(0x0042C4D0, FireRocket);
 	INJECT(0x0042C5C0, ControlRocket);
-
-	//	INJECT(0x0042C9D0, draw_shotgun);
-	//	INJECT(0x0042CB40, undraw_shotgun);
-	//	INJECT(0x0042CC50, AnimateShotgun);
+	INJECT(0x0042C9D0, draw_shotgun);
+	INJECT(0x0042CB40, undraw_shotgun);
+	INJECT(0x0042CC50, AnimateShotgun);
 }

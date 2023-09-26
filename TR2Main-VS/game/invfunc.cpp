@@ -742,7 +742,7 @@ void RemoveInventoryText() {
 	}
 }
 
-void Inv_RingInit(RING_INFO* ring, __int16 type, INVENTORY_ITEM** itemList, __int16 objCount, __int16 currentObj, INV_MOTION_INFO* motionInfo) {
+void Inv_RingInit(RING_INFO* ring, short type, INVENTORY_ITEM** itemList, short objCount, short currentObj, INV_MOTION_INFO* motionInfo) {
 	ring->type = type;
 	ring->itemList = itemList;
 	ring->objCount = objCount;
@@ -798,7 +798,7 @@ void Inv_RingLight(RING_INFO* ring) {
 	phd_RotateLight(angles.pitch, angles.yaw);
 }
 
-void Inv_RingCalcAdders(RING_INFO* ring, __int16 rotDuration) {
+void Inv_RingCalcAdders(RING_INFO* ring, short rotDuration) {
 	ring->angleAdder = PHD_360 / ring->objCount;
 	ring->rotAdderL = ring->angleAdder / rotDuration;
 	ring->rotAdderR = -ring->rotAdderL;
@@ -888,7 +888,7 @@ void Inv_RingRotateRight(RING_INFO* ring) {
 	ring->rotAdder = ring->rotAdderR;
 }
 
-void Inv_RingMotionInit(RING_INFO* ring, __int16 framesCount, __int16 status, __int16 statusTarget) {
+void Inv_RingMotionInit(RING_INFO* ring, short framesCount, short status, short statusTarget) {
 	INV_MOTION_INFO* mi = ring->motionInfo;
 
 	mi->framesCount = framesCount;
@@ -913,7 +913,7 @@ void Inv_RingMotionInit(RING_INFO* ring, __int16 framesCount, __int16 status, __
 	mi->misc = 0;
 }
 
-void Inv_RingMotionSetup(RING_INFO* ring, __int16 status, __int16 statusTarget, __int16 framesCount) {
+void Inv_RingMotionSetup(RING_INFO* ring, short status, short statusTarget, short framesCount) {
 	INV_MOTION_INFO* mi = ring->motionInfo;
 
 	mi->framesCount = framesCount;
@@ -923,28 +923,28 @@ void Inv_RingMotionSetup(RING_INFO* ring, __int16 status, __int16 statusTarget, 
 	mi->cameraRate_y = 0;
 }
 
-void Inv_RingMotionRadius(RING_INFO* ring, __int16 target) {
+void Inv_RingMotionRadius(RING_INFO* ring, short target) {
 	INV_MOTION_INFO* mi = ring->motionInfo;
 
 	mi->radiusTarget = target;
 	mi->radiusRate = (target - ring->radius) / mi->framesCount;
 }
 
-void Inv_RingMotionRotation(RING_INFO* ring, __int16 rotation, __int16 target) {
+void Inv_RingMotionRotation(RING_INFO* ring, short rotation, short target) {
 	INV_MOTION_INFO* mi = ring->motionInfo;
 
 	mi->rotateTarget = target;
 	mi->rotateRate = rotation / mi->framesCount;
 }
 
-void Inv_RingMotionCameraPos(RING_INFO* ring, __int16 target) {
+void Inv_RingMotionCameraPos(RING_INFO* ring, short target) {
 	INV_MOTION_INFO* mi = ring->motionInfo;
 
 	mi->cameraTarget_y = target;
 	mi->cameraRate_y = (target - ring->camera.y) / mi->framesCount;
 }
 
-void Inv_RingMotionCameraPitch(RING_INFO* ring, __int16 target) {
+void Inv_RingMotionCameraPitch(RING_INFO* ring, short target) {
 	INV_MOTION_INFO* mi = ring->motionInfo;
 
 	mi->cameraTarget_pitch = target;

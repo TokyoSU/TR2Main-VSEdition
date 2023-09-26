@@ -27,14 +27,14 @@
  /*
   * Function list
   */
-void LaraControl(__int16 itemID);
+void LaraControl(short itemID);
 
 #define AnimateLara ((void(__cdecl*)(ITEM_INFO*)) 0x00430A10)
 
-void UseItem(__int16 itemID); // 0x00430D10
+void UseItem(short itemID); // 0x00430D10
 void LaraCheatGetStuff(); // 0x00430ED0
-void ControlLaraExtra(__int16 itemID); // 0x00430F90
-void InitialiseLaraLoad(__int16 itemID); // 0x00430FB0
+void ControlLaraExtra(short itemID); // 0x00430F90
+void InitialiseLaraLoad(short itemID); // 0x00430FB0
 
 #define InitialiseLara ((void(__cdecl*)(int)) 0x00430FE0)
 

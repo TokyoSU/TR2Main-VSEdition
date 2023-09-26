@@ -28,14 +28,14 @@
   * Function list
   */
 
-#define PickUpCollision ((void(__cdecl*)(__int16, ITEM_INFO *, COLL_INFO *)) 0x00437F20)
+#define PickUpCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x00437F20)
 
   //	0x004383A0:		SwitchCollision
   //	0x004385B0:		SwitchCollision2
   //	0x004386B0:		DetonatorCollision
   //	0x004388F0:		KeyHoleCollision
 
-#define PuzzleHoleCollision ((void(__cdecl*)(__int16, ITEM_INFO *, COLL_INFO *)) 0x00438B30)
+#define PuzzleHoleCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x00438B30)
 
 //	0x00438DF0:		SwitchControl
 //	0x00438E30:		SwitchTrigger

@@ -38,7 +38,7 @@
 
 int ItemNearLara(PHD_3DPOS* pos, int distance) {
 	int dx, dy, dz;
-	__int16* frame;
+	short* frame;
 
 	dx = pos->x - LaraItem->pos.x;
 	dy = pos->y - LaraItem->pos.y;
@@ -63,8 +63,8 @@ void SoundEffects() {
 	SOUND_EndScene();
 }
 
-__int16 DoBloodSplat(int x, int y, int z, __int16 speed, __int16 direction, __int16 roomID) {
-	__int16 fxID;
+short DoBloodSplat(int x, int y, int z, short speed, short direction, short roomID) {
+	short fxID;
 	FX_INFO* fx;
 
 	fxID = CreateEffect(roomID);
@@ -82,7 +82,7 @@ __int16 DoBloodSplat(int x, int y, int z, __int16 speed, __int16 direction, __in
 	return fxID;
 }
 
-void DoLotsOfBlood(int x, int y, int z, __int16 speed, __int16 direction, __int16 roomID, int number) {
+void DoLotsOfBlood(int x, int y, int z, short speed, short direction, short roomID, int number) {
 	int i;
 
 	for (i = 0; i < number; ++i)
@@ -94,7 +94,7 @@ void DoLotsOfBlood(int x, int y, int z, __int16 speed, __int16 direction, __int1
 			roomID);
 }
 
-void ControlBlood1(__int16 fxID) {
+void ControlBlood1(short fxID) {
 	FX_INFO* fx;
 
 	fx = &Effects[fxID];
@@ -109,7 +109,7 @@ void ControlBlood1(__int16 fxID) {
 	}
 }
 
-void ControlExplosion1(__int16 fxID) {
+void ControlExplosion1(short fxID) {
 	FX_INFO* fx;
 
 	fx = &Effects[fxID];
@@ -130,7 +130,7 @@ void ControlExplosion1(__int16 fxID) {
 }
 
 void Richochet(GAME_VECTOR* pos) {
-	__int16 fxID = CreateEffect(pos->roomNumber);
+	short fxID = CreateEffect(pos->roomNumber);
 	if (fxID < 0) {
 		return;
 	}
@@ -144,7 +144,7 @@ void Richochet(GAME_VECTOR* pos) {
 	PlaySoundEffect(10, &fx->pos, 0);
 }
 
-void ControlRichochet1(__int16 fxID) {
+void ControlRichochet1(short fxID) {
 	FX_INFO* fx;
 
 	fx = &Effects[fxID];
@@ -153,8 +153,8 @@ void ControlRichochet1(__int16 fxID) {
 		KillEffect(fxID);
 }
 
-void CreateBubble(PHD_3DPOS* pos, __int16 roomNumber) {
-	__int16 fxID = CreateEffect(roomNumber);
+void CreateBubble(PHD_3DPOS* pos, short roomNumber) {
+	short fxID = CreateEffect(roomNumber);
 	if (fxID < 0) return;
 	FX_INFO* fx = &Effects[fxID];
 	fx->pos = *pos;
@@ -180,10 +180,10 @@ void LaraBubbles(ITEM_INFO* item) {
 	while (counter-- > 0) CreateBubble((PHD_3DPOS*)&pos, item->roomNumber);
 }
 
-void ControlBubble1(__int16 fxID) {
+void ControlBubble1(short fxID) {
 	FX_INFO* fx;
 	int x, y, z, ceiling;
-	__int16 roomID;
+	short roomID;
 	FLOOR_INFO* floor;
 
 	fx = &Effects[fxID];
@@ -210,7 +210,7 @@ void ControlBubble1(__int16 fxID) {
 
 void Splash(ITEM_INFO* item) {
 	int y, i;
-	__int16 roomID, fxID;
+	short roomID, fxID;
 	FX_INFO* fx;
 
 	y = GetWaterHeight(item->pos.x, item->pos.y, item->pos.z, item->roomNumber);
@@ -235,7 +235,7 @@ void WadeSplash(ITEM_INFO* item, int height) {
 	return; // NULL function
 }
 
-void ControlSplash1(__int16 fxID) {
+void ControlSplash1(short fxID) {
 	FX_INFO* fx;
 
 	fx = &Effects[fxID];
@@ -249,7 +249,7 @@ void ControlSplash1(__int16 fxID) {
 	}
 }
 
-void ControlWaterSprite(__int16 fxID) {
+void ControlWaterSprite(short fxID) {
 	FX_INFO* fx;
 
 	fx = &Effects[fxID];
@@ -272,7 +272,7 @@ void ControlWaterSprite(__int16 fxID) {
 	}
 }
 
-void ControlSnowSprite(__int16 fxID) {
+void ControlSnowSprite(short fxID) {
 	FX_INFO* fx;
 
 	fx = &Effects[fxID];
@@ -290,9 +290,9 @@ void ControlSnowSprite(__int16 fxID) {
 	}
 }
 
-void ControlHotLiquid(__int16 fxID) {
+void ControlHotLiquid(short fxID) {
 	FX_INFO* fx;
-	__int16 roomID;
+	short roomID;
 	int height;
 
 	fx = &Effects[fxID];
@@ -318,9 +318,9 @@ void ControlHotLiquid(__int16 fxID) {
 	}
 }
 
-void WaterFall(__int16 itemID) {
+void WaterFall(short itemID) {
 	ITEM_INFO* item;
-	__int16 fxID;
+	short fxID;
 	FX_INFO* fx;
 
 	item = &Items[itemID];
@@ -436,7 +436,7 @@ void SetChangeFX(ITEM_INFO* item) {
 	FlipEffect = -1;
 }
 
-void ControlDingDong(__int16 itemID) {
+void ControlDingDong(short itemID) {
 	ITEM_INFO* item;
 
 	item = &Items[itemID];
@@ -446,7 +446,7 @@ void ControlDingDong(__int16 itemID) {
 	}
 }
 
-void ControlLaraAlarm(__int16 itemID) {
+void ControlLaraAlarm(short itemID) {
 	ITEM_INFO* item;
 
 	item = &Items[itemID];
@@ -454,7 +454,7 @@ void ControlLaraAlarm(__int16 itemID) {
 		PlaySoundEffect(335, &item->pos, 0);
 }
 
-void ControlAlarmSound(__int16 itemID) {
+void ControlAlarmSound(short itemID) {
 	ITEM_INFO* item;
 	int counter;
 
@@ -471,7 +471,7 @@ void ControlAlarmSound(__int16 itemID) {
 	}
 }
 
-void ControlBirdTweeter(__int16 itemID) {
+void ControlBirdTweeter(short itemID) {
 	ITEM_INFO* item;
 
 	item = &Items[itemID];
@@ -494,7 +494,7 @@ void DoChimeSound(ITEM_INFO* item) {
 	PlaySoundEffect(208, &pos, 0);
 }
 
-void ControlClockChimes(__int16 itemID) {
+void ControlClockChimes(short itemID) {
 	ITEM_INFO* item;
 
 	item = &Items[itemID];
@@ -512,7 +512,7 @@ void ControlClockChimes(__int16 itemID) {
 	}
 }
 
-void SphereOfDoomCollision(__int16 itemID, ITEM_INFO* laraItem, COLL_INFO* coll) {
+void SphereOfDoomCollision(short itemID, ITEM_INFO* laraItem, COLL_INFO* coll) {
 	ITEM_INFO* item;
 	int dx, dz, distance, angle;
 
@@ -545,7 +545,7 @@ void SphereOfDoomCollision(__int16 itemID, ITEM_INFO* laraItem, COLL_INFO* coll)
 	}
 }
 
-void SphereOfDoom(__int16 itemID) {
+void SphereOfDoom(short itemID) {
 	ITEM_INFO* item;
 	int dx, dy, dz, distance, difference;
 	PHD_3DPOS pos;
@@ -598,14 +598,14 @@ void flip_map_effect(ITEM_INFO* item) {
 }
 
 void draw_right_gun(ITEM_INFO* item) {
-	__int16* tmp;
+	short* tmp;
 
 	SWAP(Lara.mesh_ptrs[4], MeshPtr[Objects[ID_LARA_PISTOLS].meshIndex + 4], tmp);
 	SWAP(Lara.mesh_ptrs[10], MeshPtr[Objects[ID_LARA_PISTOLS].meshIndex + 10], tmp);
 }
 
 void draw_left_gun(ITEM_INFO* item) {
-	__int16* tmp;
+	short* tmp;
 
 	SWAP(Lara.mesh_ptrs[1], MeshPtr[Objects[ID_LARA_PISTOLS].meshIndex + 1], tmp);
 	SWAP(Lara.mesh_ptrs[13], MeshPtr[Objects[ID_LARA_PISTOLS].meshIndex + 13], tmp);
@@ -613,7 +613,7 @@ void draw_left_gun(ITEM_INFO* item) {
 
 void swap_meshes_with_meshswap1(ITEM_INFO* item) {
 	int i;
-	__int16* tmp;
+	short* tmp;
 
 	for (i = 0; i < Objects[item->objectID].nMeshes; ++i)
 		SWAP(MeshPtr[Objects[item->objectID].meshIndex + i], MeshPtr[Objects[ID_MESH_SWAP1].meshIndex + i], tmp);
@@ -621,7 +621,7 @@ void swap_meshes_with_meshswap1(ITEM_INFO* item) {
 
 void swap_meshes_with_meshswap2(ITEM_INFO* item) {
 	int i;
-	__int16* tmp;
+	short* tmp;
 
 	for (i = 0; i < Objects[item->objectID].nMeshes; ++i)
 		SWAP(MeshPtr[Objects[item->objectID].meshIndex + i], MeshPtr[Objects[ID_MESH_SWAP2].meshIndex + i], tmp);
@@ -629,7 +629,7 @@ void swap_meshes_with_meshswap2(ITEM_INFO* item) {
 
 void swap_meshes_with_meshswap3(ITEM_INFO* item) {
 	int i;
-	__int16* tmp;
+	short* tmp;
 
 	for (i = 0; i < Objects[item->objectID].nMeshes; ++i) {
 		if (item == LaraItem)

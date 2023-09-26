@@ -159,8 +159,8 @@ void PaulD_CDLoop() {
 	}
 }
 
-void PaulD_CDPlay(__int16 trackID, BOOL isLooped) {
-	__int16 track;
+void PaulD_CDPlay(short trackID, BOOL isLooped) {
+	short track;
 	char cmdString[256];
 
 	if (MusicVolume == 0)
@@ -190,7 +190,7 @@ void PaulD_CDStop() {
 }
 
 BOOL PaulD_StartSyncedAudio(int trackID) {
-	__int16 track;
+	short track;
 	char cmdString[256];
 
 	track = GetRealTrack(trackID);
@@ -206,7 +206,7 @@ BOOL PaulD_StartSyncedAudio(int trackID) {
 }
 
 DWORD PaulD_CDGetLoc() {
-	__int16 track;
+	short track;
 	char statusString[32];
 
 	if (0 != mciSendString("status " CD_ALIAS " position", statusString, sizeof(statusString), 0))

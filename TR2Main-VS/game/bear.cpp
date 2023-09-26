@@ -46,7 +46,7 @@ static const BITE_INFO BearBite = {
 	0, 96, 335, 14
 };
 
-void BearControl(__int16 itemID) {
+void BearControl(short itemID) {
 	ITEM_INFO* item = &Items[itemID];
 
 	if (item->status == ITEM_INVISIBLE) {
@@ -59,8 +59,8 @@ void BearControl(__int16 itemID) {
 	CREATURE_INFO* bear = (CREATURE_INFO*)item->data;
 	if (bear == NULL) return; // NOTE: additional check not presented in the original game
 
-	__int16 angle = 0;
-	__int16 head = 0;
+	short angle = 0;
+	short head = 0;
 
 	if (item->hitPoints <= 0) {
 		angle = CreatureTurn(item, 1 * PHD_DEGREE);

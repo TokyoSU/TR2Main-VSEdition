@@ -27,7 +27,7 @@
  /*
   * Function list
   */
-#define InitialiseSkidoo ((void(__cdecl*)(__int16)) 0x0043CEE0)
+#define InitialiseSkidoo ((void(__cdecl*)(short)) 0x0043CEE0)
 
   //	0x0043CF20:		SkidooCheckGeton
   //	0x0043D010:		SkidooCollision
@@ -54,11 +54,11 @@ void SkidooGuns(); // 0x0043E590
 
 void DrawSkidoo(ITEM_INFO* item);
 
-#define InitialiseSkidman ((void(__cdecl*)(__int16)) 0x0043EDF0)
-#define SkidManControl ((void(__cdecl*)(__int16)) 0x0043EE80)
+#define InitialiseSkidman ((void(__cdecl*)(short)) 0x0043EDF0)
+#define SkidManControl ((void(__cdecl*)(short)) 0x0043EE80)
 
 //	0x0043F280:		SkidmanPush
 
-#define SkidmanCollision ((void(__cdecl*)(__int16, ITEM_INFO *, COLL_INFO *)) 0x0043F3A0)
+#define SkidmanCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x0043F3A0)
 
 #endif // SKIDOO_H_INCLUDED

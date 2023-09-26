@@ -181,13 +181,13 @@ int ControlPhase(int nTicks, BOOL demoMode) {
 	return 0;
 }
 
-void TriggerCDTrack(__int16 value, UINT16 flags, __int16 type) {
+void TriggerCDTrack(short value, UINT16 flags, short type) {
 	if (value > 1 && value < 64) {
 		TriggerNormalCDTrack(value, flags, type);
 	}
 }
 
-void TriggerNormalCDTrack(__int16 value, UINT16 flags, __int16 type) {
+void TriggerNormalCDTrack(short value, UINT16 flags, short type) {
 	if (type != 2) {
 		UINT16 codebits = flags & IFL_CODEBITS;
 		if (CHK_ANY(codebits, CD_Flags[value])) {

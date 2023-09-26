@@ -24,7 +24,7 @@
 #include "game/control.h"
 #include "global/vars.h"
 
-int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, __int16 roomID, int hite) {
+int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomID, int hite) {
 	int rxMin = x - coll->radius;
 	int rxMax = x + coll->radius;
 	int ryMin = y - hite;
@@ -176,7 +176,7 @@ int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, __int16 roomID, i
 	return 0;
 }
 
-void GetNearByRooms(int x, int y, int z, int r, int h, __int16 roomID) {
+void GetNearByRooms(int x, int y, int z, int r, int h, short roomID) {
 	DrawRoomsArray[0] = roomID;
 	DrawRoomsCount = 1;
 	GetNewRoom(x + r, y, z + r, roomID);
@@ -189,7 +189,7 @@ void GetNearByRooms(int x, int y, int z, int r, int h, __int16 roomID) {
 	GetNewRoom(x - r, y - h, z - r, roomID);
 }
 
-void GetNewRoom(int x, int y, int z, __int16 roomID) {
+void GetNewRoom(int x, int y, int z, short roomID) {
 	GetFloor(x, y, z, &roomID);
 	for (int i = 0; i < DrawRoomsCount; ++i) {
 		if (DrawRoomsArray[i] == roomID) {

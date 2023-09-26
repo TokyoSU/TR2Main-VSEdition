@@ -62,7 +62,7 @@ extern bool LoadingScreensEnabled;
 #endif // FEATURE_HUD_IMPROVED
 
 #ifdef FEATURE_VIDEOFX_IMPROVED
-static bool MarkSemitransPoly(__int16* ptrObj, int vtxCount, bool colored, LPVOID param) {
+static bool MarkSemitransPoly(short* ptrObj, int vtxCount, bool colored, LPVOID param) {
 	UINT16 index = ptrObj[vtxCount];
 	if (colored) {
 		GamePalette16[index >> 8].peFlags = 1; // semitransparent blending mode 1
@@ -75,7 +75,7 @@ static bool MarkSemitransPoly(__int16* ptrObj, int vtxCount, bool colored, LPVOI
 
 static bool MarkSemitransMesh(int objID, int meshIdx, POLYFILTER* filter) {
 	if (objID < 0) return false;
-	__int16* ptrObj = NULL;
+	short* ptrObj = NULL;
 	// if mesh index is negative, then it's a static mesh
 	if (meshIdx < 0) {
 		if ((DWORD)objID >= ARRAY_SIZE(StaticObjects)) return false;
@@ -157,7 +157,7 @@ static void MarkSemitransObjects() {
 
 static void MarkSemitransTextureRanges() {
 	POLYINDEX* filter = NULL;
-	__int16* ptr = AnimatedTextureRanges;
+	short* ptr = AnimatedTextureRanges;
 
 #ifdef FEATURE_MOD_CONFIG
 	filter = GetModSemitransAnimtexFilter();
@@ -291,7 +291,7 @@ static bool GetBgndPatternInfo() {
 		return false;
 	}
 
-	__int16* meshPtr = MeshPtr[Objects[ID_INV_BACKGROUND].meshIndex];
+	short* meshPtr = MeshPtr[Objects[ID_INV_BACKGROUND].meshIndex];
 	meshPtr += 3 + 2; // skip mesh coords (3*INT16) and radius (1*INT32)
 
 	int num = *(meshPtr++);
@@ -465,10 +465,10 @@ BOOL LoadTexturePages(HANDLE hFile) {
 BOOL LoadRooms(HANDLE hFile) {
 	DWORD bytesRead;
 	DWORD dwCount;
-	__int16 wCount;
+	short wCount;
 
 	// Get number of rooms
-	ReadFileSync(hFile, &RoomCount, sizeof(__int16), &bytesRead, NULL);
+	ReadFileSync(hFile, &RoomCount, sizeof(short), &bytesRead, NULL);
 	if (RoomCount < 0 || RoomCount > 0x400) {
 		lstrcpy(StringToShow, "LoadRoom(): Too many rooms");
 		return FALSE;
@@ -494,32 +494,32 @@ BOOL LoadRooms(HANDLE hFile) {
 
 		// Room mesh
 		ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
-		RoomInfo[i].data = (__int16*)game_malloc(sizeof(__int16) * dwCount, GBUF_RoomMesh);
-		ReadFileSync(hFile, RoomInfo[i].data, sizeof(__int16) * dwCount, &bytesRead, NULL);
+		RoomInfo[i].data = (short*)game_malloc(sizeof(short) * dwCount, GBUF_RoomMesh);
+		ReadFileSync(hFile, RoomInfo[i].data, sizeof(short) * dwCount, &bytesRead, NULL);
 
 		// Doors
-		ReadFileSync(hFile, &wCount, sizeof(__int16), &bytesRead, NULL);
+		ReadFileSync(hFile, &wCount, sizeof(short), &bytesRead, NULL);
 		if (wCount == 0) {
 			RoomInfo[i].doors = NULL;
 		}
 		else {
-			RoomInfo[i].doors = (DOOR_INFOS*)game_malloc(sizeof(__int16) + sizeof(DOOR_INFO) * wCount, GBUF_RoomDoor);
+			RoomInfo[i].doors = (DOOR_INFOS*)game_malloc(sizeof(short) + sizeof(DOOR_INFO) * wCount, GBUF_RoomDoor);
 			RoomInfo[i].doors->wCount = wCount;
 			ReadFileSync(hFile, &RoomInfo[i].doors->door, sizeof(DOOR_INFO) * wCount, &bytesRead, NULL);
 		}
 
 		// Room floor
-		ReadFileSync(hFile, &RoomInfo[i].xSize, sizeof(__int16), &bytesRead, NULL);
-		ReadFileSync(hFile, &RoomInfo[i].ySize, sizeof(__int16), &bytesRead, NULL);
+		ReadFileSync(hFile, &RoomInfo[i].xSize, sizeof(short), &bytesRead, NULL);
+		ReadFileSync(hFile, &RoomInfo[i].ySize, sizeof(short), &bytesRead, NULL);
 		dwCount = RoomInfo[i].xSize * RoomInfo[i].ySize;
 		RoomInfo[i].floor = (FLOOR_INFO*)game_malloc(sizeof(FLOOR_INFO) * dwCount, GBUF_RoomFloor);
 		ReadFileSync(hFile, RoomInfo[i].floor, sizeof(FLOOR_INFO) * dwCount, &bytesRead, NULL);
 
 		// Room lights
-		ReadFileSync(hFile, &RoomInfo[i].ambient1, sizeof(__int16), &bytesRead, NULL);
-		ReadFileSync(hFile, &RoomInfo[i].ambient2, sizeof(__int16), &bytesRead, NULL);
-		ReadFileSync(hFile, &RoomInfo[i].lightMode, sizeof(__int16), &bytesRead, NULL);
-		ReadFileSync(hFile, &RoomInfo[i].numLights, sizeof(__int16), &bytesRead, NULL);
+		ReadFileSync(hFile, &RoomInfo[i].ambient1, sizeof(short), &bytesRead, NULL);
+		ReadFileSync(hFile, &RoomInfo[i].ambient2, sizeof(short), &bytesRead, NULL);
+		ReadFileSync(hFile, &RoomInfo[i].lightMode, sizeof(short), &bytesRead, NULL);
+		ReadFileSync(hFile, &RoomInfo[i].numLights, sizeof(short), &bytesRead, NULL);
 		if (RoomInfo[i].numLights == 0) {
 			RoomInfo[i].light = NULL;
 		}
@@ -529,7 +529,7 @@ BOOL LoadRooms(HANDLE hFile) {
 		}
 
 		// Static mesh infos
-		ReadFileSync(hFile, &RoomInfo[i].numMeshes, sizeof(__int16), &bytesRead, NULL);
+		ReadFileSync(hFile, &RoomInfo[i].numMeshes, sizeof(short), &bytesRead, NULL);
 		if (RoomInfo[i].numMeshes == 0) {
 			RoomInfo[i].mesh = NULL;
 		}
@@ -539,10 +539,10 @@ BOOL LoadRooms(HANDLE hFile) {
 		}
 
 		// Flipped (alternative) room
-		ReadFileSync(hFile, &RoomInfo[i].flippedRoom, sizeof(__int16), &bytesRead, NULL);
+		ReadFileSync(hFile, &RoomInfo[i].flippedRoom, sizeof(short), &bytesRead, NULL);
 
 		// Room flags
-		ReadFileSync(hFile, &RoomInfo[i].flags, sizeof(__int16), &bytesRead, NULL);
+		ReadFileSync(hFile, &RoomInfo[i].flags, sizeof(short), &bytesRead, NULL);
 
 		// Initialise some variables
 		RoomInfo[i].boundActive = 0;
@@ -556,8 +556,8 @@ BOOL LoadRooms(HANDLE hFile) {
 
 	// Read floor data
 	ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
-	FloorData = (__int16*)game_malloc(sizeof(__int16) * dwCount, GBUF_FloorData);
-	ReadFileSync(hFile, FloorData, sizeof(__int16) * dwCount, &bytesRead, NULL);
+	FloorData = (short*)game_malloc(sizeof(short) * dwCount, GBUF_FloorData);
+	ReadFileSync(hFile, FloorData, sizeof(short) * dwCount, &bytesRead, NULL);
 	return TRUE;
 }
 
@@ -634,17 +634,17 @@ BOOL LoadObjects(HANDLE hFile) {
 
 	// Load mesh base data
 	ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
-	Meshes = (__int16*)game_malloc(sizeof(__int16) * dwCount, GBUF_Meshes);
-	ReadFileSync(hFile, Meshes, sizeof(__int16) * dwCount, &bytesRead, NULL);
+	Meshes = (short*)game_malloc(sizeof(short) * dwCount, GBUF_Meshes);
+	ReadFileSync(hFile, Meshes, sizeof(short) * dwCount, &bytesRead, NULL);
 
 	// Load mesh pointers
 	ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
-	MeshPtr = (__int16**)game_malloc(sizeof(__int16*) * dwCount, GBUF_MeshPointers);
-	ReadFileSync(hFile, MeshPtr, sizeof(__int16*) * dwCount, &bytesRead, NULL);
+	MeshPtr = (short**)game_malloc(sizeof(short*) * dwCount, GBUF_MeshPointers);
+	ReadFileSync(hFile, MeshPtr, sizeof(short*) * dwCount, &bytesRead, NULL);
 
 	// Remap mesh pointers
 	for (i = 0; i < dwCount; ++i)
-		MeshPtr[i] = (__int16*)((DWORD)Meshes + (DWORD)MeshPtr[i]);
+		MeshPtr[i] = (short*)((DWORD)Meshes + (DWORD)MeshPtr[i]);
 
 	// Load anims
 	ReadFileSync(hFile, &animCount, sizeof(DWORD), &bytesRead, NULL);
@@ -663,8 +663,8 @@ BOOL LoadObjects(HANDLE hFile) {
 
 	// Load commands
 	ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
-	AnimCommands = (__int16*)game_malloc(sizeof(__int16) * dwCount, GBUF_Commands);
-	ReadFileSync(hFile, AnimCommands, sizeof(__int16) * dwCount, &bytesRead, NULL);
+	AnimCommands = (short*)game_malloc(sizeof(short) * dwCount, GBUF_Commands);
+	ReadFileSync(hFile, AnimCommands, sizeof(short) * dwCount, &bytesRead, NULL);
 
 	// Load bones
 	ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
@@ -673,23 +673,23 @@ BOOL LoadObjects(HANDLE hFile) {
 
 	// Load frames
 	ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
-	AnimFrames = (__int16*)game_malloc(sizeof(__int16) * dwCount, GBUF_Frames);
-	ReadFileSync(hFile, AnimFrames, sizeof(__int16) * dwCount, &bytesRead, NULL);
+	AnimFrames = (short*)game_malloc(sizeof(short) * dwCount, GBUF_Frames);
+	ReadFileSync(hFile, AnimFrames, sizeof(short) * dwCount, &bytesRead, NULL);
 
 	// Remap anim pointers
 	for (i = 0; i < animCount; ++i)
-		Anims[i].framePtr = (__int16*)((DWORD)AnimFrames + (DWORD)Anims[i].framePtr);
+		Anims[i].framePtr = (short*)((DWORD)AnimFrames + (DWORD)Anims[i].framePtr);
 
 	// Load animated objects
 	ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
 	for (i = 0; i < dwCount; ++i) {
 		ReadFileSync(hFile, &objNumber, sizeof(DWORD), &bytesRead, NULL);
-		ReadFileSync(hFile, &Objects[objNumber].nMeshes, sizeof(__int16), &bytesRead, NULL);
-		ReadFileSync(hFile, &Objects[objNumber].meshIndex, sizeof(__int16), &bytesRead, NULL);
+		ReadFileSync(hFile, &Objects[objNumber].nMeshes, sizeof(short), &bytesRead, NULL);
+		ReadFileSync(hFile, &Objects[objNumber].meshIndex, sizeof(short), &bytesRead, NULL);
 		ReadFileSync(hFile, &Objects[objNumber].boneIndex, sizeof(int), &bytesRead, NULL);
 		ReadFileSync(hFile, &animOffset, sizeof(DWORD), &bytesRead, NULL);
-		ReadFileSync(hFile, &Objects[objNumber].animIndex, sizeof(__int16), &bytesRead, NULL);
-		Objects[objNumber].frameBase = (__int16*)((DWORD)AnimFrames + animOffset);
+		ReadFileSync(hFile, &Objects[objNumber].animIndex, sizeof(short), &bytesRead, NULL);
+		Objects[objNumber].frameBase = (short*)((DWORD)AnimFrames + animOffset);
 		Objects[objNumber].loaded = 1;
 	}
 
@@ -703,7 +703,7 @@ BOOL LoadObjects(HANDLE hFile) {
 #endif // FEATURE_VIDEOFX_IMPROVED
 	for (i = 0; i < dwCount; ++i) {
 		ReadFileSync(hFile, &objNumber, sizeof(DWORD), &bytesRead, NULL);
-		ReadFileSync(hFile, &StaticObjects[objNumber].meshIndex, sizeof(__int16), &bytesRead, NULL);
+		ReadFileSync(hFile, &StaticObjects[objNumber].meshIndex, sizeof(short), &bytesRead, NULL);
 		ReadFileSync(hFile, &StaticObjects[objNumber].drawBounds, sizeof(STATIC_BOUNDS), &bytesRead, NULL);
 		ReadFileSync(hFile, &StaticObjects[objNumber].collisionBounds, sizeof(STATIC_BOUNDS), &bytesRead, NULL);
 		ReadFileSync(hFile, &StaticObjects[objNumber].flags, sizeof(UINT16), &bytesRead, NULL);
@@ -752,14 +752,14 @@ BOOL LoadSprites(HANDLE hFile) {
 	for (DWORD i = 0; i < dwCount; ++i) {
 		ReadFileSync(hFile, &objNumber, sizeof(DWORD), &bytesRead, NULL);
 		if (objNumber < ID_NUMBER_OBJECTS) {
-			ReadFileSync(hFile, &Objects[objNumber].nMeshes, sizeof(__int16), &bytesRead, NULL);
-			ReadFileSync(hFile, &Objects[objNumber].meshIndex, sizeof(__int16), &bytesRead, NULL);
+			ReadFileSync(hFile, &Objects[objNumber].nMeshes, sizeof(short), &bytesRead, NULL);
+			ReadFileSync(hFile, &Objects[objNumber].meshIndex, sizeof(short), &bytesRead, NULL);
 			Objects[objNumber].loaded = 1;
 		}
 		else {
 			objNumber -= ID_NUMBER_OBJECTS;
-			SetFilePointer(hFile, sizeof(__int16), NULL, FILE_CURRENT); // StaticObjects don't have nMeshes (just one mesh)
-			ReadFileSync(hFile, &StaticObjects[objNumber].meshIndex, sizeof(__int16), &bytesRead, NULL);
+			SetFilePointer(hFile, sizeof(short), NULL, FILE_CURRENT); // StaticObjects don't have nMeshes (just one mesh)
+			ReadFileSync(hFile, &StaticObjects[objNumber].meshIndex, sizeof(short), &bytesRead, NULL);
 		}
 	}
 	return TRUE;
@@ -786,14 +786,14 @@ BOOL LoadItems(HANDLE hFile) {
 	InitialiseItemArray(NUMBER_ITEMS);
 
 	for (DWORD i = 0; i < itemsCount; ++i) {
-		ReadFileSync(hFile, &Items[i].objectID, sizeof(__int16), &bytesRead, NULL);
-		ReadFileSync(hFile, &Items[i].roomNumber, sizeof(__int16), &bytesRead, NULL);
+		ReadFileSync(hFile, &Items[i].objectID, sizeof(short), &bytesRead, NULL);
+		ReadFileSync(hFile, &Items[i].roomNumber, sizeof(short), &bytesRead, NULL);
 		ReadFileSync(hFile, &Items[i].pos.x, sizeof(int), &bytesRead, NULL);
 		ReadFileSync(hFile, &Items[i].pos.y, sizeof(int), &bytesRead, NULL);
 		ReadFileSync(hFile, &Items[i].pos.z, sizeof(int), &bytesRead, NULL);
-		ReadFileSync(hFile, &Items[i].pos.rotY, sizeof(__int16), &bytesRead, NULL);
-		ReadFileSync(hFile, &Items[i].shade1, sizeof(__int16), &bytesRead, NULL);
-		ReadFileSync(hFile, &Items[i].shade2, sizeof(__int16), &bytesRead, NULL);
+		ReadFileSync(hFile, &Items[i].pos.rotY, sizeof(short), &bytesRead, NULL);
+		ReadFileSync(hFile, &Items[i].shade1, sizeof(short), &bytesRead, NULL);
+		ReadFileSync(hFile, &Items[i].shade2, sizeof(short), &bytesRead, NULL);
 		ReadFileSync(hFile, &Items[i].flags, sizeof(UINT16), &bytesRead, NULL);
 
 		if (Items[i].objectID < 0 || Items[i].objectID >= ID_NUMBER_OBJECTS) {
@@ -939,20 +939,20 @@ BOOL LoadBoxes(HANDLE hFile) {
 				(j == 1 && !Objects[ID_SPIDER_or_WOLF].loaded && !Objects[ID_SKIDOO_ARMED].loaded) ||
 				(j == 3 && !Objects[ID_YETI].loaded && !Objects[ID_WORKER3].loaded))
 			{
-				SetFilePointer(hFile, sizeof(__int16) * BoxesCount, NULL, FILE_CURRENT); // skip some GroundZones
+				SetFilePointer(hFile, sizeof(short) * BoxesCount, NULL, FILE_CURRENT); // skip some GroundZones
 				continue;
 			}
 
-			GroundZones[j * 2 + i] = (__int16*)game_malloc(sizeof(__int16) * BoxesCount, GBUF_GroundZone);
-			ReadFileSync(hFile, GroundZones[j * 2 + i], sizeof(__int16) * BoxesCount, &bytesRead, NULL);
-			if (bytesRead != sizeof(__int16) * BoxesCount) {
+			GroundZones[j * 2 + i] = (short*)game_malloc(sizeof(short) * BoxesCount, GBUF_GroundZone);
+			ReadFileSync(hFile, GroundZones[j * 2 + i], sizeof(short) * BoxesCount, &bytesRead, NULL);
+			if (bytesRead != sizeof(short) * BoxesCount) {
 				lstrcpy(StringToShow, "LoadBoxes(): Unable to load 'ground_zone'");
 				return FALSE;
 			}
 		}
-		FlyZones[i] = (__int16*)game_malloc(sizeof(__int16) * BoxesCount, GBUF_FlyZone);
-		ReadFileSync(hFile, FlyZones[i], sizeof(__int16) * BoxesCount, &bytesRead, NULL);
-		if (bytesRead != sizeof(__int16) * BoxesCount) {
+		FlyZones[i] = (short*)game_malloc(sizeof(short) * BoxesCount, GBUF_FlyZone);
+		ReadFileSync(hFile, FlyZones[i], sizeof(short) * BoxesCount, &bytesRead, NULL);
+		if (bytesRead != sizeof(short) * BoxesCount) {
 			lstrcpy(StringToShow, "LoadBoxes(): Unable to load 'fly_zone'");
 			return FALSE;
 		}
@@ -964,15 +964,15 @@ BOOL LoadAnimatedTextures(HANDLE hFile) {
 	DWORD animTexCount, bytesRead;
 
 	ReadFileSync(hFile, &animTexCount, sizeof(DWORD), &bytesRead, NULL);
-	AnimatedTextureRanges = (__int16*)game_malloc(sizeof(__int16) * animTexCount, GBUF_AnimatingTextureRanges);
-	ReadFileSync(hFile, AnimatedTextureRanges, sizeof(__int16) * animTexCount, &bytesRead, NULL);
+	AnimatedTextureRanges = (short*)game_malloc(sizeof(short) * animTexCount, GBUF_AnimatingTextureRanges);
+	ReadFileSync(hFile, AnimatedTextureRanges, sizeof(short) * animTexCount, &bytesRead, NULL);
 	return TRUE;
 }
 
 BOOL LoadCinematic(HANDLE hFile) {
 	DWORD bytesRead;
 
-	ReadFileSync(hFile, &CineFramesCount, sizeof(__int16), &bytesRead, NULL);
+	ReadFileSync(hFile, &CineFramesCount, sizeof(short), &bytesRead, NULL);
 	if (CineFramesCount != 0) {
 		CineFrames = (CINE_FRAME_INFO*)game_malloc(sizeof(CINE_FRAME_INFO) * CineFramesCount, GBUF_CinematicFrames);
 		ReadFileSync(hFile, CineFrames, sizeof(CINE_FRAME_INFO) * CineFramesCount, &bytesRead, NULL);
@@ -986,11 +986,11 @@ BOOL LoadCinematic(HANDLE hFile) {
 
 BOOL LoadDemo(HANDLE hFile) {
 	DWORD bytesRead;
-	__int16 demoSize;
+	short demoSize;
 
 	DemoCount = 0;
 	DemoPtr = game_malloc(36000, GBUF_LoadDemoBuffer);
-	ReadFileSync(hFile, &demoSize, sizeof(__int16), &bytesRead, NULL);
+	ReadFileSync(hFile, &demoSize, sizeof(short), &bytesRead, NULL);
 	if (demoSize != 0) {
 		ReadFileSync(hFile, DemoPtr, demoSize, &bytesRead, NULL);
 		IsDemoLoaded = TRUE;
@@ -1379,7 +1379,7 @@ BOOL S_LoadGameFlow(LPCTSTR fileName) {
 	ReadFileSync(hFile, offsets, sizeof(UINT16) * (GF_GameFlow.num_Levels + 1), &bytesRead, NULL);
 	ReadFileSync(hFile, &scriptSize, sizeof(scriptSize), &bytesRead, NULL);
 
-	GF_ScriptBuffer = (__int16*)GlobalAlloc(GMEM_FIXED, scriptSize);
+	GF_ScriptBuffer = (short*)GlobalAlloc(GMEM_FIXED, scriptSize);
 	if (GF_ScriptBuffer == NULL)
 		goto CLEANUP;
 

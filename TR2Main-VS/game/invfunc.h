@@ -39,19 +39,19 @@ void Inv_RemoveAllItems(); // 0x00424C90
 BOOL Inv_RemoveItem(GAME_OBJECT_ID itemID); // 0x00424CB0
 GAME_OBJECT_ID Inv_GetItemOption(GAME_OBJECT_ID itemID); // 0x00424DC0
 void RemoveInventoryText(); // 0x00424FB0
-void Inv_RingInit(RING_INFO* ring, __int16 type, INVENTORY_ITEM** itemList, __int16 objCount, __int16 currentObj, INV_MOTION_INFO* motionInfo); // 0x00424FE0
+void Inv_RingInit(RING_INFO* ring, short type, INVENTORY_ITEM** itemList, short objCount, short currentObj, INV_MOTION_INFO* motionInfo); // 0x00424FE0
 void Inv_RingGetView(RING_INFO* ring, PHD_3DPOS* view); // 0x004250F0
 void Inv_RingLight(RING_INFO* ring); // 0x00425150
-void Inv_RingCalcAdders(RING_INFO* ring, __int16 rotDuration); // 0x00425190
+void Inv_RingCalcAdders(RING_INFO* ring, short rotDuration); // 0x00425190
 void Inv_RingDoMotions(RING_INFO* ring); // 0x004251C0
 void Inv_RingRotateLeft(RING_INFO* ring); // 0x00425300
 void Inv_RingRotateRight(RING_INFO* ring); // 0x00425330
-void Inv_RingMotionInit(RING_INFO* ring, __int16 framesCount, __int16 status, __int16 statusTarget); // 0x00425360
-void Inv_RingMotionSetup(RING_INFO* ring, __int16 status, __int16 statusTarget, __int16 framesCount); // 0x004253D0
-void Inv_RingMotionRadius(RING_INFO* ring, __int16 target); // 0x00425400
-void Inv_RingMotionRotation(RING_INFO* ring, __int16 rotation, __int16 target); // 0x00425430
-void Inv_RingMotionCameraPos(RING_INFO* ring, __int16 target); // 0x00425460
-void Inv_RingMotionCameraPitch(RING_INFO* ring, __int16 target); // 0x00425490
+void Inv_RingMotionInit(RING_INFO* ring, short framesCount, short status, short statusTarget); // 0x00425360
+void Inv_RingMotionSetup(RING_INFO* ring, short status, short statusTarget, short framesCount); // 0x004253D0
+void Inv_RingMotionRadius(RING_INFO* ring, short target); // 0x00425400
+void Inv_RingMotionRotation(RING_INFO* ring, short rotation, short target); // 0x00425430
+void Inv_RingMotionCameraPos(RING_INFO* ring, short target); // 0x00425460
+void Inv_RingMotionCameraPitch(RING_INFO* ring, short target); // 0x00425490
 void Inv_RingMotionItemSelect(RING_INFO* ring, INVENTORY_ITEM* item); // 0x004254B0
 void Inv_RingMotionItemDeselect(RING_INFO* ring, INVENTORY_ITEM* item); // 0x00425510
 

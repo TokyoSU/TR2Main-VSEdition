@@ -32,10 +32,10 @@
 extern DWORD AlphaBlendMode;
 #endif // FEATURE_VIDEOFX_IMPROVED
 
-__int16 GunShot(int x, int y, int z, __int16 speed, __int16 rotY, __int16 roomNumber) {
+short GunShot(int x, int y, int z, short speed, short rotY, short roomNumber) {
 #ifdef FEATURE_VIDEOFX_IMPROVED
 	if (AlphaBlendMode) {
-		__int16 fx_id = CreateEffect(roomNumber);
+		short fx_id = CreateEffect(roomNumber);
 		if (fx_id >= 0) {
 			FX_INFO* fx = &Effects[fx_id];
 			fx->pos.x = x;
@@ -56,7 +56,7 @@ __int16 GunShot(int x, int y, int z, __int16 speed, __int16 rotY, __int16 roomNu
 		}
 	}
 #endif // FEATURE_VIDEOFX_IMPROVED
-	__int16 fx_id = CreateEffect(roomNumber);
+	short fx_id = CreateEffect(roomNumber);
 	if (fx_id >= 0) {
 		FX_INFO* fx = &Effects[fx_id];
 		fx->pos.x = x;
@@ -74,12 +74,12 @@ __int16 GunShot(int x, int y, int z, __int16 speed, __int16 rotY, __int16 roomNu
 	return fx_id;
 }
 
-__int16 GunHit(int x, int y, int z, __int16 speed, __int16 rotY, __int16 roomNumber) {
+short GunHit(int x, int y, int z, short speed, short rotY, short roomNumber) {
 	PHD_VECTOR pos = { 0, 0, 0 };
 	GetJointAbsPosition(LaraItem, &pos, GetRandomControl() * 25 / 0x7FFF);
 #ifdef FEATURE_CHEAT
 	if (Lara.water_status == LWS_Cheat) {
-		__int16 fxID = CreateEffect(roomNumber);
+		short fxID = CreateEffect(roomNumber);
 		if (fxID >= 0) {
 			FX_INFO* fx = &Effects[fxID];
 			fx->pos.x = pos.x;
@@ -104,7 +104,7 @@ __int16 GunHit(int x, int y, int z, __int16 speed, __int16 rotY, __int16 roomNum
 	return GunShot(x, y, z, speed, rotY, roomNumber);
 }
 
-__int16 GunMiss(int x, int y, int z, __int16 speed, __int16 rotY, __int16 roomNumber) {
+short GunMiss(int x, int y, int z, short speed, short rotY, short roomNumber) {
 	GAME_VECTOR pos;
 	pos.x = LaraItem->pos.x + (GetRandomDraw() - 0x4000) * 0x200 / 0x7FFF;
 	pos.y = LaraItem->floor;

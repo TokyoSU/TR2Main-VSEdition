@@ -57,7 +57,7 @@ int S_Sound_CalculateSampleVolume(DWORD volume) {
 	return (int)(((double)(S_MasterVolume * volume) / 0x200000.p0 - 1.0) * 5000.0);
 }
 
-int S_Sound_CalculateSamplePan(__int16 pan) {
+int S_Sound_CalculateSamplePan(short pan) {
 	return pan / 16;
 }
 
@@ -177,8 +177,8 @@ void S_CDLoop() {
 	}
 }
 
-void S_CDPlay(__int16 trackID, BOOL isLooped) {
-	__int16 track;
+void S_CDPlay(short trackID, BOOL isLooped) {
+	short track;
 	MCI_PLAY_PARMS playParams;
 
 #ifdef FEATURE_PAULD_CDAUDIO
@@ -221,7 +221,7 @@ void S_CDStop() {
 }
 
 BOOL StartSyncedAudio(int trackID) {
-	__int16 track;
+	short track;
 	MCI_PLAY_PARMS playParams;
 	MCI_SET_PARMS setParams;
 

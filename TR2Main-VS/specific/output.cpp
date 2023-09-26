@@ -69,12 +69,12 @@ DWORD PauseBackgroundMode = 1;
 #endif // FEATURE_BACKGROUND_IMPROVED
 
 typedef struct ShadowInfo_t {
-	__int16 x;
-	__int16 y;
-	__int16 z;
-	__int16 radius;
-	__int16 polyCount;
-	__int16 vertexCount;
+	short x;
+	short y;
+	short z;
+	short radius;
+	short polyCount;
+	short vertexCount;
 	POS_3D vertex[32]; // original size was 8
 } SHADOW_INFO;
 
@@ -342,7 +342,7 @@ void S_OutputPolyList() {
 	}
 }
 
-int S_GetObjectBounds(__int16* bPtr) {
+int S_GetObjectBounds(short* bPtr) {
 	int xMin, xMax, yMin, yMax, zMin, zMax;
 	int numZ, xv, yv, zv;
 	PHD_VECTOR vtx[8];
@@ -423,7 +423,7 @@ void S_InsertBackPolygon(int x0, int y0, int x1, int y1) {
 		PhdFarZ + 1, InvColours[ICLR_Black]);
 }
 
-void S_PrintShadow(__int16 radius, __int16* bPtr, ITEM_INFO* item) {
+void S_PrintShadow(short radius, short* bPtr, ITEM_INFO* item) {
 	static SHADOW_INFO ShadowInfo = {
 		0,
 		0,
@@ -502,7 +502,7 @@ void S_PrintShadow(__int16 radius, __int16* bPtr, ITEM_INFO* item) {
 	phd_PopMatrix();
 }
 
-void S_CalculateLight(int x, int y, int z, __int16 roomNumber) {
+void S_CalculateLight(int x, int y, int z, short roomNumber) {
 	ROOM_INFO* room;
 	int xDist, yDist, zDist, distance, radius, depth;
 	int xBrightest = 0, yBrightest = 0, zBrightest = 0;
@@ -618,7 +618,7 @@ void S_CalculateLight(int x, int y, int z, __int16 roomNumber) {
 		LsAdder = 0x1FFF;
 }
 
-void S_CalculateStaticLight(__int16 adder) {
+void S_CalculateStaticLight(short adder) {
 	int depth;
 
 	LsAdder = adder - 0x1000;
@@ -681,7 +681,7 @@ void S_LightRoom(ROOM_INFO* room) {
 		roomVtxCount = *room->data;
 		roomVtx = (ROOM_VERTEX_INFO*)(room->data + 1);
 		for (int i = 0; i < roomVtxCount; ++i) {
-			__int16 wibble = roomLightTable[roomVtx[i].lightTableValue % WIBBLE_SIZE];
+			short wibble = roomLightTable[roomVtx[i].lightTableValue % WIBBLE_SIZE];
 			roomVtx[i].lightAdder = roomVtx[i].lightBase + wibble;
 		}
 	}
@@ -893,8 +893,8 @@ void S_DrawAirBar(int percent) {
 
 void AnimateTextures(int nTicks) {
 	static int tickComp = 0;
-	__int16 i, j;
-	__int16* ptr;
+	short i, j;
+	short* ptr;
 	PHD_TEXTURE temp1, temp2;
 
 	tickComp += nTicks;

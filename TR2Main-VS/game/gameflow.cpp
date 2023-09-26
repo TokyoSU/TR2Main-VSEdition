@@ -41,12 +41,12 @@ bool LoadingScreensEnabled = true;
 static int CurrentEvent = GFE_END_SEQ; // NOTE: not presented in the original game
 
 // NOTE: there is no such function in the original code
-static bool GF_GetSequenceValue(DWORD levelID, GF_EVENTS event, __int16* pValue, __int16 defValue) {
+static bool GF_GetSequenceValue(DWORD levelID, GF_EVENTS event, short* pValue, short defValue) {
 	if (levelID >= GF_GameFlow.num_Levels) {
 		return false;
 	}
-	__int16* seq = GF_ScriptTable[levelID];
-	__int16 operand = 0;
+	short* seq = GF_ScriptTable[levelID];
+	short operand = 0;
 	bool result = false;
 
 	if (pValue != NULL) {
@@ -54,7 +54,7 @@ static bool GF_GetSequenceValue(DWORD levelID, GF_EVENTS event, __int16* pValue,
 	}
 
 	while (*seq != GFE_END_SEQ) {
-		__int16 seqCode = *seq;
+		short seqCode = *seq;
 		switch (seqCode) {
 		case GFE_STARTLEVEL:
 		case GFE_LOADINGPIC:
@@ -106,7 +106,7 @@ static bool GF_GetSequenceValue(DWORD levelID, GF_EVENTS event, __int16* pValue,
 
 // NOTE: there is no such function in the original code
 int GF_GetNumSecrets(DWORD levelID) {
-	__int16 result = 3;
+	short result = 3;
 	GF_GetSequenceValue(levelID, GFE_NUMSECRETS, &result, result);
 	return result;
 }
@@ -191,7 +191,7 @@ int GF_DoLevelSequence(DWORD levelID, GF_LEVEL_TYPE levelType) {
 	return GF_EXIT_TO_TITLE;
 }
 
-int GF_InterpretSequence(__int16* seq, GF_LEVEL_TYPE levelType, int seqType) {
+int GF_InterpretSequence(short* seq, GF_LEVEL_TYPE levelType, int seqType) {
 	int result = GF_EXIT_TO_TITLE;
 	int trackIndex = 0;
 	char str[80];
@@ -256,7 +256,7 @@ int GF_InterpretSequence(__int16* seq, GF_LEVEL_TYPE levelType, int seqType) {
 		case GFE_CUTSCENE:
 			if (levelType != GFL_SAVED) {
 				sprintf(str, "CUTSCENE %d %s", seq[1], GF_CutsFilesStringTable[seq[1]]);
-				__int16 storedLevel = CurrentLevel;
+				short storedLevel = CurrentLevel;
 				int cine_ret = StartCinematic(seq[1]);
 				CurrentLevel = storedLevel;
 				if (cine_ret == 2 && (levelType == GFL_STORY || levelType == GFL_MIDSTORY)) {

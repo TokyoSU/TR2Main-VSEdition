@@ -31,11 +31,11 @@
   //	0x00417900:		CreateBartoliLight
   //	0x004179E0:		DragonFire
 
-#define DragonCollision ((void(__cdecl*)(__int16, ITEM_INFO *, COLL_INFO *)) 0x00417A90)
-#define DragonBones ((void(__cdecl*)(__int16)) 0x00417D80)
-#define DragonControl ((void(__cdecl*)(__int16)) 0x00417E60)
-#define InitialiseBartoli ((void(__cdecl*)(__int16)) 0x004183B0)
-#define BartoliControl ((void(__cdecl*)(__int16)) 0x004184D0)
-#define DinoControl ((void(__cdecl*)(__int16)) 0x00418670)
+#define DragonCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x00417A90)
+#define DragonBones ((void(__cdecl*)(short)) 0x00417D80)
+#define DragonControl ((void(__cdecl*)(short)) 0x00417E60)
+#define InitialiseBartoli ((void(__cdecl*)(short)) 0x004183B0)
+#define BartoliControl ((void(__cdecl*)(short)) 0x004184D0)
+#define DinoControl ((void(__cdecl*)(short)) 0x00418670)
 
 #endif // DRAGON_H_INCLUDED

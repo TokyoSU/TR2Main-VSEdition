@@ -28,11 +28,11 @@
   * Function list
   */
 
-void ControlMissile(__int16 fxID); // 0x00433090
+void ControlMissile(short fxID); // 0x00433090
 
 // 0x00433360:		ShootAtLara
 
-#define ExplodingDeath ((BOOL(__cdecl*)(__int16, DWORD, __int16)) 0x00433410)
+#define ExplodingDeath ((BOOL(__cdecl*)(short, DWORD, short)) 0x00433410)
 
 // 0x004337A0:		ControlBodyPart
 

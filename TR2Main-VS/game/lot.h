@@ -29,8 +29,8 @@
   */
   //	0x00432B10:		InitialiseLOTarray
 
-#define DisableBaddieAI ((void(__cdecl*)(__int16)) 0x00432B70)
-#define EnableBaddieAI ((int(__cdecl*)(__int16, BOOL)) 0x00432BC0)
+#define DisableBaddieAI ((void(__cdecl*)(short)) 0x00432B70)
+#define EnableBaddieAI ((int(__cdecl*)(short, BOOL)) 0x00432BC0)
 
 //	0x00432D70:		InitialiseSlot
 //	0x00432F80:		CreateZone

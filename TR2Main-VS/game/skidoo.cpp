@@ -42,7 +42,7 @@ static BITE_INFO SkidooLeftGun = { 219, -71, 550, 0 };
 static BITE_INFO SkidooRightGun = { -235, -71, 550, 0 };
 
 void DoSnowEffect(ITEM_INFO* item) {
-	__int16 fxID;
+	short fxID;
 	FX_INFO* fx;
 	int displacement;
 
@@ -71,7 +71,7 @@ void DoSnowEffect(ITEM_INFO* item) {
 }
 
 void SkidooExplode(ITEM_INFO* item) {
-	__int16 fxID;
+	short fxID;
 	FX_INFO* fx;
 
 	fxID = CreateEffect(item->roomNumber);
@@ -99,7 +99,7 @@ void SkidooGuns() {
 	AimWeapon(weapon, &Lara.right_arm);
 
 	if (CHK_ANY(InputStatus, IN_ACTION)) {
-		__int16 angles[2];
+		short angles[2];
 		angles[0] = Lara.right_arm.y_rot + LaraItem->pos.rotY;
 		angles[1] = Lara.right_arm.x_rot;
 		if (FireWeapon(LGT_Skidoo, Lara.target, LaraItem, angles)) {
@@ -119,7 +119,7 @@ void SkidooGuns() {
 }
 
 void DrawSkidoo(ITEM_INFO* item) {
-	__int16* frames[2];
+	short* frames[2];
 	int rate = 0;
 	UINT16 flags = 0;
 	OBJECT_INFO* obj;
@@ -143,8 +143,8 @@ void DrawSkidoo(ITEM_INFO* item) {
 	if (clip) {
 		CalculateObjectLighting(item, frames[0]);
 
-		__int16** track = 0;
-		__int16** meshPtr = &MeshPtr[obj->meshIndex];
+		short** track = 0;
+		short** meshPtr = &MeshPtr[obj->meshIndex];
 		int* bonePtr = &AnimBones[obj->boneIndex];
 		if ((flags & 3) == 1) {
 			track = &MeshPtr[Objects[ID_SKIDOO_LARA].meshIndex + 1];

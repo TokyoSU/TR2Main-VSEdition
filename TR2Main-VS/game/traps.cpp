@@ -36,18 +36,18 @@
 #include "modding/joy_output.h"
 #endif // FEATURE_INPUT_IMPROVED
 
-void MineControl(__int16 mineID) {
+void MineControl(short mineID) {
 	ITEM_INFO* mine = &Items[mineID];
 	if (CHK_ANY(mine->flags, IFL_INVISIBLE)) {
 		return;
 	}
 
 	if (!MinesDetonated) {
-		__int16 roomNumber = mine->roomNumber;
+		short roomNumber = mine->roomNumber;
 		GetFloor(mine->pos.x, mine->pos.y - 0x800, mine->pos.z, &roomNumber);
 
 		ITEM_INFO* item = NULL;
-		__int16 itemID = RoomInfo[roomNumber].itemNumber;
+		short itemID = RoomInfo[roomNumber].itemNumber;
 		for (; itemID >= 0; itemID = item->nextItem) {
 			item = &Items[itemID];
 			if (item->objectID == ID_BOAT) {
@@ -82,7 +82,7 @@ void MineControl(__int16 mineID) {
 		return;
 	}
 
-	__int16 fxID = CreateEffect(mine->roomNumber);
+	short fxID = CreateEffect(mine->roomNumber);
 	if (fxID != -1)
 	{
 		FX_INFO* fx = &Effects[fxID];
@@ -105,10 +105,10 @@ void MineControl(__int16 mineID) {
 #endif // FEATURE_INPUT_IMPROVED
 }
 
-void ControlSpikeWall(__int16 itemID) {
+void ControlSpikeWall(short itemID) {
 	ITEM_INFO* item;
 	int x, z;
-	__int16 roomID;
+	short roomID;
 
 	item = &Items[itemID];
 	if (TriggerActive(item) && item->status != ITEM_DISABLED) {
@@ -135,10 +135,10 @@ void ControlSpikeWall(__int16 itemID) {
 	}
 }
 
-void ControlCeilingSpikes(__int16 itemID) {
+void ControlCeilingSpikes(short itemID) {
 	ITEM_INFO* item;
 	int y;
-	__int16 roomID;
+	short roomID;
 
 	item = &Items[itemID];
 	if (TriggerActive(item) && item->status != ITEM_DISABLED) {
@@ -163,7 +163,7 @@ void ControlCeilingSpikes(__int16 itemID) {
 	}
 }
 
-void HookControl(__int16 itemID) {
+void HookControl(short itemID) {
 	ITEM_INFO* item;
 	static BOOL IsHookHit = FALSE;
 
@@ -179,10 +179,10 @@ void HookControl(__int16 itemID) {
 	AnimateItem(item);
 }
 
-void SpinningBlade(__int16 itemID) {
+void SpinningBlade(short itemID) {
 	ITEM_INFO* item;
 	int x, z;
-	__int16 roomID;
+	short roomID;
 	BOOL reverse;
 
 	item = &Items[itemID];
@@ -217,9 +217,9 @@ void SpinningBlade(__int16 itemID) {
 		item->pos.rotY += PHD_180;
 }
 
-void IcicleControl(__int16 itemID) {
+void IcicleControl(short itemID) {
 	ITEM_INFO* item;
-	__int16 roomID;
+	short roomID;
 	FLOOR_INFO* floor;
 
 	item = &Items[itemID];
@@ -261,7 +261,7 @@ void IcicleControl(__int16 itemID) {
 	}
 }
 
-void InitialiseBlade(__int16 itemID) {
+void InitialiseBlade(short itemID) {
 	ITEM_INFO* item;
 
 	item = &Items[itemID];
@@ -270,7 +270,7 @@ void InitialiseBlade(__int16 itemID) {
 	item->frameNumber = Anims[item->animNumber].frameBase;
 }
 
-void BladeControl(__int16 itemID) {
+void BladeControl(short itemID) {
 	ITEM_INFO* item;
 
 	item = &Items[itemID];
@@ -288,7 +288,7 @@ void BladeControl(__int16 itemID) {
 	AnimateItem(item);
 }
 
-void InitialiseKillerStatue(__int16 itemID) {
+void InitialiseKillerStatue(short itemID) {
 	ITEM_INFO* item;
 
 	item = &Items[itemID];
@@ -297,7 +297,7 @@ void InitialiseKillerStatue(__int16 itemID) {
 	item->frameNumber = Anims[item->animNumber].frameBase;
 }
 
-void KillerStatueControl(__int16 itemID) {
+void KillerStatueControl(short itemID) {
 	ITEM_INFO* item;
 
 	item = &Items[itemID];
@@ -320,7 +320,7 @@ void KillerStatueControl(__int16 itemID) {
 	AnimateItem(item);
 }
 
-void Pendulum(__int16 itemID) {
+void Pendulum(short itemID) {
 	ITEM_INFO* item;
 
 	item = &Items[itemID];
@@ -338,7 +338,7 @@ void Pendulum(__int16 itemID) {
 	AnimateItem(item);
 }
 
-void TeethTrap(__int16 itemID) {
+void TeethTrap(short itemID) {
 	ITEM_INFO* item;
 	static BITE_INFO Teeth[3][2] = {
 		{{-23, 0, -1718, 0}, {71, 0, -1718, 1}},
@@ -366,9 +366,9 @@ void TeethTrap(__int16 itemID) {
 	AnimateItem(item);
 }
 
-void FallingCeiling(__int16 itemID) {
+void FallingCeiling(short itemID) {
 	ITEM_INFO* item;
-	__int16 roomID;
+	short roomID;
 
 	item = &Items[itemID];
 	if (!item->currentAnimState) {
@@ -399,9 +399,9 @@ void FallingCeiling(__int16 itemID) {
 	}
 }
 
-void DartEmitterControl(__int16 itemID) {
+void DartEmitterControl(short itemID) {
 	ITEM_INFO* item, * dynamic;
-	__int16 dynamicID;
+	short dynamicID;
 	int dx, dz;
 
 	item = &Items[itemID];
@@ -453,9 +453,9 @@ void DartEmitterControl(__int16 itemID) {
 	AnimateItem(item);
 }
 
-void DartsControl(__int16 itemID) {
+void DartsControl(short itemID) {
 	ITEM_INFO* item;
-	__int16 roomID, fxID;
+	short roomID, fxID;
 	FLOOR_INFO* floor;
 	FX_INFO* fx;
 
@@ -487,7 +487,7 @@ void DartsControl(__int16 itemID) {
 	}
 }
 
-void DartEffectControl(__int16 fxID) {
+void DartEffectControl(short fxID) {
 	FX_INFO* fx;
 
 	fx = &Effects[fxID];
@@ -500,9 +500,9 @@ void DartEffectControl(__int16 fxID) {
 	}
 }
 
-void FlameEmitterControl(__int16 item_id) {
+void FlameEmitterControl(short item_id) {
 	ITEM_INFO* item;
-	__int16 fxID;
+	short fxID;
 	FX_INFO* fx;
 
 	item = &Items[item_id];
@@ -529,7 +529,7 @@ void FlameEmitterControl(__int16 item_id) {
 	}
 }
 
-void FlameControl(__int16 fx_id) {
+void FlameControl(short fx_id) {
 	FX_INFO* fx = &Effects[fx_id];
 	if (--fx->frame_number <= Objects[ID_FLAME].nMeshes) {
 		fx->frame_number = 0;
@@ -590,7 +590,7 @@ void LaraBurn() {
 		return;
 	}
 
-	__int16 fx_id = CreateEffect(LaraItem->roomNumber);
+	short fx_id = CreateEffect(LaraItem->roomNumber);
 	if (fx_id < 0) {
 		return;
 	}
@@ -611,7 +611,7 @@ void LavaBurn(ITEM_INFO* item) {
 		return;
 	}
 
-	__int16 room_number = item->roomNumber;
+	short room_number = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.x, 32000, item->pos.z, &room_number);
 	if (item->floor != GetHeight(floor, item->pos.x, 32000, item->pos.z)) {
 		return;
@@ -620,7 +620,7 @@ void LavaBurn(ITEM_INFO* item) {
 	item->hitStatus = 1;
 	item->hitPoints = -1;
 	for (int i = 0; i < 10; ++i) {
-		__int16 fx_id = CreateEffect(item->roomNumber);
+		short fx_id = CreateEffect(item->roomNumber);
 		if (fx_id < 0) continue;
 		FX_INFO* fx = &Effects[fx_id];
 		fx->object_number = ID_FLAME;

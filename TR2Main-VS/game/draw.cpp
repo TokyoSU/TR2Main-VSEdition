@@ -31,7 +31,7 @@
 #ifdef FEATURE_EXTENDED_LIMITS
 LIGHT_INFO DynamicLights[64];
 int BoundRooms[1024];
-__int16 DrawRoomsArray[1024];
+short DrawRoomsArray[1024];
 STATIC_INFO StaticObjects[256];
 #endif // FEATURE_EXTENDED_LIMITS
 
@@ -44,7 +44,7 @@ void ResetGoldenLaraAlpha() {
 }
 #endif // FEATURE_VIDEOFX_IMPROVED
 
-void DrawRooms(__int16 currentRoom) {
+void DrawRooms(short currentRoom) {
 	ROOM_INFO* room = &RoomInfo[currentRoom];
 
 	PhdWinLeft = room->left = 0;
@@ -200,14 +200,14 @@ void GetRoomBounds() {
 				+ door->y * (room->y + door->vertex[0].y - MatrixW2V._13)
 				+ door->z * (room->z + door->vertex[0].z - MatrixW2V._23) < 0)
 			{
-				SetRoomBounds((__int16*)&door->x, door->room, room);
+				SetRoomBounds((short*)&door->x, door->room, room);
 			}
 		}
 		phd_PopMatrix();
 	}
 }
 
-void SetRoomBounds(__int16* ptrObj, int roomNumber, ROOM_INFO* parent) {
+void SetRoomBounds(short* ptrObj, int roomNumber, ROOM_INFO* parent) {
 	ROOM_INFO* room = &RoomInfo[roomNumber];
 	if (room->boundLeft <= parent->left
 		&& room->boundRight >= parent->right
@@ -389,7 +389,7 @@ void ClipRoom(ROOM_INFO* room) {
 	}
 }
 
-void PrintRooms(__int16 roomNumber) {
+void PrintRooms(short roomNumber) {
 	ROOM_INFO* room = &RoomInfo[roomNumber];
 #ifdef FEATURE_VIEW_IMPROVED
 	if (CHK_ANY(room->boundActive, 4)) {
@@ -423,7 +423,7 @@ void PrintRooms(__int16 roomNumber) {
 #endif // FEATURE_VIEW_IMPROVED
 }
 
-void PrintObjects(__int16 roomNumber) {
+void PrintObjects(short roomNumber) {
 	ROOM_INFO* room = &RoomInfo[roomNumber];
 	if (CHK_ANY(room->flags, ROOM_UNDERWATER)) {
 		S_SetupBelowWater(UnderwaterCamera);
@@ -452,7 +452,7 @@ void PrintObjects(__int16 roomNumber) {
 		phd_PushMatrix();
 		phd_TranslateAbs(mesh[i].x, mesh[i].y, mesh[i].z);
 		phd_RotY(mesh[i].yRot);
-		__int16 clip = S_GetObjectBounds((__int16*)&StaticObjects[mesh[i].staticNumber].drawBounds);
+		short clip = S_GetObjectBounds((short*)&StaticObjects[mesh[i].staticNumber].drawBounds);
 		if (clip) {
 			S_CalculateStaticMeshLight(mesh[i].x, mesh[i].y, mesh[i].z, mesh[i].shade1, mesh[i].shade2, room);
 #ifdef FEATURE_VIDEOFX_IMPROVED
@@ -471,13 +471,13 @@ void PrintObjects(__int16 roomNumber) {
 	PhdWinRight = PhdWinMaxX + 1;
 	PhdWinBottom = PhdWinMaxY + 1;
 
-	for (__int16 id = room->itemNumber; id >= 0; id = Items[id].nextItem) {
+	for (short id = room->itemNumber; id >= 0; id = Items[id].nextItem) {
 		if (Items[id].status != ITEM_INVISIBLE) {
 			Objects[Items[id].objectID].drawRoutine(&Items[id]);
 		}
 	}
 
-	for (__int16 id = room->fxNumber; id >= 0; id = Effects[id].next_fx) {
+	for (short id = room->fxNumber; id >= 0; id = Effects[id].next_fx) {
 		DrawEffect(id);
 	}
 
@@ -488,7 +488,7 @@ void PrintObjects(__int16 roomNumber) {
 	room->boundBottom = 0;
 }
 
-void DrawEffect(__int16 fx_id) {
+void DrawEffect(short fx_id) {
 	FX_INFO* fx = &Effects[fx_id];
 	OBJECT_INFO* obj = &Objects[fx->object_number];
 	if (!obj->loaded) return;
@@ -509,7 +509,7 @@ void DrawEffect(__int16 fx_id) {
 		phd_PushMatrix();
 		phd_TranslateAbs(fx->pos.x, fx->pos.y, fx->pos.z);
 		if (PhdMatrixPtr->_23 > PhdNearZ && PhdMatrixPtr->_23 < PhdFarZ) {
-			__int16* meshPtr = NULL;
+			short* meshPtr = NULL;
 			phd_RotYXZ(fx->pos.rotY, fx->pos.rotX, fx->pos.rotZ);
 			S_CalculateStaticLight(fx->shade);
 			if (obj->nMeshes) {
@@ -545,8 +545,8 @@ void DrawDummyItem(ITEM_INFO* item) {
 }
 
 void DrawAnimatingItem(ITEM_INFO* item) {
-	static __int16 no_rotation[12] = { 0 };
-	__int16* frames[2] = { 0 };
+	static short no_rotation[12] = { 0 };
+	short* frames[2] = { 0 };
 	int rate = 0;
 	DWORD bit = 1;
 	int frac = GetFrames(item, frames, &rate);
@@ -564,8 +564,8 @@ void DrawAnimatingItem(ITEM_INFO* item) {
 	if (clip) {
 		CalculateObjectLighting(item, frames[0]);
 
-		__int16* rots = item->data ? (__int16*)item->data : no_rotation;
-		__int16** meshPtr = &MeshPtr[obj->meshIndex];
+		short* rots = item->data ? (short*)item->data : no_rotation;
+		short** meshPtr = &MeshPtr[obj->meshIndex];
 		int* bonePtr = &AnimBones[obj->boneIndex];
 		if (frac) {
 			InitInterpolate(frac, rate);
@@ -671,13 +671,13 @@ void DrawAnimatingItem(ITEM_INFO* item) {
 	phd_PopMatrix();
 }
 
-void DrawLaraInt(ITEM_INFO* item, __int16* frame1, __int16* frame2, int frac, int rate) {
+void DrawLaraInt(ITEM_INFO* item, short* frame1, short* frame2, int frac, int rate) {
 	PHD_MATRIX matrix;
 	UINT16* rot1, * rot2, * rot1copy, * rot2copy;
 	int frame, * bones;
 
 	OBJECT_INFO* obj = &Objects[item->objectID];
-	__int16* bounds = GetBoundsAccurate(item);
+	short* bounds = GetBoundsAccurate(item);
 	if (Lara.skidoo == -1) {
 		S_PrintShadow(obj->shadowSize, bounds, item);
 	}
@@ -940,7 +940,7 @@ void phd_RotYXZsuperpack(UINT16** pptr, int index) {
 	}
 }
 
-void phd_PutPolygons_I(__int16* ptrObj, int clip) {
+void phd_PutPolygons_I(short* ptrObj, int clip) {
 	phd_PushMatrix();
 	InterpolateMatrix();
 	phd_PutPolygons(ptrObj, clip);
@@ -948,7 +948,7 @@ void phd_PutPolygons_I(__int16* ptrObj, int clip) {
 }
 
 void DrawGunFlash(int weapon, int clip) {
-	__int16 light;
+	short light;
 	int len;
 	int off;
 

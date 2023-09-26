@@ -138,7 +138,7 @@ static POLYTYPE GetPolyType(UINT16 drawtype) {
 	return POLY_HWR_WGTmap;
 }
 
-bool InsertObjectEM(__int16* ptrObj, int vtxCount, D3DCOLOR tint, PHD_UV* em_uv) {
+bool InsertObjectEM(short* ptrObj, int vtxCount, D3DCOLOR tint, PHD_UV* em_uv) {
 	PHD_VBUF* vtx[4];
 	PHD_TEXTURE texture;
 	PHD_UV* uv = texture.uv;
@@ -177,7 +177,7 @@ void InsertGourQuad(int x0, int y0, int x1, int y1, int z, D3DCOLOR color0, D3DC
 	*(Info3dPtr++) = POLY_HWR_trans;
 	*(Info3dPtr++) = 4; //  vertex count
 	*(D3DTLVERTEX**)Info3dPtr = HWR_VertexPtr;
-	Info3dPtr += sizeof(D3DTLVERTEX*) / sizeof(__int16);
+	Info3dPtr += sizeof(D3DTLVERTEX*) / sizeof(short);
 
 	rhw = RhwFactor / (double)z;
 	sz = FltResZBuf - rhw * FltResZORhw;
@@ -363,12 +363,12 @@ int XYGUVClipper(int vtxCount, VERTEX_INFO* vtx) {
 	return (j < 3) ? 0 : j;
 }
 
-__int16* __cdecl InsertObjectGT4(__int16* ptrObj, int number, SORTTYPE sortType) {
+short* __cdecl InsertObjectGT4(short* ptrObj, int number, SORTTYPE sortType) {
 	char clipOR, clipAND;
 	PHD_VBUF* vtx0, * vtx1, * vtx2, * vtx3;
 	int i, j, nPoints;
 	float zv;
-	__int16 textureIdx;
+	short textureIdx;
 	PHD_TEXTURE* texture;
 	PHD_UV* uv;
 	POINT_INFO points[4];
@@ -437,41 +437,41 @@ __int16* __cdecl InsertObjectGT4(__int16* ptrObj, int number, SORTTYPE sortType)
 					*Info3dPtr++ = (int)vtx0->ys;
 					*Info3dPtr++ = (int)vtx0->g;
 					*(float*)Info3dPtr = vtx0->rhw;
-					Info3dPtr += sizeof(float) / sizeof(__int16);
+					Info3dPtr += sizeof(float) / sizeof(short);
 					*(float*)Info3dPtr = (double)uv[0].u * vtx0->rhw;
-					Info3dPtr += sizeof(float) / sizeof(__int16);
+					Info3dPtr += sizeof(float) / sizeof(short);
 					*(float*)Info3dPtr = (double)uv[0].v * vtx0->rhw;
-					Info3dPtr += sizeof(float) / sizeof(__int16);
+					Info3dPtr += sizeof(float) / sizeof(short);
 
 					*Info3dPtr++ = (int)vtx1->xs;
 					*Info3dPtr++ = (int)vtx1->ys;
 					*Info3dPtr++ = (int)vtx1->g;
 					*(float*)Info3dPtr = vtx1->rhw;
-					Info3dPtr += sizeof(float) / sizeof(__int16);
+					Info3dPtr += sizeof(float) / sizeof(short);
 					*(float*)Info3dPtr = (double)uv[1].u * vtx1->rhw;
-					Info3dPtr += sizeof(float) / sizeof(__int16);
+					Info3dPtr += sizeof(float) / sizeof(short);
 					*(float*)Info3dPtr = (double)uv[1].v * vtx1->rhw;
-					Info3dPtr += sizeof(float) / sizeof(__int16);
+					Info3dPtr += sizeof(float) / sizeof(short);
 
 					*Info3dPtr++ = (int)vtx2->xs;
 					*Info3dPtr++ = (int)vtx2->ys;
 					*Info3dPtr++ = (int)vtx2->g;
 					*(float*)Info3dPtr = vtx2->rhw;
-					Info3dPtr += sizeof(float) / sizeof(__int16);
+					Info3dPtr += sizeof(float) / sizeof(short);
 					*(float*)Info3dPtr = (double)uv[2].u * vtx2->rhw;
-					Info3dPtr += sizeof(float) / sizeof(__int16);
+					Info3dPtr += sizeof(float) / sizeof(short);
 					*(float*)Info3dPtr = (double)uv[2].v * vtx2->rhw;
-					Info3dPtr += sizeof(float) / sizeof(__int16);
+					Info3dPtr += sizeof(float) / sizeof(short);
 
 					*Info3dPtr++ = (int)vtx3->xs;
 					*Info3dPtr++ = (int)vtx3->ys;
 					*Info3dPtr++ = (int)vtx3->g;
 					*(float*)Info3dPtr = vtx3->rhw;
-					Info3dPtr += sizeof(float) / sizeof(__int16);
+					Info3dPtr += sizeof(float) / sizeof(short);
 					*(float*)Info3dPtr = (double)uv[3].u * vtx3->rhw;
-					Info3dPtr += sizeof(float) / sizeof(__int16);
+					Info3dPtr += sizeof(float) / sizeof(short);
 					*(float*)Info3dPtr = (double)uv[3].v * vtx3->rhw;
-					Info3dPtr += sizeof(float) / sizeof(__int16);
+					Info3dPtr += sizeof(float) / sizeof(short);
 				}
 				++SurfaceCount;
 				continue;
@@ -584,11 +584,11 @@ __int16* __cdecl InsertObjectGT4(__int16* ptrObj, int number, SORTTYPE sortType)
 				*Info3dPtr++ = (int)VBuffer[j].y;
 				*Info3dPtr++ = (int)VBuffer[j].g;
 				*(float*)Info3dPtr = VBuffer[j].rhw;
-				Info3dPtr += sizeof(float) / sizeof(__int16);
+				Info3dPtr += sizeof(float) / sizeof(short);
 				*(float*)Info3dPtr = VBuffer[j].u;
-				Info3dPtr += sizeof(float) / sizeof(__int16);
+				Info3dPtr += sizeof(float) / sizeof(short);
 				*(float*)Info3dPtr = VBuffer[j].v;
-				Info3dPtr += sizeof(float) / sizeof(__int16);
+				Info3dPtr += sizeof(float) / sizeof(short);
 			}
 		}
 		++SurfaceCount;
@@ -597,12 +597,12 @@ __int16* __cdecl InsertObjectGT4(__int16* ptrObj, int number, SORTTYPE sortType)
 	return ptrObj;
 }
 
-__int16* __cdecl InsertObjectGT3(__int16* ptrObj, int number, SORTTYPE sortType) {
+short* __cdecl InsertObjectGT3(short* ptrObj, int number, SORTTYPE sortType) {
 	char clipOR, clipAND;
 	PHD_VBUF* vtx0, * vtx1, * vtx2;
 	int i, j, nPoints;
 	float zv;
-	__int16 textureIdx;
+	short textureIdx;
 	PHD_TEXTURE* texture;
 	PHD_UV* uv;
 	POINT_INFO points[3];
@@ -664,31 +664,31 @@ __int16* __cdecl InsertObjectGT3(__int16* ptrObj, int number, SORTTYPE sortType)
 					*Info3dPtr++ = (int)vtx0->ys;
 					*Info3dPtr++ = (int)vtx0->g;
 					*(float*)Info3dPtr = vtx0->rhw;
-					Info3dPtr += sizeof(float) / sizeof(__int16);
+					Info3dPtr += sizeof(float) / sizeof(short);
 					*(float*)Info3dPtr = (double)uv[0].u * vtx0->rhw;
-					Info3dPtr += sizeof(float) / sizeof(__int16);
+					Info3dPtr += sizeof(float) / sizeof(short);
 					*(float*)Info3dPtr = (double)uv[0].v * vtx0->rhw;
-					Info3dPtr += sizeof(float) / sizeof(__int16);
+					Info3dPtr += sizeof(float) / sizeof(short);
 
 					*Info3dPtr++ = (int)vtx1->xs;
 					*Info3dPtr++ = (int)vtx1->ys;
 					*Info3dPtr++ = (int)vtx1->g;
 					*(float*)Info3dPtr = vtx1->rhw;
-					Info3dPtr += sizeof(float) / sizeof(__int16);
+					Info3dPtr += sizeof(float) / sizeof(short);
 					*(float*)Info3dPtr = (double)uv[1].u * vtx1->rhw;
-					Info3dPtr += sizeof(float) / sizeof(__int16);
+					Info3dPtr += sizeof(float) / sizeof(short);
 					*(float*)Info3dPtr = (double)uv[1].v * vtx1->rhw;
-					Info3dPtr += sizeof(float) / sizeof(__int16);
+					Info3dPtr += sizeof(float) / sizeof(short);
 
 					*Info3dPtr++ = (int)vtx2->xs;
 					*Info3dPtr++ = (int)vtx2->ys;
 					*Info3dPtr++ = (int)vtx2->g;
 					*(float*)Info3dPtr = vtx2->rhw;
-					Info3dPtr += sizeof(float) / sizeof(__int16);
+					Info3dPtr += sizeof(float) / sizeof(short);
 					*(float*)Info3dPtr = (double)uv[2].u * vtx2->rhw;
-					Info3dPtr += sizeof(float) / sizeof(__int16);
+					Info3dPtr += sizeof(float) / sizeof(short);
 					*(float*)Info3dPtr = (double)uv[2].v * vtx2->rhw;
-					Info3dPtr += sizeof(float) / sizeof(__int16);
+					Info3dPtr += sizeof(float) / sizeof(short);
 				}
 				++SurfaceCount;
 				continue;
@@ -784,11 +784,11 @@ __int16* __cdecl InsertObjectGT3(__int16* ptrObj, int number, SORTTYPE sortType)
 				*Info3dPtr++ = (int)VBuffer[j].y;
 				*Info3dPtr++ = (int)VBuffer[j].g;
 				*(float*)Info3dPtr = VBuffer[j].rhw;
-				Info3dPtr += sizeof(float) / sizeof(__int16);
+				Info3dPtr += sizeof(float) / sizeof(short);
 				*(float*)Info3dPtr = VBuffer[j].u;
-				Info3dPtr += sizeof(float) / sizeof(__int16);
+				Info3dPtr += sizeof(float) / sizeof(short);
 				*(float*)Info3dPtr = VBuffer[j].v;
-				Info3dPtr += sizeof(float) / sizeof(__int16);
+				Info3dPtr += sizeof(float) / sizeof(short);
 			}
 		}
 		++SurfaceCount;
@@ -903,7 +903,7 @@ int XYGClipper(int vtxCount, VERTEX_INFO* vtx) {
 	return (j < 3) ? 0 : j;
 }
 
-__int16* __cdecl InsertObjectG4(__int16* ptrObj, int number, SORTTYPE sortType) {
+short* __cdecl InsertObjectG4(short* ptrObj, int number, SORTTYPE sortType) {
 	char clipOR, clipAND;
 	PHD_VBUF* vtx0, * vtx1, * vtx2, * vtx3;
 	int i, j, nPoints;
@@ -1018,7 +1018,7 @@ __int16* __cdecl InsertObjectG4(__int16* ptrObj, int number, SORTTYPE sortType) 
 	return ptrObj;
 }
 
-__int16* __cdecl InsertObjectG3(__int16* ptrObj, int number, SORTTYPE sortType) {
+short* __cdecl InsertObjectG3(short* ptrObj, int number, SORTTYPE sortType) {
 	char clipOR, clipAND;
 	PHD_VBUF* vtx0, * vtx1, * vtx2;
 	int i, j, nPoints;
@@ -1226,7 +1226,7 @@ int XYClipper(int vtxCount, VERTEX_INFO* vtx) {
 	return (j < 3) ? 0 : j;
 }
 
-void InsertTrans8(PHD_VBUF* vbuf, __int16 shade) {
+void InsertTrans8(PHD_VBUF* vbuf, short shade) {
 	int i, nPoints, polyZ;
 	char clipOR = 0x00;
 	char clipAND = 0xFF;
@@ -1560,7 +1560,7 @@ void InsertGT4_ZBuffered(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_VBU
 	}
 }
 
-__int16* __cdecl InsertObjectGT4_ZBuffered(__int16* ptrObj, int number, SORTTYPE sortType) {
+short* __cdecl InsertObjectGT4_ZBuffered(short* ptrObj, int number, SORTTYPE sortType) {
 	PHD_VBUF* vtx0, * vtx1, * vtx2, * vtx3;
 	PHD_TEXTURE* texture;
 
@@ -1581,7 +1581,7 @@ __int16* __cdecl InsertObjectGT4_ZBuffered(__int16* ptrObj, int number, SORTTYPE
 	return ptrObj;
 }
 
-__int16* __cdecl InsertObjectGT3_ZBuffered(__int16* ptrObj, int number, SORTTYPE sortType) {
+short* __cdecl InsertObjectGT3_ZBuffered(short* ptrObj, int number, SORTTYPE sortType) {
 	PHD_VBUF* vtx0, * vtx1, * vtx2;
 	PHD_TEXTURE* texture;
 	PHD_UV* uv;
@@ -1603,11 +1603,11 @@ __int16* __cdecl InsertObjectGT3_ZBuffered(__int16* ptrObj, int number, SORTTYPE
 	return ptrObj;
 }
 
-__int16* __cdecl InsertObjectG4_ZBuffered(__int16* ptrObj, int number, SORTTYPE sortType) {
+short* __cdecl InsertObjectG4_ZBuffered(short* ptrObj, int number, SORTTYPE sortType) {
 	char clipOR, clipAND;
 	PHD_VBUF* vtx0, * vtx1, * vtx2, * vtx3;
 	int i, nPoints;
-	__int16 colorIdx;
+	short colorIdx;
 	POINT_INFO pts[4];
 
 	HWR_TexSource(0);
@@ -1736,11 +1736,11 @@ void DrawPoly_Gouraud(int vtxCount, int red, int green, int blue) {
 	HWR_DrawPrimitive(D3DPT_TRIANGLEFAN, VBufferD3D, vtxCount, true);
 }
 
-__int16* __cdecl InsertObjectG3_ZBuffered(__int16* ptrObj, int number, SORTTYPE sortType) {
+short* __cdecl InsertObjectG3_ZBuffered(short* ptrObj, int number, SORTTYPE sortType) {
 	char clipOR, clipAND;
 	PHD_VBUF* vtx0, * vtx1, * vtx2;
 	int i, nPoints;
-	__int16 colorIdx;
+	short colorIdx;
 	POINT_INFO pts[3];
 
 	HWR_TexSource(0);
@@ -1939,7 +1939,7 @@ void InsertGT3_Sorted(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_TEXTUR
 			* Info3dPtr++ = texture->tpage;
 			*Info3dPtr++ = 3;
 			*(D3DTLVERTEX**)Info3dPtr = HWR_VertexPtr;
-			Info3dPtr += sizeof(D3DTLVERTEX*) / sizeof(__int16);
+			Info3dPtr += sizeof(D3DTLVERTEX*) / sizeof(short);
 
 			HWR_VertexPtr[0].sx = vtx0->xs;
 			HWR_VertexPtr[0].sy = vtx0->ys;
@@ -2040,7 +2040,7 @@ void InsertGT3_Sorted(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_TEXTUR
 #endif // FEATURE_VIDEOFX_IMPROVED
 }
 
-void InsertClippedPoly_Textured(int vtxCount, float z, __int16 polyType, __int16 texPage) {
+void InsertClippedPoly_Textured(int vtxCount, float z, short polyType, short texPage) {
 	double tu, tv;
 
 	Sort3dPtr->_0 = (DWORD)Info3dPtr;
@@ -2051,7 +2051,7 @@ void InsertClippedPoly_Textured(int vtxCount, float z, __int16 polyType, __int16
 	*(Info3dPtr++) = texPage;
 	*(Info3dPtr++) = vtxCount;
 	*(D3DTLVERTEX**)Info3dPtr = HWR_VertexPtr;
-	Info3dPtr += sizeof(D3DTLVERTEX*) / sizeof(__int16);
+	Info3dPtr += sizeof(D3DTLVERTEX*) / sizeof(short);
 
 	for (int i = 0; i < vtxCount; ++i) {
 		tu = VBuffer[i].u / double(PHD_ONE) / VBuffer[i].rhw;
@@ -2095,7 +2095,7 @@ void InsertGT4_Sorted(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_VBUF* 
 		* Info3dPtr++ = texture->tpage;
 		*Info3dPtr++ = 4;
 		*(D3DTLVERTEX**)Info3dPtr = HWR_VertexPtr;
-		Info3dPtr += sizeof(D3DTLVERTEX*) / sizeof(__int16);
+		Info3dPtr += sizeof(D3DTLVERTEX*) / sizeof(short);
 
 		HWR_VertexPtr[0].sx = vtx0->xs;
 		HWR_VertexPtr[0].sy = vtx0->ys;
@@ -2140,7 +2140,7 @@ void InsertGT4_Sorted(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_VBUF* 
 	}
 }
 
-__int16* __cdecl InsertObjectGT4_Sorted(__int16* ptrObj, int number, SORTTYPE sortType) {
+short* __cdecl InsertObjectGT4_Sorted(short* ptrObj, int number, SORTTYPE sortType) {
 	PHD_VBUF* vtx0, * vtx1, * vtx2, * vtx3;
 	PHD_TEXTURE* texture;
 
@@ -2162,7 +2162,7 @@ __int16* __cdecl InsertObjectGT4_Sorted(__int16* ptrObj, int number, SORTTYPE so
 	return ptrObj;
 }
 
-__int16* __cdecl InsertObjectGT3_Sorted(__int16* ptrObj, int number, SORTTYPE sortType) {
+short* __cdecl InsertObjectGT3_Sorted(short* ptrObj, int number, SORTTYPE sortType) {
 	PHD_VBUF* vtx0, * vtx1, * vtx2;
 	PHD_TEXTURE* texture;
 	PHD_UV* uv;
@@ -2185,12 +2185,12 @@ __int16* __cdecl InsertObjectGT3_Sorted(__int16* ptrObj, int number, SORTTYPE so
 	return ptrObj;
 }
 
-__int16* __cdecl InsertObjectG4_Sorted(__int16* ptrObj, int number, SORTTYPE sortType) {
+short* __cdecl InsertObjectG4_Sorted(short* ptrObj, int number, SORTTYPE sortType) {
 	char clipOR, clipAND;
 	PHD_VBUF* vtx0, * vtx1, * vtx2, * vtx3;
 	int i, nPoints;
 	float zv;
-	__int16 colorIdx;
+	short colorIdx;
 	PALETTEENTRY* color;
 	POINT_INFO pts[4];
 
@@ -2304,7 +2304,7 @@ __int16* __cdecl InsertObjectG4_Sorted(__int16* ptrObj, int number, SORTTYPE sor
 	return ptrObj;
 }
 
-void InsertPoly_Gouraud(int vtxCount, float z, int red, int green, int blue, __int16 polyType) {
+void InsertPoly_Gouraud(int vtxCount, float z, int red, int green, int blue, short polyType) {
 	BYTE alpha = (polyType == POLY_HWR_trans) ? 0x80 : 0xFF;
 
 	Sort3dPtr->_0 = (DWORD)Info3dPtr;
@@ -2314,7 +2314,7 @@ void InsertPoly_Gouraud(int vtxCount, float z, int red, int green, int blue, __i
 	*(Info3dPtr++) = polyType;
 	*(Info3dPtr++) = vtxCount;
 	*(D3DTLVERTEX**)Info3dPtr = HWR_VertexPtr;
-	Info3dPtr += sizeof(D3DTLVERTEX*) / sizeof(__int16);
+	Info3dPtr += sizeof(D3DTLVERTEX*) / sizeof(short);
 
 	for (int i = 0; i < vtxCount; ++i) {
 		HWR_VertexPtr[i].sx = VBuffer[i].x;
@@ -2328,12 +2328,12 @@ void InsertPoly_Gouraud(int vtxCount, float z, int red, int green, int blue, __i
 	++SurfaceCount;
 }
 
-__int16* __cdecl InsertObjectG3_Sorted(__int16* ptrObj, int number, SORTTYPE sortType) {
+short* __cdecl InsertObjectG3_Sorted(short* ptrObj, int number, SORTTYPE sortType) {
 	char clipOR, clipAND;
 	PHD_VBUF* vtx0, * vtx1, * vtx2;
 	int i, nPoints;
 	float zv;
-	__int16 colorIdx;
+	short colorIdx;
 	PALETTEENTRY* color;
 	POINT_INFO pts[3];
 
@@ -2434,10 +2434,10 @@ __int16* __cdecl InsertObjectG3_Sorted(__int16* ptrObj, int number, SORTTYPE sor
 }
 
 #ifdef FEATURE_VIDEOFX_IMPROVED
-void InsertSprite_Sorted(int z, int x0, int y0, int x1, int y1, int spriteIdx, __int16 shade, DWORD flags) {
+void InsertSprite_Sorted(int z, int x0, int y0, int x1, int y1, int spriteIdx, short shade, DWORD flags) {
 	if (TextureFormat.bpp < 16 && CHK_ANY(flags, SPR_TINT)) return; // tinted sprites are not supported for 8 bit textured mode
 #else // FEATURE_VIDEOFX_IMPROVED
-void InsertSprite_Sorted(int z, int x0, int y0, int x1, int y1, int spriteIdx, __int16 shade) {
+void InsertSprite_Sorted(int z, int x0, int y0, int x1, int y1, int spriteIdx, short shade) {
 #endif // FEATURE_VIDEOFX_IMPROVED
 	double rhw, u0, v0, u1, v1;
 	int uOffset, vOffset, nPoints;
@@ -2559,7 +2559,7 @@ void InsertFlatRect_Sorted(int x0, int y0, int x1, int y1, int z, BYTE colorIdx)
 	*(Info3dPtr++) = POLY_HWR_gouraud;
 	*(Info3dPtr++) = 4; //  vertex count
 	*(D3DTLVERTEX**)Info3dPtr = HWR_VertexPtr;
-	Info3dPtr += sizeof(D3DTLVERTEX*) / sizeof(__int16);
+	Info3dPtr += sizeof(D3DTLVERTEX*) / sizeof(short);
 
 	color = shadeColor(GamePalette8[colorIdx].red, GamePalette8[colorIdx].green, GamePalette8[colorIdx].blue, 0xFF, 0, false);
 	rhw = RhwFactor / (double)z;
@@ -2595,7 +2595,7 @@ void InsertLine_Sorted(int x0, int y0, int x1, int y1, int z, BYTE colorIdx) {
 	*(Info3dPtr++) = POLY_HWR_line;
 	*(Info3dPtr++) = 2; //  vertex count
 	*(D3DTLVERTEX**)Info3dPtr = HWR_VertexPtr;
-	Info3dPtr += sizeof(D3DTLVERTEX*) / sizeof(__int16);
+	Info3dPtr += sizeof(D3DTLVERTEX*) / sizeof(short);
 
 	color = shadeColor(GamePalette8[colorIdx].red, GamePalette8[colorIdx].green, GamePalette8[colorIdx].blue, 0xFF, 0, false);
 	rhw = RhwFactor / (double)z;
@@ -2616,7 +2616,7 @@ void InsertLine_Sorted(int x0, int y0, int x1, int y1, int z, BYTE colorIdx) {
 	++SurfaceCount;
 }
 
-void InsertTrans8_Sorted(PHD_VBUF * vbuf, __int16 shade) {
+void InsertTrans8_Sorted(PHD_VBUF * vbuf, short shade) {
 	int i, nPoints, polyZ;
 	char clipOR = 0x00;
 	char clipAND = 0xFF;
@@ -2680,7 +2680,7 @@ void InsertTransQuad_Sorted(int x, int y, int width, int height, int z) {
 	*(Info3dPtr++) = POLY_HWR_trans;
 	*(Info3dPtr++) = 4; //  vertex count
 	*(D3DTLVERTEX**)Info3dPtr = HWR_VertexPtr;
-	Info3dPtr += sizeof(D3DTLVERTEX*) / sizeof(__int16);
+	Info3dPtr += sizeof(D3DTLVERTEX*) / sizeof(short);
 
 	x0 = (float)x;
 	y0 = (float)y;
@@ -2710,10 +2710,10 @@ void InsertTransQuad_Sorted(int x, int y, int width, int height, int z) {
 }
 
 #ifdef FEATURE_VIDEOFX_IMPROVED
-void InsertSprite(int z, int x0, int y0, int x1, int y1, int spriteIdx, __int16 shade, DWORD flags) {
+void InsertSprite(int z, int x0, int y0, int x1, int y1, int spriteIdx, short shade, DWORD flags) {
 	if (CHK_ANY(flags, SPR_TINT)) return; // tinted sprites are not supported by software renderer yet
 #else // FEATURE_VIDEOFX_IMPROVED
-void InsertSprite(int z, int x0, int y0, int x1, int y1, int spriteIdx, __int16 shade) {
+void InsertSprite(int z, int x0, int y0, int x1, int y1, int spriteIdx, short shade) {
 #endif // FEATURE_VIDEOFX_IMPROVED
 	Sort3dPtr->_0 = (DWORD)Info3dPtr;
 	Sort3dPtr->_1 = MAKE_ZSORT(z);

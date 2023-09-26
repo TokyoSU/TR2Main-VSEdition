@@ -36,7 +36,7 @@ static int AtanBaseTable[8] = {
 };
 
 // Arctan angle table
-static __int16 AtanAngleTable[0x802] = {
+static short AtanAngleTable[0x802] = {
 	0x0000, 0x0005, 0x000A, 0x000F, 0x0014, 0x0019, 0x001F, 0x0024,
 	0x0029, 0x002E, 0x0033, 0x0038, 0x003D, 0x0042, 0x0047, 0x004C,
 	0x0051, 0x0057, 0x005C, 0x0061, 0x0066, 0x006B, 0x0070, 0x0075,
@@ -297,7 +297,7 @@ static __int16 AtanAngleTable[0x802] = {
 };
 
 // Sines integer representation table for angle 0..90 degrees
-static const __int16 PhdSinTable[0x402] = {
+static const short PhdSinTable[0x402] = {
 	0x0000, 0x0019, 0x0032, 0x004B, 0x0065, 0x007E, 0x0097, 0x00B0,
 	0x00C9, 0x00E2, 0x00FB, 0x0114, 0x012E, 0x0147, 0x0160, 0x0179,
 	0x0192, 0x01AB, 0x01C4, 0x01DD, 0x01F7, 0x0210, 0x0229, 0x0242,
@@ -459,11 +459,11 @@ int __fastcall phd_atan(int x, int y) {
 	return result;
 }
 
-int __fastcall phd_cos(__int16 angle) {
+int __fastcall phd_cos(short angle) {
 	return phd_sin(angle + PHD_90);
 }
 
-int __fastcall phd_sin(__int16 angle) {
+int __fastcall phd_sin(short angle) {
 	UINT16 sector = (UINT16)angle & (PHD_180 - 1); // sector range will be: 0..0x7FFF (0..179.99 degrees)
 
 	if (sector > PHD_90)

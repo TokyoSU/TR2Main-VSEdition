@@ -30,10 +30,10 @@
  // If the first item has index=0 and number=0 then all polys of such type must be processed.
 #define POLYFILTER_SIZE 256
 
-typedef struct { __int16 idx; __int16 num; } POLYINDEX;
+typedef struct { short idx; short num; } POLYINDEX;
 
 typedef struct {
-	__int16 n_vtx, n_gt4, n_gt3, n_g4, n_g3;
+	short n_vtx, n_gt4, n_gt3, n_g4, n_g3;
 	POLYINDEX gt4[POLYFILTER_SIZE];
 	POLYINDEX gt3[POLYFILTER_SIZE];
 	POLYINDEX g4[POLYFILTER_SIZE];
@@ -46,12 +46,12 @@ typedef struct PolyfilterNode_t {
 	struct PolyfilterNode_t* next;
 } POLYFILTER_NODE;
 
-typedef bool (*ENUM_POLYS_CB) (__int16* ptrObj, int vtxCount, bool colored, LPVOID param);
+typedef bool (*ENUM_POLYS_CB) (short* ptrObj, int vtxCount, bool colored, LPVOID param);
 
 /*
  * Function list
  */
-bool EnumeratePolys(__int16* ptrObj, bool isRoomMesh, ENUM_POLYS_CB callback, POLYFILTER* filter, LPVOID param);
+bool EnumeratePolys(short* ptrObj, bool isRoomMesh, ENUM_POLYS_CB callback, POLYFILTER* filter, LPVOID param);
 
 #ifdef FEATURE_MOD_CONFIG
 bool IsModConfigLoaded();

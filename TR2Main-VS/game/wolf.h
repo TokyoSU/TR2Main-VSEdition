@@ -28,7 +28,7 @@
   * Function list
   */
   // NOTE: these functions are presented in the "Golden Mask" only
-void InitialiseWolf(__int16 itemID); // tomb2gold:0x004431C0
-void WolfControl(__int16 itemID); // tomb2gold:0x004431F0
+void InitialiseWolf(short itemID); // tomb2gold:0x004431C0
+void WolfControl(short itemID); // tomb2gold:0x004431F0
 
 #endif // WOLF_H_INCLUDED

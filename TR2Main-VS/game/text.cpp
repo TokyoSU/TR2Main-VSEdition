@@ -104,7 +104,7 @@ void T_InitPrint() {
 	TextStringCount = 0;
 }
 
-TEXT_STR_INFO* __cdecl T_Print(int x, int y, __int16 z, const char* str) {
+TEXT_STR_INFO* __cdecl T_Print(int x, int y, short z, const char* str) {
 	if (str == NULL || TextStringCount >= 64)
 		return NULL;
 
@@ -164,7 +164,7 @@ void T_SetScale(TEXT_STR_INFO* textInfo, int scaleH, int scaleV) {
 	}
 }
 
-void T_FlashText(TEXT_STR_INFO* textInfo, __int16 state, __int16 rate) {
+void T_FlashText(TEXT_STR_INFO* textInfo, short state, short rate) {
 	if (textInfo == NULL)
 		return;
 
@@ -178,7 +178,7 @@ void T_FlashText(TEXT_STR_INFO* textInfo, __int16 state, __int16 rate) {
 	}
 }
 
-void T_AddBackground(TEXT_STR_INFO* textInfo, __int16 xSize, __int16 ySize, __int16 xOff, __int16 yOff, __int16 zOff, INV_COLOURS invColour, GOURAUD_FILL* gour, UINT16 flags) {
+void T_AddBackground(TEXT_STR_INFO* textInfo, short xSize, short ySize, short xOff, short yOff, short zOff, INV_COLOURS invColour, GOURAUD_FILL* gour, UINT16 flags) {
 	if (textInfo == NULL)
 		return;
 
@@ -379,7 +379,7 @@ BOOL T_RemovePrint(TEXT_STR_INFO* textInfo) {
 	return true;
 }
 
-__int16 T_GetStringLen(const char* str) {
+short T_GetStringLen(const char* str) {
 	// Calculates string length up to 64 chars including null terminator
 	for (int i = 0; i < 64; ++i) {
 		if (str[i] == 0)
@@ -415,7 +415,7 @@ void T_DrawThisText(TEXT_STR_INFO* textInfo) {
 
 	// Do text flashing if required
 	if (CHK_ANY(textInfo->flags, TIF_Flash)) {
-		textInfo->flashCount -= (__int16)Camera.numberFrames;
+		textInfo->flashCount -= (short)Camera.numberFrames;
 
 		if (textInfo->flashCount <= -textInfo->flashRate) {
 			textInfo->flashCount = textInfo->flashRate;
@@ -665,7 +665,7 @@ DWORD GetTextScaleV(DWORD baseScale) {
 }
 
 #ifdef FEATURE_HUD_IMPROVED
-void T_HideText(TEXT_STR_INFO* textInfo, __int16 state) {
+void T_HideText(TEXT_STR_INFO* textInfo, short state) {
 	if (textInfo == NULL)
 		return;
 

@@ -27,7 +27,7 @@
 #include "game/missile.h"
 #include "global/vars.h"
 
-void CreatureDie(__int16 itemID, BOOL explode) {
+void CreatureDie(short itemID, BOOL explode) {
 	ITEM_INFO* item = &Items[itemID];
 	item->collidable = 0;
 	item->hitPoints = HP_DONT_TARGET;

@@ -29,7 +29,7 @@
   */
   //	0x00440070:		SpiderLeap
 
-#define SpiderControl ((void(__cdecl*)(__int16)) 0x00440120)
-#define BigSpiderControl ((void(__cdecl*)(__int16)) 0x00440340)
+#define SpiderControl ((void(__cdecl*)(short)) 0x00440120)
+#define BigSpiderControl ((void(__cdecl*)(short)) 0x00440340)
 
 #endif // SPIDER_H_INCLUDED

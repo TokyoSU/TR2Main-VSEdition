@@ -34,7 +34,7 @@ void MoveCamera(GAME_VECTOR* destination, int speed); // 0x00410630
 
 #define ClipCamera ((void(__cdecl*)(int*, int*, int*, int, int, int, int, int, int, int)) 0x004109B0)
 #define ShiftCamera ((void(__cdecl*)(int*, int*, int*, int, int, int, int, int, int, int)) 0x00410A90)
-#define GoodPosition ((FLOOR_INFO*(__cdecl*)(int, int, int, __int16)) 0x00410BF0)
+#define GoodPosition ((FLOOR_INFO*(__cdecl*)(int, int, int, short)) 0x00410BF0)
 #define SmartShift ((void(__cdecl*)(GAME_VECTOR*, CB_SMARTCAM)) 0x00410C40)
 #define ChaseCamera ((void(__cdecl*)(ITEM_INFO*)) 0x004113D0)
 #define ShiftClamp ((int(__cdecl*)(GAME_VECTOR*, int)) 0x004114C0)

@@ -27,21 +27,18 @@
  /*
   * Function list
   */
-  //	0x0042BC90:		draw_shotgun_meshes
-  //	0x0042BCD0:		undraw_shotgun_meshes
-  //	0x0042BD00:		ready_shotgun
-
+void draw_shotgun_meshes(int weaponType); // 0x0042BC90
+void undraw_shotgun_meshes(int weaponType); // 0x0042BCD0
+void ready_shotgun(int weaponType); // 0x0042BD00
 void RifleHandler(int weaponType); // 0x0042BD70
 void FireShotgun(); // 0x0042BE70
 void FireM16(BOOL isRunning); // 0x0042BF70
 void FireHarpoon(); // 0x0042BFF0
-void ControlHarpoonBolt(__int16 itemID); // 0x0042C180
+void ControlHarpoonBolt(short itemID); // 0x0042C180
 void FireRocket(); // 0x0042C4D0
-void ControlRocket(__int16 itemID); // 0x0042C5C0
-
-//	0x0042C9D0:		draw_shotgun
-//	0x0042CB40:		undraw_shotgun
-
-#define AnimateShotgun ((void(__cdecl*)(int)) 0x0042CC50)
+void ControlRocket(short itemID); // 0x0042C5C0
+void draw_shotgun(int weaponType); // 0x0042C9D0
+void undraw_shotgun(int weaponType); // 0x0042CB40
+void AnimateShotgun(int weaponType); // 0x0042CC50
 
 #endif // LARA1GUN_H_INCLUDED

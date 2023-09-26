@@ -34,7 +34,7 @@ extern DWORD AlphaBlendMode;
 
 void DrawFlareInAir(ITEM_INFO* item) {
 	int rate;
-	__int16* ptr[2];
+	short* ptr[2];
 	GetFrames(item, ptr, &rate);
 	phd_PushMatrix();
 	phd_TranslateAbs(item->pos.x, item->pos.y, item->pos.z);

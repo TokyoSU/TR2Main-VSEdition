@@ -28,19 +28,19 @@
   * Function list
   */
 
-void MineControl(__int16 mineID); // 0x00440FC0
-void ControlSpikeWall(__int16 itemID); // 0x004411C0
-void ControlCeilingSpikes(__int16 itemID); // 0x00441300
-void HookControl(__int16 itemID); // 0x00441420
+void MineControl(short mineID); // 0x00440FC0
+void ControlSpikeWall(short itemID); // 0x004411C0
+void ControlCeilingSpikes(short itemID); // 0x00441300
+void HookControl(short itemID); // 0x00441420
 
 //	0x004414B0:		PropellerControl
 
-void SpinningBlade(__int16 itemID); // 0x00441640
-void IcicleControl(__int16 itemID); // 0x004417C0
-void InitialiseBlade(__int16 itemID); // 0x004418C0
-void BladeControl(__int16 itemID); // 0x00441900
-void InitialiseKillerStatue(__int16 itemID); // 0x004419A0
-void KillerStatueControl(__int16 itemID); // 0x004419F0
+void SpinningBlade(short itemID); // 0x00441640
+void IcicleControl(short itemID); // 0x004417C0
+void InitialiseBlade(short itemID); // 0x004418C0
+void BladeControl(short itemID); // 0x00441900
+void InitialiseKillerStatue(short itemID); // 0x004419A0
+void KillerStatueControl(short itemID); // 0x004419F0
 
 //	0x00441B00:		SpringBoardControl
 //	0x00441BE0:		InitialiseRollingBall
@@ -52,19 +52,19 @@ void KillerStatueControl(__int16 itemID); // 0x004419F0
 //	0x004423B0:		TrapDoorCeiling
 //	0x004423F0:		OnTrapDoor
 
-void Pendulum(__int16 itemID); // 0x004424A0
+void Pendulum(short itemID); // 0x004424A0
 
 //	0x004425B0:		FallingBlock
 //	0x004426C0:		FallingBlockFloor
 //	0x00442700:		FallingBlockCeiling
 
-void TeethTrap(__int16 itemID); // 0x00442750
-void FallingCeiling(__int16 itemID); // 0x00442810
-void DartEmitterControl(__int16 itemID); // 0x004428F0
-void DartsControl(__int16 itemID); // 0x00442A30
-void DartEffectControl(__int16 fxID); // 0x00442B90
-void FlameEmitterControl(__int16 item_id); // 0x00442BE0
-void FlameControl(__int16 fx_id); // 0x00442C70
+void TeethTrap(short itemID); // 0x00442750
+void FallingCeiling(short itemID); // 0x00442810
+void DartEmitterControl(short itemID); // 0x004428F0
+void DartsControl(short itemID); // 0x00442A30
+void DartEffectControl(short fxID); // 0x00442B90
+void FlameEmitterControl(short item_id); // 0x00442BE0
+void FlameControl(short fx_id); // 0x00442C70
 void LaraBurn(); // 0x00442DE0
 void LavaBurn(ITEM_INFO* item); // 0x00442E30
 

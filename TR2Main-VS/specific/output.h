@@ -37,11 +37,11 @@ DWORD S_DumpScreen(); // 0x00450CB0
 void S_ClearScreen(); // 0x00450CF0
 void S_InitialiseScreen(GF_LEVEL_TYPE levelType); // 0x00450D00
 void S_OutputPolyList(); // 0x00450D40
-int S_GetObjectBounds(__int16* bPtr); // 0x00450D80
+int S_GetObjectBounds(short* bPtr); // 0x00450D80
 void S_InsertBackPolygon(int x0, int y0, int x1, int y1); // 0x00450FF0
-void S_PrintShadow(__int16 radius, __int16* bPtr, ITEM_INFO* item); // 0x00451040
-void S_CalculateLight(int x, int y, int z, __int16 roomNumber); // 0x00451240
-void S_CalculateStaticLight(__int16 adder); // 0x00451540
+void S_PrintShadow(short radius, short* bPtr, ITEM_INFO* item); // 0x00451040
+void S_CalculateLight(int x, int y, int z, short roomNumber); // 0x00451240
+void S_CalculateStaticLight(short adder); // 0x00451540
 void S_CalculateStaticMeshLight(int x, int y, int z, int shade1, int shade2, ROOM_INFO* room); // 0x00451580
 void S_LightRoom(ROOM_INFO* room); // 0x004516B0
 void S_DrawHealthBar(int percent); // 0x004518C0

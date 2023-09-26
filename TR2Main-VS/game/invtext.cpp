@@ -548,7 +548,7 @@ void AddRequesterItem(REQUEST_INFO* req, const char* string1, DWORD flags1, cons
 	++req->itemsCount;
 }
 
-void SetPCRequesterSize(REQUEST_INFO* req, int maxLines, __int16 yPos) {
+void SetPCRequesterSize(REQUEST_INFO* req, int maxLines, short yPos) {
 	req->yPos = yPos;
 #ifdef FEATURE_HUD_IMPROVED
 	req->visibleCount = GetRenderHeightDownscaled() / 2 / REQ_LN_HEIGHT;

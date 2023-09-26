@@ -29,7 +29,7 @@
   */
   //	0x004339A0:		InitialiseMovingBlock
 
-#define MovableBlock ((void(__cdecl*)(__int16)) 0x004339D0)
+#define MovableBlock ((void(__cdecl*)(short)) 0x004339D0)
 
 //	0x00433B20:		MovableBlockCollision
 //	0x00433D80:		TestBlockMovable

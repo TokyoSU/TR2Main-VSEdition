@@ -31,7 +31,7 @@
 #include "specific/game.h"
 #include "global/vars.h"
 
-void ControlMissile(__int16 fxID) {
+void ControlMissile(short fxID) {
 	FX_INFO* fx = &Effects[fxID];
 
 	if (Effects[fxID].object_number == ID_MISSILE_HARPOON
@@ -45,7 +45,7 @@ void ControlMissile(__int16 fxID) {
 	fx->pos.z += speed * phd_cos(fx->pos.rotY) >> W2V_SHIFT;
 	fx->pos.x += speed * phd_sin(fx->pos.rotY) >> W2V_SHIFT;
 
-	__int16 roomNumber = fx->room_number;
+	short roomNumber = fx->room_number;
 	FLOOR_INFO* floor = GetFloor(fx->pos.x, fx->pos.y, fx->pos.z, &roomNumber);
 	if (fx->pos.y >= GetHeight(floor, fx->pos.x, fx->pos.y, fx->pos.z)
 		|| (fx->pos.y <= GetCeiling(floor, fx->pos.x, fx->pos.y, fx->pos.z)))

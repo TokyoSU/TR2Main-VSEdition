@@ -160,7 +160,7 @@ void UpdateJoyOutput(bool isInGame) {
 		b = RGB_GETBLUE(DEFAULT_JOYSTICK_LED_COLOR);
 	}
 	else {
-		static __int16 hitPoints = 0;
+		static short hitPoints = 0;
 		isInjured = (LaraItem->hitPoints < hitPoints && Lara.air > 0);
 		hitPoints = LaraItem->hitPoints;
 		if (isInjured) {

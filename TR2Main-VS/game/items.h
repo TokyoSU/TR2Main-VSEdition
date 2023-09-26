@@ -29,24 +29,24 @@
   */
 void InitialiseItemArray(int itemCount); // 0x00426CD0
 
-#define KillItem ((void(__cdecl*)(__int16)) 0x00426D30)
-#define CreateItem ((__int16(__cdecl*)(void)) 0x00426E50)
+#define KillItem ((void(__cdecl*)(short)) 0x00426D30)
+#define CreateItem ((short(__cdecl*)(void)) 0x00426E50)
 
-void InitialiseItem(__int16 itemIndex); // 0x00426E90
+void InitialiseItem(short itemIndex); // 0x00426E90
 
-#define RemoveActiveItem ((void(__cdecl*)(__int16)) 0x00427050)
-#define RemoveDrawnItem ((void(__cdecl*)(__int16)) 0x004270E0)
+#define RemoveActiveItem ((void(__cdecl*)(short)) 0x00427050)
+#define RemoveDrawnItem ((void(__cdecl*)(short)) 0x004270E0)
 
-void AddActiveItem(__int16 itemIndex); // 0x00427150
+void AddActiveItem(short itemIndex); // 0x00427150
 
-#define ItemNewRoom ((void(__cdecl*)(__int16, __int16)) 0x004271B0)
+#define ItemNewRoom ((void(__cdecl*)(short, short)) 0x004271B0)
 
 int GlobalItemReplace(int oldItemID, int newItemID); // 0x00427250
 
 #define InitialiseFXArray ((void(__cdecl*)(void)) 0x004272D0)
-#define CreateEffect ((__int16(__cdecl*)(__int16)) 0x00427300)
-#define KillEffect ((void(__cdecl*)(__int16)) 0x00427370)
-#define EffectNewRoom ((void(__cdecl*)(__int16, __int16)) 0x00427460)
+#define CreateEffect ((short(__cdecl*)(short)) 0x00427300)
+#define KillEffect ((void(__cdecl*)(short)) 0x00427370)
+#define EffectNewRoom ((void(__cdecl*)(short, short)) 0x00427460)
 #define ClearBodyBag ((void(__cdecl*)(void)) 0x00427500)
 
 #endif // ITEMS_H_INCLUDED
