@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.9.0.1] - 2023-09-24
+## [0.9.0.1] - 2023-09-24 - Fix count: 2
 
 ### Warning:
 
@@ -27,6 +27,10 @@ to
 - Fixed directinput initialize, was using wrong enum type when switching to DX9.
 - Fixed CreateEnvmapBufferSurface() return types.
 - Fixed WinMain argument.
+- Fixed bug introduced with the Savegame buffer size:
+1) Secret items given when you pickup the 3 dragon. (Fix2)
+2) Holsters when the game start or if you reload a savegame. (Fix2)
+3) Harpoon and 2 stats was not increasing. (Fix1)
 - Moved SaveGame, SG_Point, SG_Count to DLL to avoid memory overflow.
 
 ### New features
