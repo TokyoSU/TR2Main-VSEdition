@@ -702,22 +702,73 @@ void InitialiseLaraInventory(int levelID) {
 	InitialiseNewWeapon();
 }
 
+void LaraInitialiseMeshes(int levelID)
+{
+	START_INFO* start = &SaveGame.start[levelID];
+
+	for (int i = 0; i < 15; i++)
+		Lara.mesh_ptrs[i] = MeshPtr[Objects[ID_LARA].meshIndex + i];
+
+	if (start->gunType != LGT_Unarmed)
+	{
+		short meshIdx = 0;
+		switch (start->gunType)
+		{
+		case LGT_Magnums:
+			meshIdx = Objects[ID_LARA_MAGNUMS].meshIndex;
+			break;
+		case LGT_Uzis:
+			meshIdx = Objects[ID_LARA_UZIS].meshIndex;
+			break;
+		default:
+			meshIdx = Objects[ID_LARA_PISTOLS].meshIndex;
+			break;
+		}
+		Lara.mesh_ptrs[1] = MeshPtr[meshIdx + 1];
+		Lara.mesh_ptrs[4] = MeshPtr[meshIdx + 4];
+	}
+
+	if (start->gunType == LGT_Flare)
+		Lara.mesh_ptrs[13] = MeshPtr[Objects[ID_LARA_FLARE].meshIndex + 13];
+
+	switch (start->gunType)
+	{
+	case LGT_M16:
+		Lara.back_gun = ID_LARA_M16;
+		break;
+	case LGT_Harpoon:
+		Lara.back_gun = ID_LARA_HARPOON;
+		break;
+	case LGT_Grenade:
+		Lara.back_gun = ID_LARA_GRENADE;
+		break;
+	case LGT_Shotgun:
+		Lara.back_gun = ID_LARA_SHOTGUN;
+		break;
+	default:
+		if (start->has_shotgun)
+			Lara.back_gun = ID_LARA_SHOTGUN;
+		else if (start->has_m16)
+			Lara.back_gun = ID_LARA_M16;
+		else if (start->has_grenade)
+			Lara.back_gun = ID_LARA_GRENADE;
+		else if (start->has_harpoon)
+			Lara.back_gun = ID_LARA_HARPOON;
+		break;
+	}
+}
+
 /*
  * Inject function
  */
 void Inject_LaraMisc() {
 	INJECT(0x00430380, LaraControl);
-
 	//	INJECT(0x00430A10, AnimateLara);
-
 	INJECT(0x00430D10, UseItem);
 	INJECT(0x00430ED0, LaraCheatGetStuff);
 	INJECT(0x00430F90, ControlLaraExtra);
 	INJECT(0x00430FB0, InitialiseLaraLoad);
-
 	//	INJECT(0x00430FE0, InitialiseLara);
-
 	INJECT(0x004312A0, InitialiseLaraInventory);
-
-	//	INJECT(0x00431610, LaraInitialiseMeshes);
+	INJECT(0x00431610, LaraInitialiseMeshes);
 }

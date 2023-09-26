@@ -629,9 +629,9 @@ x function is unused / included in another function
 0x0042C180:	+	ControlHarpoonBolt
 0x0042C4D0:	+	FireRocket
 0x0042C5C0:	+	ControlRocket
-0x0042C9D0:		draw_shotgun
-0x0042CB40:		undraw_shotgun
-0x0042CC50:	 *	AnimateShotgun
+0x0042C9D0:	+	draw_shotgun
+0x0042CB40:	+	undraw_shotgun
+0x0042CC50:	+	AnimateShotgun
 
 	game/lara2gun.cpp
 0x0042D000:		set_pistol_arm
@@ -698,7 +698,7 @@ x function is unused / included in another function
 0x00430FB0:	+	InitialiseLaraLoad
 0x00430FE0:	 *	InitialiseLara
 0x004312A0:	+	InitialiseLaraInventory
-0x00431610:	 *	LaraInitialiseMeshes
+0x00431610:	+	LaraInitialiseMeshes
 
 	game/larasurf.cpp
 0x00431710:	 *	LaraSurface
