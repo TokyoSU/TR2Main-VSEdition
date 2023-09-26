@@ -131,94 +131,94 @@ extern void Inject_WinMain();
 extern void Inject_WinVid();
 
 static void Inject() {
-	Log("Injecting new functions from DLL to EXE.");
-	Log("===================================================");
+	LogDebug("Injecting new functions from DLL to EXE.");
+	LogDebug("===================================================");
 	// 3d system
-	Log("Starting 3DSystem Class.");
-	Inject_3Dgen(); Log("- Injected 3DGen");
-	Inject_3Dout(); Log("- Injected 3DOut");
-	Inject_3Dinsert(); Log("- Injected 3DInsert");
-	Inject_PhdMath(); Log("- Injected PhdMath");
-	Inject_ScaleSpr(); Log("- Injected ScaleSpr");
+	LogDebug("Starting 3DSystem Class.");
+	Inject_3Dgen(); LogDebug("- Injected 3DGen");
+	Inject_3Dout(); LogDebug("- Injected 3DOut");
+	Inject_3Dinsert(); LogDebug("- Injected 3DInsert");
+	Inject_PhdMath(); LogDebug("- Injected PhdMath");
+	Inject_ScaleSpr(); LogDebug("- Injected ScaleSpr");
 	// game
-	Log("Starting Game Class.");
-	Inject_Bird(); Log("- Injected Bird");
-	Inject_Boat(); Log("- Injected Boat");
-	Inject_Box(); Log("- Injected Box");
-	Inject_Camera(); Log("- Injected Camera");
-	Inject_Cinema(); Log("- Injected Cinema");
-	Inject_Collide(); Log("- Injected Collide");
-	Inject_Control(); Log("- Injected Control");
-	Inject_Demo(); Log("- Injected Demo");
-	Inject_Diver(); Log("- Injected Diver");
-	Inject_Dog(); Log("- Injected Dog");
-	Inject_Dragon(); Log("- Injected Dragon");
-	Inject_Draw(); Log("- Injected Draw");
-	Inject_Eel(); Log("- Injected Eel");
-	Inject_Effects(); Log("- Injected Effects");
-	Inject_Enemies(); Log("- Injected Enemies");
-	Inject_Gameflow(); Log("- Injected Gameflow");
-	Inject_Hair(); Log("- Injected Hair");
-	Inject_Health(); Log("- Injected Health");
-	Inject_Inventory(); Log("- Injected Inventory");
-	Inject_InvFunc(); Log("- Injected InvFunc");
-	Inject_InvText(); Log("- Injected InvText");
-	Inject_Items(); Log("- Injected Items");
-	Inject_Lara(); Log("- Injected Lara");
-	Inject_Lara1Gun(); Log("- Injected Lara1Gun");
-	Inject_Lara2Gun(); Log("- Injected Lara2Gun");
-	Inject_LaraClimb(); Log("- Injected LaraClimb");
-	Inject_LaraFire(); Log("- Injected LaraFire");
-	Inject_LaraFlare(); Log("- Injected LaraFlare");
-	Inject_LaraMisc(); Log("- Injected LaraMisc");
-	Inject_LaraSurf(); Log("- Injected LaraSurf");
-	Inject_LaraSwim(); Log("- Injected LaraSwim");
-	Inject_Lot(); Log("- Injected Lot");
-	Inject_Missile(); Log("- Injected Missile");
-	Inject_MoveBlock(); Log("- Injected MoveBlock");
-	Inject_Objects(); Log("- Injected Objects");
-	Inject_People(); Log("- Injected People");
-	Inject_Pickup(); Log("- Injected Pickup");
-	Inject_Rat(); Log("- Injected Rat");
-	Inject_SaveGame(); Log("- Injected SaveGame");
-	Inject_Setup(); Log("- Injected Setup");
-	Inject_Shark(); Log("- Injected Shark");
-	Inject_Skidoo(); Log("- Injected Skidoo");
-	Inject_Sound(); Log("- Injected Sound");
-	Inject_Sphere(); Log("- Injected Sphere");
-	Inject_Spider(); Log("- Injected Spider");
-	Inject_Text(); Log("- Injected Text");
-	Inject_Traps(); Log("- Injected Traps");
-	Inject_Yeti(); Log("- Injected Yeti");
+	LogDebug("Starting Game Class.");
+	Inject_Bird(); LogDebug("- Injected Bird");
+	Inject_Boat(); LogDebug("- Injected Boat");
+	Inject_Box(); LogDebug("- Injected Box");
+	Inject_Camera(); LogDebug("- Injected Camera");
+	Inject_Cinema(); LogDebug("- Injected Cinema");
+	Inject_Collide(); LogDebug("- Injected Collide");
+	Inject_Control(); LogDebug("- Injected Control");
+	Inject_Demo(); LogDebug("- Injected Demo");
+	Inject_Diver(); LogDebug("- Injected Diver");
+	Inject_Dog(); LogDebug("- Injected Dog");
+	Inject_Dragon(); LogDebug("- Injected Dragon");
+	Inject_Draw(); LogDebug("- Injected Draw");
+	Inject_Eel(); LogDebug("- Injected Eel");
+	Inject_Effects(); LogDebug("- Injected Effects");
+	Inject_Enemies(); LogDebug("- Injected Enemies");
+	Inject_Gameflow(); LogDebug("- Injected Gameflow");
+	Inject_Hair(); LogDebug("- Injected Hair");
+	Inject_Health(); LogDebug("- Injected Health");
+	Inject_Inventory(); LogDebug("- Injected Inventory");
+	Inject_InvFunc(); LogDebug("- Injected InvFunc");
+	Inject_InvText(); LogDebug("- Injected InvText");
+	Inject_Items(); LogDebug("- Injected Items");
+	Inject_Lara(); LogDebug("- Injected Lara");
+	Inject_Lara1Gun(); LogDebug("- Injected Lara1Gun");
+	Inject_Lara2Gun(); LogDebug("- Injected Lara2Gun");
+	Inject_LaraClimb(); LogDebug("- Injected LaraClimb");
+	Inject_LaraFire(); LogDebug("- Injected LaraFire");
+	Inject_LaraFlare(); LogDebug("- Injected LaraFlare");
+	Inject_LaraMisc(); LogDebug("- Injected LaraMisc");
+	Inject_LaraSurf(); LogDebug("- Injected LaraSurf");
+	Inject_LaraSwim(); LogDebug("- Injected LaraSwim");
+	Inject_Lot(); LogDebug("- Injected Lot");
+	Inject_Missile(); LogDebug("- Injected Missile");
+	Inject_MoveBlock(); LogDebug("- Injected MoveBlock");
+	Inject_Objects(); LogDebug("- Injected Objects");
+	Inject_People(); LogDebug("- Injected People");
+	Inject_Pickup(); LogDebug("- Injected Pickup");
+	Inject_Rat(); LogDebug("- Injected Rat");
+	Inject_SaveGame(); LogDebug("- Injected SaveGame");
+	Inject_Setup(); LogDebug("- Injected Setup");
+	Inject_Shark(); LogDebug("- Injected Shark");
+	Inject_Skidoo(); LogDebug("- Injected Skidoo");
+	Inject_Sound(); LogDebug("- Injected Sound");
+	Inject_Sphere(); LogDebug("- Injected Sphere");
+	Inject_Spider(); LogDebug("- Injected Spider");
+	Inject_Text(); LogDebug("- Injected Text");
+	Inject_Traps(); LogDebug("- Injected Traps");
+	Inject_Yeti(); LogDebug("- Injected Yeti");
 	// specific
-	Log("Starting Specific Class.");
-	Inject_Background(); Log("- Injected Background");
-	Inject_Display(); Log("- Injected Display");
-	Inject_File(); Log("- Injected File");
-	Inject_Fmv(); Log("- Injected Fmv");
-	Inject_Frontend(); Log("- Injected Frontend");
-	Inject_Game(); Log("- Injected Game");
-	Inject_HWR(); Log("- Injected Hwr");
-	Inject_Init(); Log("- Injected Init");
-	Inject_Init3d(); Log("- Injected Init3D");
-	Inject_InitDisplay(); Log("- Injected InitDisplay");
-	Inject_InitInput(); Log("- Injected InitInput");
-	Inject_InitSound(); Log("- Injected InitSound");
-	Inject_Input(); Log("- Injected Input");
-	Inject_Option(); Log("- Injected Option");
-	Inject_Output(); Log("- Injected Output");
-	Inject_Registry(); Log("- Injected Registry");
-	Inject_Screenshot(); Log("- Injected ScreenShot");
-	Inject_SetupDlg(); Log("- Injected SetupDlg");
-	Inject_SetupWnd(); Log("- Injected SetupWnd");
-	Inject_SMain(); Log("- Injected SMain");
-	Inject_SndPC(); Log("- Injected SndPC");
-	Inject_Texture(); Log("- Injected Texture");
-	Inject_Utils(); Log("- Injected Utils");
-	Inject_WinMain(); Log("- Injected WinMain");
-	Inject_WinVid(); Log("- Injected WinVid");
-	Log("===================================================");
-	Log("Finished injecting.");
+	LogDebug("Starting Specific Class.");
+	Inject_Background(); LogDebug("- Injected Background");
+	Inject_Display(); LogDebug("- Injected Display");
+	Inject_File(); LogDebug("- Injected File");
+	Inject_Fmv(); LogDebug("- Injected Fmv");
+	Inject_Frontend(); LogDebug("- Injected Frontend");
+	Inject_Game(); LogDebug("- Injected Game");
+	Inject_HWR(); LogDebug("- Injected Hwr");
+	Inject_Init(); LogDebug("- Injected Init");
+	Inject_Init3d(); LogDebug("- Injected Init3D");
+	Inject_InitDisplay(); LogDebug("- Injected InitDisplay");
+	Inject_InitInput(); LogDebug("- Injected InitInput");
+	Inject_InitSound(); LogDebug("- Injected InitSound");
+	Inject_Input(); LogDebug("- Injected Input");
+	Inject_Option(); LogDebug("- Injected Option");
+	Inject_Output(); LogDebug("- Injected Output");
+	Inject_Registry(); LogDebug("- Injected Registry");
+	Inject_Screenshot(); LogDebug("- Injected ScreenShot");
+	Inject_SetupDlg(); LogDebug("- Injected SetupDlg");
+	Inject_SetupWnd(); LogDebug("- Injected SetupWnd");
+	Inject_SMain(); LogDebug("- Injected SMain");
+	Inject_SndPC(); LogDebug("- Injected SndPC");
+	Inject_Texture(); LogDebug("- Injected Texture");
+	Inject_Utils(); LogDebug("- Injected Utils");
+	Inject_WinMain(); LogDebug("- Injected WinMain");
+	Inject_WinVid(); LogDebug("- Injected WinVid");
+	LogDebug("===================================================");
+	LogDebug("Finished injecting.");
 }
 
 extern "C" DLL_EXPORT int DummyFunction() {
@@ -235,10 +235,11 @@ extern "C" DLL_EXPORT int DummyFunction() {
  * @note See the MSDN for more information
  */
 extern "C" BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
+	LogInit();
 	switch (fdwReason) {
 	case DLL_PROCESS_ATTACH:
-		Log("Process was attached.");
-		Log("DLL version: %s", VER_FULL);
+		LogDebug("Process was attached.");
+		LogDebug("DLL version: %s", VER_FULL);
 		// attach to process
 		hInstance = hinstDLL;
 		Inject();
@@ -246,7 +247,7 @@ extern "C" BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpv
 
 	case DLL_PROCESS_DETACH:
 		// detach from process
-		Log("Process was detached.");
+		LogDebug("Process was detached.");
 		break;
 
 	case DLL_THREAD_ATTACH:

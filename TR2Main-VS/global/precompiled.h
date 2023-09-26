@@ -71,6 +71,7 @@
 
 #include <stdio.h>
 #include <windows.h>
+#include <string>
 #include <shlobj.h>
 #include <shlwapi.h>
 #include <dinput.h>
@@ -90,4 +91,6 @@
 #define strcasecmp _stricmp
 #endif
 
-extern void Log(const char* message, ...);
+extern void LogInit();
+extern void LogDebug(const char* message, ...);
+extern void LogWarn(const char* message, ...);

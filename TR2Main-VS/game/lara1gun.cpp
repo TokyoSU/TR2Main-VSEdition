@@ -424,7 +424,7 @@ void draw_shotgun(int weaponType)
 		Lara.weapon_item = CreateItem();
 		if (Lara.weapon_item == -1)
 		{
-			Log("Failed to create weapon_item for the back weapon (torso)");
+			LogDebug("Failed to create weapon_item for the back weapon (torso)");
 			return;
 		}
 		item = &Items[Lara.weapon_item];
@@ -467,7 +467,7 @@ void undraw_shotgun(int weaponType)
 {
 	if (Lara.weapon_item == -1)
 	{
-		Log("Failed to undraw back weapon, it not exist !");
+		LogDebug("Failed to undraw back weapon, it not exist !");
 		return;
 	}
 	ITEM_INFO* item = &Items[Lara.weapon_item];

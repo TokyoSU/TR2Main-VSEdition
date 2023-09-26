@@ -28,36 +28,26 @@
   * Function list
   */
 int ControlPhase(int nTicks, BOOL demoMode);
-
 #define AnimateItem ((void(__cdecl*)(ITEM_INFO*)) 0x004146C0)
-
 // 0x00414A30:		GetChange
 // 0x00414AE0:		TranslateItem
-
 #define GetFloor ((FLOOR_INFO*(__cdecl*)(int, int, int, short*)) 0x00414B40)
 #define GetWaterHeight ((int(__cdecl*)(int, int, int, short)) 0x00414CE0)
 #define GetHeight ((int(__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00414E50)
-
-// 0x004150D0:		RefreshCamera
-
-#define TestTriggers ((void(__cdecl*)(short*, BOOL)) 0x004151C0)
+#define RefreshCamera ((void(__cdecl*)(int,short*)) 0x004150D0)
+#define TestTriggers ((void(__cdecl*)(short*,BOOL)) 0x004151C0)
+//void TestTriggers(short* data, BOOL isHeavy); // 0x004151C0 (WIP)
 #define TriggerActive ((int(__cdecl*)(ITEM_INFO*)) 0x004158A0)
 #define GetCeiling ((int(__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00415900)
-
 // 0x00415B60:		GetDoor
-
 #define LOS ((int(__cdecl*)(GAME_VECTOR*, GAME_VECTOR*)) 0x00415BB0)
-
 // 0x00415C50:		zLOS
 // 0x00415F40:		xLOS
 // 0x00416230:		ClipTarget
-
 #define ObjectOnLOS ((short(__cdecl*)(GAME_VECTOR*,GAME_VECTOR*)) 0x00416310)
 #define FlipMap ((void(__cdecl*)(void)) 0x00416610)
-
 // 0x004166D0:		RemoveRoomFlipItems
 // 0x00416770:		AddRoomFlipItems
-
 void TriggerCDTrack(short value, UINT16 flags, short type); // 0x004167D0
 void TriggerNormalCDTrack(short value, UINT16 flags, short type); // 0x00416800;
 

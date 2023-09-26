@@ -25,8 +25,12 @@
 #include "game/demo.h"
 #include "game/effects.h"
 #include "game/hair.h"
+#include "game/items.h"
 #include "game/inventory.h"
 #include "game/laramisc.h"
+#include "game/traps.h"
+#include "game/lot.h"
+#include "game/pickup.h"
 #include "game/savegame.h"
 #include "specific/game.h"
 #include "specific/input.h"
@@ -181,6 +185,240 @@ int ControlPhase(int nTicks, BOOL demoMode) {
 	return 0;
 }
 
+/*#define END_BIT 0x80
+void TestTriggers(short* data, BOOL isHeavy)
+{
+	ITEM_INFO* item = NULL, *camera_item = NULL;
+	OBJECT_VECTOR* fixed_cam = NULL;
+	int quadrant = 0, value = 0, type = 0, flags = 0, timer = 0, flip = 0, flip_enabled = 0, effect = -1, switch_off = 0;
+	short trigger = 0;
+
+	if (!isHeavy)
+		Lara.climb_status = 0;
+
+	if (data == NULL)
+	{
+		LogWarn("Failed to test triggers, data is NULL");
+		return;
+	}
+
+	switch (*data)
+	{
+	case LAVA_TYPE:
+		LogDebug("Lava trigger");
+		if (!isHeavy && (LaraItem->pos.y == LaraItem->floor || Lara.water_status != LWS_AboveWater))
+			LavaBurn(LaraItem);
+		if (*(data + 1) & END_BIT)
+			return;
+		++data;
+		break;
+	case CLIMB_TYPE:
+		LogDebug("Climb trigger");
+		if (!isHeavy)
+		{
+			quadrant = 1 << (((LaraItem->pos.rotY + 0x2000) >> 14) + 8);
+			if (quadrant & *data)
+				Lara.climb_status = 1;
+		}
+		if (*(data + 1) & END_BIT)
+			return;
+		++data;
+		break;
+	}
+
+	type = (*(data++) >> 8) & 0x3F;
+	flags = *(data++);
+	timer = flags & 0xFF;
+
+	if (Camera.type != CAM_Heavy)
+		RefreshCamera(type, data);
+
+	if (!isHeavy)
+	{
+		switch (type)
+		{
+		case SWITCH:
+			value = *(data++) & 0x3FF;
+			if (!SwitchTrigger(value, timer))
+				return;
+			LogDebug("Switch trigger");
+			switch_off = (Items[value].currentAnimState == 1);
+			break;
+		case PAD:
+		case ANTIPAD:
+			if (LaraItem->pos.y != LaraItem->floor)
+				return;
+			LogDebug("Pad/Antipad trigger");
+			break;
+		case KEY:
+			LogDebug("Key trigger");
+			break;
+		case PICKUP:
+			LogDebug("Pickup trigger");
+			break;
+		case COMBAT:
+			LogDebug("Combat trigger");
+			break;
+		case HEAVY:
+		case DUMMY:
+			return;
+		}
+	}
+	else if (type != HEAVY)
+		return;
+
+	do
+	{
+		trigger = *(data++);
+		value = trigger & 0x3FF;
+
+		switch ((trigger >> 10) & 0xF)
+		{
+		case TO_OBJECT:
+			LogDebug("Object trigger");
+			if (value < 0 || value > NUMBER_ITEMS) // NOTE: not exist in the og.
+			{
+				LogWarn("Failed to call TO_OBJECT trigger, value returned was less than 0 or more than 1024 !");
+				break;
+			}
+			item = &Items[value];
+			if (item->flags & IFL_INVISIBLE)
+				break;
+
+			item->timer = timer;
+			if (timer != 1)
+				item->timer *= 30;
+
+			switch (type)
+			{
+			case SWITCH:
+				item->flags ^= (flags & IFL_CODEBITS);
+				//if (flags & IFL_INVISIBLE)
+				//	item->flags |= IFL_INVISIBLE;
+				break;
+			case ANTIPAD:
+			case ANTITRIGGER:
+				item->flags &= ~(IFL_CODEBITS | IFL_REVERSE);
+				//if (flags & IFL_INVISIBLE)
+				//	item->flags |= IFL_INVISIBLE;
+				break;
+			default:
+				if (flags & IFL_CODEBITS)
+					item->flags |= (flags & IFL_CODEBITS);
+				break;
+			}
+
+			if ((item->flags & IFL_CODEBITS) == IFL_CODEBITS)
+				break;
+
+			if (flags & 0x100)
+				item->flags |= 1;
+
+			if (!item->active)
+			{
+				if (Objects[item->objectID].intelligent)
+				{
+					switch (item->status)
+					{
+					case ITEM_ACTIVE:
+						item->touchBits = 0;
+						item->status = ITEM_ACTIVE;
+						AddActiveItem(value);
+						EnableBaddieAI(value, TRUE);
+						break;
+					case ITEM_INVISIBLE:
+						item->touchBits = 0;
+						if (EnableBaddieAI(value, FALSE))
+							item->status = ITEM_ACTIVE;
+						else
+							item->status = ITEM_INVISIBLE;
+						AddActiveItem(value);
+						break;
+					}
+				}
+				else
+				{
+					item->touchBits = 0;
+					item->status = ITEM_ACTIVE;
+					AddActiveItem(value);
+				}
+			}
+
+			break;
+		case TO_CAMERA:
+			LogDebug("Camera trigger");
+
+			break;
+		case TO_TARGET:
+			LogDebug("Target trigger");
+			if (value < 0 || value > NUMBER_ITEMS) // NOTE: not exist in the og.
+			{
+				LogWarn("Failed to call TO_TARGET trigger, value returned was less than 0 or more than 1024 !");
+				break;
+			}
+			camera_item = &Items[value];
+			break;
+		case TO_SINK:
+			LogDebug("Sink trigger");
+			fixed_cam = &Camera.fixed[value];
+			if (Lara.creature == NULL)
+				EnableBaddieAI(Lara.item_number, TRUE);
+			Lara.creature->LOT.target.x = fixed_cam->x;
+			Lara.creature->LOT.target.y = fixed_cam->y;
+			Lara.creature->LOT.target.z = fixed_cam->z;
+			Lara.creature->LOT.required_box = fixed_cam->flags;
+			Lara.current_active = 6 * fixed_cam->data;
+			break;
+		case TO_FLIPMAP:
+			LogDebug("Flipmap trigger");
+			flip_enabled = 1;
+
+			break;
+		case TO_FLIPON:
+			LogDebug("Flipon trigger");
+			flip_enabled = 1;
+			if ((FlipMaps[value] & IFL_CODEBITS) == IFL_CODEBITS && !FlipStatus)
+				flip = 1;
+			break;
+		case TO_FLIPOFF:
+			LogDebug("Flipoff trigger");
+			flip_enabled = 1;
+			if ((FlipMaps[value] & IFL_CODEBITS) == IFL_CODEBITS && FlipStatus)
+				flip = 1;
+			break;
+		case TO_FLIPEFFECT:
+			LogDebug("Flipeffect trigger");
+			effect = value;
+			break;
+		case TO_FINISH:
+			LogDebug("Finish trigger");
+			IsLevelComplete = TRUE;
+			break;
+		case TO_CD:
+			LogDebug("CD trigger");
+			TriggerCDTrack(value, flags, type);
+			break;
+		case TO_BODYBAG:
+			LogDebug("Bodybag trigger");
+			//ClearBodyBag();
+			break;
+		}
+	}
+	while (!(trigger & END_BIT));
+
+	if (camera_item != NULL && (Camera.type == CAM_Fixed || Camera.type == CAM_Heavy))
+		Camera.item = camera_item;
+
+	if (flip)
+		FlipMap();
+
+	if (effect != -1 && (flip || !flip_enabled))
+	{
+		FlipEffect = effect;
+		FlipTimer = 0;
+	}
+}*/
+
 void TriggerCDTrack(short value, UINT16 flags, short type) {
 	if (value > 1 && value < 64) {
 		TriggerNormalCDTrack(value, flags, type);
@@ -232,7 +470,7 @@ void Inject_Control() {
 	//	INJECT(0x00414CE0, GetWaterHeight);
 	//	INJECT(0x00414E50, GetHeight);
 	//	INJECT(0x004150D0, RefreshCamera);
-	//	INJECT(0x004151C0, TestTriggers);
+	//INJECT(0x004151C0, TestTriggers); (WIP)
 	//	INJECT(0x004158A0, TriggerActive);
 	//	INJECT(0x00415900, GetCeiling);
 	//	INJECT(0x00415B60, GetDoor);
@@ -244,7 +482,6 @@ void Inject_Control() {
 	//	INJECT(0x00416610, FlipMap);
 	//	INJECT(0x004166D0, RemoveRoomFlipItems);
 	//	INJECT(0x00416770, AddRoomFlipItems);
-
 	INJECT(0x004167D0, TriggerCDTrack);
 	INJECT(0x00416800, TriggerNormalCDTrack);
 }

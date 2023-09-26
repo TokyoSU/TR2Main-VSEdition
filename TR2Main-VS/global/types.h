@@ -40,7 +40,7 @@ typedef struct {
 
 #ifdef _DEBUG
 #define TRACE(func,line) { \
-	Log("%s: line %d\n", func, line); \
+	LogDebug("%s: line %d\n", func, line); \
 }
 #else
 #define TRACE(func,line)
@@ -1117,6 +1117,49 @@ typedef enum {
 	ITEM_DISABLED,
 	ITEM_INVISIBLE,
 } ITEM_STATUS;
+
+typedef enum {
+	FLOOR_TYPE,
+	DOOR_TYPE,
+	TILT_TYPE,
+	ROOF_TYPE,
+	TRIGGER_TYPE,
+	LAVA_TYPE,
+	CLIMB_TYPE
+} TRIGGER_DATA_TYPES;
+
+typedef enum {
+	TRIGGER,
+	PAD,
+	SWITCH,
+	KEY,
+	PICKUP,
+	HEAVY,
+	ANTIPAD,
+	COMBAT,
+	DUMMY,
+	ANTITRIGGER,
+	HEAVYSWITCH,
+	HEAVYANTITRIGGER
+} TRIGGER_TYPES;
+
+typedef enum
+{
+	TO_OBJECT,
+	TO_CAMERA,
+	TO_SINK,
+	TO_FLIPMAP,
+	TO_FLIPON,
+	TO_FLIPOFF,
+	TO_TARGET,
+	TO_FINISH,
+	TO_CD,
+	TO_FLIPEFFECT,
+	TO_SECRET,
+	TO_BODYBAG,
+	TO_FLYBY,
+	TO_CUTSCENE
+} TRIGGER_OBJECTS;
 
 typedef enum {
 	ADDINV_PISTOL,
