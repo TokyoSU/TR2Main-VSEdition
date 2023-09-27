@@ -407,37 +407,37 @@ void LaraCheatGetStuff() {
 		if (!Inv_RequestItem(ID_MAGNUM_ITEM)) {
 			Inv_AddItem(ID_MAGNUM_ITEM);
 		}
-		Lara.magnum_ammo = (SaveGame.bonusFlag && !IsDemoLevelType) ? 10001 : 1000;
+		Lara.magnum_ammo = (SaveGame.bonusFlag && !IsDemoLevelType) ? WEAPON_UNLIMITED : 1000;
 	}
 	if (Objects[ID_UZI_OPTION].loaded) {
 		if (!Inv_RequestItem(ID_UZI_ITEM)) {
 			Inv_AddItem(ID_UZI_ITEM);
 		}
-		Lara.uzi_ammo = (SaveGame.bonusFlag && !IsDemoLevelType) ? 10001 : 2000;
+		Lara.uzi_ammo = (SaveGame.bonusFlag && !IsDemoLevelType) ? WEAPON_UNLIMITED : 2000;
 	}
 	if (Objects[ID_SHOTGUN_OPTION].loaded) {
 		if (!Inv_RequestItem(ID_SHOTGUN_ITEM)) {
 			Inv_AddItem(ID_SHOTGUN_ITEM);
 		}
-		Lara.shotgun_ammo = (SaveGame.bonusFlag && !IsDemoLevelType) ? 10001 : 300;
+		Lara.shotgun_ammo = (SaveGame.bonusFlag && !IsDemoLevelType) ? WEAPON_UNLIMITED : 300;
 	}
 	if (Objects[ID_HARPOON_OPTION].loaded) {
 		if (!Inv_RequestItem(ID_HARPOON_ITEM)) {
 			Inv_AddItem(ID_HARPOON_ITEM);
 		}
-		Lara.harpoon_ammo = (SaveGame.bonusFlag && !IsDemoLevelType) ? 10001 : 300;
+		Lara.harpoon_ammo = (SaveGame.bonusFlag && !IsDemoLevelType) ? WEAPON_UNLIMITED : 300;
 	}
 	if (Objects[ID_M16_OPTION].loaded) {
 		if (!Inv_RequestItem(ID_M16_ITEM)) {
 			Inv_AddItem(ID_M16_ITEM);
 		}
-		Lara.m16_ammo = (SaveGame.bonusFlag && !IsDemoLevelType) ? 10001 : 300;
+		Lara.m16_ammo = (SaveGame.bonusFlag && !IsDemoLevelType) ? WEAPON_UNLIMITED : 300;
 	}
 	if (Objects[ID_GRENADE_OPTION].loaded) {
 		if (!Inv_RequestItem(ID_GRENADE_ITEM)) {
 			Inv_AddItem(ID_GRENADE_ITEM);
 		}
-		Lara.grenade_ammo = (SaveGame.bonusFlag && !IsDemoLevelType) ? 10001 : 300;
+		Lara.grenade_ammo = (SaveGame.bonusFlag && !IsDemoLevelType) ? WEAPON_UNLIMITED : 300;
 	}
 
 	for (int i = 0; i < 10; ++i) {
@@ -596,7 +596,7 @@ void InitialiseLaraInventory(int levelID) {
 	Inv_AddItem(ID_COMPASS_ITEM);
 
 	// Pistols
-	Lara.pistol_ammo = 1000;
+	Lara.pistol_ammo = PISTOLS_AMMO_DEFAULT;
 	if (start->has_pistols) {
 		Inv_AddItem(ID_PISTOL_ITEM);
 	}
@@ -608,7 +608,7 @@ void InitialiseLaraInventory(int levelID) {
 		GlobalItemReplace(ID_MAGNUM_ITEM, ID_MAGNUM_AMMO_ITEM);
 	}
 	else {
-		for (i = 0; i < start->magnumAmmo / 40; ++i) {
+		for (i = 0; i < start->magnumAmmo / AUTOPISTOLS_AMMO_CLIPS; ++i) {
 			Inv_AddItem(ID_MAGNUM_AMMO_ITEM);
 		}
 		Lara.magnum_ammo = 0;
@@ -621,7 +621,7 @@ void InitialiseLaraInventory(int levelID) {
 		GlobalItemReplace(ID_UZI_ITEM, ID_UZI_AMMO_ITEM);
 	}
 	else {
-		for (i = 0; i < start->uziAmmo / 80; ++i) {
+		for (i = 0; i < start->uziAmmo / UZIS_AMMO_CLIPS; ++i) {
 			Inv_AddItem(ID_UZI_AMMO_ITEM);
 		}
 		Lara.uzi_ammo = 0;
@@ -634,7 +634,7 @@ void InitialiseLaraInventory(int levelID) {
 		GlobalItemReplace(ID_SHOTGUN_ITEM, ID_SHOTGUN_AMMO_ITEM);
 	}
 	else {
-		for (i = 0; i < start->shotgunAmmo / 12; ++i) {
+		for (i = 0; i < start->shotgunAmmo / SHOTGUN_AMMO_CLIPS; ++i) {
 			Inv_AddItem(ID_SHOTGUN_AMMO_ITEM);
 		}
 		Lara.shotgun_ammo = 0;
@@ -647,7 +647,7 @@ void InitialiseLaraInventory(int levelID) {
 		GlobalItemReplace(ID_GRENADE_ITEM, ID_GRENADE_AMMO_ITEM);
 	}
 	else {
-		for (i = 0; i < start->grenadeAmmo / 2; ++i) {
+		for (i = 0; i < start->grenadeAmmo / GRENADE_AMMO_CLIPS; ++i) {
 			Inv_AddItem(ID_GRENADE_AMMO_ITEM);
 		}
 		Lara.grenade_ammo = 0;
@@ -660,7 +660,7 @@ void InitialiseLaraInventory(int levelID) {
 		GlobalItemReplace(ID_M16_ITEM, ID_M16_AMMO_ITEM);
 	}
 	else {
-		for (i = 0; i < start->m16Ammo / 40; ++i) {
+		for (i = 0; i < start->m16Ammo / M16_AMMO_CLIPS; ++i) {
 			Inv_AddItem(ID_M16_AMMO_ITEM);
 		}
 		Lara.m16_ammo = 0;
@@ -673,7 +673,7 @@ void InitialiseLaraInventory(int levelID) {
 		GlobalItemReplace(ID_HARPOON_ITEM, ID_HARPOON_AMMO_ITEM);
 	}
 	else {
-		for (i = 0; i < start->harpoonAmmo / 3; ++i) {
+		for (i = 0; i < start->harpoonAmmo / HARPOON_AMMO_CLIPS; ++i) {
 			Inv_AddItem(ID_HARPOON_AMMO_ITEM);
 		}
 		Lara.harpoon_ammo = 0;

@@ -56,7 +56,64 @@ bool EnumeratePolys(short* ptrObj, bool isRoomMesh, ENUM_POLYS_CB callback, POLY
 #ifdef FEATURE_MOD_CONFIG
 bool IsModConfigLoaded();
 bool IsModBarefoot();
-bool IsModRemoveShotgunAtStart();
+
+bool IsModPistolsAtStart();
+bool IsModShotgunAtStart();
+bool IsModUzisAtStart();
+bool IsModAutopistolsAtStart();
+bool IsModM16AtStart();
+bool IsModGrenadeAtStart();
+bool IsModHarpoonAtStart();
+
+int GetModShotgunAmmoCountAtStart();
+int GetModUzisAmmoCountAtStart();
+int GetModAutopistolsAmmoCountAtStart();
+int GetModM16AmmoCountAtStart();
+int GetModGrenadeAmmoCountAtStart();
+int GetModHarpoonAmmoCountAtStart();
+
+int GetModFlareCountAtStart();
+int GetModSmallMedikitCountAtStart();
+int GetModBigMedikitCountAtStart();
+
+int GetModDogHealth();
+int GetModMouseHealth();
+int GetModCult1Health();
+int GetModCult1AHealth();
+int GetModCult1BHealth();
+int GetModCult2Health();
+int GetModSharkHealth();
+int GetModTigerHealth();
+int GetModBarracudaHealth();
+int GetModSmallSpiderHealth();
+int GetModWolfHealth();
+int GetModBigSpiderHealth();
+int GetModBearHealth();
+int GetModYetiHealth();
+int GetModJellyHealth();
+int GetModDiverHealth();
+int GetModWorker1Health();
+int GetModWorker2Health();
+int GetModWorker3Health();
+int GetModWorker4Health();
+int GetModWorker5Health();
+int GetModCult3Health();
+int GetModMonk1Health();
+int GetModMonk2Health();
+int GetModEagleHealth();
+int GetModCrowHealth();
+int GetModBigEelHealth();
+int GetModEelHealth();
+int GetModBandit1Health();
+int GetModBandit2Health();
+int GetModBandit2BHealth();
+int GetModSkidmanHealth();
+int GetModXianLordHealth();
+int GetModWarriorHealth();
+int GetModDragonHealth();
+int GetModGiantYetiHealth();
+int GetModDinoHealth();
+
 const char* GetModLoadingPix();
 DWORD GetModWaterColor();
 bool IsModSemitransConfigLoaded();

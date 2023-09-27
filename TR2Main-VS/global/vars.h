@@ -34,10 +34,21 @@
 
 #define MessageBoxName		"Tomb Raider II"
 
-  // Variable macros
+// Variable macros
 #define VAR_U_(address, type)			(*(type*)(address)) // uninitialized variable
 #define VAR_I_(address, type, value)	(*(type*)(address)) // initialized variable (value is just for info)
 #define ARRAY_(address, type, length)	(*(type(*)length)(address)) // array (can be multidimensional)
+
+// Macros values.
+
+#define WEAPON_UNLIMITED 10001
+#define PISTOLS_AMMO_DEFAULT 1000
+#define AUTOPISTOLS_AMMO_CLIPS 40
+#define UZIS_AMMO_CLIPS 80
+#define SHOTGUN_AMMO_CLIPS 12
+#define HARPOON_AMMO_CLIPS 3
+#define M16_AMMO_CLIPS 40
+#define GRENADE_AMMO_CLIPS 2
 
 /*
  * General Variables

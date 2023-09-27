@@ -44,7 +44,64 @@ typedef struct {
 typedef struct {
 	bool isLoaded;
 	bool isBarefoot;
-	bool removeShotgunAtStart;
+
+	bool pistolsAtStart;
+	bool shotgunAtStart;
+	bool uzisAtStart;
+	bool autopistolsAtStart;
+	bool m16AtStart;
+	bool grenadeAtStart;
+	bool harpoonAtStart;
+
+	int shotgunAmmoAtStart;
+	int uzisAmmoAtStart;
+	int autopistolsAmmoAtStart;
+	int m16AmmoAtStart;
+	int grenadeAmmoAtStart;
+	int harpoonAmmoAtStart;
+
+	int smallMedikitAtStart;
+	int bigMedikitAtStart;
+	int flareCountAtStart;
+	
+	int dogHealth;
+	int mouseHealth;
+	int cult1Health;
+	int cult1AHealth;
+	int cult1BHealth;
+	int cult2Health;
+	int sharkHealth;
+	int tigerHealth;
+	int barracudaHealth;
+	int smallSpiderHealth; // spider or wolf (separated)
+	int wolfHealth;
+	int bigSpiderHealth; // big spider or bear (separated)
+	int bearHealth;
+	int yetiHealth;
+	int jellyHealth;
+	int diverHealth;
+	int worker1Health;
+	int worker2Health;
+	int worker3Health;
+	int worker4Health;
+	int worker5Health;
+	int cult3Health;
+	int monk1Health;
+	int monk2Health;
+	int eagleHealth;
+	int crowHealth;
+	int bigEelHealth;
+	int eelHealth;
+	int bandit1Health;
+	int bandit2Health;
+	int bandit2BHealth;
+	int skidmanHealth;
+	int xianLordHealth;
+	int warriorHealth;
+	int dragonHealth;
+	int giantYetiHealth;
+	int dinoHealth;
+
 	char loadingPix[256];
 	DWORD waterColor;
 	SEMITRANS_CONFIG semitrans;
@@ -170,8 +227,216 @@ bool IsModBarefoot() {
 	return ModConfig.isBarefoot;
 }
 
-bool IsModRemoveShotgunAtStart() {
-	return ModConfig.removeShotgunAtStart;
+bool IsModPistolsAtStart() {
+	return ModConfig.pistolsAtStart;
+}
+
+bool IsModShotgunAtStart() {
+	return ModConfig.shotgunAtStart;
+}
+
+bool IsModUzisAtStart() {
+	return ModConfig.uzisAtStart;
+}
+
+bool IsModAutopistolsAtStart() {
+	return ModConfig.autopistolsAtStart;
+}
+
+bool IsModM16AtStart() {
+	return ModConfig.m16AtStart;
+}
+
+bool IsModGrenadeAtStart() {
+	return ModConfig.grenadeAtStart;
+}
+
+bool IsModHarpoonAtStart() {
+	return ModConfig.harpoonAtStart;
+}
+
+int GetModShotgunAmmoCountAtStart() {
+	return ModConfig.shotgunAmmoAtStart * (SHOTGUN_AMMO_CLIPS / 2);
+}
+
+int GetModUzisAmmoCountAtStart() {
+	return ModConfig.uzisAmmoAtStart;
+}
+
+int GetModAutopistolsAmmoCountAtStart() {
+	return ModConfig.autopistolsAmmoAtStart;
+}
+
+int GetModM16AmmoCountAtStart() {
+	return ModConfig.m16AmmoAtStart;
+}
+
+int GetModGrenadeAmmoCountAtStart() {
+	return ModConfig.grenadeAmmoAtStart;
+}
+
+int GetModHarpoonAmmoCountAtStart() {
+	return ModConfig.harpoonAmmoAtStart;
+}
+
+int GetModFlareCountAtStart() {
+	return ModConfig.flareCountAtStart;
+}
+
+int GetModSmallMedikitCountAtStart() {
+	return ModConfig.smallMedikitAtStart;
+}
+
+int GetModBigMedikitCountAtStart() {
+	return ModConfig.bigMedikitAtStart;
+}
+
+int GetModDogHealth() {
+	return ModConfig.dogHealth;
+}
+
+int GetModMouseHealth() {
+	return ModConfig.mouseHealth;
+}
+
+int GetModCult1Health() {
+	return ModConfig.cult1Health;
+}
+
+int GetModCult1AHealth() {
+	return ModConfig.cult1AHealth;
+}
+
+int GetModCult1BHealth() {
+	return ModConfig.cult1BHealth;
+}
+
+int GetModCult2Health() {
+	return ModConfig.cult2Health;
+}
+
+int GetModSharkHealth() {
+	return ModConfig.sharkHealth;
+}
+
+int GetModTigerHealth() {
+	return ModConfig.tigerHealth;
+}
+
+int GetModBarracudaHealth() {
+	return ModConfig.barracudaHealth;
+}
+
+int GetModSmallSpiderHealth() {
+	return ModConfig.smallSpiderHealth;
+}
+
+int GetModWolfHealth() {
+	return ModConfig.wolfHealth;
+}
+
+int GetModBigSpiderHealth() {
+	return ModConfig.bigSpiderHealth;
+}
+
+int GetModBearHealth() {
+	return ModConfig.bearHealth;
+}
+
+int GetModYetiHealth() {
+	return ModConfig.yetiHealth;
+}
+
+int GetModJellyHealth() {
+	return ModConfig.jellyHealth;
+}
+
+int GetModDiverHealth() {
+	return ModConfig.diverHealth;
+}
+
+int GetModWorker1Health() {
+	return ModConfig.worker1Health;
+}
+
+int GetModWorker2Health() {
+	return ModConfig.worker2Health;
+}
+
+int GetModWorker3Health() {
+	return ModConfig.worker3Health;
+}
+
+int GetModWorker4Health() {
+	return ModConfig.worker4Health;
+}
+
+int GetModWorker5Health() {
+	return ModConfig.worker5Health;
+}
+
+int GetModCult3Health() {
+	return ModConfig.cult3Health;
+}
+
+int GetModMonk1Health() {
+	return ModConfig.monk1Health;
+}
+
+int GetModMonk2Health() {
+	return ModConfig.monk2Health;
+}
+
+int GetModEagleHealth() {
+	return ModConfig.eagleHealth;
+}
+
+int GetModCrowHealth() {
+	return ModConfig.crowHealth;
+}
+
+int GetModBigEelHealth() {
+	return ModConfig.bigEelHealth;
+}
+
+int GetModEelHealth() {
+	return ModConfig.eelHealth;
+}
+
+int GetModBandit1Health() {
+	return ModConfig.bandit1Health;
+}
+
+int GetModBandit2Health() {
+	return ModConfig.bandit2Health;
+}
+
+int GetModBandit2BHealth() {
+	return ModConfig.bandit2BHealth;
+}
+
+int GetModSkidmanHealth() {
+	return ModConfig.skidmanHealth;
+}
+
+int GetModXianLordHealth() {
+	return ModConfig.xianLordHealth;
+}
+
+int GetModWarriorHealth() {
+	return ModConfig.warriorHealth;
+}
+
+int GetModDragonHealth() {
+	return ModConfig.dragonHealth;
+}
+
+int GetModGiantYetiHealth() {
+	return ModConfig.giantYetiHealth;
+}
+
+int GetModDinoHealth() {
+	return ModConfig.dinoHealth;
 }
 
 const char* GetModLoadingPix() {
@@ -404,12 +669,56 @@ static bool ParseReflectConfiguration(json_value* root) {
 	return true;
 }
 
+static bool ParseBooleanConfigByName(json_value* root, const char* name, bool defaultValue = false) {
+	json_value* field = GetJsonField(root, json_boolean, name, NULL);
+	if (field) {
+		return (bool)field->u.boolean;
+	}
+	return defaultValue;
+}
+
+static int ParseIntegerConfigByName(json_value* root, const char* name, int defaultValue = -1) {
+	json_value* field = GetJsonField(root, json_integer, name, NULL);
+	if (field) {
+		return (int)field->u.integer;
+	}
+	return defaultValue;
+}
+
+static bool ParseDefaultLevelConfiguration(json_value* root) {
+	if (root == NULL || root->type != json_object) {
+		return false;
+	}
+
+	ModConfig.pistolsAtStart = ParseBooleanConfigByName(root, "pistolsatstart", true);
+	ModConfig.shotgunAtStart = ParseBooleanConfigByName(root, "shotgunatstart", true);
+	ModConfig.uzisAtStart = ParseBooleanConfigByName(root, "uzisatstart");
+	ModConfig.autopistolsAtStart = ParseBooleanConfigByName(root, "autopistolsatstart");
+	ModConfig.m16AtStart = ParseBooleanConfigByName(root, "m16atstart");
+	ModConfig.grenadeAtStart = ParseBooleanConfigByName(root, "grenadeatstart");
+	ModConfig.harpoonAtStart = ParseBooleanConfigByName(root, "harpoonatstart");
+
+	ModConfig.shotgunAmmoAtStart = ParseIntegerConfigByName(root, "shotgunammoatstart", ModConfig.shotgunAtStart ? 12 : 0);
+	ModConfig.uzisAmmoAtStart = ParseIntegerConfigByName(root, "uzisammoatstart");
+	ModConfig.autopistolsAmmoAtStart = ParseIntegerConfigByName(root, "autopistolsammoatstart");
+	ModConfig.m16AmmoAtStart = ParseIntegerConfigByName(root, "m16ammoatstart");
+	ModConfig.grenadeAmmoAtStart = ParseIntegerConfigByName(root, "grenadeammoatstart");
+	ModConfig.harpoonAmmoAtStart = ParseIntegerConfigByName(root, "harpoonammoatstart");
+
+	ModConfig.flareCountAtStart = ParseIntegerConfigByName(root, "flaresatstart", 2);
+	ModConfig.smallMedikitAtStart = ParseIntegerConfigByName(root, "smallmedikitatstart", 1);
+	ModConfig.bigMedikitAtStart = ParseIntegerConfigByName(root, "bigmedikitatstart", 1);
+
+	ParseSemitransConfiguration(GetJsonField(root, json_object, "semitransparent", NULL));
+	ParseReflectConfiguration(GetJsonField(root, json_object, "reflective", NULL));
+	return true;
+}
+
 static bool ParseLevelConfiguration(json_value* root) {
 	if (root == NULL || root->type != json_object) {
 		return false;
 	}
 	json_value* field = NULL;
-
 	field = GetJsonField(root, json_string, "picture", NULL);
 	if (field) {
 		snprintf(ModConfig.loadingPix, sizeof(ModConfig.loadingPix), "data\\%.*s.pcx", field->u.string.length, field->u.string.ptr);
@@ -418,14 +727,47 @@ static bool ParseLevelConfiguration(json_value* root) {
 	if (field && field->u.string.length == 6) {
 		ModConfig.waterColor = strtol(field->u.string.ptr, NULL, 16);
 	}
-	field = GetJsonField(root, json_boolean, "barefoot", NULL);
-	if (field) {
-		ModConfig.isBarefoot = field->u.boolean;
-	}
-	field = GetJsonField(root, json_boolean, "removeshotgunatstart", NULL);
-	if (field) {
-		ModConfig.removeShotgunAtStart = field->u.boolean;
-	}
+
+	ModConfig.isBarefoot = ParseBooleanConfigByName(root, "barefoot");
+
+	ModConfig.dogHealth = ParseIntegerConfigByName(root, "dogHealth", 10);
+	ModConfig.mouseHealth = ParseIntegerConfigByName(root, "mouseHealth", 4);
+	ModConfig.cult1Health = ParseIntegerConfigByName(root, "cult1Health", 25);
+	ModConfig.cult1AHealth = ParseIntegerConfigByName(root, "cult1AHealth", 25);
+	ModConfig.cult1BHealth = ParseIntegerConfigByName(root, "cult1BHealth", 25);
+	ModConfig.cult2Health = ParseIntegerConfigByName(root, "cult2Health", 60);
+	ModConfig.sharkHealth = ParseIntegerConfigByName(root, "sharkHealth", 30);
+	ModConfig.tigerHealth = ParseIntegerConfigByName(root, "tigerHealth", 20);
+	ModConfig.barracudaHealth = ParseIntegerConfigByName(root, "barracudaHealth", 12);
+	ModConfig.smallSpiderHealth = ParseIntegerConfigByName(root, "spiderHealth", 5);
+	ModConfig.wolfHealth = ParseIntegerConfigByName(root, "wolfHealth", 10);
+	ModConfig.bigSpiderHealth = ParseIntegerConfigByName(root, "bigSpiderHealth", 40);
+	ModConfig.bearHealth = ParseIntegerConfigByName(root, "bearHealth", 30);
+	ModConfig.yetiHealth = ParseIntegerConfigByName(root, "yetiHealth", 30);
+	ModConfig.jellyHealth = ParseIntegerConfigByName(root, "jellyHealth", 10);
+	ModConfig.diverHealth = ParseIntegerConfigByName(root, "diverHealth", 20);
+	ModConfig.worker1Health = ParseIntegerConfigByName(root, "worker1Health", 25);
+	ModConfig.worker2Health = ParseIntegerConfigByName(root, "worker2Health", 20);
+	ModConfig.worker3Health = ParseIntegerConfigByName(root, "worker3Health", 27);
+	ModConfig.worker4Health = ParseIntegerConfigByName(root, "worker4Health", 27);
+	ModConfig.worker5Health = ParseIntegerConfigByName(root, "worker5Health", 20);
+	ModConfig.cult3Health = ParseIntegerConfigByName(root, "cult3Health", 150);
+	ModConfig.monk1Health = ParseIntegerConfigByName(root, "monk1Health", 30);
+	ModConfig.monk2Health = ParseIntegerConfigByName(root, "monk2Health", 30);
+	ModConfig.eagleHealth = ParseIntegerConfigByName(root, "eagleHealth", 20);
+	ModConfig.crowHealth = ParseIntegerConfigByName(root, "crowHealth", 15);
+	ModConfig.bigEelHealth = ParseIntegerConfigByName(root, "bigEelHealth", 20);
+	ModConfig.eelHealth = ParseIntegerConfigByName(root, "eelHealth", 5);
+	ModConfig.bandit1Health = ParseIntegerConfigByName(root, "bandit1Health", 45);
+	ModConfig.bandit2Health = ParseIntegerConfigByName(root, "bandit2Health", 50);
+	ModConfig.bandit2BHealth = ParseIntegerConfigByName(root, "bandit2BHealth", 50);
+	ModConfig.skidmanHealth = ParseIntegerConfigByName(root, "skidmanHealth", 100);
+	ModConfig.xianLordHealth = ParseIntegerConfigByName(root, "xianLordHealth", 100);
+	ModConfig.warriorHealth = ParseIntegerConfigByName(root, "warriorHealth", 80);
+	ModConfig.dragonHealth = ParseIntegerConfigByName(root, "dragonHealth", 300);
+	ModConfig.giantYetiHealth = ParseIntegerConfigByName(root, "giantYetiHealth", 200);
+	ModConfig.dinoHealth = ParseIntegerConfigByName(root, "dinoHealth", 100);
+
 	ParseSemitransConfiguration(GetJsonField(root, json_object, "semitransparent", NULL));
 	ParseReflectConfiguration(GetJsonField(root, json_object, "reflective", NULL));
 	return true;
@@ -436,7 +778,8 @@ static bool ParseModConfiguration(char* levelName, json_value* root) {
 		return false;
 	}
 	// parsing default configs
-	ParseLevelConfiguration(GetJsonField(root, json_object, "default", NULL));
+	ParseDefaultLevelConfiguration(GetJsonField(root, json_object, "default", NULL));
+
 	// parsing level specific configs
 	json_value* levels = GetJsonField(root, json_array, "levels", NULL);
 	if (levels) ParseLevelConfiguration(GetJsonObjectByStringField(levels, "filename", levelName, false, NULL));

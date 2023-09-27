@@ -22,6 +22,7 @@
 #include "precompiled.h"
 #include "game/setup.h"
 #include "game/bear.h"
+#include "game/box.h"
 #include "game/bird.h"
 #include "game/collide.h"
 #include "game/diver.h"
@@ -42,6 +43,10 @@
 #include "game/yeti.h"
 #include "specific/winmain.h"
 #include "global/vars.h"
+
+#if defined(FEATURE_MOD_CONFIG)
+#include "modding/mod_utils.h"
+#endif
 
 #ifdef FEATURE_GOLD
 extern bool IsGold();
@@ -94,10 +99,15 @@ void BaddyObjects() {
 	// Other objects are optional
 	obj = &Objects[ID_DOG];
 	if (obj->loaded) {
-		obj->control = DogControl;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
+		obj->control = DogControl;
 		obj->shadowSize = 128;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModDogHealth();
+#else
 		obj->hitPoints = 10;
+#endif
 		obj->pivotLength = 300;
 		obj->intelligent = 1;
 		obj->save_position = 1;
@@ -109,33 +119,42 @@ void BaddyObjects() {
 	}
 	obj = &Objects[ID_MOUSE];
 	if (obj->loaded) {
-		obj->control = MouseControl;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+		obj->control = MouseControl;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModMouseHealth();
+#else
 		obj->hitPoints = 4;
+#endif
+		obj->pivotLength = 50;
+		obj->radius = 102;
+		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->pivotLength = 50;
-		obj->radius = 102;
 		AnimBones[obj->boneIndex + 3 * 4] |= 0x08;
 	}
 	obj = &Objects[ID_CULT1];
 	if (obj->loaded) {
 		obj->initialise = InitialiseCult1;
-		obj->control = Cult1Control;
 		obj->collision = CreatureCollision;
+		obj->control = Cult1Control;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModCult1Health();
+#else
+		obj->hitPoints = 25;
+#endif
+		obj->pivotLength = 50;
+		obj->radius = 102;
 		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->hitPoints = 25;
-		obj->pivotLength = 50;
-		obj->radius = 102;
 		AnimBones[obj->boneIndex + 0 * 4] |= 0x08;
 	}
 	obj = &Objects[ID_CULT1A];
@@ -148,15 +167,19 @@ void BaddyObjects() {
 		obj->initialise = InitialiseCult1;
 		obj->control = Cult1Control;
 		obj->collision = CreatureCollision;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModCult1AHealth();
+#else
+		obj->hitPoints = 25;
+#endif
+		obj->pivotLength = 50;
+		obj->radius = 102;
+		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->shadowSize = 128;
-		obj->hitPoints = 25;
-		obj->pivotLength = 50;
-		obj->radius = 102;
 		AnimBones[obj->boneIndex + 0 * 4] |= 0x08;
 	}
 	obj = &Objects[ID_CULT1B];
@@ -167,75 +190,99 @@ void BaddyObjects() {
 		obj->frameBase = Objects[ID_CULT1].frameBase;
 		obj->animIndex = Objects[ID_CULT1].animIndex;
 		obj->initialise = InitialiseCult1;
-		obj->control = Cult1Control;
 		obj->collision = CreatureCollision;
+		obj->control = Cult1Control;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModCult1BHealth();
+#else
+		obj->hitPoints = 25;
+#endif
+		obj->pivotLength = 50;
+		obj->radius = 102;
+		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->shadowSize = 128;
-		obj->hitPoints = 25;
-		obj->pivotLength = 50;
-		obj->radius = 102;
 		AnimBones[obj->boneIndex + 0 * 4] |= 0x08;
 	}
 	obj = &Objects[ID_CULT2];
 	if (obj->loaded) {
-		obj->control = Cult2Control;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+		obj->control = Cult2Control;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModCult2Health();
+#else
 		obj->hitPoints = 60;
+#endif
 		obj->pivotLength = 50;
+		obj->radius = 102;
+		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->radius = 102;
 		AnimBones[obj->boneIndex + 0 * 4] |= 0x08;
 		AnimBones[obj->boneIndex + 8 * 4] |= 0x08;
 	}
 	obj = &Objects[ID_SHARK];
 	if (obj->loaded) {
+		obj->initialise = InitialiseCreature;
+		obj->collision = CreatureCollision;
 		obj->control = SharkControl;
 		obj->drawRoutine = DrawUnclippedItem;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModSharkHealth();
+#else
 		obj->hitPoints = 30;
+#endif
+		obj->pivotLength = 200;
+		obj->radius = 341;
+		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
 		obj->water_creature = 1;
-		obj->pivotLength = 200;
-		obj->radius = 341;
 		AnimBones[obj->boneIndex + 9 * 4] |= 0x08;
 	}
 	obj = &Objects[ID_TIGER];
 	if (obj->loaded) {
-		obj->control = TigerControl;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+		obj->control = TigerControl;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModTigerHealth();
+#else
 		obj->hitPoints = 20;
+#endif
 		obj->pivotLength = 200;
+		obj->radius = 341;
+		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->radius = 341;
 		AnimBones[obj->boneIndex + 21 * 4] |= 0x08;
 	}
 	obj = &Objects[ID_BARRACUDA];
 	if (obj->loaded) {
-		obj->control = BaracuddaControl;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+		obj->control = BaracuddaControl;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModBarracudaHealth();
+#else
 		obj->hitPoints = 12;
+#endif
 		obj->pivotLength = 200;
 		obj->radius = 204;
+		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
@@ -247,13 +294,21 @@ void BaddyObjects() {
 	obj = &Objects[ID_SPIDER_or_WOLF];
 	if (obj->loaded) {
 #ifdef FEATURE_GOLD
-		obj->initialise = IsGold() ? InitialiseWolf : NULL;
+		obj->initialise = IsGold() ? InitialiseWolf : InitialiseCreature;
 		obj->control = IsGold() ? WolfControl : SpiderControl;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = IsGold() ? GetModWolfHealth() : GetModSmallSpiderHealth();
+#else
 		obj->hitPoints = IsGold() ? 10 : 5;
+#endif
 		obj->radius = IsGold() ? 341 : 102;
 #else
 		obj->control = SpiderControl;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModSmallSpiderHealth();
+#else
 		obj->hitPoints = 5;
+#endif
 		obj->radius = 102;
 #endif
 		obj->collision = CreatureCollision;
@@ -266,14 +321,23 @@ void BaddyObjects() {
 	}
 	obj = &Objects[ID_BIG_SPIDER_or_BEAR];
 	if (obj->loaded) {
+		obj->initialise = InitialiseCreature;
+		obj->collision = CreatureCollision;
 #ifdef FEATURE_GOLD
 		obj->control = IsGold() ? BearControl : BigSpiderControl;
-		obj->hitPoints = IsGold() ? 30 : 40;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = IsGold() ? GetModBearHealth() : GetModBigSpiderHealth();
+#else
+		obj->hitPoints = 12;
+#endif
 #else
 		obj->control = BigSpiderControl;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModBigSpiderHealth();
+#else
 		obj->hitPoints = 40;
 #endif
-		obj->collision = CreatureCollision;
+#endif
 		obj->shadowSize = 128;
 		obj->radius = 341;
 		obj->intelligent = 1;
@@ -284,27 +348,38 @@ void BaddyObjects() {
 	}
 	obj = &Objects[ID_YETI];
 	if (obj->loaded) {
-		obj->control = YetiControl;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+		obj->control = YetiControl;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModYetiHealth();
+#else
 		obj->hitPoints = 30;
+#endif
+		obj->pivotLength = 100;
 		obj->radius = 128;
+		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->pivotLength = 100;
 		AnimBones[obj->boneIndex + 6 * 4] |= 0x08;
 		AnimBones[obj->boneIndex + 14 * 4] |= 0x08;
 	}
 	obj = &Objects[ID_JELLY];
 	if (obj->loaded) {
-		obj->control = JellyControl;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+		obj->control = JellyControl;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModJellyHealth();
+#else
 		obj->hitPoints = 10;
+#endif
+		obj->shadowSize = 128;
 		obj->radius = 102;
+		obj->pivotLength = 0;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
@@ -314,10 +389,15 @@ void BaddyObjects() {
 	}
 	obj = &Objects[ID_DIVER];
 	if (obj->loaded) {
-		obj->control = DiverControl;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+		obj->control = DiverControl;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModDiverHealth();
+#else
 		obj->hitPoints = 20;
+#endif
+		obj->shadowSize = 128;
 		obj->radius = 341;
 		obj->pivotLength = 50;
 		obj->intelligent = 1;
@@ -331,81 +411,106 @@ void BaddyObjects() {
 	}
 	obj = &Objects[ID_WORKER1];
 	if (obj->loaded) {
-		obj->control = Worker1Control;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+		obj->control = Worker1Control;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModWorker1Health();
+#else
 		obj->hitPoints = 25;
+#endif
 		obj->radius = 102;
+		obj->pivotLength = 0;
+		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->pivotLength = 0;
 		AnimBones[obj->boneIndex + 4 * 4] |= 0x08;
 		AnimBones[obj->boneIndex + 13 * 4] |= 0x08;
 	}
 	obj = &Objects[ID_WORKER2];
 	if (obj->loaded) {
-		obj->control = Worker2Control;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+		obj->control = Worker2Control;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModWorker2Health();
+#else
 		obj->hitPoints = 20;
+#endif
+		obj->pivotLength = 0;
 		obj->radius = 102;
+		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->pivotLength = 0;
 		AnimBones[obj->boneIndex + 4 * 4] |= 0x08;
 		AnimBones[obj->boneIndex + 13 * 4] |= 0x08;
 	}
 	obj = &Objects[ID_WORKER3];
 	if (obj->loaded) {
-		obj->control = Worker3Control;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+		obj->control = Worker3Control;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModWorker3Health();
+#else
 		obj->hitPoints = 27;
+#endif
+		obj->pivotLength = 0;
 		obj->radius = 102;
+		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->pivotLength = 0;
 		AnimBones[obj->boneIndex + 0 * 4] |= 0x08;
 		AnimBones[obj->boneIndex + 4 * 4] |= 0x08;
 	}
 	obj = &Objects[ID_WORKER4];
 	if (obj->loaded) {
-		obj->hitPoints = 27;
-		obj->control = Worker3Control;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
+		obj->control = Worker3Control;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModWorker4Health();
+#else
+		obj->hitPoints = 27;
+#endif
+		obj->pivotLength = 0;
+		obj->radius = 102;
 		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->radius = 102;
-		obj->pivotLength = 0;
 		AnimBones[obj->boneIndex + 0 * 4] |= 0x08;
 		AnimBones[obj->boneIndex + 4 * 4] |= 0x08;
 	}
 	obj = &Objects[ID_WORKER5];
 	if (obj->loaded) {
-		obj->control = Worker2Control;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+		obj->control = Worker2Control;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModWorker5Health();
+#else
 		obj->hitPoints = 20;
+#endif
 		obj->radius = 102;
+		obj->pivotLength = 0;
+		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->pivotLength = 0;
 		AnimBones[obj->boneIndex + 4 * 4] |= 0x08;
 		AnimBones[obj->boneIndex + 13 * 4] |= 0x08;
 	}
@@ -414,41 +519,55 @@ void BaddyObjects() {
 		obj->initialise = InitialiseCult3;
 		obj->control = Cult3Control;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModCult3Health();
+#else
 		obj->hitPoints = 150;
+#endif
 		obj->radius = 102;
+		obj->pivotLength = 0;
+		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->pivotLength = 0;
 	}
 	obj = &Objects[ID_MONK1];
 	if (obj->loaded) {
+		obj->initialise = InitialiseCreature;
 		obj->control = MonkControl;
 		obj->collision = CreatureCollision;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModMonk1Health();
+#else
+		obj->hitPoints = 30;
+#endif
+		obj->radius = 102;
+		obj->pivotLength = 0;
 #ifdef FEATURE_GOLD
 		obj->shadowSize = IsGold() ? 0 : 128;
 #else
 		obj->shadowSize = 128;
 #endif
-		obj->hitPoints = 30;
-		obj->radius = 102;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->pivotLength = 0;
 		AnimBones[obj->boneIndex + 6 * 4] |= 0x08;
 	}
 	obj = &Objects[ID_MONK2];
 	if (obj->loaded) {
+		obj->initialise = InitialiseCreature;
 		obj->control = MonkControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModMonk2Health();
+#else
 		obj->hitPoints = 30;
+#endif
+		obj->shadowSize = 128;
 		obj->radius = 102;
 		obj->intelligent = 1;
 		obj->save_position = 1;
@@ -462,36 +581,49 @@ void BaddyObjects() {
 		obj->initialise = InitialiseEagle;
 		obj->control = EagleControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModEagleHealth();
+#else
 		obj->hitPoints = 20;
+#endif
+		obj->pivotLength = 0;
 		obj->radius = 204;
+		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->pivotLength = 0;
 	}
 	obj = &Objects[ID_CROW];
 	if (obj->loaded) {
 		obj->initialise = InitialiseEagle;
 		obj->control = EagleControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModCrowHealth();
+#else
 		obj->hitPoints = 15;
+#endif
 		obj->radius = 204;
+		obj->pivotLength = 0;
+		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->pivotLength = 0;
 	}
 	obj = &Objects[ID_BIG_EEL];
 	if (obj->loaded) {
-		obj->control = BigEelControl;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
+		obj->control = BigEelControl;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModBigEelHealth();
+#else
 		obj->hitPoints = 20;
+#endif
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
@@ -499,8 +631,14 @@ void BaddyObjects() {
 	}
 	obj = &Objects[ID_EEL];
 	if (obj->loaded) {
-		obj->control = EelControl;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
+		obj->control = EelControl;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModEelHealth();
+#else
+		obj->hitPoints = 5;
+#endif
 		obj->hitPoints = 5;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
@@ -509,33 +647,43 @@ void BaddyObjects() {
 	}
 	obj = &Objects[ID_BANDIT1];
 	if (obj->loaded) {
-		obj->control = BanditControl;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+		obj->control = BanditControl;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModBandit1Health();
+#else
 		obj->hitPoints = 45;
+#endif
 		obj->radius = 102;
+		obj->pivotLength = 0;
+		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->pivotLength = 0;
 		AnimBones[obj->boneIndex + 6 * 4] |= 0x08;
 		AnimBones[obj->boneIndex + 8 * 4] |= 0x08;
 	}
 	obj = &Objects[ID_BANDIT2];
 	if (obj->loaded) {
-		obj->control = Bandit2Control;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+		obj->control = Bandit2Control;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModBandit2Health();
+#else
 		obj->hitPoints = 50;
+#endif
 		obj->radius = 102;
+		obj->pivotLength = 0;
+		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->pivotLength = 0;
 		AnimBones[obj->boneIndex + 6 * 4] |= 0x08;
 		AnimBones[obj->boneIndex + 8 * 4] |= 0x08;
 	}
@@ -546,8 +694,14 @@ void BaddyObjects() {
 		}
 		obj->frameBase = Objects[ID_BANDIT2].frameBase;
 		obj->animIndex = Objects[ID_BANDIT2].animIndex;
-		obj->control = Bandit2Control;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
+		obj->control = Bandit2Control;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModBandit2BHealth();
+#else
+		obj->hitPoints = 50;
+#endif
 		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
@@ -562,12 +716,16 @@ void BaddyObjects() {
 	}
 	obj = &Objects[ID_SKIDOO_ARMED];
 	if (obj->loaded) {
-		obj->drawRoutine = DrawSkidoo;
 		obj->collision = SkidmanCollision;
-		obj->shadowSize = 128;
+		obj->drawRoutine = DrawSkidoo;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModSkidmanHealth();
+#else
 		obj->hitPoints = 100;
+#endif
 		obj->radius = 341;
 		obj->pivotLength = 0;
+		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
@@ -589,18 +747,22 @@ void BaddyObjects() {
 			S_ExitSystem("FATAL: XianLord requires CHINESE2 (statue)");
 		}
 		obj->initialise = InitialiseXianLord;
-		obj->drawRoutine = DrawXianLord;
-		obj->control = XianLordControl;
 		obj->collision = CreatureCollision;
+		obj->control = XianLordControl;
+		obj->drawRoutine = DrawXianLord;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModXianLordHealth();
+#else
+		obj->hitPoints = 100;
+#endif
+		obj->pivotLength = 0;
+		obj->radius = 204;
 		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->hitPoints = 100;
-		obj->radius = 204;
-		obj->pivotLength = 0;
 		AnimBones[obj->boneIndex + 6 * 4] |= 0x08;
 		AnimBones[obj->boneIndex + 12 * 4] |= 0x08;
 	}
@@ -609,19 +771,23 @@ void BaddyObjects() {
 		if (!Objects[ID_CHINESE4].loaded) {
 			S_ExitSystem("FATAL: Warrior requires CHINESE4 (statue)");
 		}
-		obj->drawRoutine = DrawXianLord;
 		obj->initialise = InitialiseXianLord;
-		obj->control = WarriorControl;
 		obj->collision = CreatureCollision;
+		obj->control = WarriorControl;
+		obj->drawRoutine = DrawXianLord;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModWarriorHealth();
+#else
+		obj->hitPoints = 80;
+#endif
+		obj->pivotLength = 0;
+		obj->radius = 204;
 		obj->shadowSize = 128;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->hitPoints = 80;
-		obj->radius = 204;
-		obj->pivotLength = 0;
 		AnimBones[obj->boneIndex + 6 * 4] |= 0x08;
 		AnimBones[obj->boneIndex + 16 * 4] |= 0x08;
 	}
@@ -630,16 +796,21 @@ void BaddyObjects() {
 		if (!Objects[ID_DRAGON_BACK].loaded) {
 			S_ExitSystem("FATAL: Dragon front needs back");
 		}
-		obj->hitPoints = 300;
-		obj->pivotLength = 300;
+		obj->initialise = InitialiseCreature;
+		obj->collision = DragonCollision;
 		obj->control = DragonControl;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModDragonHealth();
+#else
+		obj->hitPoints = 300;
+#endif
+		obj->radius = 341;
+		obj->pivotLength = 300;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->collision = DragonCollision;
-		obj->radius = 341;
 		AnimBones[obj->boneIndex + 10 * 4] |= 0x10;
 	}
 	obj = &Objects[ID_DRAGON_BACK];
@@ -660,9 +831,14 @@ void BaddyObjects() {
 	}
 	obj = &Objects[ID_GIANT_YETI];
 	if (obj->loaded) {
-		obj->control = GiantYetiControl;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
+		obj->control = GiantYetiControl;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModGiantYetiHealth();
+#else
 		obj->hitPoints = 200;
+#endif
 		obj->radius = 341;
 		obj->intelligent = 1;
 		obj->save_position = 1;
@@ -673,24 +849,30 @@ void BaddyObjects() {
 	}
 	obj = &Objects[ID_DINO];
 	if (obj->loaded) {
-		obj->control = DinoControl;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
+		obj->control = DinoControl;
+#if defined(FEATURE_MOD_CONFIG)
+		obj->hitPoints = GetModDinoHealth();
+#else
 		obj->hitPoints = 100;
+#endif
 		obj->shadowSize = 64;
+		obj->radius = 341;
 		obj->pivotLength = 1800;
 		obj->intelligent = 1;
 		obj->save_position = 1;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->radius = 341;
 		AnimBones[obj->boneIndex + 10 * 4] |= 0x08;
 		AnimBones[obj->boneIndex + 11 * 4] |= 0x08;
 	}
 	obj = &Objects[ID_WINSTON];
 	if (obj->loaded) {
-		obj->control = WinstonControl;
+		obj->initialise = InitialiseCreature;
 		obj->collision = ObjectCollision;
+		obj->control = WinstonControl;
 		obj->hitPoints = HP_DONT_TARGET;
 		obj->shadowSize = 64;
 		obj->radius = 102;
@@ -707,14 +889,10 @@ void BaddyObjects() {
 void Inject_Setup() {
 	//	INJECT(0x0043A330, InitialiseLevel);
 	//	INJECT(0x0043A490, InitialiseGameFlags);
-
 	INJECT(0x0043A500, InitialiseLevelFlags);
 	INJECT(0x0043A530, BaddyObjects);
-
 	//	INJECT(0x0043B570, TrapObjects);
 	//	INJECT(0x0043BB70, ObjectObjects);
-
 	INJECT(0x0043C7C0, InitialiseObjects);
-
 	//	INJECT(0x0043C830, GetCarriedItems);
 }

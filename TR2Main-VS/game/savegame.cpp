@@ -71,14 +71,14 @@ void ModifyStartInfo(int levelIdx) {
 
 	switch (levelIdx) {
 	case 0: // Assault (Lara's Home)
-		start->available = 1; // make level available
-		start->has_pistols = 0; // Lara has no weapons
-		start->has_magnums = 0;
-		start->has_uzis = 0;
-		start->has_shotgun = 0;
-		start->has_m16 = 0;
-		start->has_grenade = 0;
-		start->has_harpoon = 0;
+		start->available = TRUE; // make level available
+		start->has_pistols = FALSE; // Lara has no weapons
+		start->has_magnums = FALSE;
+		start->has_uzis = FALSE;
+		start->has_shotgun = FALSE;
+		start->has_m16 = FALSE;
+		start->has_grenade = FALSE;
+		start->has_harpoon = FALSE;
 		start->gunType = LGT_Unarmed; // Lara doesn't have weapons
 		start->gunStatus = LGS_Armless; // Lara has no weapons in hands
 
@@ -97,56 +97,55 @@ void ModifyStartInfo(int levelIdx) {
 
 	case 1: // Regular New Game
 		start->available = TRUE; // make level available
+		start->gunStatus = LGS_Armless; // Lara has no weapons in hands
+#ifdef FEATURE_MOD_CONFIG
+		start->has_pistols = IsModPistolsAtStart(); // Lara has pistols and shotgun
+		start->has_shotgun = IsModShotgunAtStart();
+		start->has_magnums = IsModAutopistolsAtStart();
+		start->has_uzis = IsModUzisAtStart();
+		start->has_m16 = IsModM16AtStart();
+		start->has_grenade = IsModGrenadeAtStart();
+		start->has_harpoon = IsModHarpoonAtStart();
+		start->shotgunAmmo = GetModShotgunAmmoCountAtStart();
+		start->magnumAmmo = GetModAutopistolsAmmoCountAtStart();
+		start->uziAmmo = GetModUzisAmmoCountAtStart();
+		start->m16Ammo = GetModM16AmmoCountAtStart();
+		start->grenadeAmmo = GetModGrenadeAmmoCountAtStart();
+		start->harpoonAmmo = GetModHarpoonAmmoCountAtStart();
+		start->flares = GetModFlareCountAtStart();
+		start->smallMedipacks = GetModSmallMedikitCountAtStart();
+		start->largeMedipacks = GetModBigMedikitCountAtStart();
+#else
 		start->has_pistols = TRUE; // Lara has pistols and shotgun
 		start->has_magnums = FALSE;
 		start->has_uzis = FALSE;
-#ifdef FEATURE_MOD_CONFIG
-		if (IsModConfigLoaded()) {
-			start->has_shotgun = IsModRemoveShotgunAtStart() ? FALSE : TRUE;
-		}
-		else {
-			start->has_shotgun = TRUE;
-		}
-#else
 		start->has_shotgun = TRUE;
-#endif
 		start->has_m16 = FALSE;
 		start->has_grenade = FALSE;
 		start->has_harpoon = FALSE;
-		start->gunStatus = LGS_Armless; // Lara has no weapons in hands
-
 		start->magnumAmmo = 0;
 		start->uziAmmo = 0;
-#ifdef FEATURE_MOD_CONFIG
-		if (IsModConfigLoaded()) {
-			start->shotgunAmmo = IsModRemoveShotgunAtStart() ? 0 : 12;
-		}
-		else {
-			start->shotgunAmmo = 12;
-		}
-#else
 		start->shotgunAmmo = 12;
-#endif
 		start->m16Ammo = 0;
 		start->grenadeAmmo = 0;
 		start->harpoonAmmo = 0;
-
 		start->flares = 2;
 		start->smallMedipacks = 1;
 		start->largeMedipacks = 1;
+#endif
 		break;
 
 		// NOTE: there was no 'default' in the original game, so new game with level selection was broken
 	default: // New Game from any other level
 		if (SaveGame.start[levelIdx - 1].statistics.timer) break; // no reset if it's not a new game
-		start->available = 1; // make level available
-		start->has_pistols = 1; // Lara has just pistols
-		start->has_magnums = 0;
-		start->has_uzis = 0;
-		start->has_shotgun = 0;
-		start->has_m16 = 0;
-		start->has_grenade = 0;
-		start->has_harpoon = 0;
+		start->available = TRUE; // make level available
+		start->has_pistols = TRUE; // Lara has just pistols
+		start->has_magnums = FALSE;
+		start->has_uzis = FALSE;
+		start->has_shotgun = FALSE;
+		start->has_m16 = FALSE;
+		start->has_grenade = FALSE;
+		start->has_harpoon = FALSE;
 		start->gunStatus = LGS_Armless; // Lara has no weapons in hands
 
 		start->magnumAmmo = 0;
@@ -164,22 +163,22 @@ void ModifyStartInfo(int levelIdx) {
 
 	// Bonus game activated and level is not Assault
 	if (SaveGame.bonusFlag && levelIdx != 0) {
-		start->available = 1; // make level available
-		start->has_pistols = 1; // Lara has all weapons
-		start->has_magnums = 1;
-		start->has_uzis = 1;
-		start->has_shotgun = 1;
-		start->has_m16 = 1;
-		start->has_grenade = 1;
-		start->has_harpoon = 1;
+		start->available = TRUE; // make level available
+		start->has_pistols = TRUE; // Lara has all weapons
+		start->has_magnums = TRUE;
+		start->has_uzis = TRUE;
+		start->has_shotgun = TRUE;
+		start->has_m16 = TRUE;
+		start->has_grenade = TRUE;
+		start->has_harpoon = TRUE;
 		start->gunType = LGT_Grenade; // current weapon is grenade launcher
 
-		start->uziAmmo = 10001;
-		start->magnumAmmo = 10001;
-		start->shotgunAmmo = 10001;
-		start->m16Ammo = 10001;
-		start->grenadeAmmo = 10001;
-		start->harpoonAmmo = 10001;
+		start->uziAmmo = WEAPON_UNLIMITED;
+		start->magnumAmmo = WEAPON_UNLIMITED;
+		start->shotgunAmmo = WEAPON_UNLIMITED;
+		start->m16Ammo = WEAPON_UNLIMITED;
+		start->grenadeAmmo = WEAPON_UNLIMITED;
+		start->harpoonAmmo = WEAPON_UNLIMITED;
 
 		start->flares = 255;
 	}
@@ -188,16 +187,16 @@ void ModifyStartInfo(int levelIdx) {
 void CreateStartInfo(int levelID) {
 	START_INFO* start = &SaveGame.start[levelID];
 
-	start->available = 1;
-	start->pistolAmmo = 1000;
+	start->available = TRUE;
+	start->pistolAmmo = PISTOLS_AMMO_DEFAULT;
 	start->has_pistols = Inv_RequestItem(ID_PISTOL_ITEM) ? 1 : 0;
 
 	if (Inv_RequestItem(ID_MAGNUM_ITEM)) {
-		start->magnumAmmo = Lara.magnum_ammo;;
+		start->magnumAmmo = Lara.magnum_ammo;
 		start->has_magnums = 1;
 	}
 	else {
-		start->magnumAmmo = 40 * Inv_RequestItem(ID_MAGNUM_AMMO_ITEM);
+		start->magnumAmmo = AUTOPISTOLS_AMMO_CLIPS * Inv_RequestItem(ID_MAGNUM_AMMO_ITEM);
 		start->has_magnums = 0;
 	}
 
@@ -206,7 +205,7 @@ void CreateStartInfo(int levelID) {
 		start->has_uzis = 1;
 	}
 	else {
-		start->uziAmmo = 80 * Inv_RequestItem(ID_UZI_AMMO_ITEM);
+		start->uziAmmo = UZIS_AMMO_CLIPS * Inv_RequestItem(ID_UZI_AMMO_ITEM);
 		start->has_uzis = 0;
 	}
 
@@ -215,7 +214,7 @@ void CreateStartInfo(int levelID) {
 		start->has_shotgun = 1;
 	}
 	else {
-		start->shotgunAmmo = 12 * Inv_RequestItem(ID_SHOTGUN_AMMO_ITEM);
+		start->shotgunAmmo = SHOTGUN_AMMO_CLIPS * Inv_RequestItem(ID_SHOTGUN_AMMO_ITEM);
 		start->has_shotgun = 0;
 	}
 
@@ -224,7 +223,7 @@ void CreateStartInfo(int levelID) {
 		start->has_harpoon = 1;
 	}
 	else {
-		start->harpoonAmmo = 3 * Inv_RequestItem(ID_HARPOON_AMMO_ITEM);
+		start->harpoonAmmo = HARPOON_AMMO_CLIPS * Inv_RequestItem(ID_HARPOON_AMMO_ITEM);
 		start->has_harpoon = 0;
 	}
 
@@ -233,7 +232,7 @@ void CreateStartInfo(int levelID) {
 		start->has_m16 = 1;
 	}
 	else {
-		start->m16Ammo = 40 * Inv_RequestItem(ID_M16_AMMO_ITEM);
+		start->m16Ammo = M16_AMMO_CLIPS * Inv_RequestItem(ID_M16_AMMO_ITEM);
 		start->has_m16 = 0;
 	}
 
@@ -242,7 +241,7 @@ void CreateStartInfo(int levelID) {
 		start->has_grenade = 1;
 	}
 	else {
-		start->grenadeAmmo = 2 * Inv_RequestItem(ID_GRENADE_AMMO_ITEM);
+		start->grenadeAmmo = GRENADE_AMMO_CLIPS * Inv_RequestItem(ID_GRENADE_AMMO_ITEM);
 		start->has_grenade = 0;
 	}
 
