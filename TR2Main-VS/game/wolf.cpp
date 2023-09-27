@@ -50,20 +50,15 @@ static const BITE_INFO WolfBite = {
 };
 
 void InitialiseWolf(short itemID) {
-	Items[itemID].frameNumber = 96; // lying wolf frame (hardcoded thing)
 	InitialiseCreature(itemID);
+	Items[itemID].frameNumber = 96; // lying wolf frame (hardcoded thing)
 }
 
 void WolfControl(short itemID) {
+	if (!CreatureActive(itemID))
+		return;
+
 	ITEM_INFO* item = &Items[itemID];
-
-	if (item->status == ITEM_INVISIBLE) {
-		if (!EnableBaddieAI(itemID, FALSE)) {
-			return;
-		}
-		item->status = ITEM_ACTIVE;
-	}
-
 	CREATURE_INFO* wolf = (CREATURE_INFO*)item->data;
 	if (wolf == NULL) return; // NOTE: additional check not presented in the original game
 

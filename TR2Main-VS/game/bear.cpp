@@ -47,15 +47,10 @@ static const BITE_INFO BearBite = {
 };
 
 void BearControl(short itemID) {
+	if (!CreatureActive(itemID))
+		return;
+
 	ITEM_INFO* item = &Items[itemID];
-
-	if (item->status == ITEM_INVISIBLE) {
-		if (!EnableBaddieAI(itemID, FALSE)) {
-			return;
-		}
-		item->status = ITEM_ACTIVE;
-	}
-
 	CREATURE_INFO* bear = (CREATURE_INFO*)item->data;
 	if (bear == NULL) return; // NOTE: additional check not presented in the original game
 
