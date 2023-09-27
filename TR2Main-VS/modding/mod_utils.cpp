@@ -104,6 +104,11 @@ typedef struct {
 
 	char loadingPix[256];
 	DWORD waterColor;
+
+	BAR_CONFIG healthbar;
+	BAR_CONFIG airbar;
+	BAR_CONFIG enemyhealthbar;
+
 	SEMITRANS_CONFIG semitrans;
 	REFLECT_CONFIG reflect;
 } MOD_CONFIG;
@@ -439,6 +444,18 @@ int GetModDinoHealth() {
 	return ModConfig.dinoHealth;
 }
 
+BAR_CONFIG* GetModLaraHealthBar() {
+	return &ModConfig.healthbar;
+}
+
+BAR_CONFIG* GetModLaraAirBar() {
+	return &ModConfig.airbar;
+}
+
+BAR_CONFIG* GetModEnemyBar() {
+	return &ModConfig.enemyhealthbar;
+}
+
 const char* GetModLoadingPix() {
 	return *ModConfig.loadingPix ? ModConfig.loadingPix : NULL;
 }
@@ -653,8 +670,8 @@ static bool ParseReflectConfiguration(json_value* root) {
 	if (root == NULL || root->type != json_object) {
 		return false;
 	}
-	json_value* field = NULL;
 
+	json_value* field = NULL;
 	json_value* objects = GetJsonField(root, json_array, "objects", NULL);
 	if (objects) {
 		for (DWORD i = 0; i < objects->u.array.length; ++i) {
@@ -664,6 +681,7 @@ static bool ParseReflectConfiguration(json_value* root) {
 			ParsePolyfilterConfiguration(GetJsonField(object, json_array, "meshes", NULL), "mesh", &ModConfig.reflect.objects[field->u.integer]);
 		}
 	}
+
 	ParsePolyfilterConfiguration(GetJsonField(root, json_array, "statics", NULL), "static", &ModConfig.reflect.statics);
 	ModConfig.reflect.isLoaded = true;
 	return true;
@@ -683,6 +701,115 @@ static int ParseIntegerConfigByName(json_value* root, const char* name, int defa
 		return (int)field->u.integer;
 	}
 	return defaultValue;
+}
+
+static DWORD ParseLongConfigByName(json_value* root, const char* name, DWORD defaultValue = -1) {
+	json_value* field = GetJsonField(root, json_integer, name, NULL);
+	if (field) {
+		return (DWORD)field->u.integer;
+	}
+	return defaultValue;
+}
+
+static DWORD ParseColorConfigByName(json_value* root, const char* name, DWORD defaultValue = -1) {
+	json_value* field = GetJsonField(root, json_string, name, NULL);
+	if (field && field->u.string.length == 6) {
+		return strtol(field->u.string.ptr, NULL, 16);
+	}
+	return defaultValue;
+}
+
+static bool ParseHealthBarConfiguration(json_value* root, BAR_CONFIG* barConfig) {
+	if (root == NULL || root->type != json_object) {
+		return false;
+	}
+	barConfig->PC_xpos = ParseIntegerConfigByName(root, "PC_x", 8);
+	barConfig->PC_ypos = ParseIntegerConfigByName(root, "PC_y", 8);
+	barConfig->PC_color[0] = (INV_COLOURS)ParseIntegerConfigByName(root, "PC_color0", 3);
+	barConfig->PC_color[1] = (INV_COLOURS)ParseIntegerConfigByName(root, "PC_color1", 4);
+	barConfig->PSX_xpos = ParseIntegerConfigByName(root, "PSX_x", 20);
+	barConfig->PSX_ypos = ParseIntegerConfigByName(root, "PSX_y", 18);
+	barConfig->PSX_leftcolor[0] = ParseColorConfigByName(root, "PSX_leftcolor0", RGB_MAKE(0x68, 0, 0));
+	barConfig->PSX_leftcolor[1] = ParseColorConfigByName(root, "PSX_leftcolor1", RGB_MAKE(0x70, 0, 0));
+	barConfig->PSX_leftcolor[2] = ParseColorConfigByName(root, "PSX_leftcolor2", RGB_MAKE(0x98, 0, 0));
+	barConfig->PSX_leftcolor[3] = ParseColorConfigByName(root, "PSX_leftcolor3", RGB_MAKE(0xD8, 0, 0));
+	barConfig->PSX_leftcolor[4] = ParseColorConfigByName(root, "PSX_leftcolor4", RGB_MAKE(0xE4, 0, 0));
+	barConfig->PSX_leftcolor[5] = ParseColorConfigByName(root, "PSX_leftcolor5", RGB_MAKE(0xF0, 0, 0));
+	barConfig->PSX_rightcolor[0] = ParseColorConfigByName(root, "PSX_rightcolor0", RGB_MAKE(0, 0x44, 0));
+	barConfig->PSX_rightcolor[1] = ParseColorConfigByName(root, "PSX_rightcolor1", RGB_MAKE(0, 0x74, 0));
+	barConfig->PSX_rightcolor[2] = ParseColorConfigByName(root, "PSX_rightcolor2", RGB_MAKE(0, 0x9C, 0));
+	barConfig->PSX_rightcolor[3] = ParseColorConfigByName(root, "PSX_rightcolor3", RGB_MAKE(0, 0xD4, 0));
+	barConfig->PSX_rightcolor[4] = ParseColorConfigByName(root, "PSX_rightcolor4", RGB_MAKE(0, 0xE8, 0));
+	barConfig->PSX_rightcolor[5] = ParseColorConfigByName(root, "PSX_rightcolor5", RGB_MAKE(0, 0xFC, 0));
+	barConfig->PSX_framecolor[0] = ParseColorConfigByName(root, "PSX_framecolor0", RGB_MAKE(0, 0, 0));
+	barConfig->PSX_framecolor[1] = ParseColorConfigByName(root, "PSX_framecolor1", RGB_MAKE(0, 0, 0));
+	barConfig->PSX_framecolor[2] = ParseColorConfigByName(root, "PSX_framecolor2", RGB_MAKE(0x50, 0x84, 0x84));
+	barConfig->PSX_framecolor[3] = ParseColorConfigByName(root, "PSX_framecolor3", RGB_MAKE(0xA0, 0xA0, 0xA0));
+	barConfig->PSX_framecolor[4] = ParseColorConfigByName(root, "PSX_framecolor4", RGB_MAKE(0x28, 0x42, 0x42));
+	barConfig->PSX_framecolor[5] = ParseColorConfigByName(root, "PSX_framecolor5", RGB_MAKE(0x50, 0x50, 0x50));
+	return true;
+}
+
+static bool ParseAirBarConfiguration(json_value* root, BAR_CONFIG* barConfig) {
+	if (root == NULL || root->type != json_object) {
+		return false;
+	}
+	barConfig->PC_xpos = ParseIntegerConfigByName(root, "PC_x", 8);
+	barConfig->PC_ypos = ParseIntegerConfigByName(root, "PC_y", 8);
+	barConfig->PC_color[0] = (INV_COLOURS)ParseIntegerConfigByName(root, "PC_color0", 3);
+	barConfig->PC_color[1] = (INV_COLOURS)ParseIntegerConfigByName(root, "PC_color1", 4);
+	barConfig->PSX_xpos = ParseIntegerConfigByName(root, "PSX_x", 20);
+	barConfig->PSX_ypos = ParseIntegerConfigByName(root, "PSX_y", 18);
+	barConfig->PSX_leftcolor[0] = ParseColorConfigByName(root, "PSX_leftcolor0", RGB_MAKE(0, 0x40, 0x54));
+	barConfig->PSX_leftcolor[1] = ParseColorConfigByName(root, "PSX_leftcolor1", RGB_MAKE(0, 0x50, 0x64));
+	barConfig->PSX_leftcolor[2] = ParseColorConfigByName(root, "PSX_leftcolor2", RGB_MAKE(0, 0x68, 0x74));
+	barConfig->PSX_leftcolor[3] = ParseColorConfigByName(root, "PSX_leftcolor3", RGB_MAKE(0, 0x78, 0x84));
+	barConfig->PSX_leftcolor[4] = ParseColorConfigByName(root, "PSX_leftcolor4", RGB_MAKE(0, 0x84, 0x8E));
+	barConfig->PSX_leftcolor[5] = ParseColorConfigByName(root, "PSX_leftcolor5", RGB_MAKE(0, 0x90, 0x98));
+	barConfig->PSX_rightcolor[0] = ParseColorConfigByName(root, "PSX_rightcolor0", RGB_MAKE(0, 0x40, 0));
+	barConfig->PSX_rightcolor[1] = ParseColorConfigByName(root, "PSX_rightcolor1", RGB_MAKE(0, 0x50, 0));
+	barConfig->PSX_rightcolor[2] = ParseColorConfigByName(root, "PSX_rightcolor2", RGB_MAKE(0, 0x68, 0));
+	barConfig->PSX_rightcolor[3] = ParseColorConfigByName(root, "PSX_rightcolor3", RGB_MAKE(0, 0x78, 0));
+	barConfig->PSX_rightcolor[4] = ParseColorConfigByName(root, "PSX_rightcolor4", RGB_MAKE(0, 0x84, 0));
+	barConfig->PSX_rightcolor[5] = ParseColorConfigByName(root, "PSX_rightcolor5", RGB_MAKE(0, 0x90, 0));
+	barConfig->PSX_framecolor[0] = ParseColorConfigByName(root, "PSX_framecolor0", RGB_MAKE(0, 0, 0));
+	barConfig->PSX_framecolor[1] = ParseColorConfigByName(root, "PSX_framecolor1", RGB_MAKE(0, 0, 0));
+	barConfig->PSX_framecolor[2] = ParseColorConfigByName(root, "PSX_framecolor2", RGB_MAKE(0x50, 0x84, 0x84));
+	barConfig->PSX_framecolor[3] = ParseColorConfigByName(root, "PSX_framecolor3", RGB_MAKE(0xA0, 0xA0, 0xA0));
+	barConfig->PSX_framecolor[4] = ParseColorConfigByName(root, "PSX_framecolor4", RGB_MAKE(0x28, 0x42, 0x42));
+	barConfig->PSX_framecolor[5] = ParseColorConfigByName(root, "PSX_framecolor5", RGB_MAKE(0x50, 0x50, 0x50));
+	return true;
+}
+
+static bool ParseEnemyBarConfiguration(json_value* root, BAR_CONFIG* barConfig) {
+	if (root == NULL || root->type != json_object) {
+		return false;
+	}
+	barConfig->PC_xpos = ParseIntegerConfigByName(root, "PC_x", 8);
+	barConfig->PC_ypos = ParseIntegerConfigByName(root, "PC_y", 8);
+	barConfig->PC_color[0] = (INV_COLOURS)ParseIntegerConfigByName(root, "PC_color0", 3);
+	barConfig->PC_color[1] = (INV_COLOURS)ParseIntegerConfigByName(root, "PC_color1", 4);
+	barConfig->PSX_xpos = ParseIntegerConfigByName(root, "PSX_x", 20);
+	barConfig->PSX_ypos = ParseIntegerConfigByName(root, "PSX_y", 18);
+	barConfig->PSX_leftcolor[0] = ParseColorConfigByName(root, "PSX_leftcolor0", RGB_MAKE(0x68, 0, 0));
+	barConfig->PSX_leftcolor[1] = ParseColorConfigByName(root, "PSX_leftcolor1", RGB_MAKE(0x70, 0, 0));
+	barConfig->PSX_leftcolor[2] = ParseColorConfigByName(root, "PSX_leftcolor2", RGB_MAKE(0x98, 0, 0));
+	barConfig->PSX_leftcolor[3] = ParseColorConfigByName(root, "PSX_leftcolor3", RGB_MAKE(0xD8, 0, 0));
+	barConfig->PSX_leftcolor[4] = ParseColorConfigByName(root, "PSX_leftcolor4", RGB_MAKE(0xE4, 0, 0));
+	barConfig->PSX_leftcolor[5] = ParseColorConfigByName(root, "PSX_leftcolor5", RGB_MAKE(0xFF, 0, 0));
+	barConfig->PSX_rightcolor[0] = ParseColorConfigByName(root, "PSX_rightcolor0", RGB_MAKE(0x31, 0, 0));
+	barConfig->PSX_rightcolor[1] = ParseColorConfigByName(root, "PSX_rightcolor1", RGB_MAKE(0x3A, 0, 0));
+	barConfig->PSX_rightcolor[2] = ParseColorConfigByName(root, "PSX_rightcolor2", RGB_MAKE(0x40, 0, 0));
+	barConfig->PSX_rightcolor[3] = ParseColorConfigByName(root, "PSX_rightcolor3", RGB_MAKE(0x78, 0, 0));
+	barConfig->PSX_rightcolor[4] = ParseColorConfigByName(root, "PSX_rightcolor4", RGB_MAKE(0x9E, 0, 0));
+	barConfig->PSX_rightcolor[5] = ParseColorConfigByName(root, "PSX_rightcolor5", RGB_MAKE(0xDC, 0, 0));
+	barConfig->PSX_framecolor[0] = ParseColorConfigByName(root, "PSX_framecolor0", RGB_MAKE(0, 0, 0));
+	barConfig->PSX_framecolor[1] = ParseColorConfigByName(root, "PSX_framecolor1", RGB_MAKE(0, 0, 0));
+	barConfig->PSX_framecolor[2] = ParseColorConfigByName(root, "PSX_framecolor2", RGB_MAKE(0x50, 0x84, 0x84));
+	barConfig->PSX_framecolor[3] = ParseColorConfigByName(root, "PSX_framecolor3", RGB_MAKE(0xA0, 0xA0, 0xA0));
+	barConfig->PSX_framecolor[4] = ParseColorConfigByName(root, "PSX_framecolor4", RGB_MAKE(0x28, 0x42, 0x42));
+	barConfig->PSX_framecolor[5] = ParseColorConfigByName(root, "PSX_framecolor5", RGB_MAKE(0x50, 0x50, 0x50));
+	return true;
 }
 
 static bool ParseDefaultLevelConfiguration(json_value* root) {
@@ -708,6 +835,10 @@ static bool ParseDefaultLevelConfiguration(json_value* root) {
 	ModConfig.flareCountAtStart = ParseIntegerConfigByName(root, "flaresatstart", 2);
 	ModConfig.smallMedikitAtStart = ParseIntegerConfigByName(root, "smallmedikitatstart", 1);
 	ModConfig.bigMedikitAtStart = ParseIntegerConfigByName(root, "bigmedikitatstart", 1);
+
+	ParseHealthBarConfiguration(GetJsonField(root, json_object, "larahealthbar", NULL), &ModConfig.healthbar);
+	ParseAirBarConfiguration(GetJsonField(root, json_object, "laraairbar", NULL), &ModConfig.airbar);
+	ParseEnemyBarConfiguration(GetJsonField(root, json_object, "enemyhealthbar", NULL), &ModConfig.enemyhealthbar);
 
 	ParseSemitransConfiguration(GetJsonField(root, json_object, "semitransparent", NULL));
 	ParseReflectConfiguration(GetJsonField(root, json_object, "reflective", NULL));

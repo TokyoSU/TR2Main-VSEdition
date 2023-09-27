@@ -29,8 +29,10 @@
   */
 
 void PSX_DrawHealthBar(int x0, int y0, int x1, int y1, int bar, int pixel, int alpha);
+void PSX_DrawEnemyBar(int x0, int y0, int x1, int y1, int bar, int pixel, int alpha);
 void PSX_DrawAirBar(int x0, int y0, int x1, int y1, int bar, int pixel, int alpha);
 void PSX_InsertHealthBar(int x0, int y0, int x1, int y1, int bar, int pixel, int alpha);
+void PSX_InsertEnemyBar(int x0, int y0, int x1, int y1, int bar, int pixel, int alpha);
 void PSX_InsertAirBar(int x0, int y0, int x1, int y1, int bar, int pixel, int alpha);
 
 #endif // PSX_BAR_H_INCLUDED

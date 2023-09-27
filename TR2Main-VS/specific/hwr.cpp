@@ -274,7 +274,7 @@ void HWR_DrawPolyList() {
 
 		polyType = *(bufPtr++);
 #ifdef FEATURE_HUD_IMPROVED
-		if (polyType == POLY_HWR_healthbar || polyType == POLY_HWR_airbar) {
+		if (polyType == POLY_HWR_healthbar || polyType == POLY_HWR_airbar || polyType == POLY_HWR_enemybar) {
 			UINT16 x0 = *(bufPtr++);
 			UINT16 y0 = *(bufPtr++);
 			UINT16 x1 = *(bufPtr++);
@@ -284,6 +284,9 @@ void HWR_DrawPolyList() {
 			UINT16 alpha = *(bufPtr++);
 			if (polyType == POLY_HWR_healthbar) {
 				PSX_DrawHealthBar(x0, y0, x1, y1, bar, pixel, alpha);
+			}
+			else if (polyType == POLY_HWR_enemybar) {
+				PSX_DrawEnemyBar(x0, y0, x1, y1, bar, pixel, alpha);
 			}
 			else {
 				PSX_DrawAirBar(x0, y0, x1, y1, bar, pixel, alpha);

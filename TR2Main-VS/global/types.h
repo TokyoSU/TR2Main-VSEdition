@@ -258,16 +258,17 @@ typedef struct {
 
 #if (DIRECT3D_VERSION >= 0x900)
 #ifndef RGB_MAKE
-#define RGBA_SETALPHA(rgba, x)	(((x) << 24) | ((rgba) & 0x00ffffff))
-#define RGBA_GETALPHA(rgb)		((rgb) >> 24)
-#define RGBA_GETRED(rgb)		(((rgb) >> 16) & 0xff)
-#define RGBA_GETGREEN(rgb)		(((rgb) >> 8) & 0xff)
-#define RGBA_GETBLUE(rgb)		((rgb) & 0xff)
-#define RGBA_MAKE(r, g, b, a)	((D3DCOLOR) (((a) << 24) | ((r) << 16) | ((g) << 8) | (b)))
-#define RGB_GETRED(rgb)			(((rgb) >> 16) & 0xff)
-#define RGB_GETGREEN(rgb)		(((rgb) >> 8) & 0xff)
-#define RGB_GETBLUE(rgb)		((rgb) & 0xff)
-#define RGB_MAKE(r, g, b)		((D3DCOLOR) (((r) << 16) | ((g) << 8) | (b)))
+#define RGBA_SETALPHA(rgba, x)		(((x) << 24) | ((rgba) & 0x00ffffff))
+#define RGBA_GETALPHA(rgb)			((rgb) >> 24)
+#define RGBA_GETRED(rgb)			(((rgb) >> 16) & 0xff)
+#define RGBA_GETGREEN(rgb)			(((rgb) >> 8) & 0xff)
+#define RGBA_GETBLUE(rgb)			((rgb) & 0xff)
+#define RGBA_MAKE(r, g, b, a)		((D3DCOLOR) (((a) << 24) | ((r) << 16) | ((g) << 8) | (b)))
+#define RGB_GETRED(rgb)				(((rgb) >> 16) & 0xff)
+#define RGB_GETGREEN(rgb)			(((rgb) >> 8) & 0xff)
+#define RGB_GETBLUE(rgb)			((rgb) & 0xff)
+#define RGB_MAKE(r, g, b)			((D3DCOLOR) (((r) << 16) | ((g) << 8) | (b)))
+#define RGBA_MAKE_OPAQUE(rgb)		((D3DCOLOR) (((255) << 24) | ((rgba) & 0x00ffffff)))
 #endif // RGB_MAKE
 
 #ifndef D3DFVF_TLVERTEX
@@ -825,6 +826,7 @@ typedef enum {
 #ifdef FEATURE_HUD_IMPROVED
 	POLY_HWR_healthbar,	// health bar
 	POLY_HWR_airbar,	// air bar
+	POLY_HWR_enemybar,  // enemy health bar
 #endif // FEATURE_HUD_IMPROVED
 } POLYTYPE;
 

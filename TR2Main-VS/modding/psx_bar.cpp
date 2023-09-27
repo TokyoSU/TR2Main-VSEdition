@@ -24,6 +24,10 @@
 #include "specific/hwr.h"
 #include "global/vars.h"
 
+#if defined(FEATURE_MOD_CONFIG)
+#include "modding/mod_utils.h"
+#endif
+
 #ifdef FEATURE_HUD_IMPROVED
 extern DWORD HealthBarMode;
 
@@ -45,7 +49,7 @@ static D3DCOLOR InterpolateColor(D3DCOLOR color0, D3DCOLOR color1, DWORD value, 
 	return result;
 }
 
-static void DrawCololoredRect(float sx0, float sy0, float sx1, float sy1, float z, D3DCOLOR color0, D3DCOLOR color1, D3DCOLOR color2, D3DCOLOR color3, BYTE alpha) {
+static void DrawColoredRect(float sx0, float sy0, float sx1, float sy1, float z, D3DCOLOR color0, D3DCOLOR color1, D3DCOLOR color2, D3DCOLOR color3, BYTE alpha) {
 	double sz, rhw;
 	D3DTLVERTEX vertex[4];
 
@@ -89,11 +93,11 @@ static void DrawCololoredRect(float sx0, float sy0, float sx1, float sy1, float 
 static void PSX_DrawBar(int x0, int y0, int x1, int y1, int bar, int pixel, D3DCOLOR* left, D3DCOLOR* right, D3DCOLOR* frame, BYTE alpha) {
 	// Extra frame (dark gray)
 	if (HealthBarMode != 1) // skip extra frame if required
-		DrawCololoredRect(x0 - pixel * 3, y0 - pixel * 1, x1 + pixel * 3, y1 + pixel * 1, PhdNearZ + 40, frame[4], frame[5], frame[5], frame[4], 255);
+		DrawColoredRect(x0 - pixel * 3, y0 - pixel * 1, x1 + pixel * 3, y1 + pixel * 1, PhdNearZ + 40, frame[4], frame[5], frame[5], frame[4], 255);
 	// Outer frame (light gray)
-	DrawCololoredRect(x0 - pixel * 2, y0 - pixel * 2, x1 + pixel * 2, y1 + pixel * 2, PhdNearZ + 30, frame[2], frame[3], frame[3], frame[2], 255);
+	DrawColoredRect(x0 - pixel * 2, y0 - pixel * 2, x1 + pixel * 2, y1 + pixel * 2, PhdNearZ + 30, frame[2], frame[3], frame[3], frame[2], 255);
 	// Inner frame (black)
-	DrawCololoredRect(x0 - pixel * 1, y0 - pixel * 1, x1 + pixel * 1, y1 + pixel * 1, PhdNearZ + 20, frame[0], frame[1], frame[1], frame[0], 255);
+	DrawColoredRect(x0 - pixel * 1, y0 - pixel * 1, x1 + pixel * 1, y1 + pixel * 1, PhdNearZ + 20, frame[0], frame[1], frame[1], frame[0], 255);
 
 	// The bar
 	if (bar > 0) {
@@ -115,18 +119,25 @@ static void PSX_DrawBar(int x0, int y0, int x1, int y1, int bar, int pixel, D3DC
 		}
 
 		for (i = 0; i < 3; ++i) {
-			DrawCololoredRect(x0, y1 - dy[i + 1], x0 + bar, y1 - dy[i], PhdNearZ + 10, dl[i + 1], dr[i + 1], dl[i], dr[i], alpha);
+			DrawColoredRect(x0, y1 - dy[i + 1], x0 + bar, y1 - dy[i], PhdNearZ + 10, dl[i + 1], dr[i + 1], dl[i], dr[i], alpha);
 		}
 
-		DrawCololoredRect(x0, y0 + pixel * 0, x0 + bar, y0 + pixel * 1, PhdNearZ + 10, left[2], right[2], left[3], right[3], alpha);
-		DrawCololoredRect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, left[5], right[5], left[4], right[4], alpha);
+		DrawColoredRect(x0, y0 + pixel * 0, x0 + bar, y0 + pixel * 1, PhdNearZ + 10, left[2], right[2], left[3], right[3], alpha);
+		DrawColoredRect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, left[5], right[5], left[4], right[4], alpha);
 	}
 }
 
 void PSX_DrawHealthBar(int x0, int y0, int x1, int y1, int bar, int pixel, int alpha) {
+#if defined(FEATURE_MOD_CONFIG)
+	BAR_CONFIG* barconfig = GetModLaraHealthBar();
+	D3DCOLOR left[6] = { barconfig->PSX_leftcolor[0], barconfig->PSX_leftcolor[1], barconfig->PSX_leftcolor[2], barconfig->PSX_leftcolor[3], barconfig->PSX_leftcolor[4], barconfig->PSX_leftcolor[5] };
+	D3DCOLOR right[6] = { barconfig->PSX_rightcolor[0], barconfig->PSX_rightcolor[1], barconfig->PSX_rightcolor[2], barconfig->PSX_rightcolor[3], barconfig->PSX_rightcolor[4], barconfig->PSX_rightcolor[5] };
+	D3DCOLOR frame[6] = { barconfig->PSX_framecolor[0], barconfig->PSX_framecolor[1], barconfig->PSX_framecolor[2], barconfig->PSX_framecolor[3], barconfig->PSX_framecolor[4], barconfig->PSX_framecolor[5] };
+#else
 	D3DCOLOR left[6] = { 0xFF680000, 0xFF700000, 0xFF980000, 0xFFD80000, 0xFFE40000, 0xFFF00000 };
 	D3DCOLOR right[6] = { 0xFF004400, 0xFF007400, 0xFF009C00, 0xFF00D400, 0xFF00E800, 0xFF00FC00 };
 	D3DCOLOR frame[6] = { 0xFF000000, 0xFF000000, 0xFF508484, 0xFFA0A0A0, 0xFF284242, 0xFF505050 };
+#endif
 
 	for (int i = 0; i < 6; ++i)
 		right[i] = InterpolateColor(left[i], right[i], bar, x1 - x0);
@@ -135,10 +146,36 @@ void PSX_DrawHealthBar(int x0, int y0, int x1, int y1, int bar, int pixel, int a
 	PSX_DrawBar(x0, y0, x1, y1, bar, pixel, left, right, frame, alpha);
 }
 
+void PSX_DrawEnemyBar(int x0, int y0, int x1, int y1, int bar, int pixel, int alpha) {
+#if defined(FEATURE_MOD_CONFIG)
+	BAR_CONFIG* barconfig = GetModEnemyBar();
+	D3DCOLOR left[6] = { barconfig->PSX_leftcolor[0], barconfig->PSX_leftcolor[1], barconfig->PSX_leftcolor[2], barconfig->PSX_leftcolor[3], barconfig->PSX_leftcolor[4], barconfig->PSX_leftcolor[5] };
+	D3DCOLOR right[6] = { barconfig->PSX_rightcolor[0], barconfig->PSX_rightcolor[1], barconfig->PSX_rightcolor[2], barconfig->PSX_rightcolor[3], barconfig->PSX_rightcolor[4], barconfig->PSX_rightcolor[5] };
+	D3DCOLOR frame[6] = { barconfig->PSX_framecolor[0], barconfig->PSX_framecolor[1], barconfig->PSX_framecolor[2], barconfig->PSX_framecolor[3], barconfig->PSX_framecolor[4], barconfig->PSX_framecolor[5] };
+#else
+	D3DCOLOR left[6] = { 0xFF680000, 0xFF700000, 0xFF980000, 0xFFD80000, 0xFFE40000, 0xFFFF0000 };
+	D3DCOLOR right[6] = { 0xFF310000, 0xFF3A0000, 0xFF400000, 0xFF780000, 0xFF9E0000, 0xFFDC0000 };
+	D3DCOLOR frame[6] = { 0xFF000000, 0xFF000000, 0xFF508484, 0xFFA0A0A0, 0xFF284242, 0xFF505050 };
+#endif
+	
+	for (int i = 0; i < 6; ++i)
+		right[i] = InterpolateColor(left[i], right[i], bar, x1 - x0);
+
+	CLAMP(alpha, 0, 255);
+	PSX_DrawBar(x0, y0, x1, y1, bar, pixel, left, right, frame, alpha);
+}
+
 void PSX_DrawAirBar(int x0, int y0, int x1, int y1, int bar, int pixel, int alpha) {
+#if defined(FEATURE_MOD_CONFIG)
+	BAR_CONFIG* barconfig = GetModLaraAirBar();
+	D3DCOLOR left[6] = { barconfig->PSX_leftcolor[0], barconfig->PSX_leftcolor[1], barconfig->PSX_leftcolor[2], barconfig->PSX_leftcolor[3], barconfig->PSX_leftcolor[4], barconfig->PSX_leftcolor[5] };
+	D3DCOLOR right[6] = { barconfig->PSX_rightcolor[0], barconfig->PSX_rightcolor[1], barconfig->PSX_rightcolor[2], barconfig->PSX_rightcolor[3], barconfig->PSX_rightcolor[4], barconfig->PSX_rightcolor[5] };
+	D3DCOLOR frame[6] = { barconfig->PSX_framecolor[0], barconfig->PSX_framecolor[1], barconfig->PSX_framecolor[2], barconfig->PSX_framecolor[3], barconfig->PSX_framecolor[4], barconfig->PSX_framecolor[5] };
+#else
 	D3DCOLOR left[6] = { 0xFF004054, 0xFF005064, 0xFF006874, 0xFF007884, 0xFF00848E, 0xFF009098 };
 	D3DCOLOR right[6] = { 0xFF004000, 0xFF005000, 0xFF006800, 0xFF007800, 0xFF008400, 0xFF009000 };
 	D3DCOLOR frame[6] = { 0xFF000000, 0xFF000000, 0xFF508484, 0xFFA0A0A0, 0xFF284242, 0xFF505050 };
+#endif
 
 	for (int i = 0; i < 6; ++i)
 		right[i] = InterpolateColor(left[i], right[i], bar, x1 - x0);
@@ -166,6 +203,10 @@ static void PSX_InsertBar(int polytype, int x0, int y0, int x1, int y1, int bar,
 
 void PSX_InsertHealthBar(int x0, int y0, int x1, int y1, int bar, int pixel, int alpha) {
 	PSX_InsertBar(POLY_HWR_healthbar, x0, y0, x1, y1, bar, pixel, alpha);
+}
+
+void PSX_InsertEnemyBar(int x0, int y0, int x1, int y1, int bar, int pixel, int alpha) {
+	PSX_InsertBar(POLY_HWR_enemybar, x0, y0, x1, y1, bar, pixel, alpha);
 }
 
 void PSX_InsertAirBar(int x0, int y0, int x1, int y1, int bar, int pixel, int alpha) {

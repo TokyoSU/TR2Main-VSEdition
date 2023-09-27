@@ -30,6 +30,7 @@
 BOOL FlashIt(); // 0x00421980
 void DrawAssaultTimer(); // 0x004219B0
 void DrawGameInfo(BOOL pickupState); // 0x00421B00
+void DrawEnemyHealthBar();
 void DrawHealthBar(BOOL flashState); // 0x00421B50
 void DrawAirBar(BOOL flashState); // 0x00421C00
 void MakeAmmoString(char* str); // 0x00421CA0

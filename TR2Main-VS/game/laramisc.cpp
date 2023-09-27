@@ -407,37 +407,37 @@ void LaraCheatGetStuff() {
 		if (!Inv_RequestItem(ID_MAGNUM_ITEM)) {
 			Inv_AddItem(ID_MAGNUM_ITEM);
 		}
-		Lara.magnum_ammo = (SaveGame.bonusFlag && !IsDemoLevelType) ? WEAPON_UNLIMITED : 1000;
+		Lara.magnum_ammo = WEAPON_UNLIMITED;
 	}
 	if (Objects[ID_UZI_OPTION].loaded) {
 		if (!Inv_RequestItem(ID_UZI_ITEM)) {
 			Inv_AddItem(ID_UZI_ITEM);
 		}
-		Lara.uzi_ammo = (SaveGame.bonusFlag && !IsDemoLevelType) ? WEAPON_UNLIMITED : 2000;
+		Lara.uzi_ammo = WEAPON_UNLIMITED;
 	}
 	if (Objects[ID_SHOTGUN_OPTION].loaded) {
 		if (!Inv_RequestItem(ID_SHOTGUN_ITEM)) {
 			Inv_AddItem(ID_SHOTGUN_ITEM);
 		}
-		Lara.shotgun_ammo = (SaveGame.bonusFlag && !IsDemoLevelType) ? WEAPON_UNLIMITED : 300;
+		Lara.shotgun_ammo = WEAPON_UNLIMITED;
 	}
 	if (Objects[ID_HARPOON_OPTION].loaded) {
 		if (!Inv_RequestItem(ID_HARPOON_ITEM)) {
 			Inv_AddItem(ID_HARPOON_ITEM);
 		}
-		Lara.harpoon_ammo = (SaveGame.bonusFlag && !IsDemoLevelType) ? WEAPON_UNLIMITED : 300;
+		Lara.harpoon_ammo = WEAPON_UNLIMITED;
 	}
 	if (Objects[ID_M16_OPTION].loaded) {
 		if (!Inv_RequestItem(ID_M16_ITEM)) {
 			Inv_AddItem(ID_M16_ITEM);
 		}
-		Lara.m16_ammo = (SaveGame.bonusFlag && !IsDemoLevelType) ? WEAPON_UNLIMITED : 300;
+		Lara.m16_ammo = WEAPON_UNLIMITED;
 	}
 	if (Objects[ID_GRENADE_OPTION].loaded) {
 		if (!Inv_RequestItem(ID_GRENADE_ITEM)) {
 			Inv_AddItem(ID_GRENADE_ITEM);
 		}
-		Lara.grenade_ammo = (SaveGame.bonusFlag && !IsDemoLevelType) ? WEAPON_UNLIMITED : 300;
+		Lara.grenade_ammo = WEAPON_UNLIMITED;
 	}
 
 	for (int i = 0; i < 10; ++i) {

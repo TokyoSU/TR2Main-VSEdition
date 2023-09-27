@@ -37,6 +37,10 @@
 #include "specific/winvid.h"
 #include "global/vars.h"
 
+#if defined(FEATURE_MOD_CONFIG)
+#include "modding/mod_utils.h"
+#endif
+
 #ifdef FEATURE_HUD_IMPROVED
 #include "modding/psx_bar.h"
 
@@ -739,8 +743,15 @@ void S_DrawHealthBar(int percent) {
 #ifdef FEATURE_HUD_IMPROVED
 	int barWidth = GetRenderScale(100);
 	int barHeight = GetRenderScale(5);
+#if defined(FEATURE_MOD_CONFIG)
+	BAR_CONFIG* barconfig = GetModLaraHealthBar();
+	int barXOffset = GetRenderScale((PsxBarPosEnabled && !IsInventoryActive) ? barconfig->PSX_xpos : barconfig->PC_xpos);
+	int barYOffset = GetRenderScale((PsxBarPosEnabled && !IsInventoryActive) ? barconfig->PSX_ypos : barconfig->PC_ypos);
+#else
 	int barXOffset = GetRenderScale((PsxBarPosEnabled && !IsInventoryActive) ? 20 : 8);
 	int barYOffset = GetRenderScale((PsxBarPosEnabled && !IsInventoryActive) ? 18 : 8);
+#endif
+
 	int pixel = GetRenderScale(1);
 	int x0, x1;
 
@@ -755,7 +766,6 @@ void S_DrawHealthBar(int percent) {
 
 	int y0 = PhdWinMinY + barYOffset;
 	int y1 = y0 + barHeight;
-
 	int bar = barWidth * percent / PHD_ONE;
 
 	// Disable underwater shading
@@ -778,8 +788,13 @@ void S_DrawHealthBar(int percent) {
 
 	// Health bar
 	if (bar > 0) {
+#if defined(FEATURE_MOD_CONFIG)
+		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[barconfig->PC_color[0]]);
+		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[barconfig->PC_color[1]]);
+#else
 		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[ICLR_Red]);
 		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[ICLR_Orange]);
+#endif
 	}
 #else // !FEATURE_HUD_IMPROVED
 	int i;
@@ -817,12 +832,110 @@ void S_DrawHealthBar(int percent) {
 #endif // FEATURE_HUD_IMPROVED
 }
 
+void S_DrawEnemyHealthBar(int percent, int originalHP) {
+	if (IsInventoryActive) return; // NOTE: Remove the bar if lara is in inventory !
+#ifdef FEATURE_HUD_IMPROVED
+	int barWidth = GetRenderScale(originalHP);
+	int barHeight = GetRenderScale(5);
+#if defined(FEATURE_MOD_CONFIG)
+	BAR_CONFIG* barconfig = GetModEnemyBar();
+	int barXOffset = GetRenderScale(PsxBarPosEnabled ? barconfig->PSX_xpos : barconfig->PC_xpos);
+	int barYOffset = GetRenderScale(PsxBarPosEnabled ? barconfig->PSX_ypos : barconfig->PC_ypos);
+#else
+	int barXOffset = GetRenderScale(PsxBarPosEnabled ? 20 : 8);
+	int barYOffset = GetRenderScale(PsxBarPosEnabled ? 29 : 18);
+#endif
+	int pixel = GetRenderScale(1);
+	int x0, x1;
+
+	if (PsxBarPosEnabled) {
+		x1 = PhdWinMinX + DumpWidth - barXOffset;
+		x0 = x1 - barWidth;
+	}
+	else {
+		x0 = PhdWinMinX + barXOffset;
+		x1 = x0 + barWidth;
+	}
+
+	int y0 = PhdWinMinY + barYOffset;
+	int y1 = y0 + barHeight;
+	int bar = barWidth * percent / PHD_ONE;
+
+	// Disable underwater shading
+	IsShadeEffect = false;
+
+	if (HealthBarMode != 0 && SavedAppSettings.RenderMode == RM_Hardware) {
+		if (SavedAppSettings.ZBuffer) {
+			PSX_DrawEnemyBar(x0, y0, x1, y1, bar, pixel, 255);
+		} else {
+			PSX_InsertEnemyBar(x0, y0, x1, y1, bar, pixel, 255);
+		}
+		return;
+	}
+
+	// Frame
+	ins_flat_rect(x0 - pixel * 2, y0 - pixel * 2, x1 + pixel * 2, y1 + pixel * 2, PhdNearZ + 50, InvColours[ICLR_White]);
+	ins_flat_rect(x0 - pixel * 1, y0 - pixel * 1, x1 + pixel * 2, y1 + pixel * 2, PhdNearZ + 40, InvColours[ICLR_Gray]);
+	ins_flat_rect(x0 - pixel * 1, y0 - pixel * 1, x1 + pixel * 1, y1 + pixel * 1, PhdNearZ + 30, InvColours[ICLR_Black]);
+
+	// Health bar
+	if (bar > 0) {
+#if defined(FEATURE_MOD_CONFIG)
+		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[barconfig->PC_color[0]]);
+		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[barconfig->PC_color[1]]);
+#else
+		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[ICLR_Red]);
+		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[ICLR_Red]);
+#endif
+	}
+#else // !FEATURE_HUD_IMPROVED
+	int i;
+
+	int barWidth = originalHP;
+	int barHeight = 5;
+
+	int x0 = 8;
+	int y0 = 8;
+	int x1 = x0 + barWidth;
+	int y1 = y0 + barHeight;
+
+	int bar = barWidth * percent / originalHP;
+
+	// Disable underwater shading
+	IsShadeEffect = false;
+
+	// Black background
+	for (i = 0; i < (barHeight + 2); ++i)
+		ins_line(x0 - 2, y0 + i - 1, x1 + 1, y0 + i - 1, PhdNearZ + 50, InvColours[ICLR_Black]);
+
+	// Dark frame
+	ins_line(x0 - 2, y1 + 1, x1 + 2, y1 + 1, PhdNearZ + 40, InvColours[ICLR_Gray]);
+	ins_line(x1 + 2, y0 - 2, x1 + 2, y1 + 1, PhdNearZ + 40, InvColours[ICLR_Gray]);
+
+	// Light frame
+	ins_line(x0 - 2, y0 - 2, x1 + 2, y0 - 2, PhdNearZ + 30, InvColours[ICLR_White]);
+	ins_line(x0 - 2, y1 + 1, x0 - 2, y0 - 2, PhdNearZ + 30, InvColours[ICLR_White]);
+
+	// Health bar
+	if (bar > 0) {
+		for (i = 0; i < barHeight; ++i)
+			ins_line(x0, y0 + i, x0 + bar, y0 + i, PhdNearZ + 20, (i == 1) ? InvColours[ICLR_Orange] : InvColours[ICLR_Red]);
+	}
+#endif // FEATURE_HUD_IMPROVED
+}
+
 void S_DrawAirBar(int percent) {
 #ifdef FEATURE_HUD_IMPROVED
 	int barWidth = GetRenderScale(100);
 	int barHeight = GetRenderScale(5);
+#if defined(FEATURE_MOD_CONFIG)
+	BAR_CONFIG* barconfig = GetModLaraAirBar();
+	int barXOffset = GetRenderScale(PsxBarPosEnabled ? barconfig->PSX_xpos : barconfig->PC_xpos);
+	int barYOffset = GetRenderScale(PsxBarPosEnabled ? barconfig->PSX_ypos : barconfig->PC_ypos);
+#else
 	int barXOffset = GetRenderScale(PsxBarPosEnabled ? 20 : 8);
 	int barYOffset = GetRenderScale(PsxBarPosEnabled ? 32 : 8);
+#endif
 	int pixel = GetRenderScale(1);
 
 	int x1 = PhdWinMinX + DumpWidth - barXOffset;
@@ -852,8 +965,13 @@ void S_DrawAirBar(int percent) {
 
 	// Air bar
 	if (bar > 0) {
+#if defined(FEATURE_MOD_CONFIG)
+		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[barconfig->PC_color[0]]);
+		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[barconfig->PC_color[1]]);
+#else
 		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[ICLR_Blue]);
 		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[ICLR_White]);
+#endif
 	}
 #else // !FEATURE_HUD_IMPROVED
 	int i;

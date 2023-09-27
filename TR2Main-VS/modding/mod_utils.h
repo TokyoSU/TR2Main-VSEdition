@@ -46,6 +46,15 @@ typedef struct PolyfilterNode_t {
 	struct PolyfilterNode_t* next;
 } POLYFILTER_NODE;
 
+typedef struct {
+	int PC_xpos, PC_ypos;
+	INV_COLOURS PC_color[2]; // Left, Right (ICLR_flags)
+	int PSX_xpos, PSX_ypos;
+	DWORD PSX_leftcolor[6];
+	DWORD PSX_rightcolor[6];
+	DWORD PSX_framecolor[6];
+} BAR_CONFIG;
+
 typedef bool (*ENUM_POLYS_CB) (short* ptrObj, int vtxCount, bool colored, LPVOID param);
 
 /*
@@ -113,6 +122,10 @@ int GetModWarriorHealth();
 int GetModDragonHealth();
 int GetModGiantYetiHealth();
 int GetModDinoHealth();
+
+BAR_CONFIG* GetModLaraHealthBar();
+BAR_CONFIG* GetModLaraAirBar();
+BAR_CONFIG* GetModEnemyBar();
 
 const char* GetModLoadingPix();
 DWORD GetModWaterColor();
