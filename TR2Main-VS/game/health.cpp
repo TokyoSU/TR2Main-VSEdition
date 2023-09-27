@@ -106,14 +106,6 @@ void DrawAssaultTimer() {
 	}
 }
 
-void DrawEnemyHealthBar(int flashIt) {
-	ITEM_INFO* target = Lara.target;
-	if (target != NULL && target->hitPoints > 0) {
-		int originalHP = Objects[target->objectID].hitPoints;
-		S_DrawEnemyHealthBar(PHD_ONE * target->hitPoints / originalHP, originalHP);
-	}
-}
-
 void DrawGameInfo(BOOL pickupState) {
 	BOOL flashState;
 
@@ -124,9 +116,6 @@ void DrawGameInfo(BOOL pickupState) {
 		flashState = FlashIt();
 		DrawHealthBar(flashState);
 		DrawAirBar(flashState);
-#ifdef FEATURE_HUD_IMPROVED
-		DrawEnemyHealthBar(flashState);
-#endif
 		DrawPickups(pickupState);
 		DrawAssaultTimer();
 	}

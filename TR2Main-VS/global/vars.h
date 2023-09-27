@@ -41,8 +41,6 @@
 
 // Macros values.
 
-#define MAX_CREATURES 5
-
 #define WEAPON_UNLIMITED 10001
 #define PISTOLS_AMMO_DEFAULT 1000
 #define AUTOPISTOLS_AMMO_CLIPS 40
@@ -673,11 +671,8 @@ extern STATIC_INFO StaticObjects[256];
 #endif // FEATURE_EXTENDED_LIMITS
 #define CD_Flags					ARRAY_(0x005261C0, short, [64])
 #define FlipMaps					ARRAY_(0x00526260, int, [10])
-#define GroundZones					ARRAY_(0x005263A0, short*, [4][2])
+#define GroundZones					ARRAY_(0x005263A0, short*, [8])
 #define FlyZones					ARRAY_(0x005263C0, short*, [2])
-#define BaddiesSlots                VAR_U_(0x005206C0, CREATURE_INFO*)
-#define BaddiesSlotUsed             VAR_U_(0x004D7C40, int)
-
 
 /*
  * GameFlow/Inventory Variables

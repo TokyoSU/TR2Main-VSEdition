@@ -1877,11 +1877,11 @@ typedef struct DoorInfos_t {
 } DOOR_INFOS;
 
 typedef struct FloorInfo_t {
-	unsigned short index;
+	short index;
 	short box;
-	unsigned char pitRoom;
+	char pitRoom;
 	char floor;
-	unsigned char skyRoom;
+	char skyRoom;
 	char ceiling;
 } FLOOR_INFO;
 
