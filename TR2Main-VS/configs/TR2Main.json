@@ -154,6 +154,7 @@
         " 'bandit2Health': (default: 50) Slot: MERCENARY2 (black ski mask)    ",
         " 'bandit2BHealth': (default: 50) Slot: MERCENARY3 (black ski mask)   ",
         " 'skidmanHealth': (default: 100) Slot: MERCENARY_SNOWMOBILE_DRIVER   ",
+        " 'xianLordHealth': (default: 100) Slot: SPEAR_XIAN_GUARD             ",
         " 'warriorHealth': (default: 80) Slot: SWORD_XIAN_GUARD               ",
         " 'dragonHealth': (default: 300) Slot: MARCO_BARTOLI (spawner)        ",
         " 'giantYetiHealth': (default: 200) Slot: BIRD_MONSTER                ",
