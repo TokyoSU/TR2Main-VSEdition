@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased: 0.9.0.2]
 
 ### TR2Main features
-- Added an json configuration to remove the shotgun given in the first level. (default: false)
+- Added json configuration for starting weapons and ammos.
+- Added json configuration for entities health.
 
 ## [0.9.0.1] - 2023-09-24 - Fix count: 3
 
