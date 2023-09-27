@@ -29,7 +29,7 @@
 
 void CreatureDie(short itemID, BOOL explode) {
 	ITEM_INFO* item = &Items[itemID];
-	item->collidable = 0;
+	item->collidable = FALSE;
 	item->hitPoints = HP_DONT_TARGET;
 
 	if (explode) {

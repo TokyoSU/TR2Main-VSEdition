@@ -182,7 +182,7 @@ int GF_DoLevelSequence(DWORD levelID, GF_LEVEL_TYPE levelType) {
 		int direction = GF_InterpretSequence(GF_ScriptTable[i], levelType, 0);
 
 		if (GF_GameFlow.singleLevel >= 0 ||
-			(direction & ~0xFFu) != GF_LEVEL_COMPLETE)
+			(direction & ~0xFF) != GF_LEVEL_COMPLETE)
 		{
 			return direction;
 		}

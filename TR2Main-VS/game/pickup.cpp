@@ -51,49 +51,57 @@ void PickUpCollision(short itemID, ITEM_INFO* laraitem, COLL_INFO* coll)
 			return;
 		}
 
-		if (laraitem->currentAnimState == AS_PICKUP && laraitem->frameNumber == (Anims[135].frameBase + 42) && item->objectID != ID_FLARE_ITEM)
+		if (laraitem->currentAnimState == AS_PICKUP)
 		{
-			AddDisplayPickup(item->objectID);
-			Inv_AddItem((GAME_OBJECT_ID)item->objectID);
-			if ((item->objectID == ID_SECRET1 || item->objectID == ID_SECRET2 || item->objectID == ID_SECRET3) &&
-			   ((SaveGame.statistics.secrets & 1)
-			 + ((SaveGame.statistics.secrets >> 1) & 1)
-			 + ((SaveGame.statistics.secrets >> 2) & 1)) >= 3)
+			if (laraitem->frameNumber == (Anims[135].frameBase + 42) && item->objectID != ID_FLARE_ITEM)
 			{
-				GF_ModifyInventory(CurrentLevel, TRUE);
+				AddDisplayPickup(item->objectID);
+				Inv_AddItem((GAME_OBJECT_ID)item->objectID);
+				if ((item->objectID == ID_SECRET1 || item->objectID == ID_SECRET2 || item->objectID == ID_SECRET3) &&
+				   ((SaveGame.statistics.secrets & 1)
+				+  ((SaveGame.statistics.secrets & 2) >> 1)
+				+  ((SaveGame.statistics.secrets & 4) >> 2)) >= 3)
+				{
+					GF_ModifyInventory(CurrentLevel, TRUE);
+				}
+				item->status = ITEM_INVISIBLE;
+				RemoveDrawnItem(itemID);
 			}
-			RemoveDrawnItem(itemID);
 		}
-		else if (laraitem->currentAnimState == AS_FLAREPICKUP && laraitem->frameNumber == (Anims[204].frameBase + 58) && item->objectID == ID_FLARE_ITEM && Lara.gun_type != LGT_Flare)
+		else if (laraitem->currentAnimState == AS_FLAREPICKUP)
 		{
-			Lara.request_gun_type = LGT_Flare;
-			Lara.gun_type = LGT_Flare;
-			InitialiseNewWeapon();
-			Lara.gun_status = LGS_Special;
-			Lara.flare_age = (short)item->data & 0x7FFF;
-			KillItem(itemID);
+			if (laraitem->frameNumber == (Anims[204].frameBase + 58) && item->objectID == ID_FLARE_ITEM && Lara.gun_type != LGT_Flare)
+			{
+				Lara.request_gun_type = LGT_Flare;
+				Lara.gun_type = LGT_Flare;
+				InitialiseNewWeapon();
+				Lara.gun_status = LGS_Special;
+				Lara.flare_age = (short)int(item->data) & 0x7FFF;
+				KillItem(itemID);
+			}
+			return;
 		}
-		else if (CHK_ANY(InputStatus, IN_ACTION) && !laraitem->gravity && laraitem->currentAnimState == AS_STOP && Lara.gun_status == LGS_Armless && (Lara.gun_type != LGT_Flare || item->objectID != ID_FLARE_ITEM))
+		else if (CHK_ANY(InputStatus, IN_ACTION) && !laraitem->gravity && laraitem->currentAnimState == AS_STOP && Lara.gun_status == LGS_Armless && !(Lara.gun_type == LGT_Flare && item->objectID == ID_FLARE_ITEM))
 		{
+			AlignLaraPosition(&PickUpPosition, item, laraitem);
+			Lara.gun_status = LGS_HandBusy;
+
 			if (item->objectID == ID_FLARE_ITEM)
 			{
 				laraitem->goalAnimState = AS_FLAREPICKUP;
 				do
 					AnimateLara(laraitem);
 				while (laraitem->currentAnimState != AS_FLAREPICKUP);
-				laraitem->goalAnimState = AS_STOP;
-				Lara.gun_status = LGS_HandBusy;
 			}
 			else
 			{
-				AlignLaraPosition(&PickUpPosition, item, laraitem);
 				laraitem->goalAnimState = AS_PICKUP;
 				do
 					AnimateLara(laraitem);
 				while (laraitem->currentAnimState != AS_PICKUP);
-				laraitem->goalAnimState = AS_STOP;
-				Lara.gun_status = LGS_HandBusy;
 			}
+
+			laraitem->goalAnimState = AS_STOP;
 		}
 	}
 	else if (Lara.water_status == LWS_Underwater)
@@ -107,53 +115,59 @@ void PickUpCollision(short itemID, ITEM_INFO* laraitem, COLL_INFO* coll)
 			return;
 		}
 
-		if (laraitem->currentAnimState == AS_PICKUP && laraitem->frameNumber == (Anims[130].frameBase + 10) && item->objectID != ID_FLARE_ITEM)
+		if (laraitem->currentAnimState == AS_PICKUP)
 		{
-			AddDisplayPickup(item->objectID);
-			Inv_AddItem((GAME_OBJECT_ID)item->objectID);
-			if ((item->objectID == ID_SECRET1 || item->objectID == ID_SECRET2 || item->objectID == ID_SECRET3) &&
-				((SaveGame.statistics.secrets & 1)
-					+ ((SaveGame.statistics.secrets >> 1) & 1)
-					+ ((SaveGame.statistics.secrets >> 2) & 1)) >= 3)
+			if (laraitem->frameNumber == (Anims[130].frameBase + 10) && item->objectID != ID_FLARE_ITEM)
 			{
-				GF_ModifyInventory(CurrentLevel, TRUE);
+				AddDisplayPickup(item->objectID);
+				Inv_AddItem((GAME_OBJECT_ID)item->objectID);
+				if ((item->objectID == ID_SECRET1 || item->objectID == ID_SECRET2 || item->objectID == ID_SECRET3) &&
+				   ((SaveGame.statistics.secrets & 1)
+				+  ((SaveGame.statistics.secrets & 2) >> 1)
+				+  ((SaveGame.statistics.secrets & 4) >> 2)) >= 3)
+				{
+					GF_ModifyInventory(CurrentLevel, TRUE);
+				}
+				item->status = ITEM_INVISIBLE;
+				RemoveDrawnItem(itemID);
 			}
-			RemoveDrawnItem(itemID);
-			return;
 		}
-		else if (laraitem->currentAnimState == AS_FLAREPICKUP && laraitem->frameNumber == (Anims[206].frameBase + 20) && item->objectID == ID_FLARE_ITEM && Lara.gun_type != LGT_Flare)
+		else if (laraitem->currentAnimState == AS_FLAREPICKUP)
 		{
-			Lara.request_gun_type = LGT_Flare;
-			Lara.gun_type = LGT_Flare;
-			InitialiseNewWeapon();
-			Lara.gun_status = LGS_Special;
-			Lara.flare_age = (short)item->data & 0x7FFF;
-			draw_flare_meshes();
-			KillItem(itemID);
+			if (laraitem->frameNumber == (Anims[206].frameBase + 20) && item->objectID == ID_FLARE_ITEM && Lara.gun_type != LGT_Flare)
+			{
+				Lara.request_gun_type = LGT_Flare;
+				Lara.gun_type = LGT_Flare;
+				InitialiseNewWeapon();
+				Lara.gun_status = LGS_Special;
+				Lara.flare_age = (short)int(item->data) & 0x7FFF;
+				draw_flare_meshes();
+				KillItem(itemID);
+			}
 			return;
 		}
 		else if (CHK_ANY(InputStatus, IN_ACTION) && laraitem->currentAnimState == AS_TREAD && Lara.gun_status == LGS_Armless && (Lara.gun_type != LGT_Flare || item->objectID != ID_FLARE_ITEM))
 		{
-			if (MoveLaraPosition(&PickUpPositionUW, item, laraitem))
-			{
-				if (item->objectID == ID_FLARE_ITEM)
-				{
-					laraitem->animNumber = 206;
-					laraitem->currentAnimState = AS_FLAREPICKUP;
-					laraitem->goalAnimState = AS_TREAD;
-					laraitem->frameNumber = Anims[laraitem->animNumber].frameBase;
-					laraitem->fallSpeed = 0;
-				}
-				else
-				{
-					laraitem->goalAnimState = AS_PICKUP;
-					do
-						AnimateLara(laraitem);
-					while (laraitem->currentAnimState != AS_PICKUP);
-					laraitem->goalAnimState = AS_TREAD;
-				}
+			if (!MoveLaraPosition(&PickUpPositionUW, item, laraitem))
 				return;
+
+			if (item->objectID == ID_FLARE_ITEM)
+			{
+				laraitem->animNumber = 206;
+				laraitem->currentAnimState = AS_FLAREPICKUP;
+				laraitem->frameNumber = Anims[laraitem->animNumber].frameBase;
+				laraitem->fallSpeed = 0;
 			}
+			else
+			{
+				laraitem->goalAnimState = AS_PICKUP;
+				do
+					AnimateLara(laraitem);
+				while (laraitem->currentAnimState != AS_PICKUP);
+			}
+
+			laraitem->goalAnimState = AS_TREAD;
+			return;
 		}
 	}
 

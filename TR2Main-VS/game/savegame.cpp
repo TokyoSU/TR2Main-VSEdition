@@ -34,6 +34,10 @@
 #include "specific/winmain.h"
 #include "global/vars.h"
 
+#ifdef FEATURE_MOD_CONFIG
+#include "modding/mod_utils.h"
+#endif
+
 #define SGF_CREATURE (0x80)
 
 SAVEGAME_INFO SaveGame = {};
@@ -92,19 +96,37 @@ void ModifyStartInfo(int levelIdx) {
 		break;
 
 	case 1: // Regular New Game
-		start->available = 1; // make level available
-		start->has_pistols = 1; // Lara has pistols and shotgun
-		start->has_magnums = 0;
-		start->has_uzis = 0;
-		start->has_shotgun = 1;
-		start->has_m16 = 0;
-		start->has_grenade = 0;
-		start->has_harpoon = 0;
+		start->available = TRUE; // make level available
+		start->has_pistols = TRUE; // Lara has pistols and shotgun
+		start->has_magnums = FALSE;
+		start->has_uzis = FALSE;
+#ifdef FEATURE_MOD_CONFIG
+		if (IsModConfigLoaded()) {
+			start->has_shotgun = IsModRemoveShotgunAtStart() ? FALSE : TRUE;
+		}
+		else {
+			start->has_shotgun = TRUE;
+		}
+#else
+		start->has_shotgun = TRUE;
+#endif
+		start->has_m16 = FALSE;
+		start->has_grenade = FALSE;
+		start->has_harpoon = FALSE;
 		start->gunStatus = LGS_Armless; // Lara has no weapons in hands
 
 		start->magnumAmmo = 0;
 		start->uziAmmo = 0;
+#ifdef FEATURE_MOD_CONFIG
+		if (IsModConfigLoaded()) {
+			start->shotgunAmmo = IsModRemoveShotgunAtStart() ? 0 : 12;
+		}
+		else {
+			start->shotgunAmmo = 12;
+		}
+#else
 		start->shotgunAmmo = 12;
+#endif
 		start->m16Ammo = 0;
 		start->grenadeAmmo = 0;
 		start->harpoonAmmo = 0;

@@ -44,6 +44,7 @@ typedef struct {
 typedef struct {
 	bool isLoaded;
 	bool isBarefoot;
+	bool removeShotgunAtStart;
 	char loadingPix[256];
 	DWORD waterColor;
 	SEMITRANS_CONFIG semitrans;
@@ -167,6 +168,10 @@ bool IsModConfigLoaded() {
 
 bool IsModBarefoot() {
 	return ModConfig.isBarefoot;
+}
+
+bool IsModRemoveShotgunAtStart() {
+	return ModConfig.removeShotgunAtStart;
 }
 
 const char* GetModLoadingPix() {
@@ -320,7 +325,7 @@ static bool ParsePolyfilterConfiguration(json_value* root, const char* name, POL
 		json_value* item = root->u.array.values[i];
 		json_value* field = GetJsonField(item, json_integer, name, NULL);
 		if (!field || field->u.integer < 0) continue;
-		POLYFILTER* filter = CreatePolyfilterNode(pNodes, field->u.integer);
+		POLYFILTER* filter = CreatePolyfilterNode(pNodes, (int)field->u.integer);
 		if (!filter) continue;
 		field = GetJsonField(item, json_object, "filter", NULL);
 		if (field) {
@@ -416,6 +421,10 @@ static bool ParseLevelConfiguration(json_value* root) {
 	field = GetJsonField(root, json_boolean, "barefoot", NULL);
 	if (field) {
 		ModConfig.isBarefoot = field->u.boolean;
+	}
+	field = GetJsonField(root, json_boolean, "removeshotgunatstart", NULL);
+	if (field) {
+		ModConfig.removeShotgunAtStart = field->u.boolean;
 	}
 	ParseSemitransConfiguration(GetJsonField(root, json_object, "semitransparent", NULL));
 	ParseReflectConfiguration(GetJsonField(root, json_object, "reflective", NULL));
