@@ -45,6 +45,7 @@ void S_CalculateStaticLight(short adder); // 0x00451540
 void S_CalculateStaticMeshLight(int x, int y, int z, int shade1, int shade2, ROOM_INFO* room); // 0x00451580
 void S_LightRoom(ROOM_INFO* room); // 0x004516B0
 void S_DrawHealthBar(int percent); // 0x004518C0
+void S_DrawEnemyHealthBar(int percent, int originalHP); // New bar.
 void S_DrawAirBar(int percent); // 0x00451A90
 void AnimateTextures(int nTicks); // 0x00451C90
 void S_SetupBelowWater(BOOL underwater); // 0x00451D50

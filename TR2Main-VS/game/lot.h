@@ -27,13 +27,11 @@
  /*
   * Function list
   */
-  //	0x00432B10:		InitialiseLOTarray
-
-#define DisableBaddieAI ((void(__cdecl*)(short)) 0x00432B70)
-#define EnableBaddieAI ((int(__cdecl*)(short, BOOL)) 0x00432BC0)
-
-//	0x00432D70:		InitialiseSlot
-//	0x00432F80:		CreateZone
-//	0x00433040:		ClearLOT
+void InitialiseLOTarray(); // 0x00432B10
+void DisableBaddieAI(short itemID); // 0x00432B70
+BOOL EnableBaddieAI(short itemID, BOOL isAlways); // 0x00432BC0
+void InitialiseSlot(short itemID, int creatureIdx); // 0x00432D70
+void CreateZone(ITEM_INFO* item); // 0x00432F80
+void ClearLOT(LOT_INFO* LOT); // 0x00433040
 
 #endif // LOT_H_INCLUDED

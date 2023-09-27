@@ -942,9 +942,8 @@ BOOL LoadBoxes(HANDLE hFile) {
 				SetFilePointer(hFile, sizeof(short) * BoxesCount, NULL, FILE_CURRENT); // skip some GroundZones
 				continue;
 			}
-
-			GroundZones[j * 2 + i] = (short*)game_malloc(sizeof(short) * BoxesCount, GBUF_GroundZone);
-			ReadFileSync(hFile, GroundZones[j * 2 + i], sizeof(short) * BoxesCount, &bytesRead, NULL);
+			GroundZones[j][i] = (short*)game_malloc(sizeof(short) * BoxesCount, GBUF_GroundZone);
+			ReadFileSync(hFile, GroundZones[j][i], sizeof(short) * BoxesCount, &bytesRead, NULL);
 			if (bytesRead != sizeof(short) * BoxesCount) {
 				lstrcpy(StringToShow, "LoadBoxes(): Unable to load 'ground_zone'");
 				return FALSE;
