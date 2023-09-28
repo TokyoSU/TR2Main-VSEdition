@@ -881,7 +881,7 @@ static bool ParseLevelConfiguration(json_value* root) {
 	ModConfig.sharkHealth = ParseIntegerConfigByName(root, "sharkHealth", 30);
 	ModConfig.tigerHealth = ParseIntegerConfigByName(root, "tigerHealth", 20);
 	ModConfig.barracudaHealth = ParseIntegerConfigByName(root, "barracudaHealth", 12);
-	ModConfig.smallSpiderHealth = ParseIntegerConfigByName(root, "spiderHealth", 5);
+	ModConfig.smallSpiderHealth = ParseIntegerConfigByName(root, "smallSpiderHealth", 5);
 	ModConfig.wolfHealth = ParseIntegerConfigByName(root, "wolfHealth", 10);
 	ModConfig.bigSpiderHealth = ParseIntegerConfigByName(root, "bigSpiderHealth", 40);
 	ModConfig.bearHealth = ParseIntegerConfigByName(root, "bearHealth", 30);

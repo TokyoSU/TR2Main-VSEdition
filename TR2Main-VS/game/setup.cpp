@@ -328,7 +328,7 @@ void BaddyObjects() {
 #if defined(FEATURE_MOD_CONFIG)
 		obj->hitPoints = IsGold() ? GetModBearHealth() : GetModBigSpiderHealth();
 #else
-		obj->hitPoints = 12;
+		obj->hitPoints = IsGold() ? 30 : 40;
 #endif
 #else
 		obj->control = BigSpiderControl;

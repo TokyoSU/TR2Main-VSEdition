@@ -70,7 +70,7 @@ void MonkControl(short itemID)
 	else
 	{
 		CreatureAIInfo(item, &ai);
-		CreatureMood(item, &ai, 1);
+		CreatureMood(item, &ai, TRUE);
 		angle = CreatureTurn(item, monk->maximum_turn);
 
 		if (ai.ahead)
