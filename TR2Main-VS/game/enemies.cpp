@@ -21,7 +21,257 @@
 
 #include "precompiled.h"
 #include "game/enemies.h"
+#include "game/box.h"
+#include "game/effects.h"
+#include "game/sound.h"
+#include "specific/game.h"
 #include "global/vars.h"
+
+enum MonkState
+{
+	MONK_STOP1 = 1,
+	MONK_WALK,
+	MONK_RUN,
+	MONK_ATTACK1,
+	MONK_ATTACK2,
+	MONK_ATTACK3,
+	MONK_ATTACK4,
+	MONK_AIM,
+	MONK_DEATH,
+	MONK_ATTACK5,
+	MONK_STOP2
+};
+
+#define MONK_DEATH_ANIM 20
+#define MONK_TOUCHBITS 0x40
+
+static BITE_INFO MonkBite = { -23, 16, 265, 14 };
+
+void MonkControl(short itemID)
+{
+	if (!CreatureActive(itemID))
+		return;
+
+	ITEM_INFO* item = &Items[itemID];
+	CREATURE_INFO* monk = (CREATURE_INFO*)item->data;
+	if (monk == NULL) return; // NOTE: Not exist in the original game.
+	AI_INFO ai{};
+	short tilt = 0, head = 0, angle = 0;
+
+	if (item->hitPoints <= 0)
+	{
+		if (item->currentAnimState != MONK_DEATH)
+		{
+			item->animNumber = (Objects[item->objectID].animIndex + GetRandomControl() / 0x4000) + MONK_DEATH_ANIM;
+			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->currentAnimState = MONK_DEATH;
+		}
+	}
+	else
+	{
+		CreatureAIInfo(item, &ai);
+		CreatureMood(item, &ai, 1);
+		angle = CreatureTurn(item, monk->maximum_turn);
+
+		if (ai.ahead)
+			head = ai.angle;
+
+		switch (item->currentAnimState)
+		{
+		case MONK_STOP1:
+			monk->flags = 0;
+
+			if (IsMonkAngry || !ai.ahead || Lara.target != item)
+			{
+				if (monk->mood != MOOD_BORED)
+				{
+					if (monk->mood == MOOD_ESCAPE)
+					{
+						item->goalAnimState = MONK_RUN;
+					}
+					else
+					{
+						if (ai.ahead && ai.distance < 0x40000)
+						{
+							if (GetRandomControl() >= 0x7000)
+								item->goalAnimState = MONK_STOP2;
+							else
+								item->goalAnimState = MONK_ATTACK1;
+						}
+						else
+						{
+							if (!ai.ahead) {
+								item->goalAnimState = MONK_RUN;
+							}
+							else if (ai.distance >= 0x100000) {
+								if (!ai.ahead || ai.distance >= 0x400000)
+									item->goalAnimState = MONK_RUN;
+								else
+									item->goalAnimState = MONK_WALK;
+							}
+							else {
+								item->goalAnimState = MONK_ATTACK4;
+							}
+						}
+					}
+				}
+				else
+				{
+					item->goalAnimState = MONK_WALK;
+				}
+			}
+			break;
+		case MONK_STOP2:
+			monk->flags = 0;
+
+			if (IsMonkAngry || !ai.ahead || Lara.target != item)
+			{
+				if (monk->mood != MOOD_BORED)
+				{
+					if (monk->mood == MOOD_ESCAPE)
+					{
+						item->goalAnimState = MONK_RUN;
+					}
+					else
+					{
+						if (ai.ahead && ai.distance < 0x40000)
+						{
+							if (GetRandomControl() >= 0x3000)
+							{
+								if (GetRandomControl() >= 0x6000)
+									item->goalAnimState = MONK_STOP1;
+								else
+									item->goalAnimState = MONK_AIM;
+							}
+							else
+							{
+								item->goalAnimState = MONK_ATTACK2;
+							}
+						}
+						else
+						{
+							if (!ai.ahead || ai.distance >= 0x400000)
+								item->goalAnimState = MONK_RUN;
+							else
+								item->goalAnimState = MONK_WALK;
+						}
+					}
+				}
+				else
+				{
+					item->goalAnimState = MONK_WALK;
+				}
+			}
+			break;
+		case MONK_WALK:
+			monk->maximum_turn = 546;
+
+			if (monk->mood != MOOD_BORED)
+			{
+				if (monk->mood == MOOD_ESCAPE)
+				{
+					item->goalAnimState = MONK_RUN;
+				}
+				else if (ai.ahead && ai.distance < 0x40000)
+				{
+					if (GetRandomControl() >= 0x4000)
+						item->goalAnimState = MONK_STOP2;
+					else
+						item->goalAnimState = MONK_STOP1;
+				}
+				else if (!ai.ahead || ai.distance > 0x400000)
+				{
+					item->goalAnimState = MONK_RUN;
+				}
+			}
+			else if (!IsMonkAngry && ai.ahead && Lara.target == item)
+			{
+				if (GetRandomControl() >= 0x4000)
+					item->goalAnimState = MONK_STOP2;
+				else
+					item->goalAnimState = MONK_STOP1;
+			}
+			break;
+		case MONK_RUN:
+			monk->flags = 0;
+			if (IsMonkAngry)
+				monk->maximum_turn = 910;
+			else
+				monk->maximum_turn = 728;
+			tilt = angle >> 2;
+
+			if (monk->mood != MOOD_BORED && monk->mood != MOOD_ESCAPE)
+			{
+				if (ai.ahead && ai.distance < 0x40000)
+				{
+					if (GetRandomControl() >= 0x4000)
+						item->goalAnimState = MONK_STOP2;
+					else
+						item->goalAnimState = MONK_STOP1;
+				}
+				else if (ai.ahead)
+				{
+					if (ai.distance >= 0x900000)
+					{
+						if (ai.ahead && ai.distance < 0x400000)
+						{
+							if (GetRandomControl() >= 0x4000)
+								item->goalAnimState = MONK_STOP2;
+							else
+								item->goalAnimState = MONK_STOP1;
+						}
+					}
+					else
+					{
+						item->goalAnimState = MONK_ATTACK5;
+					}
+				}
+			}
+			else
+			{
+				item->goalAnimState = MONK_STOP1;
+			}
+			break;
+		case MONK_AIM:
+			if (ai.ahead && ai.distance <= 0x40000)
+				item->goalAnimState = MONK_ATTACK3;
+			else
+				item->goalAnimState = MONK_STOP2;
+			break;
+		case MONK_ATTACK1:
+		case MONK_ATTACK2:
+		case MONK_ATTACK3:
+		case MONK_ATTACK4:
+		case MONK_ATTACK5:
+			if (!monk->flags)
+			{
+				if (monk->enemy == LaraItem && CHK_ANY(item->touchBits, MONK_TOUCHBITS))
+				{
+					monk->enemy->hitPoints -= 150;
+					monk->enemy->hitStatus = 1;
+					monk->flags = 1;
+					PlaySoundEffect(245, &item->pos, 0);
+					CreatureEffect(item, &MonkBite, DoBloodSplat);
+				}
+				else if (ABS(item->pos.x - monk->enemy->pos.x) < 512 &&
+						 ABS(item->pos.y - monk->enemy->pos.y) < 512 &&
+						 ABS(item->pos.z - monk->enemy->pos.z) < 512)
+				{
+					monk->enemy->hitPoints -= 5;
+					monk->enemy->hitStatus = 1;
+					monk->flags = 1;
+					PlaySoundEffect(245, &item->pos, 0);
+					CreatureEffect(item, &MonkBite, DoBloodSplat); // NOTE: Not exist in the original game.
+				}
+			}
+			break;
+		}
+	}
+
+	CreatureTilt(item, tilt);
+	CreatureHead(item, head);
+	CreatureAnimation(itemID, angle, 0);
+}
 
  /*
   * Inject function
@@ -29,7 +279,7 @@
 void Inject_Enemies() {
 	//	INJECT(0x0041DB30, Knife);
 	//	INJECT(0x0041DBB0, Cult2Control);
-	//	INJECT(0x0041DFE0, MonkControl);
+	INJECT(0x0041DFE0, MonkControl);
 	//	INJECT(0x0041E4B0, Worker3Control);
 	//	INJECT(0x0041EAC0, DrawXianLord);
 	//	INJECT(0x0041EEC0, XianDamage);

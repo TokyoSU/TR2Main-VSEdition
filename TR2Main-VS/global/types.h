@@ -268,7 +268,6 @@ typedef struct {
 #define RGB_GETGREEN(rgb)			(((rgb) >> 8) & 0xff)
 #define RGB_GETBLUE(rgb)			((rgb) & 0xff)
 #define RGB_MAKE(r, g, b)			((D3DCOLOR) (((r) << 16) | ((g) << 8) | (b)))
-#define RGBA_MAKE_OPAQUE(rgb)		((D3DCOLOR) (((255) << 24) | ((rgba) & 0x00ffffff)))
 #endif // RGB_MAKE
 
 #ifndef D3DFVF_TLVERTEX
