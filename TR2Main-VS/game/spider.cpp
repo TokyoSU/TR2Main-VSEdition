@@ -21,13 +21,40 @@
 
 #include "precompiled.h"
 #include "game/spider.h"
+#include "game/box.h"
 #include "global/vars.h"
+
+typedef enum
+{
+	SPIDER_STOP = 1,
+	SPIDER_WALK1,
+	SPIDER_WALK2,
+	SPIDER_ATTACK1,
+	SPIDER_ATTACK2,
+	SPIDER_ATTACK3,
+	SPIDER_DEATH
+} SPIDER_STATE;
+
+void SpiderControl(short itemID)
+{
+	if (!CreatureActive(itemID))
+		return;
+
+
+
+
+}
+
+void BigSpiderControl(short itemID)
+{
+
+}
 
  /*
   * Inject function
   */
 void Inject_Spider() {
 	//	INJECT(0x00440070, SpiderLeap);
-	//	INJECT(0x00440120, SpiderControl);
-	//	INJECT(0x00440340, BigSpiderControl);
+	INJECT(0x00440120, SpiderControl);
+	INJECT(0x00440340, BigSpiderControl);
 }

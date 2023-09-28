@@ -24,9 +24,84 @@
 #include "3dsystem/3d_gen.h"
 #include "game/control.h"
 #include "game/effects.h"
+#include "game/lot.h"
 #include "game/sphere.h"
 #include "specific/game.h"
 #include "global/vars.h"
+
+#if defined(FEATURE_MOD_CONFIG)
+#include "modding/mod_utils.h"
+#endif
+
+bool IsMonkAngry = false;
+
+void LaraGetNewTarget(WEAPON_INFO* weapon)
+{
+	CREATURE_INFO* creature = NULL;
+	ITEM_INFO* targetItem = NULL, *bestTarget = NULL;
+	GAME_VECTOR srcPos{}, targetPos{};
+	VECTOR_ANGLES angle{};
+	int bestDistance = 0x7FFFFFFF, distance = 0, x = 0, y = 0, z = 0;
+	short bestAngle = 0x7FFF, angleY = 0;
+	srcPos.x = LaraItem->pos.x;
+	srcPos.y = LaraItem->pos.y - weapon->gunHeight;
+	srcPos.z = LaraItem->pos.z;
+	srcPos.roomNumber = LaraItem->roomNumber;
+
+	for (int i = 0; i < MAX_CREATURES; i++)
+	{
+		creature = &BaddiesSlots[i];
+		if (creature->item_num == -1 || Lara.item_number == creature->item_num)
+			continue;
+		targetItem = &Items[creature->item_num];
+		if (targetItem->hitPoints <= 0)
+			continue;
+#if defined(FEATURE_MOD_CONFIG)
+		if (GetModLaraIgnoreMonkIfNotAngry())
+		{
+			if ((targetItem->objectID == ID_MONK1 || targetItem->objectID == ID_MONK2) && !IsMonkAngry)
+				continue;
+		}
+#endif
+		x = targetItem->pos.x - srcPos.x;
+		y = targetItem->pos.y - srcPos.y;
+		z = targetItem->pos.z - srcPos.z;
+		if (ABS(x) > weapon->targetDist ||
+			ABS(y) > weapon->targetDist ||
+			ABS(z) > weapon->targetDist)
+			continue;
+		distance = SQR(z) + SQR(y) + SQR(x);
+		if (distance < SQR(weapon->targetDist))
+		{
+			find_target_point(targetItem, &targetPos);
+			if (LOS(&srcPos, &targetPos))
+			{
+				phd_GetVectorAngles(targetPos.x - srcPos.x, targetPos.y - srcPos.y, targetPos.z - srcPos.z, &angle);
+				angle.yaw -= LaraItem->pos.rotY + Lara.torso_y_rot;
+				angle.pitch -= LaraItem->pos.rotX + Lara.torso_x_rot;
+
+				if ((angle.yaw >= weapon->lockAngles[0])
+				&&  (angle.yaw <= weapon->lockAngles[1])
+				&&  (angle.pitch >= weapon->lockAngles[2])
+				&&  (angle.pitch <= weapon->lockAngles[3]))
+				{
+					angleY = ABS(angle.yaw);
+					if ((angleY < (bestAngle + 0xAAA))
+					&&  (distance < bestDistance))
+					{
+						bestDistance = distance;
+						bestAngle = angleY;
+						bestTarget = targetItem;
+					}
+				}
+
+			}
+		}
+	}
+
+	Lara.target = bestTarget;
+	LaraTargetInfo(weapon);
+}
 
 int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles) {
 	WEAPON_INFO* weaponInfo = NULL;
@@ -156,7 +231,7 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* dest, int damage) {
 	{
 		creature = (CREATURE_INFO*)item->data;
 		if ((creature->flags & 0x0FFF) > 10 || creature->mood == MOOD_BORED)
-			IsMonkAngry = TRUE;
+			IsMonkAngry = true;
 	}
 }
 

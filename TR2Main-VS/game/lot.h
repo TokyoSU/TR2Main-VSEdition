@@ -23,7 +23,11 @@
 #define LOT_H_INCLUDED
 
 #include "global/types.h"
-#define MAX_CREATURES 5
+
+#define MAX_CREATURES 12
+
+extern CREATURE_INFO* BaddiesSlots;
+extern int BaddiesSlotUsed;
 
  /*
   * Function list

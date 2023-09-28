@@ -25,6 +25,7 @@
 #include "game/dragon.h"
 #include "game/invfunc.h"
 #include "game/items.h"
+#include "game/larafire.h"
 #include "game/laramisc.h"
 #include "game/moveblock.h"
 #include "game/lot.h"

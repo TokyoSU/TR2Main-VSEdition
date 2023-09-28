@@ -102,6 +102,7 @@ typedef struct {
 	int giantYetiHealth;
 	int dinoHealth;
 
+	bool laraIgnoreMonkIfNotAngry;
 	bool makeMonkAttackLaraFirst;
 	bool makeMercenaryAttackLaraFirst;
 
@@ -445,6 +446,10 @@ int GetModGiantYetiHealth() {
 
 int GetModDinoHealth() {
 	return ModConfig.dinoHealth;
+}
+
+bool GetModLaraIgnoreMonkIfNotAngry() {
+	return ModConfig.laraIgnoreMonkIfNotAngry;
 }
 
 bool GetModMakeMonkAttackLaraDirectly() {
@@ -909,9 +914,9 @@ static bool ParseLevelConfiguration(json_value* root) {
 	ModConfig.dragonHealth = ParseIntegerConfigByName(root, "dragonHealth", 300);
 	ModConfig.giantYetiHealth = ParseIntegerConfigByName(root, "giantYetiHealth", 200);
 	ModConfig.dinoHealth = ParseIntegerConfigByName(root, "dinoHealth", 100);
+	ModConfig.laraIgnoreMonkIfNotAngry = ParseBooleanConfigByName(root, "laraignoremonkifnotangry");
 	ModConfig.makeMercenaryAttackLaraFirst = ParseBooleanConfigByName(root, "mercenaryattacklaradirectly");
 	ModConfig.makeMonkAttackLaraFirst = ParseBooleanConfigByName(root, "monksattacklaradirectly");
-	IsMonkAngry = ModConfig.makeMonkAttackLaraFirst;
 
 	ParseSemitransConfiguration(GetJsonField(root, json_object, "semitransparent", NULL));
 	ParseReflectConfiguration(GetJsonField(root, json_object, "reflective", NULL));

@@ -24,6 +24,9 @@
 #include "specific/init.h"
 #include "global/vars.h"
 
+CREATURE_INFO* BaddiesSlots = NULL;
+int BaddiesSlotUsed = 0;
+
 void InitialiseLOTarray()
 {
 	CREATURE_INFO* creature = NULL;

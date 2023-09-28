@@ -24,6 +24,7 @@
 #include "3dsystem/phd_math.h"
 #include "game/control.h"
 #include "game/items.h"
+#include "game/larafire.h"
 #include "game/lot.h"
 #include "game/missile.h"
 #include "global/vars.h"
@@ -153,6 +154,81 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillStat
 	Camera.pos.roomNumber = LaraItem->roomNumber;
 }
 
+void GetBaddieTarget(short creatureIdx, BOOL isMonk)
+{
+	ITEM_INFO* item = NULL, *targetItem = NULL, *bestTarget = NULL;
+	CREATURE_INFO* creature = NULL, *baddy = NULL;
+	int bestdistance = 0, x = 0, y = 0, z = 0, distance = 0;
+
+	item = &Items[creatureIdx];
+	creature = (CREATURE_INFO*)item->data;
+	if (creature == NULL) 
+		return;
+
+	bestdistance = 0x7FFFFFFF;
+	for (int i = 0; i < MAX_CREATURES; i++)
+	{
+		baddy = &BaddiesSlots[i];
+		if (baddy->item_num == -1 || creatureIdx == baddy->item_num)
+			continue;
+		targetItem = &Items[baddy->item_num];
+		if (isMonk)
+		{
+			if (targetItem->objectID != ID_BANDIT1 && targetItem->objectID != ID_BANDIT2)
+				continue;
+		}
+		else if (targetItem->objectID != ID_MONK1 && targetItem->objectID != ID_MONK2)
+			continue;
+		x = (targetItem->pos.x - item->pos.x) >> 6;
+		y = (targetItem->pos.y - item->pos.y) >> 6;
+		z = (targetItem->pos.z - item->pos.z) >> 6;
+		distance = SQR(z) + SQR(y) + SQR(x);
+		if (distance < bestdistance)
+		{
+			bestdistance = distance;
+			bestTarget = targetItem;
+		}
+	}
+
+	if (bestTarget != NULL)
+	{
+		if (!isMonk || IsMonkAngry)
+		{
+			x = (LaraItem->pos.x - item->pos.x) >> 6;
+			y = (LaraItem->pos.y - item->pos.y) >> 6;
+			z = (LaraItem->pos.z - item->pos.z) >> 6;
+			distance = SQR(z) + SQR(y) + SQR(x);
+			if (distance < bestdistance)
+			{
+				bestdistance = distance;
+				bestTarget = LaraItem;
+			}
+		}
+
+		if (creature->enemy != NULL && creature->enemy->status == ITEM_ACTIVE)
+		{
+			x = (creature->enemy->pos.x - item->pos.x) >> 6;
+			y = (creature->enemy->pos.y - item->pos.y) >> 6;
+			z = (creature->enemy->pos.z - item->pos.z) >> 6;
+			distance = SQR(z) + SQR(y) + SQR(x);
+			if (distance < (bestdistance + 0x400000))
+				creature->enemy = bestTarget;
+		}
+		else
+		{
+			creature->enemy = bestTarget;
+		}
+	}
+	else if (!isMonk || IsMonkAngry)
+	{
+		creature->enemy = LaraItem;
+	}
+	else
+	{
+		creature->enemy = NULL;
+	}
+}
+
 /*
  * Inject function
  */
@@ -181,5 +257,5 @@ void Inject_Box() {
 	//	INJECT(0x00410090, CreatureEffect);
 	//	INJECT(0x004100F0, CreatureVault);
 	INJECT(0x00410230, CreatureKill);
-	//	INJECT(0x004103A0, GetBaddieTarget);
+	INJECT(0x004103A0, GetBaddieTarget);
 }

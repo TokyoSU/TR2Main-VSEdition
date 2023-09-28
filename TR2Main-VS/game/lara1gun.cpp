@@ -353,12 +353,7 @@ void ControlRocket(short itemID) {
 	}
 	for (linkID = RoomInfo[item->roomNumber].itemNumber; linkID != -1; linkID = link->nextItem) {
 		link = &Items[linkID];
-		if (link != LaraItem &&
-			link->collidable &&
-			(link->objectID == ID_WINDOW1 ||
-				(Objects[link->objectID].intelligent &&
-					link->status != ITEM_INVISIBLE &&
-					Objects[link->objectID].collision)))
+		if (link != LaraItem && link->collidable && (link->objectID == ID_WINDOW1 || (Objects[link->objectID].intelligent && link->status != ITEM_INVISIBLE && Objects[link->objectID].collision)))
 		{
 			frame = GetBestFrame(link);
 			if (item->pos.y + displacement >= link->pos.y + frame[2] && item->pos.y - displacement <= link->pos.y + frame[3]) {

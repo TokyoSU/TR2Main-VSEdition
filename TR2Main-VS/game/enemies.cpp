@@ -22,6 +22,7 @@
 #include "precompiled.h"
 #include "game/enemies.h"
 #include "game/box.h"
+#include "game/larafire.h"
 #include "game/effects.h"
 #include "game/sound.h"
 #include "specific/game.h"
@@ -43,7 +44,7 @@ enum MonkState
 };
 
 #define MONK_DEATH_ANIM 20
-#define MONK_TOUCHBITS 0x40
+#define MONK_TOUCHBITS 0x4000
 
 static BITE_INFO MonkBite = { -23, 16, 265, 14 };
 
@@ -243,15 +244,19 @@ void MonkControl(short itemID)
 		case MONK_ATTACK3:
 		case MONK_ATTACK4:
 		case MONK_ATTACK5:
-			if (!monk->flags)
+			if (!monk->flags && monk->enemy != NULL)
 			{
-				if (monk->enemy == LaraItem && CHK_ANY(item->touchBits, MONK_TOUCHBITS))
+
+				if (monk->enemy == LaraItem)
 				{
-					monk->enemy->hitPoints -= 150;
-					monk->enemy->hitStatus = 1;
-					monk->flags = 1;
-					PlaySoundEffect(245, &item->pos, 0);
-					CreatureEffect(item, &MonkBite, DoBloodSplat);
+					if (CHK_ANY(item->touchBits, MONK_TOUCHBITS))
+					{
+						monk->enemy->hitPoints -= 150;
+						monk->enemy->hitStatus = 1;
+						monk->flags = 1;
+						PlaySoundEffect(245, &item->pos, 0);
+						CreatureEffect(item, &MonkBite, DoBloodSplat);
+					}
 				}
 				else if (ABS(item->pos.x - monk->enemy->pos.x) < 512 &&
 						 ABS(item->pos.y - monk->enemy->pos.y) < 512 &&

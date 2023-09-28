@@ -51,6 +51,6 @@ void CreatureDie(short itemID, BOOL explode); // 0x0040F440
 #define CreatureEffect ((short(__cdecl*)(ITEM_INFO *, const BITE_INFO *, short(__cdecl*)(int, int, int, short, short, short))) 0x00410090)
 //	0x004100F0:		CreatureVault
 void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillState); // 0x00410230
-#define GetBaddieTarget ((void(__cdecl*)(short,BOOL)) 0x004103A0)
+void GetBaddieTarget(short creatureIdx, BOOL isMonk); // 0x004103A0
 
 #endif // BOX_H_INCLUDED

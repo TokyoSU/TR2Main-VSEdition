@@ -172,7 +172,6 @@ extern short InvOptionObjectsCount;
 #define BoundEnd					VAR_U_(0x004D77B4, int)
 #define IsAssaultTimerDisplay		VAR_U_(0x004D77D0, BOOL)
 #define IsAssaultTimerActive		VAR_U_(0x004D77D4, BOOL)
-#define IsMonkAngry					VAR_U_(0x004D77D8, BOOL)
 #define AmmoTextInfo				VAR_U_(0x004D791C, TEXT_STR_INFO*)
 #define DisplayModeTextInfo			VAR_U_(0x004D7920, TEXT_STR_INFO*)
 #define DisplayModeInfoTimer		VAR_U_(0x004D7924, DWORD)
@@ -673,8 +672,6 @@ extern STATIC_INFO StaticObjects[256];
 #define FlipMaps					ARRAY_(0x00526260, int, [10])
 #define GroundZones					ARRAY_(0x005263A0, short*, [4][2])
 #define FlyZones					ARRAY_(0x005263C0, short*, [2])
-#define BaddiesSlots                VAR_U_(0x005206C0, CREATURE_INFO*)
-#define BaddiesSlotUsed             VAR_U_(0x004D7C40, int)
 
 /*
  * GameFlow/Inventory Variables

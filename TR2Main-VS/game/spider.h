@@ -27,9 +27,8 @@
  /*
   * Function list
   */
-  //	0x00440070:		SpiderLeap
-
-#define SpiderControl ((void(__cdecl*)(short)) 0x00440120)
-#define BigSpiderControl ((void(__cdecl*)(short)) 0x00440340)
+#define SpiderLeap ((void(__cdecl*)(short,short)) 0x00440070)
+void SpiderControl(short itemID); // 0x00440120
+void BigSpiderControl(short itemID); // 0x00440340
 
 #endif // SPIDER_H_INCLUDED
