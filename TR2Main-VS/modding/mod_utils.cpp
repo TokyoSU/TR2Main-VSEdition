@@ -102,6 +102,9 @@ typedef struct {
 	int giantYetiHealth;
 	int dinoHealth;
 
+	bool makeMonkAttackLaraFirst;
+	bool makeMercenaryAttackLaraFirst;
+
 	char loadingPix[256];
 	DWORD waterColor;
 
@@ -442,6 +445,14 @@ int GetModGiantYetiHealth() {
 
 int GetModDinoHealth() {
 	return ModConfig.dinoHealth;
+}
+
+bool GetModMakeMonkAttackLaraDirectly() {
+	return ModConfig.makeMonkAttackLaraFirst;
+}
+
+bool GetModMakeMercenaryAttackLaraDirectly() {
+	return ModConfig.makeMercenaryAttackLaraFirst;
 }
 
 BAR_CONFIG* GetModLaraHealthBar() {
@@ -898,6 +909,9 @@ static bool ParseLevelConfiguration(json_value* root) {
 	ModConfig.dragonHealth = ParseIntegerConfigByName(root, "dragonHealth", 300);
 	ModConfig.giantYetiHealth = ParseIntegerConfigByName(root, "giantYetiHealth", 200);
 	ModConfig.dinoHealth = ParseIntegerConfigByName(root, "dinoHealth", 100);
+	ModConfig.makeMercenaryAttackLaraFirst = ParseBooleanConfigByName(root, "mercenaryattacklaradirectly");
+	ModConfig.makeMonkAttackLaraFirst = ParseBooleanConfigByName(root, "monksattacklaradirectly");
+	IsMonkAngry = ModConfig.makeMonkAttackLaraFirst;
 
 	ParseSemitransConfiguration(GetJsonField(root, json_object, "semitransparent", NULL));
 	ParseReflectConfiguration(GetJsonField(root, json_object, "reflective", NULL));

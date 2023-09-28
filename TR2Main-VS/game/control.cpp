@@ -48,6 +48,8 @@
 
 int ControlPhase(int nTicks, BOOL demoMode) {
 	static int tickCount = 0;
+	ITEM_INFO* item = NULL;
+	FX_INFO* fx = NULL;
 	int id = -1;
 	int next = -1;
 	int result = 0;
@@ -154,18 +156,20 @@ int ControlPhase(int nTicks, BOOL demoMode) {
 		DynamicLightCount = 0;
 
 		for (id = NextItemActive; id >= 0; id = next) {
-			next = Items[id].nextActive;
+			item = &Items[id];
 			// NOTE: there is no IFL_CLEARBODY check in the original code
-			if (Objects[Items[id].objectID].control && !CHK_ANY(Items[id].flags, IFL_CLEARBODY)) {
-				Objects[Items[id].objectID].control(id);
+			if (Objects[item->objectID].control && !CHK_ANY(item->flags, IFL_CLEARBODY)) {
+				Objects[item->objectID].control(id);
 			}
+			next = item->nextActive;
 		}
 
 		for (id = NextEffectActive; id >= 0; id = next) {
-			next = Effects[id].next_active;
-			if (Objects[Effects[id].object_number].control) {
-				Objects[Effects[id].object_number].control(id);
+			fx = &Effects[id];
+			if (Objects[fx->object_number].control) {
+				Objects[fx->object_number].control(id);
 			}
+			next = fx->next_active;
 		}
 
 		LaraControl(0);

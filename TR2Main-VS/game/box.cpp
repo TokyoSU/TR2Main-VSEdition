@@ -28,25 +28,27 @@
 #include "game/missile.h"
 #include "global/vars.h"
 
+#if defined(FEATURE_MOD_CONFIG)
+#include "modding/mod_utils.h"
+#endif
+
 void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 {
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	if (creature == NULL) return;
-
-	switch (item->objectID)
-	{
-	case ID_BANDIT1:
-	case ID_BANDIT2:
+#if defined(FEATURE_MOD_CONFIG)
+	if ((item->objectID == ID_BANDIT1 || item->objectID == ID_BANDIT2) && !GetModMakeMercenaryAttackLaraDirectly())
 		GetBaddieTarget(creature->item_num, FALSE);
-		break;
-	case ID_MONK1:
-	case ID_MONK2:
+	else if (item->objectID == ID_MONK1 || item->objectID == ID_MONK2 && !GetModMakeMonkAttackLaraDirectly())
 		GetBaddieTarget(creature->item_num, TRUE);
-		break;
-	default:
+#else
+	if (item->objectID == ID_BANDIT1 || item->objectID == ID_BANDIT2)
+		GetBaddieTarget(creature->item_num, FALSE);
+	else if (item->objectID == ID_MONK1 || item->objectID == ID_MONK2)
+		GetBaddieTarget(creature->item_num, TRUE);
+#endif
+	else
 		creature->enemy = LaraItem;
-		break;
-	}
 
 	ITEM_INFO* enemy = creature->enemy;
 	ROOM_INFO* room = NULL;

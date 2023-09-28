@@ -123,6 +123,9 @@ int GetModDragonHealth();
 int GetModGiantYetiHealth();
 int GetModDinoHealth();
 
+bool GetModMakeMonkAttackLaraDirectly();
+bool GetModMakeMercenaryAttackLaraDirectly();
+
 BAR_CONFIG* GetModLaraHealthBar();
 BAR_CONFIG* GetModLaraAirBar();
 BAR_CONFIG* GetModEnemyBar();
