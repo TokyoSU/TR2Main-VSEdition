@@ -8,8 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased: 0.9.0.2]
 
 ### TR2Main features
+- Added enemy bars.
 - Added json configuration for starting weapons and ammos.
 - Added json configuration for entities health.
+- Added json configuration for health bar, air bar and enemy bar position and color.
 
 ## [0.9.0.1] - 2023-09-24 - Fix count: 3
 
