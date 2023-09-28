@@ -29,7 +29,7 @@
   */
 #define InitialiseCreature ((void(__cdecl*)(short)) 0x0040E190)
 #define CreatureActive ((BOOL(__cdecl*)(short)) 0x0040E1C0)
-#define CreatureAIInfo ((void(__cdecl*)(ITEM_INFO *, AI_INFO *)) 0x0040E210)
+void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI); // 0x0040E210
 //	0x0040E470:		SearchLOT
 //	0x0040E670:		UpdateLOT
 //	0x0040E6E0:		TargetBox
@@ -51,6 +51,6 @@ void CreatureDie(short itemID, BOOL explode); // 0x0040F440
 #define CreatureEffect ((short(__cdecl*)(ITEM_INFO *, const BITE_INFO *, short(__cdecl*)(int, int, int, short, short, short))) 0x00410090)
 //	0x004100F0:		CreatureVault
 void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillState); // 0x00410230
-//	0x004103A0:		GetBaddieTarget
+#define GetBaddieTarget ((void(__cdecl*)(short,BOOL)) 0x004103A0)
 
 #endif // BOX_H_INCLUDED

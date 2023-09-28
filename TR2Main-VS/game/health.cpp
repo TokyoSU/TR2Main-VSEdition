@@ -126,7 +126,7 @@ void DrawGameInfo(BOOL pickupState) {
 
 void DrawEnemyHealthBar() {
 	ITEM_INFO* target = Lara.target;
-	if (target != NULL && target->hitPoints > 0) {
+	if (target != NULL && target->hitPoints > 0 && Lara.gun_status == LGS_Ready) {
 		int originalHP = Objects[target->objectID].hitPoints;
 		S_DrawEnemyHealthBar(PHD_ONE * target->hitPoints / originalHP, originalHP);
 	}

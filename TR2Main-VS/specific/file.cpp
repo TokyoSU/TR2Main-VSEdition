@@ -935,16 +935,9 @@ BOOL LoadBoxes(HANDLE hFile) {
 	// Load GroundZones and FlyZones
 	for (int i = 0; i < 2; ++i) {
 		for (int j = 0; j < 4; ++j) {
-			if ((j == 2) ||
-				(j == 1 && !Objects[ID_SPIDER_or_WOLF].loaded && !Objects[ID_SKIDOO_ARMED].loaded) ||
-				(j == 3 && !Objects[ID_YETI].loaded && !Objects[ID_WORKER3].loaded))
-			{
-				SetFilePointer(hFile, sizeof(short) * BoxesCount, NULL, FILE_CURRENT); // skip some GroundZones
-				continue;
-			}
-
-			GroundZones[j * 2 + i] = (short*)game_malloc(sizeof(short) * BoxesCount, GBUF_GroundZone);
-			ReadFileSync(hFile, GroundZones[j * 2 + i], sizeof(short) * BoxesCount, &bytesRead, NULL);
+			// NOTE: Seem like skipping zones crash the game when trying to read GroundZones !
+			GroundZones[j][i] = (short*)game_malloc(sizeof(short) * BoxesCount, GBUF_GroundZone);
+			ReadFileSync(hFile, GroundZones[j][i], sizeof(short) * BoxesCount, &bytesRead, NULL);
 			if (bytesRead != sizeof(short) * BoxesCount) {
 				lstrcpy(StringToShow, "LoadBoxes(): Unable to load 'ground_zone'");
 				return FALSE;

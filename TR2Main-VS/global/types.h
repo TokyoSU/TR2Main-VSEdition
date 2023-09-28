@@ -1067,6 +1067,15 @@ typedef enum {
 	RING_Keys,
 } RING_TYPE;
 
+typedef enum
+{
+	ZT_Skelly,
+	ZT_Basic,
+	ZT_Water,
+	ZT_Human,
+	ZT_Fly,
+} ZONE_TYPES;
+
 typedef enum {
 	GFL_NOLEVEL = -1,
 	GFL_TITLE,
@@ -1878,11 +1887,11 @@ typedef struct DoorInfos_t {
 } DOOR_INFOS;
 
 typedef struct FloorInfo_t {
-	short index;
+	unsigned short index;
 	short box;
-	char pitRoom;
+	BYTE pitRoom;
 	char floor;
-	char skyRoom;
+	BYTE skyRoom;
 	char ceiling;
 } FLOOR_INFO;
 
