@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Minor changes.
 - Improved wolf and bear code.
 - Improved small spider jump chance.
+- Added or improved error message when certain objects is missing when loading.
 
 ### Internal changes.
 - Decompiled spider.cpp

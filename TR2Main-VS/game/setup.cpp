@@ -48,7 +48,7 @@
 #include "modding/mod_utils.h"
 #endif
 
-#ifdef FEATURE_GOLD
+#if defined(FEATURE_GOLD)
 extern bool IsGold();
 #endif
 
@@ -718,6 +718,9 @@ void BaddyObjects() {
 	}
 	obj = &Objects[ID_SKIDOO_ARMED];
 	if (obj->loaded) {
+		if (!Objects[ID_SKIDMAN].loaded) {
+			S_ExitSystem("FATAL: SKIDOO_ARMED requires SKIDMAN, Also SKIDMAN need to be placed and triggered instead.");
+		}
 		obj->collision = SkidmanCollision;
 		obj->drawRoutine = DrawSkidoo;
 #if defined(FEATURE_MOD_CONFIG)
@@ -746,7 +749,7 @@ void BaddyObjects() {
 	obj = &Objects[ID_XIAN_LORD];
 	if (obj->loaded) {
 		if (!Objects[ID_CHINESE2].loaded) {
-			S_ExitSystem("FATAL: XianLord requires CHINESE2 (statue)");
+			S_ExitSystem("FATAL: XianLord requires CHINESE2 (statue) mesh object.");
 		}
 		obj->initialise = InitialiseXianLord;
 		obj->collision = CreatureCollision;
@@ -771,7 +774,7 @@ void BaddyObjects() {
 	obj = &Objects[ID_WARRIOR];
 	if (obj->loaded) {
 		if (!Objects[ID_CHINESE4].loaded) {
-			S_ExitSystem("FATAL: Warrior requires CHINESE4 (statue)");
+			S_ExitSystem("FATAL: Warrior requires CHINESE4 (statue) mesh object.");
 		}
 		obj->initialise = InitialiseXianLord;
 		obj->collision = CreatureCollision;
@@ -795,8 +798,8 @@ void BaddyObjects() {
 	}
 	obj = &Objects[ID_DRAGON_FRONT];
 	if (obj->loaded) {
-		if (!Objects[ID_DRAGON_BACK].loaded) {
-			S_ExitSystem("FATAL: Dragon front needs back");
+		if (!Objects[ID_BARTOLI].loaded) {
+			S_ExitSystem("FATAL: DRAGON_FRONT requires BARTOLI and DRAGON_BACK,\n- BARTOLI need to be placed and triggered instead.\n- DRAGON_BONE_FRONT and DRAGON_BONE_BACK is required, also SPHERE_OF_DOOM 1 to 3.");
 		}
 		obj->initialise = InitialiseCreature;
 		obj->collision = DragonCollision;
@@ -817,6 +820,9 @@ void BaddyObjects() {
 	}
 	obj = &Objects[ID_DRAGON_BACK];
 	if (obj->loaded) {
+		if (!Objects[ID_BARTOLI].loaded) {
+			S_ExitSystem("FATAL: DRAGON_BACK requires BARTOLI and DRAGON_FRONT,\n- BARTOLI need to be placed and triggered instead.\n- DRAGON_BONE_FRONT and DRAGON_BONE_BACK is required, also SPHERE_OF_DOOM 1 to 3.");
+		}
 		obj->control = DragonControl;
 		obj->collision = DragonCollision;
 		obj->radius = 341;
@@ -826,6 +832,9 @@ void BaddyObjects() {
 	}
 	obj = &Objects[ID_BARTOLI];
 	if (obj->loaded) {
+		if (!Objects[ID_DRAGON_BACK].loaded || !Objects[ID_DRAGON_FRONT].loaded) {
+			S_ExitSystem("FATAL: BARTOLI requires DRAGON_BACK and DRAGON_FRONT,\n- BARTOLI need to be placed and triggered.\n- DRAGON_BONE_FRONT and DRAGON_BONE_BACK is required, also SPHERE_OF_DOOM 1 to 3.");
+		}
 		obj->initialise = InitialiseBartoli;
 		obj->control = BartoliControl;
 		obj->save_flags = 1;
