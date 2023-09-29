@@ -27,6 +27,9 @@
 #include "specific/game.h"
 #include "global/vars.h"
 
+#define WOLF_SLEEP_ANIM (0)
+#define WOLF_DAMAGE0 (50)
+#define WOLF_DAMAGE1 (100)
 #define WOLF_TOUCH (0x774F)
 
 typedef enum {
@@ -45,13 +48,17 @@ typedef enum {
 	WOLF_BITE
 } WOLF_ANIMS;
 
-static const BITE_INFO WolfBite = {
-	0, -14, 174, 6
-};
+static const BITE_INFO WolfBite = { 0, -14, 174, 6 };
 
 void InitialiseWolf(short itemID) {
+	ITEM_INFO* item = &Items[itemID];
 	InitialiseCreature(itemID);
-	Items[itemID].frameNumber = 96; // lying wolf frame (hardcoded thing)
+	// Wolf is sleeping by default.
+	// NOTE: this code was refactored to use Anims[].frameBase instead of raw value.
+	item->animNumber = Objects[item->objectID].animIndex + WOLF_SLEEP_ANIM;
+	item->frameNumber = Anims[item->animNumber].frameBase + 96; // lying wolf frame (hardcoded thing)
+	item->currentAnimState = WOLF_SLEEP;
+	item->goalAnimState = WOLF_SLEEP;
 }
 
 void WolfControl(short itemID) {
@@ -61,21 +68,18 @@ void WolfControl(short itemID) {
 	ITEM_INFO* item = &Items[itemID];
 	CREATURE_INFO* wolf = (CREATURE_INFO*)item->data;
 	if (wolf == NULL) return; // NOTE: additional check not presented in the original game
-
-	short angle = 0;
-	short head = 0;
-	short tilt = 0;
+	AI_INFO info{};
+	short angle = 0, head = 0, tilt = 0;
 
 	if (item->hitPoints <= 0) {
 		if (item->currentAnimState != WOLF_DEATH) {
 			// some hardcoded death animation start
-			item->animNumber = Objects[ID_SPIDER_or_WOLF].animIndex + GetRandomControl() / 11000 + 20;
+			item->animNumber = Objects[item->objectID].animIndex + GetRandomControl() / 11000 + 20;
 			item->frameNumber = Anims[item->animNumber].frameBase;
 			item->currentAnimState = WOLF_DEATH;
 		}
 	}
 	else {
-		AI_INFO info;
 
 		CreatureAIInfo(item, &info);
 		if (info.ahead) {
@@ -107,7 +111,7 @@ void WolfControl(short itemID) {
 			break;
 
 		case WOLF_WALK:
-			wolf->maximum_turn = 2 * PHD_DEGREE;
+			wolf->maximum_turn = 364;
 			if (wolf->mood != MOOD_BORED) {
 				item->goalAnimState = WOLF_STALK;
 				item->requiredAnimState = WOLF_EMPTY;
@@ -140,7 +144,7 @@ void WolfControl(short itemID) {
 			break;
 
 		case WOLF_STALK:
-			wolf->maximum_turn = 2 * PHD_DEGREE;
+			wolf->maximum_turn = 364;
 			if (wolf->mood == MOOD_ESCAPE) {
 				item->goalAnimState = WOLF_RUN;
 			}
@@ -167,7 +171,7 @@ void WolfControl(short itemID) {
 			break;
 
 		case WOLF_RUN:
-			wolf->maximum_turn = 5 * PHD_DEGREE;
+			wolf->maximum_turn = 910;
 			tilt = angle;
 			if (info.ahead && info.distance < 0x240000) {
 				if (info.distance > 0x120000 &&
@@ -196,8 +200,8 @@ void WolfControl(short itemID) {
 				CHK_ANY(item->touchBits, WOLF_TOUCH))
 			{
 				CreatureEffect(item, &WolfBite, DoBloodSplat);
-				LaraItem->hitPoints -= 50;
-				LaraItem->hitStatus = 1;
+				wolf->enemy->hitPoints -= WOLF_DAMAGE0;
+				wolf->enemy->hitStatus = 1;
 				item->requiredAnimState = WOLF_RUN;
 			}
 			item->goalAnimState = WOLF_RUN;
@@ -209,8 +213,8 @@ void WolfControl(short itemID) {
 				CHK_ANY(item->touchBits, WOLF_TOUCH))
 			{
 				CreatureEffect(item, &WolfBite, DoBloodSplat);
-				LaraItem->hitPoints -= 100;
-				LaraItem->hitStatus = 1;
+				wolf->enemy->hitPoints -= WOLF_DAMAGE1;
+				wolf->enemy->hitStatus = 1;
 				item->requiredAnimState = WOLF_CROUCH;
 			}
 			break;

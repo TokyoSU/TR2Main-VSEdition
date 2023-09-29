@@ -2188,6 +2188,10 @@ typedef struct CreatureInfo_t {
 	ITEM_INFO* enemy;
 } CREATURE_INFO;
 
+static CREATURE_INFO* GetCreatureInfo(ITEM_INFO* item) {
+	return static_cast<CREATURE_INFO*>(item->data);
+}
+
 typedef struct BoatInfo_t {
 	int turn;
 	int leftFallspeed;

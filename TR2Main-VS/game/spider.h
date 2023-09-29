@@ -27,7 +27,7 @@
  /*
   * Function list
   */
-#define SpiderLeap ((void(__cdecl*)(short,short)) 0x00440070)
+void SpiderLeap(short itemID, short angle); // 0x00440070
 void SpiderControl(short itemID); // 0x00440120
 void BigSpiderControl(short itemID); // 0x00440340
 

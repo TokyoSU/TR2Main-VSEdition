@@ -22,7 +22,19 @@
 #include "precompiled.h"
 #include "game/spider.h"
 #include "game/box.h"
+#include "game/effects.h"
+#include "game/lot.h"
+#include "game/items.h"
+#include "game/missile.h"
+#include "game/sound.h"
+#include "specific/game.h"
 #include "global/vars.h"
+
+#define SPIDER_JUMP_ANIM (2)
+#define SPIDER_DAMAGE (25)
+
+#define BIG_SPIDER_DEATH_ANIM (2)
+#define BIG_SPIDER_DAMAGE (100)
 
 typedef enum
 {
@@ -35,26 +47,214 @@ typedef enum
 	SPIDER_DEATH
 } SPIDER_STATE;
 
+static const BITE_INFO SpiderBite = { 0, 0, 41, 1 };
+
+void SpiderLeap(short itemID, short angle)
+{
+	ITEM_INFO* item = &Items[itemID];
+	PHD_3DPOS oldPos = item->pos;
+	short oldRoomNumber = item->roomNumber;
+	CreatureAnimation(itemID, angle, 0);
+	if (item->pos.y <= oldPos.y - 384)
+	{
+		item->pos.x = oldPos.x;
+		item->pos.y = oldPos.y;
+		item->pos.z = oldPos.z;
+		if (item->roomNumber != oldRoomNumber)
+			ItemNewRoom(itemID, oldRoomNumber);
+		item->animNumber = Objects[item->objectID].animIndex + SPIDER_JUMP_ANIM;
+		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->currentAnimState = SPIDER_ATTACK2;
+		item->goalAnimState = SPIDER_STOP;
+		CreatureAnimation(itemID, angle, 0);
+	}
+}
+
 void SpiderControl(short itemID)
 {
 	if (!CreatureActive(itemID))
 		return;
 
+	ITEM_INFO* item = &Items[itemID];
+	CREATURE_INFO* spider = GetCreatureInfo(item);
+	if (spider == NULL) return;
+	AI_INFO AI{};
+	short angle = 0;
 
+	if (item->hitPoints <= 0)
+	{
+		if (ExplodingDeath(itemID, 0xFFFFFFFF, 0))
+		{
+			DisableBaddieAI(itemID);
+			KillItem(itemID);
+			item->status = ITEM_DISABLED;
+			PlaySoundEffect(349, &item->pos, 0);
+			return;
+		}
+	}
+	else
+	{
+		CreatureAIInfo(item, &AI);
+		CreatureMood(item, &AI, TRUE);
+		angle = CreatureTurn(item, 1456);
 
+		switch (item->currentAnimState)
+		{
+		case SPIDER_STOP:
+			spider->flags = 0;
 
+			if (spider->mood != MOOD_BORED)
+			{
+				if (!AI.ahead || item->touchBits == 0)
+				{
+					if (spider->mood != MOOD_STALK)
+					{
+						if (spider->mood == MOOD_ESCAPE || spider->mood == MOOD_ATTACK)
+							item->goalAnimState = SPIDER_WALK2;
+						else
+							item->goalAnimState = SPIDER_WALK1;
+					}
+				}
+				else
+				{
+					item->goalAnimState = SPIDER_ATTACK1;
+				}
+			}
+			else if (GetRandomControl() < 256)
+			{
+				item->goalAnimState = SPIDER_WALK1;
+			}
+			break;
+		case SPIDER_WALK1:
+			if (spider->mood != MOOD_BORED)
+			{
+				if (spider->mood == MOOD_ESCAPE || spider->mood == MOOD_ATTACK)
+					item->goalAnimState = SPIDER_WALK2;
+				else
+					item->goalAnimState = SPIDER_WALK1;
+			}
+			else if (GetRandomControl() < 256)
+			{
+				item->goalAnimState = SPIDER_STOP;
+			}
+			break;
+		case SPIDER_WALK2:
+			if (spider->mood != MOOD_BORED && spider->mood != MOOD_STALK && AI.ahead)
+			{
+				if (item->touchBits != 0)
+					item->goalAnimState = SPIDER_STOP;
+				else if (AI.distance < 0xA290)
+					item->goalAnimState = SPIDER_ATTACK3;
+				else if (GetRandomControl() < 0x1000 && AI.distance < 0x40000)
+					item->goalAnimState = SPIDER_ATTACK2;
+			}
+			else
+			{
+				item->goalAnimState = SPIDER_WALK1;
+			}
+			break;
+		case SPIDER_ATTACK1:
+		case SPIDER_ATTACK2:
+		case SPIDER_ATTACK3:
+			if (!spider->flags && item->touchBits != 0)
+			{
+				CreatureEffect(item, &SpiderBite, DoBloodSplat);
+				spider->enemy->hitPoints -= SPIDER_DAMAGE;
+				spider->enemy->hitStatus = 1;
+				spider->flags = 1;
+			}
+			break;
+		}
+	}
+
+	SpiderLeap(itemID, angle);
 }
 
 void BigSpiderControl(short itemID)
 {
+	if (!CreatureActive(itemID))
+		return;
 
+	ITEM_INFO* item = &Items[itemID];
+	CREATURE_INFO* spider = GetCreatureInfo(item);
+	if (spider == NULL) return;
+	AI_INFO AI{};
+	short angle = 0;
+
+	if (item->hitPoints <= 0)
+	{
+		if (item->currentAnimState != SPIDER_DEATH)
+		{
+			item->animNumber = Objects[item->objectID].animIndex + BIG_SPIDER_DEATH_ANIM;
+			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->currentAnimState = SPIDER_DEATH;
+			item->goalAnimState = SPIDER_DEATH;
+		}
+	}
+	else
+	{
+		CreatureAIInfo(item, &AI);
+		CreatureMood(item, &AI, TRUE);
+		angle = CreatureTurn(item, 728);
+
+		switch (item->currentAnimState)
+		{
+		case SPIDER_STOP:
+			spider->flags = 0;
+			if (spider->mood != MOOD_BORED)
+			{
+				if (AI.ahead && item->touchBits != 0)
+				{
+					item->goalAnimState = SPIDER_ATTACK1;
+				}
+				else if (spider->mood != MOOD_STALK)
+				{
+					if (spider->mood == MOOD_ESCAPE || spider->mood == MOOD_ATTACK)
+						item->goalAnimState = SPIDER_WALK2;
+				}
+				else
+				{
+					item->goalAnimState = SPIDER_WALK1;
+				}
+			}
+			break;
+		case SPIDER_WALK1:
+			if (spider->mood != MOOD_BORED)
+			{
+				if (AI.ahead && item->touchBits != 0)
+					item->goalAnimState = SPIDER_STOP;
+				else if (spider->mood == MOOD_ESCAPE || spider->mood == MOOD_ATTACK)
+					item->goalAnimState = SPIDER_WALK2;
+			}
+			break;
+		case SPIDER_WALK2:
+			spider->flags = 0;
+
+			if (AI.ahead && item->touchBits != 0)
+				item->goalAnimState = SPIDER_STOP;
+			else if (spider->mood == MOOD_BORED || spider->mood == MOOD_STALK)
+				item->goalAnimState = SPIDER_WALK1;
+			break;
+		case SPIDER_ATTACK1:
+			if (!spider->flags && item->touchBits != 0)
+			{
+				CreatureEffect(item, &SpiderBite, DoBloodSplat);
+				spider->enemy->hitPoints -= BIG_SPIDER_DAMAGE;
+				spider->enemy->hitStatus = 1;
+				spider->flags = 1;
+			}
+			break;
+		}
+	}
+
+	CreatureAnimation(itemID, angle, 0);
 }
 
  /*
   * Inject function
   */
 void Inject_Spider() {
-	//	INJECT(0x00440070, SpiderLeap);
+	INJECT(0x00440070, SpiderLeap);
 	INJECT(0x00440120, SpiderControl);
 	INJECT(0x00440340, BigSpiderControl);
 }

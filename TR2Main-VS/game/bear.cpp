@@ -27,6 +27,8 @@
 #include "specific/game.h"
 #include "global/vars.h"
 
+#define BEAR_DAMAGE0 (200)
+#define BEAR_DAMAGE1 (400)
 #define BEAR_TOUCH (0x2406C)
 
 typedef enum {
@@ -42,39 +44,34 @@ typedef enum {
 	BEAR_DEATH
 } BEAR_ANIMS;
 
-static const BITE_INFO BearBite = {
-	0, 96, 335, 14
-};
+static const BITE_INFO BearBite = { 0, 96, 335, 14 };
 
 void BearControl(short itemID) {
 	if (!CreatureActive(itemID))
 		return;
 
 	ITEM_INFO* item = &Items[itemID];
-	CREATURE_INFO* bear = (CREATURE_INFO*)item->data;
+	CREATURE_INFO* bear = GetCreatureInfo(item);
 	if (bear == NULL) return; // NOTE: additional check not presented in the original game
-
-	short angle = 0;
-	short head = 0;
+	AI_INFO info{};
+	BOOL isLaraDead = FALSE;
+	short angle = 0, head = 0;
 
 	if (item->hitPoints <= 0) {
-		angle = CreatureTurn(item, 1 * PHD_DEGREE);
+		angle = CreatureTurn(item, 182);
 		switch (item->currentAnimState) {
 		case BEAR_STROLL:
 		case BEAR_RUN:
 			item->goalAnimState = BEAR_STOP;
 			break;
-
 		case BEAR_REAR:
 			bear->flags = 1;
 			item->goalAnimState = BEAR_DEATH;
 			break;
-
 		case BEAR_STOP:
 			bear->flags = 0;
 			item->goalAnimState = BEAR_DEATH;
 			break;
-
 		case BEAR_DEATH:
 			if (bear->flags && CHK_ANY(item->touchBits, BEAR_TOUCH)) {
 				LaraItem->hitPoints -= 200;
@@ -82,18 +79,12 @@ void BearControl(short itemID) {
 				bear->flags = 0;
 			}
 			break;
-
 		case BEAR_WALK:
 			item->goalAnimState = BEAR_REAR;
-			break;
-
-		default:
 			break;
 		}
 	}
 	else {
-		AI_INFO info;
-		BOOL isLaraDead;
 
 		CreatureAIInfo(item, &info);
 		if (info.ahead) {
@@ -102,7 +93,7 @@ void BearControl(short itemID) {
 
 		CreatureMood(item, &info, TRUE);
 		angle = CreatureTurn(item, bear->maximum_turn);
-		isLaraDead = (LaraItem->hitPoints < 0);
+		isLaraDead = (LaraItem->hitPoints <= 0);
 
 		if (item->hitStatus) {
 			bear->flags = 1;
@@ -130,7 +121,7 @@ void BearControl(short itemID) {
 			break;
 
 		case BEAR_STROLL:
-			bear->maximum_turn = 2 * PHD_DEGREE;
+			bear->maximum_turn = 364;
 			if (isLaraDead && CHK_ANY(item->touchBits, BEAR_TOUCH) && info.ahead) {
 				item->goalAnimState = BEAR_STOP;
 			}
@@ -210,7 +201,7 @@ void BearControl(short itemID) {
 
 		case BEAR_ATTACK2:
 			if (item->requiredAnimState == BEAR_STROLL && CHK_ANY(item->touchBits, BEAR_TOUCH)) {
-				LaraItem->hitPoints -= 400;
+				LaraItem->hitPoints -= BEAR_DAMAGE1;
 				LaraItem->hitStatus = 1;
 				item->requiredAnimState = BEAR_REAR;
 			}
@@ -220,7 +211,7 @@ void BearControl(short itemID) {
 			if (item->requiredAnimState == BEAR_STROLL && CHK_ANY(item->touchBits, BEAR_TOUCH))
 			{
 				CreatureEffect(item, &BearBite, DoBloodSplat);
-				LaraItem->hitPoints -= 200;
+				LaraItem->hitPoints -= BEAR_DAMAGE0;
 				LaraItem->hitStatus = 1;
 				item->requiredAnimState = BEAR_STOP;
 			}

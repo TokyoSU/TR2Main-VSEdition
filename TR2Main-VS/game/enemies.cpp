@@ -28,6 +28,11 @@
 #include "specific/game.h"
 #include "global/vars.h"
 
+#define MONK_DAMAGE_TO_OTHER_ENEMIES (5)
+#define MONK_DAMAGE (150)
+#define MONK_DEATH_ANIM (20)
+#define MONK_TOUCHBITS (0x4000)
+
 enum MonkState
 {
 	MONK_STOP1 = 1,
@@ -43,10 +48,7 @@ enum MonkState
 	MONK_STOP2
 };
 
-#define MONK_DEATH_ANIM 20
-#define MONK_TOUCHBITS 0x4000
-
-static BITE_INFO MonkBite = { -23, 16, 265, 14 };
+static const BITE_INFO MonkBite = { -23, 16, 265, 14 };
 
 void MonkControl(short itemID)
 {
@@ -54,7 +56,7 @@ void MonkControl(short itemID)
 		return;
 
 	ITEM_INFO* item = &Items[itemID];
-	CREATURE_INFO* monk = (CREATURE_INFO*)item->data;
+	CREATURE_INFO* monk = GetCreatureInfo(item);
 	if (monk == NULL) return; // NOTE: Not exist in the original game.
 	AI_INFO ai{};
 	short tilt = 0, head = 0, angle = 0;
@@ -246,12 +248,11 @@ void MonkControl(short itemID)
 		case MONK_ATTACK5:
 			if (!monk->flags && monk->enemy != NULL)
 			{
-
 				if (monk->enemy == LaraItem)
 				{
 					if (CHK_ANY(item->touchBits, MONK_TOUCHBITS))
 					{
-						monk->enemy->hitPoints -= 150;
+						monk->enemy->hitPoints -= MONK_DAMAGE;
 						monk->enemy->hitStatus = 1;
 						monk->flags = 1;
 						PlaySoundEffect(245, &item->pos, 0);
@@ -262,7 +263,7 @@ void MonkControl(short itemID)
 						 ABS(item->pos.y - monk->enemy->pos.y) < 512 &&
 						 ABS(item->pos.z - monk->enemy->pos.z) < 512)
 				{
-					monk->enemy->hitPoints -= 5;
+					monk->enemy->hitPoints -= MONK_DAMAGE_TO_OTHER_ENEMIES;
 					monk->enemy->hitStatus = 1;
 					monk->flags = 1;
 					PlaySoundEffect(245, &item->pos, 0);
