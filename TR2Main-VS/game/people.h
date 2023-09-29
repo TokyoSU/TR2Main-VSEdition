@@ -27,16 +27,13 @@
  /*
   * Function list
   */
-  //	0x00435EB0:		Targetable
+#define Targetable ((BOOL(__cdecl*)(ITEM_INFO*,AI_INFO*)) 0x00435EB0)
   //	0x00435F40:		ControlGlow
   //	0x00435F80:		ControlGunShot
-
 short GunShot(int x, int y, int z, short speed, short rotY, short roomNumber); // 0x00435FD0
 short GunHit(int x, int y, int z, short speed, short rotY, short roomNumber); // 0x00436040
 short GunMiss(int x, int y, int z, short speed, short rotY, short roomNumber); // 0x00436100
-
-//	0x004361B0:		ShotLara
-
+#define ShotLara ((BOOL(__cdecl*)(ITEM_INFO*,AI_INFO*,BITE_INFO*,short,int)) 0x004361B0)
 #define InitialiseCult1 ((void(__cdecl*)(short)) 0x00436380)
 #define Cult1Control ((void(__cdecl*)(short)) 0x004363D0)
 #define InitialiseCult3 ((void(__cdecl*)(short)) 0x00436800)

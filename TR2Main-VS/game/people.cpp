@@ -114,6 +114,16 @@ short GunMiss(int x, int y, int z, short speed, short rotY, short roomNumber) {
 	return GunShot(x, y, z, speed, rotY, roomNumber);
 }
 
+/*void BanditControl(short itemID)
+{
+
+}
+
+void Bandit2Control(short itemID)
+{
+
+}*/
+
 /*
  * Inject function
  */
@@ -121,11 +131,9 @@ void Inject_People() {
 	//	INJECT(0x00435EB0, Targetable);
 	//	INJECT(0x00435F40, ControlGlow);
 	//	INJECT(0x00435F80, ControlGunShot);
-
 	INJECT(0x00435FD0, GunShot);
 	INJECT(0x00436040, GunHit);
 	INJECT(0x00436100, GunMiss);
-
 	//	INJECT(0x004361B0, ShotLara);
 	//	INJECT(0x00436380, InitialiseCult1);
 	//	INJECT(0x004363D0, Cult1Control);
@@ -133,7 +141,7 @@ void Inject_People() {
 	//	INJECT(0x00436850, Cult3Control);
 	//	INJECT(0x00436DC0, Worker1Control);
 	//	INJECT(0x004371C0, Worker2Control);
-	//	INJECT(0x00437620, BanditControl);
-	//	INJECT(0x00437960, Bandit2Control);
+	//  INJECT(0x00437620, BanditControl);
+	//  INJECT(0x00437960, Bandit2Control);
 	//	INJECT(0x00437DA0, WinstonControl);
 }

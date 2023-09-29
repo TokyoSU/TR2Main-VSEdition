@@ -21,6 +21,8 @@
 
 #include "precompiled.h"
 #include "game/lara.h"
+#include "3dsystem/3d_gen.h"
+#include "game/draw.h"
 #include "global/vars.h"
 
 #ifdef FEATURE_GAMEPLAY_FIXES
@@ -57,6 +59,745 @@ void lara_col_jumper(ITEM_INFO* item, COLL_INFO* coll) {
 		if (item->fallSpeed <= 0)
 			item->fallSpeed = 1;
 	}
+}
+
+// NOTE: Custom implementation to get absolute position for lara joint, the old one was messy and was not accurate (it also didn't include all bones).
+void GetLaraJointAbsPosition(PHD_VECTOR* pos, int meshID)
+{
+	ITEM_INFO* item = LaraItem;
+	OBJECT_INFO* obj = &Objects[item->objectID];
+	UINT16* rot1 = NULL, *rot1copy = NULL;
+	int* bones = &AnimBones[obj->boneIndex];
+	int rate = 0, frac = 0, frame = 0;
+	short* frames[2]{}, *framePtr = NULL, *hitframePtr = NULL;
+	short interp = 0;
+
+	frac = GetFrames(LaraItem, frames, &rate);
+	if (frac)
+	{
+		GetLJAInt(item, pos, frames[0], frames[1], frac, rate, meshID);
+		return;
+	}
+
+	short hitDir = Lara.hit_direction;
+	if (hitDir >= 0)
+	{
+		switch (hitDir)
+		{
+		case 0:
+			hitframePtr = Anims[125].framePtr;
+			interp = Anims[125].interpolation;
+			break;
+		case 1:
+			hitframePtr = Anims[126].framePtr;
+			interp = Anims[126].interpolation;
+			break;
+		case 2:
+			hitframePtr = Anims[127].framePtr;
+			interp = Anims[127].interpolation;
+			break;
+		case 3:
+			hitframePtr = Anims[128].framePtr;
+			interp = Anims[128].interpolation;
+			break;
+		}
+		if (hitframePtr == NULL)
+			return;
+		framePtr = &hitframePtr[Lara.hit_frame * (interp >> 8)];
+	}
+	else
+	{
+		framePtr = frames[0];
+	}
+	if (framePtr == NULL)
+		return;
+
+	phd_PushUnitMatrix();
+	PhdMatrixPtr->_03 = 0;
+	PhdMatrixPtr->_13 = 0;
+	PhdMatrixPtr->_23 = 0;
+	phd_RotYXZ(item->pos.rotY, item->pos.rotX, item->pos.rotZ);
+
+	phd_PushMatrix();
+	bones = &AnimBones[obj->boneIndex];
+	rot1 = (UINT16*)framePtr + 9;
+
+	phd_TranslateRel(framePtr[6], framePtr[7], framePtr[8]);
+	phd_RotYXZsuperpack(&rot1, 0);
+	if (meshID == LM_Hips)
+	{
+		phd_TranslateRel(pos->x, pos->y, pos->z);
+		pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+		pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+		pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+	}
+
+	phd_PushMatrix();
+	phd_TranslateRel(bones[1], bones[2], bones[3]);
+	phd_RotYXZsuperpack(&rot1, 0);
+	if (meshID == LM_ThighL)
+	{
+		phd_TranslateRel(pos->x, pos->y, pos->z);
+		pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+		pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+		pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+	}
+	phd_TranslateRel(bones[5], bones[6], bones[7]);
+	phd_RotYXZsuperpack(&rot1, 0);
+	if (meshID == LM_CalfL)
+	{
+		phd_TranslateRel(pos->x, pos->y, pos->z);
+		pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+		pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+		pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+	}
+	phd_TranslateRel(bones[9], bones[10], bones[11]);
+	phd_RotYXZsuperpack(&rot1, 0);
+	if (meshID == LM_FootL)
+	{
+		phd_TranslateRel(pos->x, pos->y, pos->z);
+		pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+		pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+		pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+	}
+	phd_PopMatrix();
+
+	phd_PushMatrix();
+	phd_TranslateRel(bones[13], bones[W2V_SHIFT], bones[15]);
+	phd_RotYXZsuperpack(&rot1, 0);
+	if (meshID == LM_ThighR)
+	{
+		phd_TranslateRel(pos->x, pos->y, pos->z);
+		pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+		pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+		pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+	}
+	phd_TranslateRel(bones[17], bones[18], bones[19]);
+	phd_RotYXZsuperpack(&rot1, 0);
+	if (meshID == LM_CalfR)
+	{
+		phd_TranslateRel(pos->x, pos->y, pos->z);
+		pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+		pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+		pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+	}
+	phd_TranslateRel(bones[21], bones[22], bones[23]);
+	phd_RotYXZsuperpack(&rot1, 0);
+	if (meshID == LM_FootR)
+	{
+		phd_TranslateRel(pos->x, pos->y, pos->z);
+		pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+		pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+		pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+	}
+	phd_PopMatrix();
+
+	phd_TranslateRel(bones[25], bones[26], bones[27]);
+	if (Lara.weapon_item != -1 && Lara.gun_type == LGT_M16
+	&& (Items[Lara.weapon_item].currentAnimState == 0
+	|| Items[Lara.weapon_item].currentAnimState == 2
+	|| Items[Lara.weapon_item].currentAnimState == 4))
+	{
+		frame = Lara.right_arm.frame_number * (Anims[Lara.right_arm.anim_number].interpolation >> 8) + 9;
+		rot1 = (UINT16*)&Lara.right_arm.frame_base[frame];
+		phd_RotYXZsuperpack(&rot1, 7);
+	}
+	else {
+		phd_RotYXZsuperpack(&rot1, 0);
+	}
+	phd_RotYXZ(Lara.torso_y_rot, Lara.torso_x_rot, Lara.torso_z_rot);
+	if (meshID == LM_Torso)
+	{
+		phd_TranslateRel(pos->x, pos->y, pos->z);
+		pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+		pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+		pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+	}
+
+	phd_PushMatrix();
+	phd_TranslateRel(bones[53], bones[54], bones[55]);
+	rot1copy = rot1;
+	phd_RotYXZsuperpack(&rot1, 6);
+	rot1 = rot1copy;
+	phd_RotYXZ(Lara.head_y_rot, Lara.head_x_rot, Lara.head_z_rot);
+	if (meshID == LM_Head)
+	{
+		phd_TranslateRel(pos->x, pos->y, pos->z);
+		pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+		pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+		pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+	}
+	phd_PopMatrix();
+
+	int gunType = LGT_Unarmed;
+	if (Lara.gun_status == LGS_Ready
+	|| Lara.gun_status == LGS_Special
+	|| Lara.gun_status == LGS_Draw
+	|| Lara.gun_status == LGS_Undraw)
+	{
+		gunType = Lara.gun_type;
+	}
+
+	switch (gunType) {
+	case LGT_Unarmed:
+	case LGT_Flare:
+		phd_PushMatrix();
+		phd_TranslateRel(bones[29], bones[30], bones[31]);
+		phd_RotYXZsuperpack(&rot1, 0);
+		if (meshID == LM_UArmR)
+		{
+			phd_TranslateRel(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_TranslateRel(bones[33], bones[34], bones[35]);
+		phd_RotYXZsuperpack(&rot1, 0);
+		if (meshID == LM_LArmR)
+		{
+			phd_TranslateRel(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_TranslateRel(bones[37], bones[38], bones[39]);
+		phd_RotYXZsuperpack(&rot1, 0);
+		if (meshID == LM_HandR)
+		{
+			phd_TranslateRel(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_PopMatrix();
+
+		phd_PushMatrix();
+		phd_TranslateRel(bones[41], bones[42], bones[43]);
+		if (Lara.flare_control_left) {
+			frame = (Anims[Lara.left_arm.anim_number].interpolation >> 8) * (Lara.left_arm.frame_number - Anims[Lara.left_arm.anim_number].frameBase) + 9;
+			rot1 = (UINT16*)&Lara.left_arm.frame_base[frame];
+			phd_RotYXZsuperpack(&rot1, 11);
+		}
+		else {
+			phd_RotYXZsuperpack(&rot1, 0);
+		}
+		if (meshID == LM_UArmL)
+		{
+			phd_TranslateRel(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+
+		phd_TranslateRel(bones[45], bones[46], bones[47]);
+		phd_RotYXZsuperpack(&rot1, 0);
+		if (meshID == LM_LArmL)
+		{
+			phd_TranslateRel(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+
+		phd_TranslateRel(bones[49], bones[50], bones[51]);
+		phd_RotYXZsuperpack(&rot1, 0);
+		if (meshID == LM_HandL)
+		{
+			phd_TranslateRel(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		break;
+	case LGT_Pistols:
+	case LGT_Magnums:
+	case LGT_Uzis:
+		phd_PushMatrix();
+		phd_TranslateRel(bones[29], bones[30], bones[31]);
+		phd_RotYXZ(Lara.right_arm.y_rot, Lara.right_arm.x_rot, Lara.right_arm.z_rot);
+		frame = (Anims[Lara.right_arm.anim_number].interpolation >> 8) * (Lara.right_arm.frame_number - Anims[Lara.right_arm.anim_number].frameBase) + 9;
+		rot1 = (UINT16*)&Lara.right_arm.frame_base[frame];
+		phd_RotYXZsuperpack(&rot1, 8);
+		if (meshID == LM_UArmR)
+		{
+			phd_TranslateRel(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_TranslateRel(bones[33], bones[34], bones[35]);
+		phd_RotYXZsuperpack(&rot1, 0);
+		if (meshID == LM_LArmR)
+		{
+			phd_TranslateRel(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_TranslateRel(bones[37], bones[38], bones[39]);
+		phd_RotYXZsuperpack(&rot1, 0);
+		if (meshID == LM_HandR)
+		{
+			phd_TranslateRel(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_PopMatrix();
+
+		phd_PushMatrix();
+		phd_TranslateRel(bones[41], bones[42], bones[43]);
+		phd_RotYXZ(Lara.left_arm.y_rot, Lara.left_arm.x_rot, Lara.left_arm.z_rot);
+		frame = (Anims[Lara.left_arm.anim_number].interpolation >> 8) * (Lara.left_arm.frame_number - Anims[Lara.left_arm.anim_number].frameBase) + 9;
+		rot1 = (UINT16*)&Lara.left_arm.frame_base[frame];
+		phd_RotYXZsuperpack(&rot1, 11);
+		if (meshID == LM_UArmL)
+		{
+			phd_TranslateRel(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_TranslateRel(bones[45], bones[46], bones[47]);
+		phd_RotYXZsuperpack(&rot1, 0);
+		if (meshID == LM_LArmL)
+		{
+			phd_TranslateRel(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_TranslateRel(bones[49], bones[50], bones[51]);
+		phd_RotYXZsuperpack(&rot1, 0);
+		if (meshID == LM_HandL)
+		{
+			phd_TranslateRel(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		break;
+	case LGT_Shotgun:
+	case LGT_M16:
+	case LGT_Grenade:
+	case LGT_Harpoon:
+		phd_PushMatrix();
+		phd_TranslateRel(bones[29], bones[30], bones[31]);
+		frame = Lara.right_arm.frame_number * (Anims[Lara.right_arm.anim_number].interpolation >> 8) + 9;
+		rot1 = (UINT16*)&Lara.right_arm.frame_base[frame];
+		phd_RotYXZsuperpack(&rot1, 8);
+		if (meshID == LM_UArmR)
+		{
+			phd_TranslateRel(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_TranslateRel(bones[33], bones[34], bones[35]);
+		phd_RotYXZsuperpack(&rot1, 0);
+		if (meshID == LM_LArmL)
+		{
+			phd_TranslateRel(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_TranslateRel(bones[37], bones[38], bones[39]);
+		phd_RotYXZsuperpack(&rot1, 0);
+		if (meshID == LM_HandR)
+		{
+			phd_TranslateRel(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_PopMatrix();
+
+		phd_PushMatrix();
+		phd_TranslateRel(bones[41], bones[42], bones[43]);
+		phd_RotYXZsuperpack(&rot1, 0);
+		if (meshID == LM_UArmL)
+		{
+			phd_TranslateRel(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_TranslateRel(bones[45], bones[46], bones[47]);
+		phd_RotYXZsuperpack(&rot1, 0);
+		if (meshID == LM_LArmL)
+		{
+			phd_TranslateRel(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_TranslateRel(bones[49], bones[50], bones[51]);
+		phd_RotYXZsuperpack(&rot1, 0);
+		if (meshID == LM_HandL)
+		{
+			phd_TranslateRel(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		break;
+	default:
+		break;
+	}
+	phd_PopMatrix();
+	phd_PopMatrix();
+	phd_PopMatrix();
+}
+
+void GetLJAInt(ITEM_INFO* item, PHD_VECTOR* pos, short* frame1, short* frame2, int frac, int rate, int meshID)
+{
+	OBJECT_INFO* obj = &Objects[item->objectID];
+	UINT16* rot1, *rot2, *rot1copy, *rot2copy;
+	int frame, *bones;
+
+	phd_PushUnitMatrix();
+	PhdMatrixPtr->_03 = 0;
+	PhdMatrixPtr->_13 = 0;
+	PhdMatrixPtr->_23 = 0;
+	phd_RotYXZ(item->pos.rotY, item->pos.rotX, item->pos.rotZ);
+
+	phd_PushMatrix();
+	bones = &AnimBones[obj->boneIndex];
+	rot1 = (UINT16*)frame1 + 9;
+	rot2 = (UINT16*)frame2 + 9;
+
+	InitInterpolate(frac, rate);
+	phd_TranslateRel_ID(frame1[6], frame1[7], frame1[8], frame2[6], frame2[7], frame2[8]);
+	phd_RotYXZsuperpack_I(&rot1, &rot2, 0);
+	if (meshID == LM_Hips)
+	{
+		phd_TranslateRel_I(pos->x, pos->y, pos->z);
+		pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+		pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+		pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+	}
+
+	phd_PushMatrix_I();
+	phd_TranslateRel_I(bones[1], bones[2], bones[3]);
+	phd_RotYXZsuperpack_I(&rot1, &rot2, 0);
+	if (meshID == LM_ThighL)
+	{
+		phd_TranslateRel_I(pos->x, pos->y, pos->z);
+		pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+		pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+		pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+	}
+	phd_TranslateRel_I(bones[5], bones[6], bones[7]);
+	phd_RotYXZsuperpack_I(&rot1, &rot2, 0);
+	if (meshID == LM_CalfL)
+	{
+		phd_TranslateRel_I(pos->x, pos->y, pos->z);
+		pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+		pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+		pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+	}
+	phd_TranslateRel_I(bones[9], bones[10], bones[11]);
+	phd_RotYXZsuperpack_I(&rot1, &rot2, 0);
+	if (meshID == LM_FootL)
+	{
+		phd_TranslateRel_I(pos->x, pos->y, pos->z);
+		pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+		pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+		pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+	}
+	phd_PopMatrix_I();
+
+	phd_PushMatrix_I();
+	phd_TranslateRel_I(bones[13], bones[W2V_SHIFT], bones[15]);
+	phd_RotYXZsuperpack_I(&rot1, &rot2, 0);
+	if (meshID == LM_ThighR)
+	{
+		phd_TranslateRel_I(pos->x, pos->y, pos->z);
+		pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+		pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+		pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+	}
+	phd_TranslateRel_I(bones[17], bones[18], bones[19]);
+	phd_RotYXZsuperpack_I(&rot1, &rot2, 0);
+	if (meshID == LM_CalfR)
+	{
+		phd_TranslateRel_I(pos->x, pos->y, pos->z);
+		pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+		pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+		pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+	}
+	phd_TranslateRel_I(bones[21], bones[22], bones[23]);
+	phd_RotYXZsuperpack_I(&rot1, &rot2, 0);
+	if (meshID == LM_FootR)
+	{
+		phd_TranslateRel_I(pos->x, pos->y, pos->z);
+		pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+		pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+		pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+	}
+	phd_PopMatrix_I();
+
+	phd_TranslateRel_I(bones[25], bones[26], bones[27]);
+	if (Lara.weapon_item != -1 && Lara.gun_type == LGT_M16
+	&& (Items[Lara.weapon_item].currentAnimState == 0
+	||  Items[Lara.weapon_item].currentAnimState == 2
+	||  Items[Lara.weapon_item].currentAnimState == 4))
+	{
+		frame = Lara.right_arm.frame_number * (Anims[Lara.right_arm.anim_number].interpolation >> 8) + 9;
+		rot1 = rot2 = (UINT16*)&Lara.right_arm.frame_base[frame];
+		phd_RotYXZsuperpack_I(&rot1, &rot2, 7);
+	}
+	else {
+		phd_RotYXZsuperpack_I(&rot1, &rot2, 0);
+	}
+	phd_RotYXZ_I(Lara.torso_y_rot, Lara.torso_x_rot, Lara.torso_z_rot);
+	if (meshID == LM_Torso)
+	{
+		phd_TranslateRel_I(pos->x, pos->y, pos->z);
+		pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+		pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+		pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+	}
+
+	phd_PushMatrix_I();
+	phd_TranslateRel_I(bones[53], bones[54], bones[55]);
+	rot1copy = rot1;
+	rot2copy = rot2;
+	phd_RotYXZsuperpack_I(&rot1, &rot2, 6);
+	rot1 = rot1copy;
+	rot2 = rot2copy;
+	phd_RotYXZ_I(Lara.head_y_rot, Lara.head_x_rot, Lara.head_z_rot);
+	if (meshID == LM_Head)
+	{
+		phd_TranslateRel_I(pos->x, pos->y, pos->z);
+		pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+		pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+		pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+	}
+	phd_PopMatrix_I();
+
+	int gunType = LGT_Unarmed;
+	if (Lara.gun_status == LGS_Ready
+	|| Lara.gun_status == LGS_Special
+	|| Lara.gun_status == LGS_Draw
+	|| Lara.gun_status == LGS_Undraw)
+	{
+		gunType = Lara.gun_type;
+	}
+
+	switch (gunType) {
+	case LGT_Unarmed:
+	case LGT_Flare:
+		phd_PushMatrix_I();
+		phd_TranslateRel_I(bones[29], bones[30], bones[31]);
+		phd_RotYXZsuperpack_I(&rot1, &rot2, 0);
+		if (meshID == LM_UArmR)
+		{
+			phd_TranslateRel_I(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_TranslateRel_I(bones[33], bones[34], bones[35]);
+		phd_RotYXZsuperpack_I(&rot1, &rot2, 0);
+		if (meshID == LM_LArmR)
+		{
+			phd_TranslateRel_I(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_TranslateRel_I(bones[37], bones[38], bones[39]);
+		phd_RotYXZsuperpack_I(&rot1, &rot2, 0);
+		if (meshID == LM_HandR)
+		{
+			phd_TranslateRel_I(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_PopMatrix_I();
+
+		phd_PushMatrix_I();
+		phd_TranslateRel_I(bones[41], bones[42], bones[43]);
+		if (Lara.flare_control_left) {
+			frame = (Anims[Lara.left_arm.anim_number].interpolation >> 8) * (Lara.left_arm.frame_number - Anims[Lara.left_arm.anim_number].frameBase) + 9;
+			rot1 = rot2 = (UINT16*)&Lara.left_arm.frame_base[frame];
+			phd_RotYXZsuperpack_I(&rot1, &rot2, 11);
+		}
+		else {
+			phd_RotYXZsuperpack_I(&rot1, &rot2, 0);
+		}
+		if (meshID == LM_UArmL)
+		{
+			phd_TranslateRel_I(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+
+		phd_TranslateRel_I(bones[45], bones[46], bones[47]);
+		phd_RotYXZsuperpack_I(&rot1, &rot2, 0);
+		if (meshID == LM_LArmL)
+		{
+			phd_TranslateRel_I(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+
+		phd_TranslateRel_I(bones[49], bones[50], bones[51]);
+		phd_RotYXZsuperpack_I(&rot1, &rot2, 0);
+		if (meshID == LM_HandL)
+		{
+			phd_TranslateRel_I(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		break;
+	case LGT_Pistols:
+	case LGT_Magnums:
+	case LGT_Uzis:
+		phd_PushMatrix_I();
+		phd_TranslateRel_I(bones[29], bones[30], bones[31]);
+		InterpolateArmMatrix();
+		phd_RotYXZ(Lara.right_arm.y_rot, Lara.right_arm.x_rot, Lara.right_arm.z_rot);
+		frame = (Anims[Lara.right_arm.anim_number].interpolation >> 8) * (Lara.right_arm.frame_number - Anims[Lara.right_arm.anim_number].frameBase) + 9;
+		rot1 = (UINT16*)&Lara.right_arm.frame_base[frame];
+		phd_RotYXZsuperpack(&rot1, 8);
+		if (meshID == LM_UArmR)
+		{
+			phd_TranslateRel_I(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_TranslateRel(bones[33], bones[34], bones[35]);
+		phd_RotYXZsuperpack(&rot1, 0);
+		if (meshID == LM_LArmR)
+		{
+			phd_TranslateRel_I(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_TranslateRel(bones[37], bones[38], bones[39]);
+		phd_RotYXZsuperpack(&rot1, 0);
+		if (meshID == LM_HandR)
+		{
+			phd_TranslateRel_I(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_PopMatrix_I();
+
+		phd_PushMatrix_I();
+		phd_TranslateRel_I(bones[41], bones[42], bones[43]);
+		InterpolateArmMatrix();
+		phd_RotYXZ(Lara.left_arm.y_rot, Lara.left_arm.x_rot, Lara.left_arm.z_rot);
+		frame = (Anims[Lara.left_arm.anim_number].interpolation >> 8) * (Lara.left_arm.frame_number - Anims[Lara.left_arm.anim_number].frameBase) + 9;
+		rot1 = (UINT16*)&Lara.left_arm.frame_base[frame];
+		phd_RotYXZsuperpack(&rot1, 11);
+		if (meshID == LM_UArmL)
+		{
+			phd_TranslateRel_I(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_TranslateRel(bones[45], bones[46], bones[47]);
+		phd_RotYXZsuperpack(&rot1, 0);
+		if (meshID == LM_LArmL)
+		{
+			phd_TranslateRel_I(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_TranslateRel(bones[49], bones[50], bones[51]);
+		phd_RotYXZsuperpack(&rot1, 0);
+		if (meshID == LM_HandL)
+		{
+			phd_TranslateRel_I(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		break;
+	case LGT_Shotgun:
+	case LGT_M16:
+	case LGT_Grenade:
+	case LGT_Harpoon:
+		phd_PushMatrix_I();
+		phd_TranslateRel_I(bones[29], bones[30], bones[31]);
+		frame = Lara.right_arm.frame_number * (Anims[Lara.right_arm.anim_number].interpolation >> 8) + 9;
+		rot1 = rot2 = (UINT16*)&Lara.right_arm.frame_base[frame];
+		phd_RotYXZsuperpack_I(&rot1, &rot2, 8);
+		if (meshID == LM_UArmR)
+		{
+			phd_TranslateRel_I(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_TranslateRel_I(bones[33], bones[34], bones[35]);
+		phd_RotYXZsuperpack_I(&rot1, &rot2, 0);
+		if (meshID == LM_LArmR)
+		{
+			phd_TranslateRel_I(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_TranslateRel_I(bones[37], bones[38], bones[39]);
+		phd_RotYXZsuperpack_I(&rot1, &rot2, 0);
+		if (meshID == LM_HandR)
+		{
+			phd_TranslateRel_I(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_PopMatrix_I();
+
+		phd_PushMatrix_I();
+		phd_TranslateRel_I(bones[41], bones[42], bones[43]);
+		phd_RotYXZsuperpack_I(&rot1, &rot2, 0);
+		if (meshID == LM_UArmL)
+		{
+			phd_TranslateRel_I(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_TranslateRel_I(bones[45], bones[46], bones[47]);
+		phd_RotYXZsuperpack_I(&rot1, &rot2, 0);
+		if (meshID == LM_LArmL)
+		{
+			phd_TranslateRel_I(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		phd_TranslateRel_I(bones[49], bones[50], bones[51]);
+		phd_RotYXZsuperpack_I(&rot1, &rot2, 0);
+		if (meshID == LM_HandL)
+		{
+			phd_TranslateRel_I(pos->x, pos->y, pos->z);
+			pos->x = (PhdMatrixPtr->_03 >> W2V_SHIFT) + item->pos.x;
+			pos->y = (PhdMatrixPtr->_13 >> W2V_SHIFT) + item->pos.y;
+			pos->z = (PhdMatrixPtr->_23 >> W2V_SHIFT) + item->pos.z;
+		}
+		break;
+	default:
+		break;
+	}
+	phd_PopMatrix_I();
+	phd_PopMatrix();
+	phd_PopMatrix();
 }
 
 /*
@@ -186,9 +927,7 @@ void Inject_Lara() {
 	//	INJECT(0x00429E90, lara_col_wade);
 	//	INJECT(----------, lara_col_twist);
 	//	INJECT(0x0042A000, lara_default_col);
-
 	INJECT(0x0042A040, lara_col_jumper);
-
 	//	INJECT(0x0042A120, lara_col_kick);
 	//	INJECT(----------, lara_col_deathslide);
 	//	INJECT(0x0042A130, GetLaraCollisionInfo);
@@ -209,6 +948,6 @@ void Inject_Lara() {
 	//	INJECT(0x0042B370, TestLaraSlide);
 	//	INJECT(0x0042B4A0, LaraFloorFront);
 	//	INJECT(0x0042B520, LaraLandedBad);
-	//	INJECT(0x0042B5E0, GetLaraJointAbsPosition);
-	//	INJECT(0x0042B970, GetLJAInt);
+	INJECT(0x0042B5E0, GetLaraJointAbsPosition);
+	INJECT(0x0042B970, GetLJAInt);
 }

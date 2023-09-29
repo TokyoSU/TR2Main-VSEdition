@@ -38,7 +38,7 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	if (creature == NULL) return;
 #if defined(FEATURE_MOD_CONFIG)
-	if ((item->objectID == ID_BANDIT1 || item->objectID == ID_BANDIT2) && !GetModMakeMercenaryAttackLaraDirectly())
+	if ((item->objectID == ID_BANDIT1 || item->objectID == ID_BANDIT2 || item->objectID == ID_BANDIT2B) && !GetModMakeMercenaryAttackLaraDirectly())
 		GetBaddieTarget(creature->item_num, FALSE);
 	else if (item->objectID == ID_MONK1 || item->objectID == ID_MONK2 && !GetModMakeMonkAttackLaraDirectly())
 		GetBaddieTarget(creature->item_num, TRUE);
@@ -174,7 +174,7 @@ void GetBaddieTarget(short creatureIdx, BOOL isMonk)
 		targetItem = &Items[baddy->item_num];
 		if (isMonk)
 		{
-			if (targetItem->objectID != ID_BANDIT1 && targetItem->objectID != ID_BANDIT2)
+			if (targetItem->objectID != ID_BANDIT1 && targetItem->objectID != ID_BANDIT2 && targetItem->objectID != ID_BANDIT2B)
 				continue;
 		}
 		else if (targetItem->objectID != ID_MONK1 && targetItem->objectID != ID_MONK2)

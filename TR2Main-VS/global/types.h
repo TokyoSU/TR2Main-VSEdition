@@ -1213,6 +1213,25 @@ typedef enum {
 	CHAR_SECRET3,
 } CHAR_SECRETS;
 
+typedef enum
+{
+	LM_Hips,
+	LM_ThighL,
+	LM_CalfL,
+	LM_FootL,
+	LM_ThighR,
+	LM_CalfR,
+	LM_FootR,
+	LM_Torso,
+	LM_UArmR,
+	LM_LArmR,
+	LM_HandR,
+	LM_UArmL,
+	LM_LArmL,
+	LM_HandL,
+	LM_Head
+} LARA_MESHES;
+
 /*
  * Structs
  */

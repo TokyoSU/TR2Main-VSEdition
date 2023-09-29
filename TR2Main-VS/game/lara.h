@@ -179,8 +179,8 @@ void lara_col_jumper(ITEM_INFO* item, COLL_INFO* coll); // 0x0042A040
 // 0x0042B4A0:		LaraFloorFront
 
 #define LaraLandedBad ((bool (__cdecl*)(ITEM_INFO *item, COLL_INFO *coll)) 0x0042B520)
-#define GetLaraJointAbsPosition ((void(__cdecl*)(PHD_VECTOR*,int)) 0x0042B5E0)
-
-// 0x0042B970:		GetLJAInt
+void GetLaraJointAbsPosition(PHD_VECTOR* pos, int meshID); // 0x0042B5E0
+// NOTE: new argument meshID, to get the right id when it's interpolated.
+void GetLJAInt(ITEM_INFO* item, PHD_VECTOR* pos, short* frame0, short* frame1, int frac, int rate, int meshID); // 0x0042B970
 
 #endif // LARA_H_INCLUDED

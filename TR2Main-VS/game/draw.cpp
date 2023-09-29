@@ -528,17 +528,13 @@ void DrawSpriteItem(ITEM_INFO* item) {
 	OBJECT_INFO* obj;
 
 	phd_PushUnitMatrix(); // NOTE: this push is workaround for sprites with no matrix
-	S_CalculateStaticMeshLight(item->pos.x, item->pos.y, item->pos.z,
-		item->shade1, item->shade2, &RoomInfo[item->roomNumber]);
+	S_CalculateStaticMeshLight(item->pos.x, item->pos.y, item->pos.z, item->shade1, item->shade2, &RoomInfo[item->roomNumber]);
 	phd_PopMatrix(); // NOTE: this pop is workaround for sprites with no matrix
 
 	obj = &Objects[item->objectID];
 
 	// NOTE: SPR_ITEM is not presented in the original game
-	S_DrawSprite(SPR_ITEM | SPR_ABS | SPR_SHADE | (obj->semi_transparent ? SPR_SEMITRANS : 0),
-		item->pos.x, item->pos.y, item->pos.z,
-		obj->meshIndex - item->frameNumber,
-		LsAdder + 0x1000, 0);
+	S_DrawSprite(SPR_ITEM | SPR_ABS | SPR_SHADE | (obj->semi_transparent ? SPR_SEMITRANS : 0), item->pos.x, item->pos.y, item->pos.z, obj->meshIndex - item->frameNumber, LsAdder + 0x1000, 0);
 }
 
 void DrawDummyItem(ITEM_INFO* item) {
@@ -673,8 +669,8 @@ void DrawAnimatingItem(ITEM_INFO* item) {
 
 void DrawLaraInt(ITEM_INFO* item, short* frame1, short* frame2, int frac, int rate) {
 	PHD_MATRIX matrix;
-	UINT16* rot1, * rot2, * rot1copy, * rot2copy;
-	int frame, * bones;
+	UINT16* rot1, *rot2, *rot1copy, *rot2copy;
+	int frame, *bones;
 
 	OBJECT_INFO* obj = &Objects[item->objectID];
 	short* bounds = GetBoundsAccurate(item);
@@ -730,9 +726,9 @@ void DrawLaraInt(ITEM_INFO* item, short* frame1, short* frame2, int frac, int ra
 
 	phd_TranslateRel_I(bones[25], bones[26], bones[27]);
 	if (Lara.weapon_item != -1 && Lara.gun_type == LGT_M16
-		&& (Items[Lara.weapon_item].currentAnimState == 0
-			|| Items[Lara.weapon_item].currentAnimState == 2
-			|| Items[Lara.weapon_item].currentAnimState == 4))
+	&& (Items[Lara.weapon_item].currentAnimState == 0
+	||  Items[Lara.weapon_item].currentAnimState == 2
+	||  Items[Lara.weapon_item].currentAnimState == 4))
 	{
 		frame = Lara.right_arm.frame_number * (Anims[Lara.right_arm.anim_number].interpolation >> 8) + 9;
 		rot1 = rot2 = (UINT16*)&Lara.right_arm.frame_base[frame];
@@ -770,9 +766,9 @@ void DrawLaraInt(ITEM_INFO* item, short* frame1, short* frame2, int frac, int ra
 
 	int gunType = LGT_Unarmed;
 	if (Lara.gun_status == LGS_Ready
-		|| Lara.gun_status == LGS_Special
-		|| Lara.gun_status == LGS_Draw
-		|| Lara.gun_status == LGS_Undraw)
+	||  Lara.gun_status == LGS_Special
+	||  Lara.gun_status == LGS_Draw
+	||  Lara.gun_status == LGS_Undraw)
 	{
 		gunType = Lara.gun_type;
 	}
@@ -812,14 +808,13 @@ void DrawLaraInt(ITEM_INFO* item, short* frame1, short* frame2, int frac, int ra
 			if (Lara.left_arm.flash_gun) {
 				phd_TranslateRel_I(11, 32, 80);
 				phd_RotX_I(-ANGLE(90));
-				phd_RotY_I(2 * GetRandomDraw());
+				phd_RotY_I(GetRandomDraw() * 2);
 				S_CalculateStaticLight(0x800);
 				phd_PutPolygons_I(MeshPtr[Objects[ID_FLARE_FIRE].meshIndex], clip);
 #ifdef FEATURE_VIDEOFX_IMPROVED
 				if (AlphaBlendMode) {
 					int shade = (GetRandomDraw() & 0xFFF) + 0x1000;
-					DWORD flags = GLOW_FLARE_COLOR;
-					flags |= SPR_BLEND_ADD | SPR_TINT | SPR_SHADE | SPR_SEMITRANS;
+					DWORD flags = GLOW_FLARE_COLOR | SPR_BLEND_ADD | SPR_TINT | SPR_SHADE | SPR_SEMITRANS;
 					S_DrawSprite(flags, 0, 0, 0, Objects[ID_GLOW].meshIndex, shade, 0);
 				}
 #endif // FEATURE_VIDEOFX_IMPROVED
@@ -907,7 +902,7 @@ void DrawLaraInt(ITEM_INFO* item, short* frame1, short* frame2, int frac, int ra
 	default:
 		break;
 	}
-	phd_PopMatrix();
+	phd_PopMatrix_I(); // NOTE: this need to be popMatrix_I since it's pushMatrix_I above.
 	phd_PopMatrix();
 	phd_PopMatrix();
 }

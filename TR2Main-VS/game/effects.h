@@ -35,6 +35,7 @@ void ControlBlood1(short fxID); // 0x0041C6C0
 void ControlExplosion1(short fxID); // 0x0041C750
 void Richochet(GAME_VECTOR* pos); // 0x0041C7D0
 void ControlRichochet1(short fxID); // 0x0041C850
+void CreateBubbleVec(PHD_VECTOR* pos, short roomNumber); // New argument, avoiding useless cast. TODO: remove 'Vec' when passing to EXE.
 void CreateBubble(PHD_3DPOS* pos, short roomNumber); // 0x0041C880
 void LaraBubbles(ITEM_INFO* item); // 0x0041C8F0
 void ControlBubble1(short fxID); // 0x0041C970

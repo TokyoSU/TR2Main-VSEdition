@@ -27,9 +27,9 @@
  /*
   * Function list
   */
-  //	0x0042F840:		DoFlareLight
-  //	0x0042F8E0:		DoFlareInHand
-void DrawFlareInAir(ITEM_INFO* item);
+#define DoFlareLight ((BOOL(__cdecl*)(PHD_VECTOR*,int)) 0x0042F840)
+void DoFlareInHand(int flare_age); // 0x0042F8E0
+void DrawFlareInAir(ITEM_INFO* item); // 0x0042F9C0
 //	0x0042FAC0:		CreateFlare
 //	0x0042FCA0:		set_flare_arm
 //	0x0042FCF0:		draw_flare

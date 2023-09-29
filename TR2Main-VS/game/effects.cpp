@@ -153,6 +153,19 @@ void ControlRichochet1(short fxID) {
 		KillEffect(fxID);
 }
 
+void CreateBubbleVec(PHD_VECTOR* pos, short roomNumber)
+{
+	short fxID = CreateEffect(roomNumber);
+	if (fxID < 0) return;
+	FX_INFO* fx = &Effects[fxID];
+	fx->pos.x = pos->x;
+	fx->pos.y = pos->y;
+	fx->pos.z = pos->z;
+	fx->speed = ((GetRandomDraw() * 6) >> 15) + 10;
+	fx->frame_number = -((GetRandomDraw() * 3) >> 15);
+	fx->object_number = ID_BUBBLES;
+}
+
 void CreateBubble(PHD_3DPOS* pos, short roomNumber) {
 	short fxID = CreateEffect(roomNumber);
 	if (fxID < 0) return;

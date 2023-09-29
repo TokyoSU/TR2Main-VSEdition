@@ -63,7 +63,7 @@ void LaraControl(short itemID) {
 				Lara.head_x_rot = Lara.head_y_rot = 0;
 				if (item->hitPoints <= 0 && Lara.gun_type != LGT_Flare) {
 					BYTE backupGunType = SaveGame.start[CurrentLevel].gunType;
-					SaveGame.start[CurrentLevel].gunType = Lara.request_gun_type;
+					SaveGame.start[CurrentLevel].gunType = (BYTE)Lara.request_gun_type;
 					LaraInitialiseMeshes(CurrentLevel);
 					SaveGame.start[CurrentLevel].gunType = backupGunType;
 					Lara.gun_status = LGS_Armless;
