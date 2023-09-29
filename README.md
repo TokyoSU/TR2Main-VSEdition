@@ -34,7 +34,7 @@ Learn about [the latest improvements](CHANGELOG.md).
 1) go to visual studio (open the project if it's not already opened).
 2) go to your project properties.
 3) go to "Debugging".
-4) change the "Working directory" to your game path (don't forget the '\' at the end of the path if it not exist).
+4) change the "Working directory" to your game path (don't forget the \ at the end of the path if it not exist).
 5) done.
 
 ## Authors
