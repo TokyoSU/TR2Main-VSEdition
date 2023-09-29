@@ -45,7 +45,6 @@ to
 - Fixed gamepad/joystick wrong check, it was only checking for the left motor, not both.
 - Fixed directinput initialize, was using wrong enum type when switching to DX9.
 - Fixed CreateEnvmapBufferSurface() return types.
-- Fixed WinMain argument.
 - Fixed bug introduced with the Savegame buffer size:
 1) Harpoon and 2 stats was not increasing. (Fix1)
 2) Holsters when the game start or if you reload a savegame. (Fix2)
@@ -58,6 +57,9 @@ to
 - Increased savegame size from 6KB to 16KB to avoid crash with the items count increase feature.
 - Added a new library: spdlog, will be able to logs data to a files more efficiently, will be able to get debug info later one.
 - Using D3DX9 library: more recent than DX7_SDK.
+
+### Minor changes.
+- Improved WinMain function argument to the recommanded syntax for visual studio.
 
 ## [0.9.0] - 2023-06-05
 ### New features
