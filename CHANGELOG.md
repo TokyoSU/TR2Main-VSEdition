@@ -7,15 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased: 0.9.0.2]
 
-### TR2Main features
+### TR2Main features.
 - Increased number of entities activated from 5 to 12.
 - Added enemy bars.
 - Added json configuration for starting weapons and ammos.
 - Added json configuration for entities health.
 - Added json configuration for health bar, air bar and enemy bar position and color.
 - Added json configuration for mercenary and monks to attack lara directly.
-- Added json configuration for lara combat camera, to avoid targeting monks if they are not angry.
+- Added json configuration for lara combat camera, to avoid targeting monks if they are not angry. (Can still explode with grenade, they will be hostile directly !)
 - Added blood effect to mercenary when monk attack them.
+
+### Minor changes.
+- Improved wolf and bear code.
+- Improved small spider jump chance.
+
+### Internal changes.
+- Decompiled spider.cpp
+- Decompiled monks in enemies.cpp
+- Decompiled lot.cpp
 
 ## [0.9.0.1] - 2023-09-24 - Fix count: 3
 
