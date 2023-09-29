@@ -29,6 +29,8 @@
 
 #define BEAR_DAMAGE0 (200)
 #define BEAR_DAMAGE1 (400)
+#define BEAR_DAMAGE2 (200)
+#define BEAR_DAMAGE_TOUCH (3)
 #define BEAR_TOUCH (0x2406C)
 
 typedef enum {
@@ -74,8 +76,8 @@ void BearControl(short itemID) {
 			break;
 		case BEAR_DEATH:
 			if (bear->flags && CHK_ANY(item->touchBits, BEAR_TOUCH)) {
-				LaraItem->hitPoints -= 200;
-				LaraItem->hitStatus = 1;
+				bear->enemy->hitPoints -= BEAR_DAMAGE2;
+				bear->enemy->hitStatus = 1;
 				bear->flags = 0;
 			}
 			break;
@@ -140,8 +142,8 @@ void BearControl(short itemID) {
 		case BEAR_RUN:
 			bear->maximum_turn = 910;
 			if (CHK_ANY(item->touchBits, BEAR_TOUCH)) {
-				LaraItem->hitPoints -= 3;
-				LaraItem->hitStatus = 1;
+				bear->enemy->hitPoints -= BEAR_DAMAGE_TOUCH;
+				bear->enemy->hitStatus = 1;
 			}
 
 			if (bear->mood == MOOD_BORED || isLaraDead) {
@@ -201,8 +203,8 @@ void BearControl(short itemID) {
 
 		case BEAR_ATTACK2:
 			if (item->requiredAnimState == BEAR_STROLL && CHK_ANY(item->touchBits, BEAR_TOUCH)) {
-				LaraItem->hitPoints -= BEAR_DAMAGE1;
-				LaraItem->hitStatus = 1;
+				bear->enemy->hitPoints -= BEAR_DAMAGE1;
+				bear->enemy->hitStatus = 1;
 				item->requiredAnimState = BEAR_REAR;
 			}
 			break;
@@ -211,8 +213,8 @@ void BearControl(short itemID) {
 			if (item->requiredAnimState == BEAR_STROLL && CHK_ANY(item->touchBits, BEAR_TOUCH))
 			{
 				CreatureEffect(item, &BearBite, DoBloodSplat);
-				LaraItem->hitPoints -= BEAR_DAMAGE0;
-				LaraItem->hitStatus = 1;
+				bear->enemy->hitPoints -= BEAR_DAMAGE0;
+				bear->enemy->hitStatus = 1;
 				item->requiredAnimState = BEAR_STOP;
 			}
 			break;
