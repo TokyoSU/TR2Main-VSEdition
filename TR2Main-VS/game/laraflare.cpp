@@ -45,7 +45,7 @@ void DrawFlareInAir(ITEM_INFO* item) {
 		phd_PutPolygons(MeshPtr[Objects[ID_FLARE_ITEM].meshIndex], clip);
 		if (CHK_ANY((DWORD)item->data, 0x8000)) {
 			phd_TranslateRel(-6, 6, 80);
-			phd_RotX(-90 * PHD_DEGREE);
+			phd_RotX(-ANGLE(90));
 			phd_RotY(2 * GetRandomDraw());
 			S_CalculateStaticLight(0x800);
 			phd_PutPolygons(MeshPtr[Objects[ID_FLARE_FIRE].meshIndex], clip);

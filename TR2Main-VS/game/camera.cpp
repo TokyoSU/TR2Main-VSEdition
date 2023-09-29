@@ -246,13 +246,13 @@ void CalculateCamera() {
 		tilt = phd_atan(shift, y - Camera.item->pos.y - (bounds[2] + bounds[3]) / 2);
 		angle /= 2;
 		tilt /= 2;
-		if (angle > -50 * PHD_DEGREE && angle < 50 * PHD_DEGREE && tilt > -85 * PHD_DEGREE && tilt < 85 * PHD_DEGREE) {
+		if (angle > -ANGLE(50) && angle < ANGLE(50) && tilt > -ANGLE(85) && tilt < ANGLE(85)) {
 			rot = angle - Lara.head_y_rot;
-			CLAMP(rot, -4 * PHD_DEGREE, 4 * PHD_DEGREE);
+			CLAMP(rot, -ANGLE(4), ANGLE(4));
 			Lara.head_y_rot += rot;
 			Lara.torso_y_rot += rot;
 			rot = tilt - Lara.head_x_rot;
-			CLAMP(rot, -4 * PHD_DEGREE, 4 * PHD_DEGREE);
+			CLAMP(rot, -ANGLE(4), ANGLE(4));
 			Lara.head_x_rot += rot;
 			Lara.torso_x_rot += rot;
 			Camera.type = CAM_Look;
@@ -261,7 +261,7 @@ void CalculateCamera() {
 	}
 
 	if (Camera.type == CAM_Look || Camera.type == CAM_Combat) {
-		y -= 0x100;
+		y -= 256;
 		Camera.target.roomNumber = item->roomNumber;
 		if (Camera.fixedCamera) {
 			Camera.target.y = y;

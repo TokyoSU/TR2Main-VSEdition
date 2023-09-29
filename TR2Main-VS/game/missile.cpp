@@ -34,12 +34,9 @@
 void ControlMissile(short fxID) {
 	FX_INFO* fx = &Effects[fxID];
 
-	if (Effects[fxID].object_number == ID_MISSILE_HARPOON
-		&& !CHK_ANY(RoomInfo[fx->room_number].flags, ROOM_UNDERWATER)
-		&& fx->pos.rotX > -PHD_90 * 3 / 4)
-	{
-		fx->pos.rotX -= PHD_DEGREE;
-	}
+	if (Effects[fxID].object_number == ID_MISSILE_HARPOON && !CHK_ANY(RoomInfo[fx->room_number].flags, ROOM_UNDERWATER) && fx->pos.rotX > -(ANGLE(270) / 4))
+		fx->pos.rotX -= ANGLE(1);
+
 	int speed = fx->speed * phd_cos(fx->pos.rotX) >> W2V_SHIFT;
 	fx->pos.y += fx->speed * phd_sin(-fx->pos.rotX) >> W2V_SHIFT;
 	fx->pos.z += speed * phd_cos(fx->pos.rotY) >> W2V_SHIFT;
@@ -48,7 +45,7 @@ void ControlMissile(short fxID) {
 	short roomNumber = fx->room_number;
 	FLOOR_INFO* floor = GetFloor(fx->pos.x, fx->pos.y, fx->pos.z, &roomNumber);
 	if (fx->pos.y >= GetHeight(floor, fx->pos.x, fx->pos.y, fx->pos.z)
-		|| (fx->pos.y <= GetCeiling(floor, fx->pos.x, fx->pos.y, fx->pos.z)))
+	|| (fx->pos.y <= GetCeiling(floor, fx->pos.x, fx->pos.y, fx->pos.z)))
 	{
 		if (fx->object_number == ID_MISSILE_KNIFE || fx->object_number == ID_MISSILE_HARPOON) {
 			fx->speed = 0;
@@ -110,7 +107,7 @@ void ControlMissile(short fxID) {
 		KillEffect(fxID);
 	}
 	else if (fx->object_number == ID_MISSILE_KNIFE) {
-		fx->pos.rotZ += 30 * PHD_DEGREE;
+		fx->pos.rotZ += ANGLE(30);
 	}
 }
 

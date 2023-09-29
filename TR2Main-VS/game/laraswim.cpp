@@ -25,21 +25,21 @@
 
 void SwimTurn(ITEM_INFO* item) {
 	if (CHK_ANY(InputStatus, IN_FORWARD)) {
-		item->pos.rotX -= 2 * PHD_DEGREE;
+		item->pos.rotX -= ANGLE(2);
 	}
 	else if (CHK_ANY(InputStatus, IN_BACK)) {
-		item->pos.rotX += 2 * PHD_DEGREE;
+		item->pos.rotX += ANGLE(2);
 	}
 
 	if (CHK_ANY(InputStatus, IN_LEFT)) {
-		Lara.turn_rate -= PHD_DEGREE * 9 / 4;
-		CLAMPL(Lara.turn_rate, -6 * PHD_DEGREE);
-		item->pos.rotZ -= 3 * PHD_DEGREE;
+		Lara.turn_rate -= ANGLE(9) / 4;
+		CLAMPL(Lara.turn_rate, -ANGLE(6));
+		item->pos.rotZ -= ANGLE(3);
 	}
 	else if (CHK_ANY(InputStatus, IN_RIGHT)) {
-		Lara.turn_rate += PHD_DEGREE * 9 / 4;
-		CLAMPG(Lara.turn_rate, 6 * PHD_DEGREE);
-		item->pos.rotZ += 3 * PHD_DEGREE;
+		Lara.turn_rate += ANGLE(9) / 4;
+		CLAMPG(Lara.turn_rate, ANGLE(6));
+		item->pos.rotZ += ANGLE(3);
 	}
 }
 

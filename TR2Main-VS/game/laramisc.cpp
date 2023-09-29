@@ -51,13 +51,13 @@ void LaraControl(short itemID) {
 			&& Lara.water_status != LWS_Cheat && CHK_ANY(InputStatus, IN_DOZYCHEAT))
 		{
 			if (Lara.water_status != LWS_Underwater || item->hitPoints <= 0) {
-				item->pos.y -= 0x80;
+				item->pos.y -= 128;
 				item->animNumber = 87;
 				item->frameNumber = Anims[item->animNumber].frameBase;
 				item->currentAnimState = AS_SWIM;
 				item->goalAnimState = AS_SWIM;
 				item->gravity = 0;
-				item->pos.rotX = 30 * PHD_DEGREE;
+				item->pos.rotX = ANGLE(30);
 				item->fallSpeed = 30;
 				Lara.torso_x_rot = Lara.torso_y_rot = 0;
 				Lara.head_x_rot = Lara.head_y_rot = 0;
@@ -118,19 +118,19 @@ void LaraControl(short itemID) {
 					StopSoundEffect(30);
 					switch (item->currentAnimState) {
 					case AS_SWANDIVE:
-						item->pos.rotX = -45 * PHD_DEGREE;
+						item->pos.rotX = -ANGLE(45);
 						item->goalAnimState = AS_DIVE;
 						AnimateLara(item);
 						item->fallSpeed *= 2;
 						break;
 					case AS_FASTDIVE:
-						item->pos.rotX = -85 * PHD_DEGREE;
+						item->pos.rotX = -ANGLE(85);
 						item->goalAnimState = AS_DIVE;
 						AnimateLara(item);
 						item->fallSpeed *= 2;
 						break;
 					default:
-						item->pos.rotX = -45 * PHD_DEGREE;
+						item->pos.rotX = -ANGLE(45);
 						item->animNumber = 112;
 						item->frameNumber = Anims[item->animNumber].frameBase;
 						item->currentAnimState = AS_DIVE;
@@ -145,7 +145,7 @@ void LaraControl(short itemID) {
 			}
 			break;
 		case LWS_Wade:
-			Camera.targetElevation = -22 * PHD_DEGREE;
+			Camera.targetElevation = -ANGLE(22);
 			if (water_surface_dist >= 0x180) {
 				if (water_surface_dist > 0x2DA) {
 					Lara.water_status = LWS_Surface;

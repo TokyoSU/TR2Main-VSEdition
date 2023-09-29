@@ -811,7 +811,7 @@ void DrawLaraInt(ITEM_INFO* item, short* frame1, short* frame2, int frac, int ra
 		if (Lara.gun_type == LGT_Flare) {
 			if (Lara.left_arm.flash_gun) {
 				phd_TranslateRel_I(11, 32, 80);
-				phd_RotX_I(-90 * PHD_DEGREE);
+				phd_RotX_I(-ANGLE(90));
 				phd_RotY_I(2 * GetRandomDraw());
 				S_CalculateStaticLight(0x800);
 				phd_PutPolygons_I(MeshPtr[Objects[ID_FLARE_FIRE].meshIndex], clip);
@@ -957,7 +957,7 @@ void DrawGunFlash(int weapon, int clip) {
 		return;
 	case LGT_Flare:
 		phd_TranslateRel(11, 32, 80);
-		phd_RotX(-90 * PHD_DEGREE);
+		phd_RotX(-ANGLE(90));
 		phd_RotY(2 * GetRandomDraw());
 		S_CalculateStaticLight(0x800);
 		phd_PutPolygons(MeshPtr[Objects[ID_FLARE_FIRE].meshIndex], clip);
@@ -972,7 +972,7 @@ void DrawGunFlash(int weapon, int clip) {
 		return;
 	case LGT_M16:
 		phd_TranslateRel(0, 400, 99);
-		phd_RotYXZ(0, -85 * PHD_DEGREE, (2 * GetRandomDraw() & 0x4000) + 0x2000);
+		phd_RotYXZ(0, -ANGLE(85), (2 * GetRandomDraw() & 0x4000) + 0x2000);
 		S_CalculateStaticLight(0xA00);
 		phd_PutPolygons(MeshPtr[Objects[ID_M16_FLASH].meshIndex], clip);
 #ifdef FEATURE_VIDEOFX_IMPROVED
@@ -1000,7 +1000,7 @@ void DrawGunFlash(int weapon, int clip) {
 		break;
 	}
 	phd_TranslateRel(0, len, off);
-	phd_RotYXZ(0, -90 * PHD_DEGREE, 2 * GetRandomDraw());
+	phd_RotYXZ(0, -ANGLE(90), 2 * GetRandomDraw());
 	S_CalculateStaticLight(light);
 	phd_PutPolygons(MeshPtr[Objects[ID_GUN_FLASH].meshIndex], clip);
 #ifdef FEATURE_VIDEOFX_IMPROVED

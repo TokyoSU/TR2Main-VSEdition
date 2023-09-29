@@ -98,7 +98,7 @@ int Display_Inventory(INVENTORY_MODE invMode) {
 
 	T_RemovePrint(AmmoTextInfo);
 	AmmoTextInfo = NULL;
-	AlterFOV(80 * PHD_DEGREE);
+	AlterFOV(ANGLE(90));
 	InventoryMode = invMode;
 	int nTicks = TICKS_PER_FRAME;
 	Construct_Inventory();

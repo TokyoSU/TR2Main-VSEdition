@@ -125,8 +125,8 @@ void FireShotgun() {
 	base[0] = Lara.left_arm.y_rot + LaraItem->pos.rotY;
 	base[1] = Lara.left_arm.x_rot;
 	for (int i = 0; i < 6; ++i) {
-		angles[0] = base[0] + (20 * PHD_DEGREE) * (GetRandomControl() - PHD_ONE / 4) / PHD_ONE;
-		angles[1] = base[1] + (20 * PHD_DEGREE) * (GetRandomControl() - PHD_ONE / 4) / PHD_ONE;
+		angles[0] = base[0] + ANGLE(20) * (GetRandomControl() - PHD_ONE / 4) / PHD_ONE;
+		angles[1] = base[1] + ANGLE(20) * (GetRandomControl() - PHD_ONE / 4) / PHD_ONE;
 		if (FireWeapon(LGT_Shotgun, Lara.target, LaraItem, angles)) {
 			Lara.right_arm.flash_gun = weapon->flashTime;
 			PlaySoundEffect(weapon->sampleNum, &LaraItem->pos, 0);
@@ -147,11 +147,11 @@ void FireM16(BOOL isRunning) {
 	// NOTE: There was a bug in the original game - ID_LARA_M16 instead of LGT_M16
 #ifdef FEATURE_GAMEPLAY_FIXES
 	if (IsRunningM16fix && isRunning) {
-		weapon->shotAccuracy = (12 * PHD_DEGREE);
+		weapon->shotAccuracy = ANGLE(12);
 		weapon->damage = 1;
 	}
 	else {
-		weapon->shotAccuracy = (4 * PHD_DEGREE);
+		weapon->shotAccuracy = ANGLE(4);
 		weapon->damage = 3;
 	}
 #endif // FEATURE_GAMEPLAY_FIXES

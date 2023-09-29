@@ -86,7 +86,9 @@ typedef struct {
 #define PHD_180				(PHD_ONE/2)
 #define PHD_90				(PHD_ONE/4)
 #define PHD_45				(PHD_ONE/8)
+#define PHD_270				(PHD_90*3)
 #define PHD_DEGREE			(PHD_ONE/360)
+#define ANGLE(x)            ((x)*PHD_DEGREE)
 
 // String macros
 #ifdef FEATURE_HUD_IMPROVED

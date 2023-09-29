@@ -187,8 +187,8 @@ void ControlBubble1(short fxID) {
 	FLOOR_INFO* floor;
 
 	fx = &Effects[fxID];
-	fx->pos.rotY += 9 * PHD_DEGREE;
-	fx->pos.rotX += 13 * PHD_DEGREE;
+	fx->pos.rotY += ANGLE(9);
+	fx->pos.rotX += ANGLE(13);
 	x = fx->pos.x + (11 * phd_sin(fx->pos.rotY) >> W2V_SHIFT);
 	y = fx->pos.y - fx->speed;
 	z = fx->pos.z + (8 * phd_cos(fx->pos.rotX) >> W2V_SHIFT);
@@ -369,7 +369,7 @@ void lara_normal_effect(ITEM_INFO* item) {
 	item->animNumber = 11;
 	item->frameNumber = Anims[item->animNumber].frameBase;
 	Camera.type = CAM_Chase;
-	AlterFOV(80 * PHD_DEGREE);
+	AlterFOV(ANGLE(80));
 }
 
 void BoilerFX(ITEM_INFO* item) {
@@ -552,7 +552,7 @@ void SphereOfDoom(short itemID) {
 
 	item = &Items[itemID];
 	item->timer += 64;
-	item->pos.rotY += item->objectID == ID_SPHERE_OF_DOOM2 ? 10 * PHD_DEGREE : -10 * PHD_DEGREE;
+	item->pos.rotY += (item->objectID == ID_SPHERE_OF_DOOM2) ? ANGLE(10) : -ANGLE(10);
 	dx = item->pos.x - LaraItem->pos.x;
 	dy = item->pos.y - LaraItem->pos.y;
 	dz = item->pos.z - LaraItem->pos.z;
