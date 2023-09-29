@@ -57,23 +57,25 @@ void InitialiseLevelFlags() {
 }
 
 void InitialiseObjects() {
+	OBJECT_INFO* obj = NULL;
 	for (int i = 0; i < ID_NUMBER_OBJECTS; ++i) {
-		Objects[i].intelligent = 0;
-		Objects[i].save_position = 0;
-		Objects[i].save_hitpoints = 0;
-		Objects[i].save_flags = 0;
-		Objects[i].save_anim = 0;
-		Objects[i].water_creature = 0;
-		Objects[i].initialise = NULL;
-		Objects[i].collision = NULL;
-		Objects[i].control = NULL;
-		Objects[i].drawRoutine = DrawAnimatingItem;
-		Objects[i].ceiling = NULL;
-		Objects[i].floor = NULL;
-		Objects[i].pivotLength = 0;
-		Objects[i].radius = 10;
-		Objects[i].shadowSize = 0;
-		Objects[i].hitPoints = HP_DONT_TARGET;
+		obj = &Objects[i];
+		obj->initialise = NULL;
+		obj->collision = NULL;
+		obj->control = NULL;
+		obj->ceiling = NULL;
+		obj->floor = NULL;
+		obj->drawRoutine = DrawAnimatingItem;
+		obj->hitPoints = HP_DONT_TARGET;
+		obj->pivotLength = 0;
+		obj->radius = 10;
+		obj->shadowSize = 0;
+		obj->intelligent = FALSE;
+		obj->water_creature = FALSE;
+		obj->save_position = FALSE;
+		obj->save_hitpoints = FALSE;
+		obj->save_flags = FALSE;
+		obj->save_anim = FALSE;
 	}
 	BaddyObjects();
 	TrapObjects();
@@ -82,7 +84,7 @@ void InitialiseObjects() {
 }
 
 void BaddyObjects() {
-	OBJECT_INFO* obj;
+	OBJECT_INFO* obj = NULL;
 
 	// Lara object is mandatory
 	obj = &Objects[ID_LARA];
