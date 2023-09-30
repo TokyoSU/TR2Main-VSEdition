@@ -27,13 +27,13 @@
   * Inject function
   */
 void Inject_MoveBlock() {
-	//	INJECT(0x004339A0, InitialiseMovingBlock);
-	//	INJECT(0x004339D0, MovableBlock);
-	//	INJECT(0x00433B20, MovableBlockCollision);
-	//	INJECT(0x00433D80, TestBlockMovable);
-	//	INJECT(0x00433DD0, TestBlockPush);
-	//	INJECT(0x00433F20, TestBlockPull);
-	//	INJECT(0x00434160, AlterFloorHeight);
-	//	INJECT(0x00434220, DrawMovableBlock);
-	//	INJECT(0x00434250, DrawUnclippedItem);
+	//INJECT(0x004339A0, InitialiseMovingBlock);
+	//INJECT(0x004339D0, MovableBlock);
+	//INJECT(0x00433B20, MovableBlockCollision);
+	//INJECT(0x00433D80, TestBlockMovable);
+	//INJECT(0x00433DD0, TestBlockPush);
+	//INJECT(0x00433F20, TestBlockPull);
+	//INJECT(0x00434160, AlterFloorHeight);
+	//INJECT(0x00434220, DrawMovableBlock);
+	//INJECT(0x00434250, DrawUnclippedItem);
 }

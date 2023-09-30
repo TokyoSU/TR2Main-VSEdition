@@ -1006,10 +1006,10 @@ void Inject_3Dout() {
 	INJECT(0x004042F0, wgtmap_persp32_fp);
 	INJECT(0x004057C0, draw_poly_gtmap_persp);
 	INJECT(0x00405800, draw_poly_wgtmap_persp);
-	//	NOTE: asm functions below use Watcom register calling convention so they incompatible
-	//	INJECT(0x00457564, flatA);
-	//	INJECT(0x004575C5, transA);
-	//	INJECT(0x004576FF, gourA);
-	//	INJECT(0x0045785F, gtmapA);
-	//	INJECT(0x00457B5C, wgtmapA);
+	//NOTE: asm functions below use Watcom register calling convention so they incompatible
+	//INJECT(0x00457564, flatA);
+	//INJECT(0x004575C5, transA);
+	//INJECT(0x004576FF, gourA);
+	//INJECT(0x0045785F, gtmapA);
+	//INJECT(0x00457B5C, wgtmapA);
 }

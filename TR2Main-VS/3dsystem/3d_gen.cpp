@@ -1116,7 +1116,7 @@ void Inject_3Dgen() {
 	INJECT(0x00401AE0, S_InsertRoom);
 	INJECT(0x00401BD0, calc_background_light);
 	INJECT(0x00401C10, S_InsertBackground);
-	//	INJECT(----------, S_InsertInvBgnd); // NOTE: this is null in the original code
+	//INJECT(----------, S_InsertInvBgnd); // NOTE: this is null in the original code
 	INJECT(0x00401D50, calc_object_vertices);
 	INJECT(0x00401F30, calc_vertice_light);
 	INJECT(0x004020A0, calc_roomvert);
@@ -1129,7 +1129,7 @@ void Inject_3Dgen() {
 	INJECT(0x00402680, phd_SetNearZ);
 	INJECT(0x004026D0, phd_SetFarZ);
 	INJECT(0x004026F0, phd_InitWindow);
-	//	INJECT(----------, phd_PopMatrix); // NOTE: this is inline or macro in the original code
+	//INJECT(----------, phd_PopMatrix); // NOTE: this is inline or macro in the original code
 	INJECT(0x00457510, phd_PushMatrix);
 	INJECT(0x0045752E, phd_PushUnitMatrix);
 }

@@ -1815,7 +1815,7 @@ void S_RemoveCtrlText() {
 void Inject_Option() {
 	INJECT(0x0044EE80, do_inventory_options);
 	INJECT(0x0044EF90, do_passport_option);
-	//	INJECT(----------, do_gamma_option); // NOTE: this is null in the original code
+	//INJECT(----------, do_gamma_option); // NOTE: this is null in the original code
 	INJECT(0x0044F5E0, do_detail_option);
 	INJECT(0x0044F8C0, do_sound_option);
 	INJECT(0x0044FD60, do_compass_option);

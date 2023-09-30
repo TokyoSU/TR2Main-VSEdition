@@ -1644,7 +1644,7 @@ void Inject_WinVid() {
 	INJECT(0x00447030, WinVidFinish);
 	INJECT(0x00447050, DisplayModeListInit);
 	INJECT(0x00447060, DisplayModeListDelete);
-	//	INJECT(0x004470A0, InsertDisplayMode); // NOTE: new one is not compatible anymore (original one is junk!!!)
+	//INJECT(0x004470A0, InsertDisplayMode); // NOTE: new one is not compatible anymore (original one is junk!!!)
 	INJECT(0x004470C0, InsertDisplayModeInListHead);
 	INJECT(0x00447110, InsertDisplayModeInListTail);
 }

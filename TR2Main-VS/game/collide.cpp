@@ -203,26 +203,26 @@ void GetNewRoom(int x, int y, int z, short roomID) {
  * Inject function
  */
 void Inject_Collide() {
-	//	INJECT(0x004128D0, GetCollisionInfo);
-	//	INJECT(0x00412F90, FindGridShift);
+	//INJECT(0x004128D0, GetCollisionInfo);
+	//INJECT(0x00412F90, FindGridShift);
 
 	INJECT(0x00412FC0, CollideStaticObjects);
 	INJECT(0x004133B0, GetNearByRooms);
 	INJECT(0x00413480, GetNewRoom);
 
-	//	INJECT(0x004134E0, ShiftItem);
-	//	INJECT(0x00413520, UpdateLaraRoom);
-	//	INJECT(0x00413580, GetTiltType);
-	//	INJECT(0x00413620, LaraBaddieCollision);
-	//	INJECT(0x004137C0, EffectSpaz);
-	//	INJECT(0x00413840, CreatureCollision);
-	//	INJECT(0x004138C0, ObjectCollision);
-	//	INJECT(0x00413920, DoorCollision);
-	//	INJECT(0x004139A0, TrapCollision);
-	//	INJECT(0x00413A10, ItemPushLara);
-	//	INJECT(0x00413D20, TestBoundsCollide);
-	//	INJECT(0x00413DF0, TestLaraPosition);
-	//	INJECT(0x00413F30, AlignLaraPosition);
-	//	INJECT(0x00414070, MoveLaraPosition);
-	//	INJECT(0x00414200, Move3DPosTo3DPos);
+	//INJECT(0x004134E0, ShiftItem);
+	//INJECT(0x00413520, UpdateLaraRoom);
+	//INJECT(0x00413580, GetTiltType);
+	//INJECT(0x00413620, LaraBaddieCollision);
+	//INJECT(0x004137C0, EffectSpaz);
+	//INJECT(0x00413840, CreatureCollision);
+	//INJECT(0x004138C0, ObjectCollision);
+	//INJECT(0x00413920, DoorCollision);
+	//INJECT(0x004139A0, TrapCollision);
+	//INJECT(0x00413A10, ItemPushLara);
+	//INJECT(0x00413D20, TestBoundsCollide);
+	//INJECT(0x00413DF0, TestLaraPosition);
+	//INJECT(0x00413F30, AlignLaraPosition);
+	//INJECT(0x00414070, MoveLaraPosition);
+	//INJECT(0x00414200, Move3DPosTo3DPos);
 }

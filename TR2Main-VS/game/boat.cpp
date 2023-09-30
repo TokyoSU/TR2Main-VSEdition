@@ -93,19 +93,19 @@ void GondolaControl(short itemID) {
  * Inject function
  */
 void Inject_Boat() {
-	//	INJECT(0x0040CB10, InitialiseBoat);
-	//	INJECT(0x0040CB50, BoatCheckGeton);
-	//	INJECT(0x0040CCC0, BoatCollision);
-	//	INJECT(0x0040CE20, TestWaterHeight);
-	//	INJECT(0x0040CF20, DoBoatShift);
+	//INJECT(0x0040CB10, InitialiseBoat);
+	//INJECT(0x0040CB50, BoatCheckGeton);
+	//INJECT(0x0040CCC0, BoatCollision);
+	//INJECT(0x0040CE20, TestWaterHeight);
+	//INJECT(0x0040CF20, DoBoatShift);
 
 	INJECT(0x0040D0F0, DoWakeEffect);
 
-	//	INJECT(0x0040D270, DoBoatDynamics);
-	//	INJECT(0x0040D2C0, BoatDynamics);
-	//	INJECT(0x0040D7A0, BoatUserControl);
-	//	INJECT(0x0040D930, BoatAnimation);
-	//	INJECT(0x0040DAA0, BoatControl);
+	//INJECT(0x0040D270, DoBoatDynamics);
+	//INJECT(0x0040D2C0, BoatDynamics);
+	//INJECT(0x0040D7A0, BoatUserControl);
+	//INJECT(0x0040D930, BoatAnimation);
+	//INJECT(0x0040DAA0, BoatControl);
 
 	INJECT(0x0040E0D0, GondolaControl);
 }

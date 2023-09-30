@@ -33,7 +33,7 @@ void ControlSpikeWall(short itemID); // 0x004411C0
 void ControlCeilingSpikes(short itemID); // 0x00441300
 void HookControl(short itemID); // 0x00441420
 
-//	0x004414B0:		PropellerControl
+//0x004414B0:		PropellerControl
 
 void SpinningBlade(short itemID); // 0x00441640
 void IcicleControl(short itemID); // 0x004417C0
@@ -42,21 +42,21 @@ void BladeControl(short itemID); // 0x00441900
 void InitialiseKillerStatue(short itemID); // 0x004419A0
 void KillerStatueControl(short itemID); // 0x004419F0
 
-//	0x00441B00:		SpringBoardControl
-//	0x00441BE0:		InitialiseRollingBall
-//	0x00441C20:		RollingBallControl
-//	0x00441F70:		RollingBallCollision
-//	0x004421C0:		SpikeCollision
-//	0x00442320:		TrapDoorControl
-//	0x00442370:		TrapDoorFloor
-//	0x004423B0:		TrapDoorCeiling
-//	0x004423F0:		OnTrapDoor
+//0x00441B00:		SpringBoardControl
+//0x00441BE0:		InitialiseRollingBall
+//0x00441C20:		RollingBallControl
+//0x00441F70:		RollingBallCollision
+//0x004421C0:		SpikeCollision
+//0x00442320:		TrapDoorControl
+//0x00442370:		TrapDoorFloor
+//0x004423B0:		TrapDoorCeiling
+//0x004423F0:		OnTrapDoor
 
 void Pendulum(short itemID); // 0x004424A0
 
-//	0x004425B0:		FallingBlock
-//	0x004426C0:		FallingBlockFloor
-//	0x00442700:		FallingBlockCeiling
+//0x004425B0:		FallingBlock
+//0x004426C0:		FallingBlockFloor
+//0x00442700:		FallingBlockCeiling
 
 void TeethTrap(short itemID); // 0x00442750
 void FallingCeiling(short itemID); // 0x00442810
@@ -68,7 +68,7 @@ void FlameControl(short fx_id); // 0x00442C70
 void LaraBurn(); // 0x00442DE0
 void LavaBurn(ITEM_INFO* item); // 0x00442E30
 
-//	0x00442F20:		LavaSpray
-//	0x00442FF0:		ControlLavaBlob
+//0x00442F20:		LavaSpray
+//0x00442FF0:		ControlLavaBlob
 
 #endif // TRAPS_H_INCLUDED

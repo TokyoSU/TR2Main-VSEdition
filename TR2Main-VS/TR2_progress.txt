@@ -809,7 +809,7 @@ x function is unused / included in another function
 0x00435FD0:	+	GunShot
 0x00436040:	+	GunHit
 0x00436100:	+	GunMiss
-0x004361B0:	 *	ShotLara
+0x004361B0:	 *	ShotTarget
 0x00436380:	 *	InitialiseCult1
 0x004363D0:	 *	Cult1Control
 0x00436800:	 *	InitialiseCult3

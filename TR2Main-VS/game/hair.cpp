@@ -27,7 +27,7 @@
   * Inject function
   */
 void Inject_Hair() {
-	//	INJECT(0x00420E80, InitialiseHair);
-	//	INJECT(0x00420F00, HairControl);
-	//	INJECT(0x00421900, DrawHair);
+	//INJECT(0x00420E80, InitialiseHair);
+	//INJECT(0x00420F00, HairControl);
+	//INJECT(0x00421900, DrawHair);
 }

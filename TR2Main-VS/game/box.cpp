@@ -233,29 +233,29 @@ void GetBaddieTarget(short creatureIdx, BOOL isMonk)
  * Inject function
  */
 void Inject_Box() {
-	//	INJECT(0x0040E190, InitialiseCreature);
-	//	INJECT(0x0040E1C0, CreatureActive);
+	//INJECT(0x0040E190, InitialiseCreature);
+	//INJECT(0x0040E1C0, CreatureActive);
 	INJECT(0x0040E210, CreatureAIInfo);
-	//	INJECT(0x0040E470, SearchLOT);
-	//	INJECT(0x0040E670, UpdateLOT);
-	//	INJECT(0x0040E6E0, TargetBox);
-	//	INJECT(0x0040E780, StalkBox);
-	//	INJECT(0x0040E880, EscapeBox);
-	//	INJECT(0x0040E930, ValidBox);
-	//	INJECT(0x0040E9E0, CreatureMood);
-	//	INJECT(0x0040EE50, CalculateTarget);
-	//	INJECT(0x0040F2B0, CreatureCreature);
-	//	INJECT(0x0040F3B0, BadFloor);
+	//INJECT(0x0040E470, SearchLOT);
+	//INJECT(0x0040E670, UpdateLOT);
+	//INJECT(0x0040E6E0, TargetBox);
+	//INJECT(0x0040E780, StalkBox);
+	//INJECT(0x0040E880, EscapeBox);
+	//INJECT(0x0040E930, ValidBox);
+	//INJECT(0x0040E9E0, CreatureMood);
+	//INJECT(0x0040EE50, CalculateTarget);
+	//INJECT(0x0040F2B0, CreatureCreature);
+	//INJECT(0x0040F3B0, BadFloor);
 	INJECT(0x0040F440, CreatureDie);
-	//	INJECT(0x0040F500, CreatureAnimation);
-	//	INJECT(0x0040FDD0, CreatureTurn);
-	//	INJECT(0x0040FEB0, CreatureTilt);
-	//	INJECT(0x0040FEF0, CreatureHead);
-	//	INJECT(0x0040FF40, CreatureNeck);
-	//	INJECT(0x0040FF90, CreatureFloat);
-	//	INJECT(0x00410040, CreatureUnderwater);
-	//	INJECT(0x00410090, CreatureEffect);
-	//	INJECT(0x004100F0, CreatureVault);
+	//INJECT(0x0040F500, CreatureAnimation);
+	//INJECT(0x0040FDD0, CreatureTurn);
+	//INJECT(0x0040FEB0, CreatureTilt);
+	//INJECT(0x0040FEF0, CreatureHead);
+	//INJECT(0x0040FF40, CreatureNeck);
+	//INJECT(0x0040FF90, CreatureFloat);
+	//INJECT(0x00410040, CreatureUnderwater);
+	//INJECT(0x00410090, CreatureEffect);
+	//INJECT(0x004100F0, CreatureVault);
 	INJECT(0x00410230, CreatureKill);
 	INJECT(0x004103A0, GetBaddieTarget);
 }

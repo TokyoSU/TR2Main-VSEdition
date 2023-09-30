@@ -181,14 +181,14 @@ void PickUpCollision(short itemID, ITEM_INFO* laraitem, COLL_INFO* coll)
   */
 void Inject_Pickup() {
 	INJECT(0x00437F20, PickUpCollision);
-	//	INJECT(0x004383A0, SwitchCollision);
-	//	INJECT(0x004385B0, SwitchCollision2);
-	//	INJECT(0x004386B0, DetonatorCollision);
-	//	INJECT(0x004388F0, KeyHoleCollision);
-	//	INJECT(0x00438B30, PuzzleHoleCollision);
-	//	INJECT(0x00438DF0, SwitchControl);
-	//	INJECT(0x00438E30, SwitchTrigger);
-	//	INJECT(0x00438EF0, KeyTrigger);
-	//	INJECT(0x00438F30, PickupTrigger);
-	//	INJECT(0x00438F70, SecretControl);
+	//INJECT(0x004383A0, SwitchCollision);
+	//INJECT(0x004385B0, SwitchCollision2);
+	//INJECT(0x004386B0, DetonatorCollision);
+	//INJECT(0x004388F0, KeyHoleCollision);
+	//INJECT(0x00438B30, PuzzleHoleCollision);
+	//INJECT(0x00438DF0, SwitchControl);
+	//INJECT(0x00438E30, SwitchTrigger);
+	//INJECT(0x00438EF0, KeyTrigger);
+	//INJECT(0x00438F30, PickupTrigger);
+	//INJECT(0x00438F70, SecretControl);
 }

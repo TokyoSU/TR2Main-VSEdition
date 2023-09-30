@@ -763,12 +763,12 @@ void LaraInitialiseMeshes(int levelID)
  */
 void Inject_LaraMisc() {
 	INJECT(0x00430380, LaraControl);
-	//	INJECT(0x00430A10, AnimateLara);
+	//INJECT(0x00430A10, AnimateLara);
 	INJECT(0x00430D10, UseItem);
 	INJECT(0x00430ED0, LaraCheatGetStuff);
 	INJECT(0x00430F90, ControlLaraExtra);
 	INJECT(0x00430FB0, InitialiseLaraLoad);
-	//	INJECT(0x00430FE0, InitialiseLara);
+	//INJECT(0x00430FE0, InitialiseLara);
 	INJECT(0x004312A0, InitialiseLaraInventory);
 	INJECT(0x00431610, LaraInitialiseMeshes);
 }

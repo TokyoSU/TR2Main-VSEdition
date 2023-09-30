@@ -638,7 +638,7 @@ void Inject_Traps() {
 	INJECT(0x00441300, ControlCeilingSpikes);
 	INJECT(0x00441420, HookControl);
 
-	//	INJECT(0x004414B0, PropellerControl);
+	//INJECT(0x004414B0, PropellerControl);
 
 	INJECT(0x00441640, SpinningBlade);
 	INJECT(0x004417C0, IcicleControl);
@@ -647,21 +647,21 @@ void Inject_Traps() {
 	INJECT(0x004419A0, InitialiseKillerStatue);
 	INJECT(0x004419F0, KillerStatueControl);
 
-	//	INJECT(0x00441B00, SpringBoardControl);
-	//	INJECT(0x00441BE0, InitialiseRollingBall);
-	//	INJECT(0x00441C20, RollingBallControl);
-	//	INJECT(0x00441F70, RollingBallCollision);
-	//	INJECT(0x004421C0, SpikeCollision);
-	//	INJECT(0x00442320, TrapDoorControl);
-	//	INJECT(0x00442370, TrapDoorFloor);
-	//	INJECT(0x004423B0, TrapDoorCeiling);
-	//	INJECT(0x004423F0, OnTrapDoor);
+	//INJECT(0x00441B00, SpringBoardControl);
+	//INJECT(0x00441BE0, InitialiseRollingBall);
+	//INJECT(0x00441C20, RollingBallControl);
+	//INJECT(0x00441F70, RollingBallCollision);
+	//INJECT(0x004421C0, SpikeCollision);
+	//INJECT(0x00442320, TrapDoorControl);
+	//INJECT(0x00442370, TrapDoorFloor);
+	//INJECT(0x004423B0, TrapDoorCeiling);
+	//INJECT(0x004423F0, OnTrapDoor);
 
 	INJECT(0x004424A0, Pendulum);
 
-	//	INJECT(0x004425B0, FallingBlock);
-	//	INJECT(0x004426C0, FallingBlockFloor);
-	//	INJECT(0x00442700, FallingBlockCeiling);
+	//INJECT(0x004425B0, FallingBlock);
+	//INJECT(0x004426C0, FallingBlockFloor);
+	//INJECT(0x00442700, FallingBlockCeiling);
 
 	INJECT(0x00442750, TeethTrap);
 	INJECT(0x00442810, FallingCeiling);
@@ -673,6 +673,6 @@ void Inject_Traps() {
 	INJECT(0x00442DE0, LaraBurn);
 	INJECT(0x00442E30, LavaBurn);
 
-	//	INJECT(0x00442F20, LavaSpray);
-	//	INJECT(0x00442FF0, ControlLavaBlob);
+	//INJECT(0x00442F20, LavaSpray);
+	//INJECT(0x00442FF0, ControlLavaBlob);
 }

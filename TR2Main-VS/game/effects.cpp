@@ -734,7 +734,7 @@ void Inject_Effects() {
 	INJECT(0x0041C970, ControlBubble1);
 	INJECT(0x0041CA70, Splash);
 
-	//	INJECT(----------, WadeSplash);
+	//INJECT(----------, WadeSplash);
 
 	INJECT(0x0041CB40, ControlSplash1);
 	INJECT(0x0041CBC0, ControlWaterSprite);
@@ -768,8 +768,8 @@ void Inject_Effects() {
 	INJECT(0x0041D780, draw_right_gun);
 	INJECT(0x0041D7D0, draw_left_gun);
 
-	//	INJECT(----------, shoot_right_gun);
-	//	INJECT(----------, shoot_left_gun);
+	//INJECT(----------, shoot_right_gun);
+	//INJECT(----------, shoot_left_gun);
 
 	INJECT(0x0041D820, swap_meshes_with_meshswap1);
 	INJECT(0x0041D890, swap_meshes_with_meshswap2);

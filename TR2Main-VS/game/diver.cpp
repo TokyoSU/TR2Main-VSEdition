@@ -27,7 +27,7 @@
   * Inject function
   */
 void Inject_Diver() {
-	//	INJECT(0x00416BF0, Harpoon);
-	//	INJECT(0x00416C70, GetWaterSurface);
-	//	INJECT(0x00416D80, DiverControl);
+	//INJECT(0x00416BF0, Harpoon);
+	//INJECT(0x00416C70, GetWaterSurface);
+	//INJECT(0x00416D80, DiverControl);
 }

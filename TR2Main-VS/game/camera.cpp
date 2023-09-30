@@ -332,13 +332,13 @@ void Inject_Camera() {
 	INJECT(0x00410580, InitialiseCamera);
 	INJECT(0x00410630, MoveCamera);
 
-	//	INJECT(0x004109B0, ClipCamera);
-	//	INJECT(0x00410A90, ShiftCamera);
-	//	INJECT(0x00410BF0, BadPosition);
-	//	INJECT(0x00410C40, SmartShift);
-	//	INJECT(0x004113D0, ChaseCamera);
-	//	INJECT(0x004114C0, ShiftClamp);
-	//	INJECT(0x00411660, CombatCamera);
+	//INJECT(0x004109B0, ClipCamera);
+	//INJECT(0x00410A90, ShiftCamera);
+	//INJECT(0x00410BF0, BadPosition);
+	//INJECT(0x00410C40, SmartShift);
+	//INJECT(0x004113D0, ChaseCamera);
+	//INJECT(0x004114C0, ShiftClamp);
+	//INJECT(0x00411660, CombatCamera);
 
 	INJECT(0x004117F0, LookCamera);
 	INJECT(0x004119E0, FixedCamera);

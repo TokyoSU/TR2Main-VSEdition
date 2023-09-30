@@ -114,10 +114,10 @@ int StartDemo(int levelID) {
  * Inject function
  */
 void Inject_Demo() {
-	//	INJECT(0x004168E0, DoDemoSequence);
+	//INJECT(0x004168E0, DoDemoSequence);
 
 	INJECT(0x00416940, StartDemo);
 
-	//	INJECT(0x00416AF0, LoadLaraDemoPos);
-	//	INJECT(0x00416BC0, GetDemoInput);
+	//INJECT(0x00416AF0, LoadLaraDemoPos);
+	//INJECT(0x00416BC0, GetDemoInput);
 }

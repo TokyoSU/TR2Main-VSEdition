@@ -73,8 +73,8 @@ void flip_map_effect(ITEM_INFO* item); // 0x0041D770
 void draw_right_gun(ITEM_INFO* item); // 0x0041D780
 void draw_left_gun(ITEM_INFO* item); // 0x0041D7D0
 
-//	----------:		shoot_right_gun
-//	----------:		shoot_left_gun
+//----------:		shoot_right_gun
+//----------:		shoot_left_gun
 
 void swap_meshes_with_meshswap1(ITEM_INFO* item); // 0x0041D820
 void swap_meshes_with_meshswap2(ITEM_INFO* item); // 0x0041D890

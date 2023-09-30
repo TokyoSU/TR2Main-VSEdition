@@ -898,12 +898,12 @@ void BaddyObjects() {
  * Inject function
  */
 void Inject_Setup() {
-	//	INJECT(0x0043A330, InitialiseLevel);
-	//	INJECT(0x0043A490, InitialiseGameFlags);
+	//INJECT(0x0043A330, InitialiseLevel);
+	//INJECT(0x0043A490, InitialiseGameFlags);
 	INJECT(0x0043A500, InitialiseLevelFlags);
 	INJECT(0x0043A530, BaddyObjects);
-	//	INJECT(0x0043B570, TrapObjects);
-	//	INJECT(0x0043BB70, ObjectObjects);
+	//INJECT(0x0043B570, TrapObjects);
+	//INJECT(0x0043BB70, ObjectObjects);
 	INJECT(0x0043C7C0, InitialiseObjects);
-	//	INJECT(0x0043C830, GetCarriedItems);
+	//INJECT(0x0043C830, GetCarriedItems);
 }

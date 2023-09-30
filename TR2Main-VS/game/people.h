@@ -28,20 +28,21 @@
   * Function list
   */
 #define Targetable ((BOOL(__cdecl*)(ITEM_INFO*,AI_INFO*)) 0x00435EB0)
-  //	0x00435F40:		ControlGlow
-  //	0x00435F80:		ControlGunShot
+// 0x00435F40: ControlGlow
+// 0x00435F80: ControlGunShot
 short GunShot(int x, int y, int z, short speed, short rotY, short roomNumber); // 0x00435FD0
 short GunHit(int x, int y, int z, short speed, short rotY, short roomNumber); // 0x00436040
 short GunMiss(int x, int y, int z, short speed, short rotY, short roomNumber); // 0x00436100
-#define ShotLara ((BOOL(__cdecl*)(ITEM_INFO*,AI_INFO*,BITE_INFO*,short,int)) 0x004361B0)
+BOOL ShotTargetNew(ITEM_INFO* item, AI_INFO* AI, const BITE_INFO* bite, short angle, int damageLara, int damageOther); // NOTE, TODO: Will remplace the original below.
+BOOL ShotTarget(ITEM_INFO* item, AI_INFO* AI, const BITE_INFO* bite, short angle, int damage); // 0x004361B0
 #define InitialiseCult1 ((void(__cdecl*)(short)) 0x00436380)
 #define Cult1Control ((void(__cdecl*)(short)) 0x004363D0)
 #define InitialiseCult3 ((void(__cdecl*)(short)) 0x00436800)
 #define Cult3Control ((void(__cdecl*)(short)) 0x00436850)
 #define Worker1Control ((void(__cdecl*)(short)) 0x00436DC0)
 #define Worker2Control ((void(__cdecl*)(short)) 0x004371C0)
-#define BanditControl ((void(__cdecl*)(short)) 0x00437620)
-#define Bandit2Control ((void(__cdecl*)(short)) 0x00437960)
+void BanditControl(short itemID); // 0x00437620
+void Bandit2Control(short itemID); // 0x00437960
 #define WinstonControl ((void(__cdecl*)(short)) 0x00437DA0)
 
 #endif // PEOPLE_H_INCLUDED

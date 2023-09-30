@@ -27,9 +27,9 @@
  /*
   * Function list
   */
-  //	0x00417780:		ControlTwinkle
-  //	0x00417900:		CreateBartoliLight
-  //	0x004179E0:		DragonFire
+  //0x00417780:		ControlTwinkle
+  //0x00417900:		CreateBartoliLight
+  //0x004179E0:		DragonFire
 
 #define DragonCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x00417A90)
 #define DragonBones ((void(__cdecl*)(short)) 0x00417D80)

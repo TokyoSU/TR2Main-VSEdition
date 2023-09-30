@@ -157,11 +157,11 @@ void Inject_Cinema() {
 	INJECT(0x00412060, InitCinematicRooms);
 	INJECT(0x00412100, DoCinematic);
 
-	//	INJECT(0x00412270, CalculateCinematicCamera);
-	//	INJECT(0x004123B0, GetCinematicRoom);
-	//	INJECT(0x00412430, ControlCinematicPlayer);
-	//	INJECT(0x00412510, LaraControlCinematic);
-	//	INJECT(0x004125B0, InitialisePlayer1);
-	//	INJECT(0x00412640, InitialiseGenPlayer);
-	//	INJECT(0x00412680, InGameCinematicCamera);
+	//INJECT(0x00412270, CalculateCinematicCamera);
+	//INJECT(0x004123B0, GetCinematicRoom);
+	//INJECT(0x00412430, ControlCinematicPlayer);
+	//INJECT(0x00412510, LaraControlCinematic);
+	//INJECT(0x004125B0, InitialisePlayer1);
+	//INJECT(0x00412640, InitialiseGenPlayer);
+	//INJECT(0x00412680, InGameCinematicCamera);
 }

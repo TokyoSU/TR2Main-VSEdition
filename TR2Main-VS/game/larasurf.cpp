@@ -27,18 +27,18 @@
   * Inject function
   */
 void Inject_LaraSurf() {
-	//	INJECT(0x00431710, LaraSurface);
-	//	INJECT(0x00431870, lara_as_surfswim);
-	//	INJECT(0x004318E0, lara_as_surfback);
-	//	INJECT(0x00431940, lara_as_surfleft);
-	//	INJECT(0x004319A0, lara_as_surfright);
-	//	INJECT(0x00431A00, lara_as_surftread);
-	//	INJECT(0x00431AC0, lara_col_surfswim);
-	//	INJECT(0x00431B00, lara_col_surfback);
-	//	INJECT(0x00431B30, lara_col_surfleft);
-	//	INJECT(0x00431B60, lara_col_surfright);
-	//	INJECT(0x00431B90, lara_col_surftread);
-	//	INJECT(0x00431BF0, LaraSurfaceCollision);
-	//	INJECT(0x00431CF0, LaraTestWaterStepOut);
-	//	INJECT(0x00431DE0, LaraTestWaterClimbOut);
+	//INJECT(0x00431710, LaraSurface);
+	//INJECT(0x00431870, lara_as_surfswim);
+	//INJECT(0x004318E0, lara_as_surfback);
+	//INJECT(0x00431940, lara_as_surfleft);
+	//INJECT(0x004319A0, lara_as_surfright);
+	//INJECT(0x00431A00, lara_as_surftread);
+	//INJECT(0x00431AC0, lara_col_surfswim);
+	//INJECT(0x00431B00, lara_col_surfback);
+	//INJECT(0x00431B30, lara_col_surfleft);
+	//INJECT(0x00431B60, lara_col_surfright);
+	//INJECT(0x00431B90, lara_col_surftread);
+	//INJECT(0x00431BF0, LaraSurfaceCollision);
+	//INJECT(0x00431CF0, LaraTestWaterStepOut);
+	//INJECT(0x00431DE0, LaraTestWaterClimbOut);
 }

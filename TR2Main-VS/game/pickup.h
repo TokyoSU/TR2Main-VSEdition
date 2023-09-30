@@ -28,15 +28,15 @@
   * Function list
   */
 void PickUpCollision(short itemID, ITEM_INFO* laraitem, COLL_INFO* coll); // 0x00437F20
-  //	0x004383A0:		SwitchCollision
-  //	0x004385B0:		SwitchCollision2
-  //	0x004386B0:		DetonatorCollision
-  //	0x004388F0:		KeyHoleCollision
+  //0x004383A0:		SwitchCollision
+  //0x004385B0:		SwitchCollision2
+  //0x004386B0:		DetonatorCollision
+  //0x004388F0:		KeyHoleCollision
 #define PuzzleHoleCollision ((void(__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x00438B30)
-//	0x00438DF0:		SwitchControl
+//0x00438DF0:		SwitchControl
 #define SwitchTrigger ((BOOL(__cdecl*)(int, int)) 0x00438E30)
-//	0x00438EF0:		KeyTrigger
-//	0x00438F30:		PickupTrigger
-//	0x00438F70:		SecretControl
+//0x00438EF0:		KeyTrigger
+//0x00438F30:		PickupTrigger
+//0x00438F70:		SecretControl
 
 #endif // PICKUP_H_INCLUDED

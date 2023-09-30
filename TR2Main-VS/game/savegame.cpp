@@ -60,13 +60,13 @@ void InitialiseStartInfo() {
 		memset(&start->statistics, 0, sizeof(STATISTICS_INFO));
 	}
 
-	SaveGame.start[0].available = 1; // make assault available
-	SaveGame.start[1].available = 1; // make new game available
+	SaveGame.start[0].available = TRUE; // make assault available
+	SaveGame.start[1].available = TRUE; // make new game available
 }
 
 void ModifyStartInfo(int levelIdx) {
 	START_INFO* start = &SaveGame.start[levelIdx];
-	start->has_pistols = 1; // Lara has pistols
+	start->has_pistols = TRUE; // Lara has pistols
 	start->gunType = LGT_Pistols; // current weapon is pistols
 	start->pistolAmmo = 1000; // infinite pistols ammo
 

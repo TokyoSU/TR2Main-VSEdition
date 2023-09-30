@@ -77,24 +77,24 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll) {
  * Inject function
  */
 void Inject_LaraSwim() {
-	//	INJECT(0x00432000, LaraUnderWater);
+	//INJECT(0x00432000, LaraUnderWater);
 
 	INJECT(0x00432230, SwimTurn);
 	INJECT(0x004322C0, lara_as_swim);
 
-	//	INJECT(0x00432330, lara_as_glide);
-	//	INJECT(0x004323B0, lara_as_tread);
-	//	INJECT(0x00432440, lara_as_dive);
-	//	INJECT(0x00432460, lara_as_uwdeath);
-	//	INJECT(0x004324C0, lara_as_waterroll);
-	//	INJECT(0x004324D0, lara_col_swim);
-	//	INJECT(----------, lara_col_glide);
-	//	INJECT(----------, lara_col_tread);
-	//	INJECT(----------, lara_col_dive);
-	//	INJECT(0x004324F0, lara_col_uwdeath);
-	//	INJECT(----------, lara_col_waterroll);
-	//	INJECT(0x00432550, GetWaterDepth);
-	//	INJECT(0x004326F0, LaraTestWaterDepth);
-	//	INJECT(0x004327C0, LaraSwimCollision);
-	//	INJECT(0x00432920, LaraWaterCurrent);
+	//INJECT(0x00432330, lara_as_glide);
+	//INJECT(0x004323B0, lara_as_tread);
+	//INJECT(0x00432440, lara_as_dive);
+	//INJECT(0x00432460, lara_as_uwdeath);
+	//INJECT(0x004324C0, lara_as_waterroll);
+	//INJECT(0x004324D0, lara_col_swim);
+	//INJECT(----------, lara_col_glide);
+	//INJECT(----------, lara_col_tread);
+	//INJECT(----------, lara_col_dive);
+	//INJECT(0x004324F0, lara_col_uwdeath);
+	//INJECT(----------, lara_col_waterroll);
+	//INJECT(0x00432550, GetWaterDepth);
+	//INJECT(0x004326F0, LaraTestWaterDepth);
+	//INJECT(0x004327C0, LaraSwimCollision);
+	//INJECT(0x00432920, LaraWaterCurrent);
 }

@@ -85,15 +85,15 @@ void PistolHandler(int weaponType) {
  * Inject function
  */
 void Inject_Lara2Gun() {
-	//	INJECT(0x0042D000, set_pistol_arm);
-	//	INJECT(0x0042D050, draw_pistols);
-	//	INJECT(0x0042D0D0, undraw_pistols);
-	//	INJECT(0x0042D300, ready_pistols);
-	//	INJECT(0x0042D360, draw_pistol_meshes);
-	//	INJECT(0x0042D3B0, undraw_pistol_mesh_left);
-	//	INJECT(0x0042D3F0, undraw_pistol_mesh_right);
+	//INJECT(0x0042D000, set_pistol_arm);
+	//INJECT(0x0042D050, draw_pistols);
+	//INJECT(0x0042D0D0, undraw_pistols);
+	//INJECT(0x0042D300, ready_pistols);
+	//INJECT(0x0042D360, draw_pistol_meshes);
+	//INJECT(0x0042D3B0, undraw_pistol_mesh_left);
+	//INJECT(0x0042D3F0, undraw_pistol_mesh_right);
 
 	INJECT(0x0042D430, PistolHandler);
 
-	//	INJECT(0x0042D5C0, AnimatePistols);
+	//INJECT(0x0042D5C0, AnimatePistols);
 }

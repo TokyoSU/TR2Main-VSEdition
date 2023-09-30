@@ -298,13 +298,13 @@ void TestTriggers(short* data, BOOL isHeavy)
 			case SWITCH:
 				item->flags ^= (flags & IFL_CODEBITS);
 				//if (flags & IFL_INVISIBLE)
-				//	item->flags |= IFL_INVISIBLE;
+				//item->flags |= IFL_INVISIBLE;
 				break;
 			case ANTIPAD:
 			case ANTITRIGGER:
 				item->flags &= ~(IFL_CODEBITS | IFL_REVERSE);
 				//if (flags & IFL_INVISIBLE)
-				//	item->flags |= IFL_INVISIBLE;
+				//item->flags |= IFL_INVISIBLE;
 				break;
 			default:
 				if (flags & IFL_CODEBITS)
@@ -467,25 +467,25 @@ void TriggerNormalCDTrack(short value, UINT16 flags, short type) {
  */
 void Inject_Control() {
 	INJECT(0x00414370, ControlPhase);
-	//	INJECT(0x004146C0, AnimateItem);
-	//	INJECT(0x00414A30, GetChange);
-	//	INJECT(0x00414AE0, TranslateItem);
-	//	INJECT(0x00414B40, GetFloor);
-	//	INJECT(0x00414CE0, GetWaterHeight);
-	//	INJECT(0x00414E50, GetHeight);
-	//	INJECT(0x004150D0, RefreshCamera);
+	//INJECT(0x004146C0, AnimateItem);
+	//INJECT(0x00414A30, GetChange);
+	//INJECT(0x00414AE0, TranslateItem);
+	//INJECT(0x00414B40, GetFloor);
+	//INJECT(0x00414CE0, GetWaterHeight);
+	//INJECT(0x00414E50, GetHeight);
+	//INJECT(0x004150D0, RefreshCamera);
 	//INJECT(0x004151C0, TestTriggers); (WIP)
-	//	INJECT(0x004158A0, TriggerActive);
-	//	INJECT(0x00415900, GetCeiling);
-	//	INJECT(0x00415B60, GetDoor);
-	//	INJECT(0x00415BB0, LOS);
-	//	INJECT(0x00415C50, zLOS);
-	//	INJECT(0x00415F40, xLOS);
-	//	INJECT(0x00416230, ClipTarget);
-	//	INJECT(0x00416310, ObjectOnLOS);
-	//	INJECT(0x00416610, FlipMap);
-	//	INJECT(0x004166D0, RemoveRoomFlipItems);
-	//	INJECT(0x00416770, AddRoomFlipItems);
+	//INJECT(0x004158A0, TriggerActive);
+	//INJECT(0x00415900, GetCeiling);
+	//INJECT(0x00415B60, GetDoor);
+	//INJECT(0x00415BB0, LOS);
+	//INJECT(0x00415C50, zLOS);
+	//INJECT(0x00415F40, xLOS);
+	//INJECT(0x00416230, ClipTarget);
+	//INJECT(0x00416310, ObjectOnLOS);
+	//INJECT(0x00416610, FlipMap);
+	//INJECT(0x004166D0, RemoveRoomFlipItems);
+	//INJECT(0x00416770, AddRoomFlipItems);
 	INJECT(0x004167D0, TriggerCDTrack);
 	INJECT(0x00416800, TriggerNormalCDTrack);
 }

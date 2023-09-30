@@ -27,13 +27,13 @@
   * Inject function
   */
 void Inject_Dragon() {
-	//	INJECT(0x00417780, ControlTwinkle);
-	//	INJECT(0x00417900, CreateBartoliLight);
-	//	INJECT(0x004179E0, DragonFire);
-	//	INJECT(0x00417A90, DragonCollision);
-	//	INJECT(0x00417D80, DragonBones);
-	//	INJECT(0x00417E60, DragonControl);
-	//	INJECT(0x004183B0, InitialiseBartoli);
-	//	INJECT(0x004184D0, BartoliControl);
-	//	INJECT(0x00418670, DinoControl);
+	//INJECT(0x00417780, ControlTwinkle);
+	//INJECT(0x00417900, CreateBartoliLight);
+	//INJECT(0x004179E0, DragonFire);
+	//INJECT(0x00417A90, DragonCollision);
+	//INJECT(0x00417D80, DragonBones);
+	//INJECT(0x00417E60, DragonControl);
+	//INJECT(0x004183B0, InitialiseBartoli);
+	//INJECT(0x004184D0, BartoliControl);
+	//INJECT(0x00418670, DinoControl);
 }

@@ -27,13 +27,13 @@
  /*
   * Function list
   */
-  //	0x0042D000:		set_pistol_arm
-  //	0x0042D050:		draw_pistols
-  //	0x0042D0D0:		undraw_pistols
-  //	0x0042D300:		ready_pistols
-  //	0x0042D360:		draw_pistol_meshes
-  //	0x0042D3B0:		undraw_pistol_mesh_left
-  //	0x0042D3F0:		undraw_pistol_mesh_right
+  //0x0042D000:		set_pistol_arm
+  //0x0042D050:		draw_pistols
+  //0x0042D0D0:		undraw_pistols
+  //0x0042D300:		ready_pistols
+  //0x0042D360:		draw_pistol_meshes
+  //0x0042D3B0:		undraw_pistol_mesh_left
+  //0x0042D3F0:		undraw_pistol_mesh_right
 
 void PistolHandler(int weaponType); // 0x0042D430
 

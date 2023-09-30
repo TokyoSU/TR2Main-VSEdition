@@ -670,7 +670,7 @@ void Inject_InitInput() {
 	INJECT(0x00447670, DInputKeyboardCreate);
 	INJECT(0x00447740, DInputKeyboardRelease);
 	INJECT(0x00447770, DInputJoystickCreate);
-	//	INJECT(----------, DInputJoystickRelease);
+	//INJECT(----------, DInputJoystickRelease);
 	INJECT(0x00447860, WinInStart);
 	INJECT(0x00447890, WinInFinish);
 	INJECT(0x004478A0, WinInRunControlPanel);

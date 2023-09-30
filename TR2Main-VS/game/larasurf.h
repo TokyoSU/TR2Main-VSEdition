@@ -29,18 +29,18 @@
   */
 #define LaraSurface ((void(__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x00431710)
 
-  //	0x00431870:		lara_as_surfswim
-  //	0x004318E0:		lara_as_surfback
-  //	0x00431940:		lara_as_surfleft
-  //	0x004319A0:		lara_as_surfright
-  //	0x00431A00:		lara_as_surftread
-  //	0x00431AC0:		lara_col_surfswim
-  //	0x00431B00:		lara_col_surfback
-  //	0x00431B30:		lara_col_surfleft
-  //	0x00431B60:		lara_col_surfright
-  //	0x00431B90:		lara_col_surftread
-  //	0x00431BF0:		LaraSurfaceCollision
-  //	0x00431CF0:		LaraTestWaterStepOut
-  //	0x00431DE0:		LaraTestWaterClimbOut
+  //0x00431870:		lara_as_surfswim
+  //0x004318E0:		lara_as_surfback
+  //0x00431940:		lara_as_surfleft
+  //0x004319A0:		lara_as_surfright
+  //0x00431A00:		lara_as_surftread
+  //0x00431AC0:		lara_col_surfswim
+  //0x00431B00:		lara_col_surfback
+  //0x00431B30:		lara_col_surfleft
+  //0x00431B60:		lara_col_surfright
+  //0x00431B90:		lara_col_surftread
+  //0x00431BF0:		LaraSurfaceCollision
+  //0x00431CF0:		LaraTestWaterStepOut
+  //0x00431DE0:		LaraTestWaterClimbOut
 
 #endif // LARA_SURF_H_INCLUDED

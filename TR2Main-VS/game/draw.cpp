@@ -1020,8 +1020,8 @@ void AddDynamicLight(int x, int y, int z, int intensity, int falloff) {
  * Inject function
  */
 void Inject_Draw() {
-	//	INJECT(0x00418920, DrawPhaseCinematic);
-	//	INJECT(0x00418960, DrawPhaseGame);
+	//INJECT(0x00418920, DrawPhaseCinematic);
+	//INJECT(0x00418960, DrawPhaseGame);
 
 	INJECT(0x004189A0, DrawRooms);
 	INJECT(0x00418C50, GetRoomBounds);
@@ -1032,36 +1032,36 @@ void Inject_Draw() {
 	INJECT(0x00419870, DrawEffect);
 	INJECT(0x004199C0, DrawSpriteItem);
 
-	//	INJECT(----------, DrawDummyItem);
+	//INJECT(----------, DrawDummyItem);
 	INJECT(0x00419A50, DrawAnimatingItem);
 
-	//	INJECT(0x00419DD0, DrawLara);
+	//INJECT(0x00419DD0, DrawLara);
 
 	INJECT(0x0041AB00, DrawLaraInt);
 
-	//	INJECT(0x0041B6F0, InitInterpolate);
-	//	INJECT(0x0041B730, phd_PopMatrix_I);
-	//	INJECT(0x0041B760, phd_PushMatrix_I);
-	//	INJECT(0x0041B790, phd_RotY_I);
-	//	INJECT(0x0041B7D0, phd_RotX_I);
-	//	INJECT(0x0041B810, phd_RotZ_I);
-	//	INJECT(0x0041B850, phd_TranslateRel_I);
-	//	INJECT(0x0041B8A0, phd_TranslateRel_ID);
-	//	INJECT(0x0041B8F0, phd_RotYXZ_I);
-	//	INJECT(0x0041B940, phd_RotYXZsuperpack_I);
+	//INJECT(0x0041B6F0, InitInterpolate);
+	//INJECT(0x0041B730, phd_PopMatrix_I);
+	//INJECT(0x0041B760, phd_PushMatrix_I);
+	//INJECT(0x0041B790, phd_RotY_I);
+	//INJECT(0x0041B7D0, phd_RotX_I);
+	//INJECT(0x0041B810, phd_RotZ_I);
+	//INJECT(0x0041B850, phd_TranslateRel_I);
+	//INJECT(0x0041B8A0, phd_TranslateRel_ID);
+	//INJECT(0x0041B8F0, phd_RotYXZ_I);
+	//INJECT(0x0041B940, phd_RotYXZsuperpack_I);
 
 	INJECT(0x0041B980, phd_RotYXZsuperpack);
 	INJECT(0x0041BA30, phd_PutPolygons_I);
 
-	//	INJECT(0x0041BA60, InterpolateMatrix);
-	//	INJECT(0x0041BC10, InterpolateArmMatrix);
+	//INJECT(0x0041BA60, InterpolateMatrix);
+	//INJECT(0x0041BC10, InterpolateArmMatrix);
 
 	INJECT(0x0041BD10, DrawGunFlash);
 
-	//	INJECT(0x0041BE80, CalculateObjectLighting);
-	//	INJECT(0x0041BF70, GetFrames);
-	//	INJECT(0x0041C010, GetBoundsAccurate);
-	//	INJECT(0x0041C090, GetBestFrame);
+	//INJECT(0x0041BE80, CalculateObjectLighting);
+	//INJECT(0x0041BF70, GetFrames);
+	//INJECT(0x0041C010, GetBoundsAccurate);
+	//INJECT(0x0041C090, GetBestFrame);
 
 	INJECT(0x0041C0D0, AddDynamicLight);
 }

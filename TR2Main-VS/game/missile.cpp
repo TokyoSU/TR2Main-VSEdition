@@ -117,7 +117,7 @@ void ControlMissile(short fxID) {
 void Inject_Missile() {
 	INJECT(0x00433090, ControlMissile);
 
-	//	INJECT(0x00433360, ShootAtLara);
-	//	INJECT(0x00433410, ExplodingDeath);
-	//	INJECT(0x004337A0, ControlBodyPart);
+	//INJECT(0x00433360, ShootAtLara);
+	//INJECT(0x00433410, ExplodingDeath);
+	//INJECT(0x004337A0, ControlBodyPart);
 }

@@ -38,60 +38,60 @@ extern DWORD InvTextBoxMode;
 #define IS_CHAR_DIACRITIC(x)	((x) == '(' || (x) == ')' || (x) == '$' || (x) == '~')
 
 static const BYTE T_TextSpacing[0x6E] = {
-	//	A	B	C	D	E	F	G	H
+	//A	B	C	D	E	F	G	H
 		14, 11, 11, 11, 11, 11, 11, 13,
-		//	I	J	K	L	M	N	O	P
+		//I	J	K	L	M	N	O	P
 			 8, 11, 12, 11, 13, 13, 12, 11,
-			 //	Q	R	S	T	U	V	W	X
+			 //Q	R	S	T	U	V	W	X
 				 12, 12, 11, 12, 13, 13, 13, 12,
-				 //	Y	Z	a	b	c	d	e	f
+				 //Y	Z	a	b	c	d	e	f
 					 12, 11,  9,  9,  9,  9,  9,  9,
-					 //	g	h	i	j	k	l	m	n
+					 //g	h	i	j	k	l	m	n
 						  9,  9,  5,  9,  9,  5, 12, 10,
-						  //	o	p	q	r	s	t	u	v
+						  //o	p	q	r	s	t	u	v
 							   9,  9,  9,  8,  9,  8,  9,  9,
-							   //	w	x	y	z	0	1	2	3
+							   //w	x	y	z	0	1	2	3
 								   11,  9,  9,  9, 12,  8, 10, 10,
-								   //	4	5	6	7	8	9	.	,
+								   //4	5	6	7	8	9	.	,
 									   10, 10, 10,  9, 10, 10,  5,  5,
-									   //	!	?	[	di"	/	di^	di'	-
+									   //!	?	[	di"	/	di^	di'	-
 											5, 11,  9, 10,  8,  6,  6,  7,
-											//	+	:	€	]	\	`	#	'
+											//+	:	€	]	\	`	#	'
 												 7,  3, 11,  8, 13, 16,  9,  4,
-												 //	arU	arD	dg0	dg1	dg2	dg3	dg4	dg5
+												 //arU	arD	dg0	dg1	dg2	dg3	dg4	dg5
 													 12, 12,  7,  5,  7,  7,  7,  7,
-													 //	dg6	dg7	dg8	dg9	js1	js2	js3	js4
+													 //dg6	dg7	dg8	dg9	js1	js2	js3	js4
 														  7,  7,  7,  7, 16, 14, 14, 14,
-														  //	js5	js6	js7	js8	js9	sc0	sc1	sc2
+														  //js5	js6	js7	js8	js9	sc0	sc1	sc2
 															  16, 16, 16, 16, 16, 12, 14,  8,
-															  //	sc3	sc4	dwn	up	lft	rht
+															  //sc3	sc4	dwn	up	lft	rht
 																   8,  8,  8,  8,  8,  8,
 };
 
 static const BYTE T_RemapASCII[0x5F] = {
-	//	nop			!	"to [		#	$to di`	%to €	&to #		'
+	//nop			!	"to [		#	$to di`	%to €	&to #		'
 		0x00,	0x40,	0x42,	0x4E,	0x4D,	0x4A,	0x4E,	0x4F,
-		//	(to di^	)to di'	*to js1  	+		,		-		.		/
+		//(to di^	)to di'	*to js1  	+		,		-		.		/
 			0x45,	0x46,	0x5C,	0x48,	0x3F,	0x47,	0x3E,	0x44,
-			//		0		1		2		3		4		5		6		7
+			//	0		1		2		3		4		5		6		7
 				0x34,	0x35,	0x36,	0x37,	0x38,	0x39,	0x3A,	0x3B,
-				//		8		9		:	;to :	<to [	=to €	>to	]		?
+				//	8		9		:	;to :	<to [	=to €	>to	]		?
 					0x3C,	0x3D,	0x49,	0x49,	0x42,	0x4A,	0x4B,	0x41,
-					//	@to	A		A		B		C		D		E		F		G
+					//@to	A		A		B		C		D		E		F		G
 						0x00,	0x00,	0x01,	0x02,	0x03,	0x04,	0x05,	0x06,
-						//		H		I		J		K		L		M		N		O
+						//	H		I		J		K		L		M		N		O
 							0x07,	0x08,	0x09,	0x0A,	0x0B,	0x0C,	0x0D,	0x0E,
-							//		P		Q		R		S		T		U		V		W
+							//	P		Q		R		S		T		U		V		W
 								0x0F,	0x10,	0x11,	0x12,	0x13,	0x14,	0x15,	0x16,
-								//		X		Y		Z	[to arU		\	]to	arD ^to js6	_to js7
+								//	X		Y		Z	[to arU		\	]to	arD ^to js6	_to js7
 									0x17,	0x18,	0x19,	0x50,	0x4C,	0x51,	0x61,	0x62,
-									//		`		a		b		c		d		e		f		g
+									//	`		a		b		c		d		e		f		g
 										0x4D,	0x1A,	0x1B,	0x1C,	0x1D,	0x1E,	0x1F,	0x20,
-										//		h		i		j		k		l		m		n		o
+										//	h		i		j		k		l		m		n		o
 											0x21,	0x22,	0x23,	0x24,	0x25,	0x26,	0x27,	0x28,
-											//		p		q		r		s		t		u		v		w
+											//	p		q		r		s		t		u		v		w
 												0x29,	0x2A,	0x2B,	0x2C,	0x2D,	0x2E,	0x2F,	0x30,
-												//		x		y		z	{to js9	|to sc0	}to sc1	~to di"
+												//	x		y		z	{to js9	|to sc0	}to sc1	~to di"
 													0x31,	0x32,	0x33,	0x64,	0x65,	0x66,	0x43,
 };
 

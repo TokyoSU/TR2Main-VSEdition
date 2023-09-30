@@ -27,46 +27,46 @@
  /*
   * Function list
   */
-  //	0x004342C0:		EarthQuake
-  //	0x004343A0:		ControlCutShotgun
-  //	0x004343E0:		InitialiseFinalLevel
-  //	0x004344B0:		FinalLevelCounter
-  //	0x004346C0:		MiniCopterControl
-  //	0x004347A0:		InitialiseDyingMonk
-  //	0x00434820:		DyingMonk
-  //	0x004348B0:		ControlGongBonger
-  //	0x00434970:		DeathSlideCollision
-  //	0x00434A30:		ControlDeathSlide
-  //	0x00434CC0:		BigBowlControl
-  //	0x00434DB0:		BellControl
-  //	0x00434E30:		InitialiseWindow
+  //0x004342C0:		EarthQuake
+  //0x004343A0:		ControlCutShotgun
+  //0x004343E0:		InitialiseFinalLevel
+  //0x004344B0:		FinalLevelCounter
+  //0x004346C0:		MiniCopterControl
+  //0x004347A0:		InitialiseDyingMonk
+  //0x00434820:		DyingMonk
+  //0x004348B0:		ControlGongBonger
+  //0x00434970:		DeathSlideCollision
+  //0x00434A30:		ControlDeathSlide
+  //0x00434CC0:		BigBowlControl
+  //0x00434DB0:		BellControl
+  //0x00434E30:		InitialiseWindow
 
 #define SmashWindow ((void(__cdecl*)(short)) 0x00434EB0)
 
-//	0x00434F80:		WindowControl
-//	0x00435020:		SmashIceControl
-//	0x00435100:		ShutThatDoor
-//	0x00435150:		OpenThatDoor
-//	0x00435190:		InitialiseDoor
-//	0x00435570:		DoorControl
-//	0x00435640:		OnDrawBridge
-//	0x00435700:		DrawBridgeFloor
-//	0x00435740:		DrawBridgeCeiling
-//	0x00435780:		DrawBridgeCollision
-//	0x004357B0:		InitialiseLift
-//	0x004357F0:		LiftControl
-//	0x004358D0:		LiftFloorCeiling
-//	0x00435A50:		LiftFloor
-//	0x00435A90:		LiftCeiling
-//	0x00435AD0:		BridgeFlatFloor
-//	0x00435AF0:		BridgeFlatCeiling
-//	0x00435B10:		GetOffset
-//	0x00435B50:		BridgeTilt1Floor
-//	0x00435B80:		BridgeTilt1Ceiling
-//	0x00435BC0:		BridgeTilt2Floor
-//	0x00435BF0:		BridgeTilt2Ceiling
-//	0x00435C30:		CopterControl
-//	0x00435D40:		GeneralControl
-//	0x00435E20:		DetonatorControl
+//0x00434F80:		WindowControl
+//0x00435020:		SmashIceControl
+//0x00435100:		ShutThatDoor
+//0x00435150:		OpenThatDoor
+//0x00435190:		InitialiseDoor
+//0x00435570:		DoorControl
+//0x00435640:		OnDrawBridge
+//0x00435700:		DrawBridgeFloor
+//0x00435740:		DrawBridgeCeiling
+//0x00435780:		DrawBridgeCollision
+//0x004357B0:		InitialiseLift
+//0x004357F0:		LiftControl
+//0x004358D0:		LiftFloorCeiling
+//0x00435A50:		LiftFloor
+//0x00435A90:		LiftCeiling
+//0x00435AD0:		BridgeFlatFloor
+//0x00435AF0:		BridgeFlatCeiling
+//0x00435B10:		GetOffset
+//0x00435B50:		BridgeTilt1Floor
+//0x00435B80:		BridgeTilt1Ceiling
+//0x00435BC0:		BridgeTilt2Floor
+//0x00435BF0:		BridgeTilt2Ceiling
+//0x00435C30:		CopterControl
+//0x00435D40:		GeneralControl
+//0x00435E20:		DetonatorControl
 
 #endif // OBJECTS_H_INCLUDED
