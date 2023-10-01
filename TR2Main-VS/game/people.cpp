@@ -367,7 +367,7 @@ void BanditControl(short itemID)
 
 			if (Targetable(item, &AI))
 			{
-				if (!ShotTargetNew(item, &AI, &BanditGunBite, head, BANDIT_DAMAGE, BANDIT_DAMAGE_TO_OTHER) || GetRandomControl() < 0x2000)
+				if (!ShotTargetNew(item, &AI, &BanditGunBite, head, BANDIT_DAMAGE, BANDIT_DAMAGE_TO_OTHER))
 					item->goalAnimState = BANDIT_STOP;
 			}
 			else
@@ -475,7 +475,7 @@ void Bandit2Control(short itemID)
 			}
 			else if (Targetable(item, &AI))
 			{
-				if ((AI.distance < 0x400000) || (AI.zone_number == AI.enemy_zone) || (GetRandomControl() < 1024))
+				if ((AI.distance < 0x400000) || (GetRandomControl() < 1024))
 					item->goalAnimState = BANDIT2_WAIT;
 				else
 					item->goalAnimState = BANDIT2_AIM4;
