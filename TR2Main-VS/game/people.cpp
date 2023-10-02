@@ -523,7 +523,7 @@ void Bandit2Control(short itemID)
 
 			if (!bandit->flags)
 			{
-				if (!ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER) || GetRandomControl() < 0x2000)
+				if (!Targetable(item, &AI) || !ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER) || GetRandomControl() < 0x2000)
 					item->goalAnimState = BANDIT2_WAIT;
 				bandit->flags = 1;
 			}
@@ -534,7 +534,7 @@ void Bandit2Control(short itemID)
 
 			if (!(bandit->flags & 1))
 			{
-				if (!ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER))
+				if (!Targetable(item, &AI) || !ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER))
 					item->goalAnimState = BANDIT2_WALK;
 				bandit->flags |= 1;
 			}
@@ -546,7 +546,7 @@ void Bandit2Control(short itemID)
 				head = AI.angle;
 			if (!(bandit->flags & 2))
 			{
-				if (!ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER))
+				if (!Targetable(item, &AI) || !ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER))
 					item->goalAnimState = BANDIT2_WALK;
 				bandit->flags |= 2;
 			}
