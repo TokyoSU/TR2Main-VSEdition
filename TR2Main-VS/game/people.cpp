@@ -521,37 +521,55 @@ void Bandit2Control(short itemID)
 			if (AI.ahead)
 				head = AI.angle;
 
-			if (!bandit->flags)
+			if (Targetable(item, &AI))
 			{
-				if (!Targetable(item, &AI) || !ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER) || GetRandomControl() < 0x2000)
-					item->goalAnimState = BANDIT2_WAIT;
-				bandit->flags = 1;
+				if (!bandit->flags)
+				{
+					if (!ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER) || GetRandomControl() < 0x2000)
+						item->goalAnimState = BANDIT2_WAIT;
+					bandit->flags = 1;
+				}
+			}
+			else
+			{
+				item->goalAnimState = BANDIT2_WAIT;
 			}
 			break;
 		case BANDIT2_SHOOT4A:
 			if (AI.ahead)
 				head = AI.angle;
 
-			if (!(bandit->flags & 1))
+			if (Targetable(item, &AI))
 			{
-				if (!Targetable(item, &AI) || !ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER))
-					item->goalAnimState = BANDIT2_WALK;
-				bandit->flags |= 1;
+				if (!(bandit->flags & 1))
+				{
+					if (!ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER))
+						item->goalAnimState = BANDIT2_WALK;
+					bandit->flags |= 1;
+				}
 			}
-			if (AI.distance < 0x400000)
+			else
+			{
 				item->goalAnimState = BANDIT2_WALK;
+			}
 			break;
 		case BANDIT2_SHOOT4B:
 			if (AI.ahead)
 				head = AI.angle;
-			if (!(bandit->flags & 2))
+
+			if (Targetable(item, &AI))
 			{
-				if (!Targetable(item, &AI) || !ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER))
-					item->goalAnimState = BANDIT2_WALK;
-				bandit->flags |= 2;
+				if (!(bandit->flags & 2))
+				{
+					if (!ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER))
+						item->goalAnimState = BANDIT2_WALK;
+					bandit->flags |= 2;
+				}
 			}
-			if (AI.distance < 0x400000)
+			else
+			{
 				item->goalAnimState = BANDIT2_WALK;
+			}
 			break;
 		}
 	}
