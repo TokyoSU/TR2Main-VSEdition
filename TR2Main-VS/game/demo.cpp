@@ -129,7 +129,6 @@ int StartDemo(int levelID) {
 }
 
 void LoadLaraDemoPos() {
-	DEMO_INFO* demoPtr = (DEMO_INFO*)DemoPtr;
 	short roomID;
 	LaraItem->pos.x = ((int*)DemoPtr)[0];
 	LaraItem->pos.y = ((int*)DemoPtr)[1];
