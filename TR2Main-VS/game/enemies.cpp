@@ -28,10 +28,10 @@
 #include "specific/game.h"
 #include "global/vars.h"
 
-#define MONK_DAMAGE_TO_OTHER_ENEMIES (5)
-#define MONK_DAMAGE (150)
-#define MONK_DEATH_ANIM (20)
-#define MONK_TOUCHBITS (0x4000)
+#define MONK_DAMAGE_TO_OTHER_ENEMIES 5
+#define MONK_DAMAGE 150
+#define MONK_DEATH_ANIM 20
+#define MONK_TOUCHBITS MESH_BITS(14)
 
 enum MonkState
 {
@@ -49,8 +49,6 @@ enum MonkState
 };
 
 static const BITE_INFO MonkBite = { -23, 16, 265, 14 };
-
-
 
 void MonkControl(short itemID)
 {
