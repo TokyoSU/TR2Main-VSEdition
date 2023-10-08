@@ -108,6 +108,12 @@ typedef struct {
 #define	TRIGMULT3(a,b,c)	(TRIGMULT2((TRIGMULT2(a,b)),c))
 #define	VBUF_VISIBLE(a,b,c)	(((a).ys-(b).ys)*((c).xs-(b).xs)>=((c).ys-(b).ys)*((a).xs-(b).xs))
 
+// Distance values
+#define BLOCK(x)			((x)*1024)
+#define CLICK(x)			((x)*256)
+#define SQR_BLOCK(x)		SQR(BLOCK(x))
+#define SQR_CLICK(x)		SQR(CLICK(x))
+
 // Mesh macros
 #define MESH_BITS(x) (1 << x)
 
