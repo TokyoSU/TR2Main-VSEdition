@@ -32,9 +32,7 @@ void MineControl(short mineID); // 0x00440FC0
 void ControlSpikeWall(short itemID); // 0x004411C0
 void ControlCeilingSpikes(short itemID); // 0x00441300
 void HookControl(short itemID); // 0x00441420
-
-//0x004414B0:		PropellerControl
-
+#define PropellerControl ((void(__cdecl*)(short)) 0x004414B0)
 void SpinningBlade(short itemID); // 0x00441640
 void IcicleControl(short itemID); // 0x004417C0
 void InitialiseBlade(short itemID); // 0x004418C0
@@ -45,18 +43,15 @@ void SpringBoardControl(short itemID); // 0x00441B00
 void InitialiseRollingBall(short itemID); // 0x00441BE0
 void RollingBallControl(short itemID); // 0x00441C20
 void RollingBallCollision(short itemID, ITEM_INFO* laraItem, COLL_INFO* coll); // 0x00441F70
-//0x004421C0:		SpikeCollision
-//0x00442320:		TrapDoorControl
-//0x00442370:		TrapDoorFloor
-//0x004423B0:		TrapDoorCeiling
-//0x004423F0:		OnTrapDoor
-
+#define SpikeCollision ((void(__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x004421C0)
+#define TrapDoorControl ((void(__cdecl*)(short)) 0x00442320)
+#define TrapDoorFloor ((void(__cdecl*)(ITEM_INFO*,int,int,int,short*)) 0x00442370)
+#define TrapDoorCeiling ((void(__cdecl*)(ITEM_INFO*,int,int,int,short*)) 0x004423B0)
+#define OnTrapDoor ((int(__cdecl*)(ITEM_INFO*,int,int)) 0x004423F0)
 void Pendulum(short itemID); // 0x004424A0
-
-//0x004425B0:		FallingBlock
-//0x004426C0:		FallingBlockFloor
-//0x00442700:		FallingBlockCeiling
-
+#define FallingBlock ((void(__cdecl*)(short)) 0x004425B0)
+#define FallingBlockFloor ((void(__cdecl*)(ITEM_INFO*,int,int,int,short*)) 0x004426C0)
+#define FallingBlockCeiling ((void(__cdecl*)(ITEM_INFO*,int,int,int,short*)) 0x00442700)
 void TeethTrap(short itemID); // 0x00442750
 void FallingCeiling(short itemID); // 0x00442810
 void DartEmitterControl(short itemID); // 0x004428F0
@@ -66,8 +61,7 @@ void FlameEmitterControl(short item_id); // 0x00442BE0
 void FlameControl(short fx_id); // 0x00442C70
 void LaraBurn(); // 0x00442DE0
 void LavaBurn(ITEM_INFO* item); // 0x00442E30
-
-//0x00442F20:		LavaSpray
-//0x00442FF0:		ControlLavaBlob
+#define LavaSpray ((void(__cdecl*)(short)) 0x00442F20)
+#define ControlLavaBlob ((void(__cdecl*)(short)) 0x00442FF0)
 
 #endif // TRAPS_H_INCLUDED

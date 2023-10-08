@@ -322,14 +322,11 @@ void KillerStatueControl(short itemID) {
 	AnimateItem(item);
 }
 
-void __cdecl SpringBoardControl(__int16 itemID) {
-	ITEM_INFO* item;
-
-	item = &Items[itemID];
-	if (!item->currentAnimState &&
-		item->pos.y == LaraItem->pos.y &&
-		!CHK_ANY(item->pos.x ^ LaraItem->pos.x, 0xFFFFFC00) &&
-		!CHK_ANY(item->pos.z ^ LaraItem->pos.z, 0xFFFFFC00))
+void SpringBoardControl(short itemID) {
+	ITEM_INFO* item = &Items[itemID];
+	if (item->currentAnimState == 0 && item->pos.y == LaraItem->pos.y &&
+		(LaraItem->pos.x >> WALL_SHIFT) == (item->pos.x >> WALL_SHIFT) &&
+		(LaraItem->pos.z >> WALL_SHIFT) == (item->pos.z >> WALL_SHIFT))
 	{
 		if (LaraItem->hitPoints > 0) {
 			if (LaraItem->currentAnimState == AS_BACK || LaraItem->currentAnimState == AS_FASTBACK)
@@ -470,8 +467,8 @@ void RollingBallCollision(short itemID, ITEM_INFO* laraItem, COLL_INFO* coll) {
 	if (item->status == ITEM_ACTIVE) {
 		if (TestBoundsCollide(item, laraItem, coll->radius) && TestCollision(item, laraItem)) {
 			if (laraItem->gravity) {
-				if (CHK_ANY(coll->flags, 8))
-					ItemPushLara(item, laraItem, coll, CHK_ANY(coll->flags, 0x10), 1);
+				if (coll->enableBaddiePush)
+					ItemPushLara(item, laraItem, coll, coll->enableSpaz, TRUE);
 				laraItem->hitPoints -= 100;
 				dx = laraItem->pos.x - item->pos.x;
 				dy = laraItem->pos.y - item->pos.y + 162;

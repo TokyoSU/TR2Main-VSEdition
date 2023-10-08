@@ -100,20 +100,20 @@ void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int he
 	c = GetCeiling(floor, x + frontX, top, z + frontZ);
 	if (c != NO_HEIGHT)
 		c -= head;
+
 	coll->sideFront.floor = h;
 	coll->sideFront.ceiling = c;
 	coll->sideFront.type = HeightType;
-	if (CHK_ANY(coll->flags, 1) && coll->sideFront.type == HT_BIG_SLOPE && coll->sideFront.floor < 0) {
+	if (coll->slopesAreWalls && coll->sideFront.type == HT_BIG_SLOPE && coll->sideFront.floor < 0) {
 		coll->sideFront.floor = -32767;
 	}
 	else {
-		if ((CHK_ANY(coll->flags, 2) &&
+		if ((coll->slopesArePits &&
 			coll->sideFront.type == HT_BIG_SLOPE &&
 			coll->sideFront.floor > 0) ||
-			(CHK_ANY(coll->flags, 4) &&
+			(coll->lavaIsPit &&
 				coll->sideFront.floor > 0 &&
-				TriggerPtr &&
-				(*TriggerPtr & DATA_TYPE) == FT_LAVA))
+				TriggerPtr && (*TriggerPtr & DATA_TYPE) == FT_LAVA))
 			coll->sideFront.floor = 512;
 	}
 	floor = GetFloor(x + leftX, top, z + leftZ, &roomID);
@@ -126,14 +126,14 @@ void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int he
 	coll->sideLeft.ceiling = c;
 	coll->sideLeft.floor = h;
 	coll->sideLeft.type = HeightType;
-	if (CHK_ANY(coll->flags, 1) && coll->sideLeft.type == HT_BIG_SLOPE && coll->sideLeft.floor < 0) {
+	if (coll->slopesAreWalls && coll->sideLeft.type == HT_BIG_SLOPE && coll->sideLeft.floor < 0) {
 		coll->sideLeft.floor = -32767;
 	}
 	else {
-		if ((CHK_ANY(coll->flags, 2) &&
+		if ((coll->slopesArePits &&
 			coll->sideLeft.type == HT_BIG_SLOPE &&
 			coll->sideLeft.floor > 0) ||
-			(CHK_ANY(coll->flags, 4) &&
+			(coll->lavaIsPit &&
 				coll->sideLeft.floor > 0 &&
 				TriggerPtr &&
 				(*TriggerPtr & DATA_TYPE) == FT_LAVA))
@@ -149,14 +149,14 @@ void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int he
 	coll->sideRight.ceiling = c;
 	coll->sideRight.floor = h;
 	coll->sideRight.type = HeightType;
-	if (CHK_ANY(coll->flags, 1) && coll->sideRight.type == HT_BIG_SLOPE && coll->sideRight.floor < 0) {
+	if (coll->slopesAreWalls && coll->sideRight.type == HT_BIG_SLOPE && coll->sideRight.floor < 0) {
 		coll->sideRight.floor = -32767;
 	}
 	else {
-		if ((CHK_ANY(coll->flags, 2) &&
+		if ((coll->slopesArePits &&
 			coll->sideRight.type == HT_BIG_SLOPE &&
 			coll->sideRight.floor > 0) ||
-			(CHK_ANY(coll->flags, 4) &&
+			(coll->lavaIsPit &&
 				coll->sideRight.floor > 0 &&
 				TriggerPtr &&
 				(*TriggerPtr & DATA_TYPE) == FT_LAVA))

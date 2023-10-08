@@ -68,7 +68,11 @@
 #define ins_objectG4		(*(short*(__cdecl **)(short*,int,SORTTYPE))			0x004BCAF8)
 #define ins_objectG3		(*(short*(__cdecl **)(short*,int,SORTTYPE))			0x004BCB40)
 
-#define SfxFunctions		(*(void(__cdecl *(*)[32])(ITEM_INFO*))		0x004641F8)
+#define SfxFunctions			(*(void(__cdecl *(*)[32])(ITEM_INFO*))				0x004641F8)
+#define EffectFunctions			(*(void(__cdecl *(*)[32])(ITEM_INFO*))				0x004641F8)
+#define ExtraFunctions			(*(void(__cdecl *(*)[11])(ITEM_INFO*,COLL_INFO*))	0x00465DF0)
+#define LaraControlFunctions	(*(void(__cdecl *(*)[71])(ITEM_INFO*,COLL_INFO*))	0x00465CD0)
+#define LaraCollisionFunctions	(*(void(__cdecl *(*)[71])(ITEM_INFO*,COLL_INFO*))	0x00465E20)
 
 // Initialized variables
 #define PerspectiveDistance			VAR_I_(0x00464060, DWORD,			0x3000000)
@@ -145,6 +149,11 @@ extern short InvOptionObjectsCount;
 #define PhdMatrixPtr				VAR_U_(0x004B2A18, PHD_MATRIX*)
 #define FltPersp					VAR_U_(0x004B2AA8, float)
 #define MatrixW2V					VAR_U_(0x004B2AB0, PHD_MATRIX)
+#define IMRate						VAR_U_(0x00526184, int)
+#define IMFrac						VAR_U_(0x005258F0, int)
+#define IMPtr						VAR_U_(0x00526188, PHD_MATRIX*)
+#define IMStack						ARRAY_(0x005252C0, PHD_MATRIX, [32])
+#define InterpolateBounds			ARRAY_(0x005261A0, __int16, [6])
 #define Info3dPtr					VAR_U_(0x004B2AE0, short*)
 #define PhdWinWidth					VAR_U_(0x004B2AE4, int)
 #define PhdViewDistance				VAR_U_(0x004BCAF0, int)

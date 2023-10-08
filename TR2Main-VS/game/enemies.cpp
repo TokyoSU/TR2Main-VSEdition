@@ -50,6 +50,8 @@ enum MonkState
 
 static const BITE_INFO MonkBite = { -23, 16, 265, 14 };
 
+
+
 void MonkControl(short itemID)
 {
 	if (!CreatureActive(itemID))
@@ -259,15 +261,11 @@ void MonkControl(short itemID)
 						CreatureEffect(item, &MonkBite, DoBloodSplat);
 					}
 				}
-				else if (ABS(item->pos.x - monk->enemy->pos.x) < 512 &&
-						 ABS(item->pos.y - monk->enemy->pos.y) < 512 &&
-						 ABS(item->pos.z - monk->enemy->pos.z) < 512)
+				else if (IsCreatureNearTarget(item, monk->enemy))
 				{
-					monk->enemy->hitPoints -= MONK_DAMAGE_TO_OTHER_ENEMIES;
-					monk->enemy->hitStatus = 1;
-					monk->flags = 1;
+					DamageTarget(item, monk->enemy, &MonkBite, MONK_DAMAGE_TO_OTHER_ENEMIES);
 					PlaySoundEffect(245, &item->pos, 0);
-					CreatureEffect(item, &MonkBite, DoBloodSplat); // NOTE: Not exist in the original game.
+					monk->flags = 1;
 				}
 			}
 			break;

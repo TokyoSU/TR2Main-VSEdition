@@ -108,6 +108,9 @@ typedef struct {
 #define	TRIGMULT3(a,b,c)	(TRIGMULT2((TRIGMULT2(a,b)),c))
 #define	VBUF_VISIBLE(a,b,c)	(((a).ys-(b).ys)*((c).xs-(b).xs)>=((c).ys-(b).ys)*((a).xs-(b).xs))
 
+// Mesh macros
+#define MESH_BITS(x) (1 << x)
+
 // Fast conversion macros
 #define BYTEn(a,b)			(*((BYTE*)&(a)+b))
 #define BYTE0(a)			(LOBYTE(a))
@@ -1850,7 +1853,12 @@ typedef struct CollInfo_t {
 	char zTilt;
 	char hitByBaddie;
 	char hitStatic;
-	UINT16 flags;
+	UINT16 slopesAreWalls : 2;
+	UINT16 slopesArePits : 1;
+	UINT16 lavaIsPit : 1;
+	UINT16 enableBaddiePush : 1;
+	UINT16 enableSpaz : 1;
+	UINT16 hitCeiling : 1;
 } COLL_INFO;
 
 typedef struct ObjectInfo_t {

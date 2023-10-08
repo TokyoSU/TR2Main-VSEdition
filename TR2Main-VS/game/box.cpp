@@ -25,6 +25,7 @@
 #include "game/control.h"
 #include "game/items.h"
 #include "game/larafire.h"
+#include "game/effects.h"
 #include "game/lot.h"
 #include "game/missile.h"
 #include "global/vars.h"
@@ -124,7 +125,7 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillStat
 		Lara.mesh_effects = 0;
 	}
 #endif // FEATURE_CHEAT
-	item->animNumber = killAnim + Objects[item->objectID].animIndex;
+	item->animNumber = Objects[item->objectID].animIndex + killAnim;
 	item->frameNumber = Anims[item->animNumber].frameBase;
 	item->currentAnimState = killState;
 	LaraItem->animNumber = Objects[ID_LARA_EXTRA].animIndex;
@@ -227,6 +228,31 @@ void GetBaddieTarget(short creatureIdx, BOOL isMonk)
 	{
 		creature->enemy = NULL;
 	}
+}
+
+bool IsCreatureNearTarget(ITEM_INFO* item, ITEM_INFO* enemy)
+{
+	return ABS(item->pos.x - enemy->pos.x) < 512 &&
+		   ABS(item->pos.y - enemy->pos.y) < 512 &&
+		   ABS(item->pos.z - enemy->pos.z) < 512;
+}
+
+void DamageTarget(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damage)
+{
+	if (enemy)
+	{
+		enemy->hitPoints -= damage;
+		enemy->hitStatus = 1;
+		CreatureEffect(item, bite, DoBloodSplat);
+	}
+}
+
+void SetAnimation(ITEM_INFO* item, int animID, int stateID, int frameID)
+{
+	item->animNumber = Objects[item->objectID].animIndex + animID;
+	item->frameNumber = Anims[item->animNumber].frameBase + frameID;
+	item->goalAnimState = stateID;
+	item->currentAnimState = stateID;
 }
 
 /*

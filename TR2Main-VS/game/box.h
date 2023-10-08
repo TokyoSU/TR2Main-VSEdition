@@ -49,8 +49,13 @@ void CreatureDie(short itemID, BOOL explode); // 0x0040F440
 //0x0040FF90:		CreatureFloat
 //0x00410040:		CreatureUnderwater
 #define CreatureEffect ((short(__cdecl*)(ITEM_INFO *, const BITE_INFO *, short(__cdecl*)(int, int, int, short, short, short))) 0x00410090)
-//0x004100F0:		CreatureVault
+#define CreatureVault ((int(__cdecl*)(short,short,int,int)) 0x004100F0)
 void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillState); // 0x00410230
 void GetBaddieTarget(short creatureIdx, BOOL isMonk); // 0x004103A0
+bool IsCreatureNearTarget(ITEM_INFO* item, ITEM_INFO* enemy);
+// NOTE: Only for hand to hand.
+// NOTE: Not exist in the original game.
+void DamageTarget(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damage);
+void SetAnimation(ITEM_INFO* item, int animID, int stateID, int frameID = 0);
 
 #endif // BOX_H_INCLUDED
