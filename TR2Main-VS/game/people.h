@@ -27,7 +27,7 @@
  /*
   * Function list
   */
-#define Targetable ((BOOL(__cdecl*)(ITEM_INFO*,AI_INFO*)) 0x00435EB0)
+BOOL Targetable(ITEM_INFO* item, AI_INFO* info); // 0x00435EB0
 // 0x00435F40: ControlGlow
 // 0x00435F80: ControlGunShot
 short GunShot(int x, int y, int z, short speed, short rotY, short roomNumber); // 0x00435FD0
@@ -43,6 +43,6 @@ BOOL ShotTarget(ITEM_INFO* item, AI_INFO* AI, const BITE_INFO* bite, short angle
 #define Worker2Control ((void(__cdecl*)(short)) 0x004371C0)
 void BanditControl(short itemID); // 0x00437620
 void Bandit2Control(short itemID); // 0x00437960
-#define WinstonControl ((void(__cdecl*)(short)) 0x00437DA0)
+void WinstonControl(short itemID); // 0x00437DA0
 
 #endif // PEOPLE_H_INCLUDED

@@ -40,10 +40,10 @@ int ControlPhase(int nTicks, BOOL demoMode);
 #define TriggerActive ((int(__cdecl*)(ITEM_INFO*)) 0x004158A0)
 #define GetCeiling ((int(__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00415900)
 // 0x00415B60:		GetDoor
-#define LOS ((int(__cdecl*)(GAME_VECTOR*, GAME_VECTOR*)) 0x00415BB0)
-// 0x00415C50:		zLOS
-// 0x00415F40:		xLOS
-// 0x00416230:		ClipTarget
+int LOS(GAME_VECTOR* start, GAME_VECTOR* target); // 0x00415BB0
+int zLOS(GAME_VECTOR* start, GAME_VECTOR* target); // 0x00415C50
+int xLOS(GAME_VECTOR* start, GAME_VECTOR* target); // 0x00415F40
+int ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target, FLOOR_INFO* floor); // 0x00416230
 #define ObjectOnLOS ((short(__cdecl*)(GAME_VECTOR*,GAME_VECTOR*)) 0x00416310)
 #define FlipMap ((void(__cdecl*)(void)) 0x00416610)
 // 0x004166D0:		RemoveRoomFlipItems

@@ -56,7 +56,7 @@ void phd_PutPolygons_I(short* ptrObj, int clip); // 0x0041BA30
 #define InterpolateMatrix ((void(__cdecl*)(void)) 0x0041BA60)
 #define InterpolateArmMatrix ((void(__cdecl*)(void)) 0x0041BC10)
 void DrawGunFlash(int weapon, int clip);
-#define CalculateObjectLighting ((void(__cdecl*)(ITEM_INFO*, short*)) 0x0041BE80)
+void CalculateObjectLighting(ITEM_INFO* item, short* frame); // 0x0041BE80
 #define GetFrames ((int(__cdecl*)(ITEM_INFO*, short**, int*)) 0x0041BF70)
 #define GetBoundsAccurate ((short*(__cdecl*)(ITEM_INFO*)) 0x0041C010)
 #define GetBestFrame ((short*(__cdecl*)(ITEM_INFO*)) 0x0041C090)

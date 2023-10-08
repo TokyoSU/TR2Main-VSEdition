@@ -27,22 +27,22 @@
  /*
   * Function list
   */
-  //0x004128D0:		GetCollisionInfo
-  //0x00412F90:		FindGridShift
+void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int height); // 0x004128D0
+#define FindGridShift ((int(__cdecl*)(int, int)) 0x00412F90)
 int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomID, int hite); // 0x00412FC0
 void GetNearByRooms(int x, int y, int z, int r, int h, short roomID); // 0x004133B0
 void GetNewRoom(int x, int y, int z, short roomID); // 0x00413480
 //0x004134E0:		ShiftItem
 #define UpdateLaraRoom ((void(__cdecl*)(ITEM_INFO*, int)) 0x00413520)
-//0x00413580:		GetTiltType
+#define GetTiltType ((short(__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00413580)
 //0x00413620:		LaraBaddieCollision
 //0x004137C0:		EffectSpaz
 #define CreatureCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x00413840)
 #define ObjectCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x004138C0)
 //0x00413920:		DoorCollision
 //0x004139A0:		TrapCollision
-//0x00413A10:		ItemPushLara
-//0x00413D20:		TestBoundsCollide
+#define ItemPushLara ((void(__cdecl*)(ITEM_INFO*, ITEM_INFO*, COLL_INFO*, BOOL, BOOL)) 0x00413A10)
+#define TestBoundsCollide ((int(__cdecl*)(ITEM_INFO*, ITEM_INFO*, int)) 0x00413D20)
 #define TestLaraPosition ((int(__cdecl*)(short*,ITEM_INFO*,ITEM_INFO*)) 0x00413DF0)
 #define AlignLaraPosition ((void(__cdecl*)(PHD_VECTOR*,ITEM_INFO*,ITEM_INFO*)) 0x00413F30)
 #define MoveLaraPosition ((int(__cdecl*)(PHD_VECTOR*,ITEM_INFO*,ITEM_INFO*)) 0x00414070)

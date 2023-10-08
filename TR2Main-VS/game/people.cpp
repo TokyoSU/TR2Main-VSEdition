@@ -45,7 +45,7 @@ extern DWORD AlphaBlendMode;
 #define BANDIT_DAMAGE_TO_OTHER 1
 #define BANDIT2_DIE_ANIM 9
 #define BANDIT2_DAMAGE 50
-#define BANDIT2_DAMAGE_TO_OTHER 3
+#define BANDIT2_DAMAGE_TO_OTHER 1
 
 typedef enum
 {
@@ -84,6 +84,26 @@ typedef enum
 
 static const BITE_INFO BanditGunBite = { -2, 150, 19, 17 };
 static const BITE_INFO Bandit2GunBite = { -1, 230, 9, 17 };
+
+BOOL Targetable(ITEM_INFO* item, AI_INFO* info) {
+	GAME_VECTOR source = {}, destination = {};
+	CREATURE_INFO* creature = NULL;
+	ITEM_INFO* enemy = NULL;
+
+	creature = (CREATURE_INFO*)item->data;
+	enemy = creature->enemy;
+	if (enemy->hitPoints > 0 && info->ahead && info->distance < SQR(8192)) {
+		source.x = item->pos.x;
+		source.y = item->pos.y - 768;
+		source.z = item->pos.z;
+		source.roomNumber = item->roomNumber;
+		destination.x = enemy->pos.x;
+		destination.y = enemy->pos.y - 768;
+		destination.z = enemy->pos.z;
+		return LOS(&source, &destination);
+	}
+	return FALSE;
+}
 
 short GunShot(int x, int y, int z, short speed, short rotY, short roomNumber) {
 #ifdef FEATURE_VIDEOFX_IMPROVED
@@ -358,21 +378,26 @@ void BanditControl(short itemID)
 					item->goalAnimState = BANDIT_WALK;
 			}
 			break;
-		case BANDIT_SHOOT1:
 		case BANDIT_SHOOT2:
+			if (AI.ahead)
+				head = AI.angle;
+
+			if (item->frameNumber == Anims[item->animNumber].frameBase + 3)
+			{
+				if (!ShotTargetNew(item, &AI, &BanditGunBite, head, BANDIT_DAMAGE, BANDIT_DAMAGE_TO_OTHER))
+					item->goalAnimState = BANDIT_STOP;
+			}
+			break;
+		case BANDIT_SHOOT1:
 		case BANDIT_SHOOT3A:
 		case BANDIT_SHOOT3B:
 			if (AI.ahead)
 				head = AI.angle;
 
-			if (Targetable(item, &AI))
+			if (item->frameNumber == Anims[item->animNumber].frameBase)
 			{
 				if (!ShotTargetNew(item, &AI, &BanditGunBite, head, BANDIT_DAMAGE, BANDIT_DAMAGE_TO_OTHER))
 					item->goalAnimState = BANDIT_STOP;
-			}
-			else
-			{
-				item->goalAnimState = BANDIT_STOP;
 			}
 			break;
 		case BANDIT_SHOOT4A:
@@ -380,14 +405,10 @@ void BanditControl(short itemID)
 			if (AI.ahead)
 				head = AI.angle;
 
-			if (Targetable(item, &AI))
+			if (item->frameNumber == Anims[item->animNumber].frameBase)
 			{
 				if (!ShotTargetNew(item, &AI, &BanditGunBite, head, BANDIT_DAMAGE, BANDIT_DAMAGE_TO_OTHER))
 					item->goalAnimState = BANDIT_WALK;
-			}
-			else
-			{
-				item->goalAnimState = BANDIT_WALK;
 			}
 			break;
 
@@ -499,11 +520,24 @@ void Bandit2Control(short itemID)
 				item->goalAnimState = BANDIT2_WAIT;
 			break;
 		case BANDIT2_AIM4:
+			bandit->flags = 0;
+			if (AI.ahead)
+				head = AI.angle;
+			if (Targetable(item, &AI))
+				item->goalAnimState = BANDIT2_SHOOT4A;
+			else
+				item->goalAnimState = BANDIT2_WALK;
+			break;
 		case BANDIT2_AIM1:
 		case BANDIT2_AIM2:
 			bandit->flags = 0;
 			if (AI.ahead)
 				head = AI.angle;
+
+			if (Targetable(item, &AI))
+				item->goalAnimState = item->currentAnimState == BANDIT2_AIM1 ? BANDIT2_SHOOT1 : BANDIT2_SHOOT2;
+			else
+				item->goalAnimState = BANDIT2_WAIT;
 			break;
 		case BANDIT2_AIM5:
 			bandit->flags = 0;
@@ -517,58 +551,43 @@ void Bandit2Control(short itemID)
 			break;
 		case BANDIT2_SHOOT1:
 		case BANDIT2_SHOOT2:
+			if (AI.ahead)
+				head = AI.angle;
+
+			if (item->frameNumber == Anims[item->animNumber].frameBase + 3)
+			{
+				if (!ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER) || GetRandomControl() < 0x2000)
+					item->goalAnimState = BANDIT2_WAIT;
+			}
+			break;
 		case BANDIT2_SHOOT5:
 			if (AI.ahead)
 				head = AI.angle;
 
-			if (Targetable(item, &AI))
+			if (item->frameNumber == Anims[item->animNumber].frameBase)
 			{
-				if (!bandit->flags)
-				{
-					if (!ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER) || GetRandomControl() < 0x2000)
-						item->goalAnimState = BANDIT2_WAIT;
-					bandit->flags = 1;
-				}
-			}
-			else
-			{
-				item->goalAnimState = BANDIT2_WAIT;
+				if (!ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER) || GetRandomControl() < 0x2000)
+					item->goalAnimState = BANDIT2_WAIT;
 			}
 			break;
 		case BANDIT2_SHOOT4A:
 			if (AI.ahead)
 				head = AI.angle;
 
-			if (Targetable(item, &AI))
+			if (item->frameNumber == Anims[item->animNumber].frameBase + 1)
 			{
-				if (!(bandit->flags & 1))
-				{
-					if (!ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER))
-						item->goalAnimState = BANDIT2_WALK;
-					bandit->flags |= 1;
-				}
-			}
-			else
-			{
-				item->goalAnimState = BANDIT2_WALK;
+				if (!ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER))
+					item->goalAnimState = BANDIT2_WALK;
 			}
 			break;
 		case BANDIT2_SHOOT4B:
 			if (AI.ahead)
 				head = AI.angle;
 
-			if (Targetable(item, &AI))
+			if (item->frameNumber == Anims[item->animNumber].frameBase + 1)
 			{
-				if (!(bandit->flags & 2))
-				{
-					if (!ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER))
-						item->goalAnimState = BANDIT2_WALK;
-					bandit->flags |= 2;
-				}
-			}
-			else
-			{
-				item->goalAnimState = BANDIT2_WALK;
+				if (!ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER))
+					item->goalAnimState = BANDIT2_WALK;
 			}
 			break;
 		}
@@ -580,11 +599,57 @@ void Bandit2Control(short itemID)
 	CreatureAnimation(itemID, angle, 0);
 }
 
+void WinstonControl(short itemID) {
+	if (!CreatureActive(itemID))
+		return;
+
+	ITEM_INFO* item = &Items[itemID];
+	CREATURE_INFO* winston = (CREATURE_INFO*)item->data;
+	AI_INFO info;
+	CreatureAIInfo(item, &info);
+	CreatureMood(item, &info, TRUE);
+	short angle = CreatureTurn(item, winston->maximum_turn);
+	if (item->currentAnimState == 1) {
+		if ((info.distance > SQR(1536) || !info.ahead) && item->goalAnimState != 2) {
+			item->goalAnimState = 2;
+			PlaySoundEffect(345, &item->pos, 0);
+		}
+	}
+	else {
+		if (info.distance <= SQR(1536)) {
+			if (info.ahead) {
+				item->goalAnimState = 1;
+				if (CHK_ANY(winston->flags, 1))
+					--winston->flags;
+			}
+			else {
+				if (!CHK_ANY(winston->flags, 1)) {
+					PlaySoundEffect(344, &item->pos, 0);
+					PlaySoundEffect(347, &item->pos, 0);
+					winston->flags |= 1;
+				}
+			}
+		}
+	}
+	if (item->touchBits && !CHK_ANY(winston->flags, 2)) {
+		PlaySoundEffect(346, &item->pos, 0);
+		PlaySoundEffect(347, &item->pos, 0);
+		winston->flags |= 2;
+	}
+	else {
+		if (!item->touchBits && CHK_ANY(winston->flags, 2))
+			winston->flags -= 2;
+	}
+	if (GetRandomDraw() < 256)
+		PlaySoundEffect(347, &item->pos, 0);
+	CreatureAnimation(itemID, angle, 0);
+}
+
 /*
  * Inject function
  */
 void Inject_People() {
-	//INJECT(0x00435EB0, Targetable);
+	INJECT(0x00435EB0, Targetable);
 	//INJECT(0x00435F40, ControlGlow);
 	//INJECT(0x00435F80, ControlGunShot);
 	INJECT(0x00435FD0, GunShot);
@@ -599,5 +664,5 @@ void Inject_People() {
 	//INJECT(0x004371C0, Worker2Control);
 	INJECT(0x00437620, BanditControl);
 	INJECT(0x00437960, Bandit2Control);
-	//INJECT(0x00437DA0, WinstonControl);
+	INJECT(0x00437DA0, WinstonControl);
 }

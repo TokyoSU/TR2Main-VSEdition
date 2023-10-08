@@ -841,7 +841,7 @@ static bool ParseDefaultLevelConfiguration(json_value* root) {
 	ModConfig.grenadeAtStart = ParseBooleanConfigByName(root, "grenadeatstart");
 	ModConfig.harpoonAtStart = ParseBooleanConfigByName(root, "harpoonatstart");
 
-	ModConfig.shotgunAmmoAtStart = ParseIntegerConfigByName(root, "shotgunammoatstart", ModConfig.shotgunAtStart ? 12 : 0);
+	ModConfig.shotgunAmmoAtStart = ParseIntegerConfigByName(root, "shotgunammoatstart", ModConfig.shotgunAtStart ? 2 : 0);
 	ModConfig.uzisAmmoAtStart = ParseIntegerConfigByName(root, "uzisammoatstart");
 	ModConfig.autopistolsAmmoAtStart = ParseIntegerConfigByName(root, "autopistolsammoatstart");
 	ModConfig.m16AmmoAtStart = ParseIntegerConfigByName(root, "m16ammoatstart");

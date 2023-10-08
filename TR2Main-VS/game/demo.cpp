@@ -21,6 +21,9 @@
 
 #include "precompiled.h"
 #include "game/demo.h"
+#include "game/control.h"
+#include "game/gameflow.h"
+#include "game/items.h"
 #include "game/laramisc.h"
 #include "game/setup.h"
 #include "game/text.h"
@@ -33,6 +36,21 @@
 extern bool PsxBarPosEnabled;
 DWORD DemoTextMode = 0;
 #endif // FEATURE_HUD_IMPROVED
+
+int DoDemoSequence(int levelID) {
+	static int DemoLevelID = 0;
+
+	if (levelID < 0 && !GF_GameFlow.num_Demos)
+		return GF_EXIT_TO_TITLE;
+	if (levelID < 0) {
+		if (DemoLevelID >= GF_GameFlow.num_Demos)
+			DemoLevelID = 0;
+		++DemoLevelID;
+		return GF_DoLevelSequence(GF_DemoLevels[DemoLevelID - 1], GFL_DEMO);
+	}
+	DemoLevelID = levelID;
+	return GF_DoLevelSequence(levelID, GFL_DEMO);
+}
 
 int StartDemo(int levelID) {
 	static int DemoLevelID = 0;
@@ -110,14 +128,43 @@ int StartDemo(int levelID) {
 	return result;
 }
 
+void LoadLaraDemoPos() {
+	DEMO_INFO* demoPtr = (DEMO_INFO*)DemoPtr;
+	short roomID;
+	LaraItem->pos.x = ((int*)DemoPtr)[0];
+	LaraItem->pos.y = ((int*)DemoPtr)[1];
+	LaraItem->pos.z = ((int*)DemoPtr)[2];
+	LaraItem->pos.rotX = ((int*)DemoPtr)[3];
+	LaraItem->pos.rotY = ((int*)DemoPtr)[4];
+	LaraItem->pos.rotZ = ((int*)DemoPtr)[5];
+	roomID = ((int*)DemoPtr)[6];
+	if (LaraItem->roomNumber != roomID)
+		ItemNewRoom(Lara.item_number, roomID);
+	LaraItem->floor = GetHeight(GetFloor(LaraItem->pos.x, LaraItem->pos.y, LaraItem->pos.z, &roomID), LaraItem->pos.x, LaraItem->pos.y, LaraItem->pos.z);
+	Lara.last_gun_type = ((int*)DemoPtr)[7];
+	DemoCount += 8;
+}
+
+void GetDemoInput() {
+	DWORD input;
+
+	if (DemoCount < 9000) {
+		input = ((DWORD*)DemoPtr)[DemoCount];
+	}
+	else {
+		input = 0xFFFFFFFF;
+	}
+	InputStatus = input;
+	if (input != 0xFFFFFFFF)
+		++DemoCount;
+}
+
 /*
  * Inject function
  */
 void Inject_Demo() {
-	//INJECT(0x004168E0, DoDemoSequence);
-
+	INJECT(0x004168E0, DoDemoSequence);
 	INJECT(0x00416940, StartDemo);
-
-	//INJECT(0x00416AF0, LoadLaraDemoPos);
-	//INJECT(0x00416BC0, GetDemoInput);
+	INJECT(0x00416AF0, LoadLaraDemoPos);
+	INJECT(0x00416BC0, GetDemoInput);
 }

@@ -41,11 +41,10 @@ void InitialiseBlade(short itemID); // 0x004418C0
 void BladeControl(short itemID); // 0x00441900
 void InitialiseKillerStatue(short itemID); // 0x004419A0
 void KillerStatueControl(short itemID); // 0x004419F0
-
-//0x00441B00:		SpringBoardControl
-//0x00441BE0:		InitialiseRollingBall
-//0x00441C20:		RollingBallControl
-//0x00441F70:		RollingBallCollision
+void SpringBoardControl(short itemID); // 0x00441B00
+void InitialiseRollingBall(short itemID); // 0x00441BE0
+void RollingBallControl(short itemID); // 0x00441C20
+void RollingBallCollision(short itemID, ITEM_INFO* laraItem, COLL_INFO* coll); // 0x00441F70
 //0x004421C0:		SpikeCollision
 //0x00442320:		TrapDoorControl
 //0x00442370:		TrapDoorFloor

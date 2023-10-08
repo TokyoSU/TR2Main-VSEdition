@@ -33,6 +33,7 @@
   //0x0040CE20:		TestWaterHeight
   //0x0040CF20:		DoBoatShift
 
+void DoBoatShift(int itemID); // 0x0040CF20
 void DoWakeEffect(ITEM_INFO* item); // 0x0040D0F0
 
 //0x0040D270:		DoBoatDynamics

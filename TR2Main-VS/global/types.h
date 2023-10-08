@@ -249,10 +249,17 @@ typedef struct {
 #define GLOW_GUNSHOT_COLOR	(0x7F701F) // Skidoo/Enemy gunfire
 
 // Collision types
-#define COLL_FRONT	(0x01)
-#define COLL_LEFT	(0x02)
-#define COLL_RIGHT	(0x04)
-#define COLL_TOP	(0x08)
+#define COLL_FRONT		(0x01)
+#define COLL_LEFT		(0x02)
+#define COLL_RIGHT		(0x04)
+#define COLL_TOP		(0x08)
+#define COLL_TOPFRONT	(0x10)
+#define COLL_CLAMP		(0x20)
+
+// Trigger/floordata control bits
+#define END_BIT		(0x8000)
+#define VALUE_BITS	(0x03FF)
+#define DATA_TYPE	(0x00FF)
 
 /*
  * DirectX type definitions
@@ -1131,49 +1138,6 @@ typedef enum {
 } ITEM_STATUS;
 
 typedef enum {
-	FLOOR_TYPE,
-	DOOR_TYPE,
-	TILT_TYPE,
-	ROOF_TYPE,
-	TRIGGER_TYPE,
-	LAVA_TYPE,
-	CLIMB_TYPE
-} TRIGGER_DATA_TYPES;
-
-typedef enum {
-	TRIGGER,
-	PAD,
-	SWITCH,
-	KEY,
-	PICKUP,
-	HEAVY,
-	ANTIPAD,
-	COMBAT,
-	DUMMY,
-	ANTITRIGGER,
-	HEAVYSWITCH,
-	HEAVYANTITRIGGER
-} TRIGGER_TYPES;
-
-typedef enum
-{
-	TO_OBJECT,
-	TO_CAMERA,
-	TO_SINK,
-	TO_FLIPMAP,
-	TO_FLIPON,
-	TO_FLIPOFF,
-	TO_TARGET,
-	TO_FINISH,
-	TO_CD,
-	TO_FLIPEFFECT,
-	TO_SECRET,
-	TO_BODYBAG,
-	TO_FLYBY,
-	TO_CUTSCENE
-} TRIGGER_OBJECTS;
-
-typedef enum {
 	ADDINV_PISTOL,
 	ADDINV_SHOTGUN,
 	ADDINV_MAGNUM,
@@ -1213,8 +1177,7 @@ typedef enum {
 	CHAR_SECRET3,
 } CHAR_SECRETS;
 
-typedef enum
-{
+typedef enum {
 	LM_Hips,
 	LM_ThighL,
 	LM_CalfL,
@@ -1231,6 +1194,35 @@ typedef enum
 	LM_HandL,
 	LM_Head
 } LARA_MESHES;
+
+typedef enum {
+	HT_WALL,
+	HT_SMALL_SLOPE,
+	HT_BIG_SLOPE,
+} HEIGHT_TYPE;
+
+typedef enum {
+	TT_TRIGGER,
+	TT_PAD,
+	TT_SWITCH,
+	TT_KEY,
+	TT_PICKUP,
+	TT_HEAVY,
+	TT_ANTIPAD,
+	TT_COMBAT,
+	TT_DUMMY,
+	TT_ANTITRIGGER,
+} TRIGGER_TYPE;
+
+typedef enum {
+	FT_FLOOR,
+	FT_DOOR,
+	FT_TILT,
+	FT_ROOF,
+	FT_TRIGGER,
+	FT_LAVA,
+	FT_CLIMB,
+} FLOOR_TYPE;
 
 /*
  * Structs
@@ -2323,7 +2315,7 @@ typedef struct Sphere_t {
 	int y;
 	int z;
 	int radius;
-} SPHERE;
+} SPHERE_INFO;
 
 typedef struct WeaponInfo_t {
 	short lockAngles[4];
