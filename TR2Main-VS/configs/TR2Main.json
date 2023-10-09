@@ -204,7 +204,7 @@
         "grenadeatstart": false,
         "harpoonatstart": false,
         
-        "shotgunammoatstart": 12,
+        "shotgunammoatstart": 2,
         "uzisammoatstart": 0,
         "autopistolsammoatstart": 0,
         "m16ammoatstart": 0,
