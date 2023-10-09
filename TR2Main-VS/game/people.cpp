@@ -124,8 +124,7 @@ short GunShot(int x, int y, int z, short speed, short rotY, short roomNumber) {
 			fx->object_number = ID_GLOW;
 			fx->shade = 0x800;
 			// NOTE: Core's hacky way to store the sprite flags in the rotation fields
-			DWORD flags = GLOW_GUNSHOT_COLOR;
-			flags |= SPR_BLEND_ADD | SPR_TINT | SPR_SHADE | SPR_SCALE | SPR_SEMITRANS | SPR_ABS;
+			DWORD flags = GLOW_GUNSHOT_COLOR | SPR_BLEND_ADD | SPR_TINT | SPR_SHADE | SPR_SCALE | SPR_SEMITRANS | SPR_ABS;
 			fx->pos.rotX = (UINT16)flags;
 			fx->pos.rotY = (UINT16)(flags >> 16);
 		}
@@ -138,9 +137,9 @@ short GunShot(int x, int y, int z, short speed, short rotY, short roomNumber) {
 		fx->pos.y = y;
 		fx->pos.z = z;
 		fx->room_number = roomNumber;
-		fx->pos.rotZ = 0;
 		fx->pos.rotX = 0;
 		fx->pos.rotY = rotY;
+		fx->pos.rotZ = 0;
 		fx->counter = 3;
 		fx->frame_number = 0;
 		fx->object_number = ID_GUN_FLASH;
