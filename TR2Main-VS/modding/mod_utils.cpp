@@ -301,150 +301,335 @@ int GetModBigMedikitCountAtStart() {
 }
 
 int GetModDogHealth() {
+	if (ModConfig.dogHealth <= 0)
+	{
+		LogWarn("Failed to get the dog health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.dogHealth;
 }
 
 int GetModMouseHealth() {
+	if (ModConfig.mouseHealth <= 0)
+	{
+		LogWarn("Failed to get the mouse/rat health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.mouseHealth;
 }
 
 int GetModCult1Health() {
+	if (ModConfig.cult1Health <= 0)
+	{
+		LogWarn("Failed to get the cult1 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.cult1Health;
 }
 
 int GetModCult1AHealth() {
+	if (ModConfig.cult1AHealth <= 0)
+	{
+		LogWarn("Failed to get the cult1A health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.cult1AHealth;
 }
 
 int GetModCult1BHealth() {
+	if (ModConfig.cult1BHealth <= 0)
+	{
+		LogWarn("Failed to get the cult1B health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.cult1BHealth;
 }
 
 int GetModCult2Health() {
+	if (ModConfig.cult2Health <= 0)
+	{
+		LogWarn("Failed to get the cult2 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.cult2Health;
 }
 
 int GetModSharkHealth() {
+	if (ModConfig.sharkHealth <= 0)
+	{
+		LogWarn("Failed to get the shark health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.sharkHealth;
 }
 
 int GetModTigerHealth() {
+	if (ModConfig.tigerHealth <= 0)
+	{
+		LogWarn("Failed to get the tiger health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.tigerHealth;
 }
 
 int GetModBarracudaHealth() {
+	if (ModConfig.barracudaHealth <= 0)
+	{
+		LogWarn("Failed to get the barracuda health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.barracudaHealth;
 }
 
 int GetModSmallSpiderHealth() {
+	if (ModConfig.smallSpiderHealth <= 0)
+	{
+		LogWarn("Failed to get the small spider health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.smallSpiderHealth;
 }
 
 int GetModWolfHealth() {
+	if (ModConfig.wolfHealth <= 0)
+	{
+		LogWarn("Failed to get the wolf (gold) health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.wolfHealth;
 }
 
 int GetModBigSpiderHealth() {
+	if (ModConfig.bigSpiderHealth <= 0)
+	{
+		LogWarn("Failed to get the big spider health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.bigSpiderHealth;
 }
 
 int GetModBearHealth() {
+	if (ModConfig.bearHealth <= 0)
+	{
+		LogWarn("Failed to get the bear (gold) health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.bearHealth;
 }
 
 int GetModYetiHealth() {
+	if (ModConfig.yetiHealth <= 0)
+	{
+		LogWarn("Failed to get the yeti health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.yetiHealth;
 }
 
 int GetModJellyHealth() {
+	if (ModConfig.jellyHealth <= 0)
+	{
+		LogWarn("Failed to get the jelly health from the level command and default value was not used, set the health to not targetable to avoid problem !");
+		return HP_DONT_TARGET;
+	}
 	return ModConfig.jellyHealth;
 }
 
 int GetModDiverHealth() {
+	if (ModConfig.diverHealth <= 0)
+	{
+		LogWarn("Failed to get the diver health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.diverHealth;
 }
 
 int GetModWorker1Health() {
+	if (ModConfig.worker1Health <= 0)
+	{
+		LogWarn("Failed to get the worker1 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.worker1Health;
 }
 
 int GetModWorker2Health() {
+	if (ModConfig.worker2Health <= 0)
+	{
+		LogWarn("Failed to get the worker2 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.worker2Health;
 }
 
 int GetModWorker3Health() {
+	if (ModConfig.worker3Health <= 0)
+	{
+		LogWarn("Failed to get the worker3 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.worker3Health;
 }
 
 int GetModWorker4Health() {
+	if (ModConfig.worker4Health <= 0)
+	{
+		LogWarn("Failed to get the worker4 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.worker4Health;
 }
 
 int GetModWorker5Health() {
+	if (ModConfig.worker5Health <= 0)
+	{
+		LogWarn("Failed to get the worker5 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.worker5Health;
 }
 
 int GetModCult3Health() {
+	if (ModConfig.cult3Health <= 0)
+	{
+		LogWarn("Failed to get the cult3 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.cult3Health;
 }
 
 int GetModMonk1Health() {
+	if (ModConfig.monk1Health <= 0)
+	{
+		LogWarn("Failed to get the monk1 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.monk1Health;
 }
 
 int GetModMonk2Health() {
+	if (ModConfig.monk2Health <= 0)
+	{
+		LogWarn("Failed to get the monk2 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.monk2Health;
 }
 
 int GetModEagleHealth() {
+	if (ModConfig.eagleHealth <= 0)
+	{
+		LogWarn("Failed to get the eagle health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.eagleHealth;
 }
 
 int GetModCrowHealth() {
+	if (ModConfig.crowHealth <= 0)
+	{
+		LogWarn("Failed to get the crow health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.crowHealth;
 }
 
 int GetModBigEelHealth() {
+	if (ModConfig.eagleHealth <= 0)
+	{
+		LogWarn("Failed to get the eagle health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.bigEelHealth;
 }
 
 int GetModEelHealth() {
+	if (ModConfig.eelHealth <= 0)
+	{
+		LogWarn("Failed to get the big eel health from the level command and default value was not used, set the health to not targetable to avoid problem !");
+		return HP_DONT_TARGET;
+	}
 	return ModConfig.eelHealth;
 }
 
 int GetModBandit1Health() {
+	if (ModConfig.bandit1Health <= 0)
+	{
+		LogWarn("Failed to get the bandit1 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.bandit1Health;
 }
 
 int GetModBandit2Health() {
+	if (ModConfig.bandit2Health <= 0)
+	{
+		LogWarn("Failed to get the bandit2 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.bandit2Health;
 }
 
 int GetModBandit2BHealth() {
+	if (ModConfig.bandit2BHealth <= 0)
+	{
+		LogWarn("Failed to get the bandit2B health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.bandit2BHealth;
 }
 
 int GetModSkidmanHealth() {
+	if (ModConfig.skidmanHealth <= 0)
+	{
+		LogWarn("Failed to get the skidman health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.skidmanHealth;
 }
 
 int GetModXianLordHealth() {
+	if (ModConfig.xianLordHealth <= 0)
+	{
+		LogWarn("Failed to get the xianlord health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.xianLordHealth;
 }
 
 int GetModWarriorHealth() {
+	if (ModConfig.warriorHealth <= 0)
+	{
+		LogWarn("Failed to get the warrior health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.warriorHealth;
 }
 
 int GetModDragonHealth() {
+	if (ModConfig.dragonHealth <= 0)
+	{
+		LogWarn("Failed to get the dragon health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.dragonHealth;
 }
 
 int GetModGiantYetiHealth() {
+	if (ModConfig.giantYetiHealth <= 0)
+	{
+		LogWarn("Failed to get the giant yeti health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.giantYetiHealth;
 }
 
 int GetModDinoHealth() {
+	if (ModConfig.dinoHealth <= 0)
+	{
+		LogWarn("Failed to get the dino health from the level command and default value was not used, set the health to 1 to avoid them dying !");
+		return 1;
+	}
 	return ModConfig.dinoHealth;
 }
 

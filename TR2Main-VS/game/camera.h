@@ -33,7 +33,7 @@ void InitialiseCamera(); // 0x00410580
 void MoveCamera(GAME_VECTOR* destination, int speed); // 0x00410630
 void ClipCamera(int* x, int* y, int* z, int tx, int ty, int tz, int left, int top, int right, int bottom); // 0x004109B0
 void ShiftCamera(int* x, int* y, int* z, int tx, int ty, int tz, int left, int top, int right, int bottom); // 0x00410A90
-FLOOR_INFO* GoodPosition(int x, int y, int z, __int16 roomID); // 0x00410BF0
+FLOOR_INFO* GoodPosition(int x, int y, int z, short roomID); // 0x00410BF0
 void SmartShift(GAME_VECTOR* goal, CB_SMARTCAM shift); // 0x00410C40
 void ChaseCamera(ITEM_INFO* item); // 0x004113D0
 int ShiftClamp(GAME_VECTOR* pos, int clamp); // 0x004114C0

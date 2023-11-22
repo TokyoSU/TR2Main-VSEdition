@@ -153,7 +153,7 @@ extern short InvOptionObjectsCount;
 #define IMFrac						VAR_U_(0x005258F0, int)
 #define IMPtr						VAR_U_(0x00526188, PHD_MATRIX*)
 #define IMStack						ARRAY_(0x005252C0, PHD_MATRIX, [32])
-#define InterpolateBounds			ARRAY_(0x005261A0, __int16, [6])
+#define InterpolateBounds			ARRAY_(0x005261A0, short, [6])
 #define Info3dPtr					VAR_U_(0x004B2AE0, short*)
 #define PhdWinWidth					VAR_U_(0x004B2AE4, int)
 #define PhdViewDistance				VAR_U_(0x004BCAF0, int)

@@ -198,7 +198,7 @@ void ShiftCamera(int* x, int* y, int* z, int tx, int ty, int tz, int left, int t
 	}
 }
 
-FLOOR_INFO* GoodPosition(int x, int y, int z, __int16 roomID) {
+FLOOR_INFO* GoodPosition(int x, int y, int z, short roomID) {
 	FLOOR_INFO* floor;
 
 	floor = GetFloor(x, y, z, &roomID);
@@ -211,7 +211,7 @@ void SmartShift(GAME_VECTOR* goal, CB_SMARTCAM shift) {
 	ROOM_INFO* room;
 	BOX_INFO* box;
 	int left, right, top, bottom, side, x, z;
-	__int16 boxID;
+	short boxID;
 	FLOOR_INFO* floorL, * floorR, * floorT, * floorB;
 	GAME_VECTOR secondary, primary;
 	BOOL clear, first;

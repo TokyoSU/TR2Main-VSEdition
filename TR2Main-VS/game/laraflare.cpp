@@ -149,7 +149,7 @@ void DrawFlareInAir(ITEM_INFO* item) {
 }
 
 void CreateFlare(BOOL isFlying) {
-	__int16 itemID;
+	short itemID;
 	ITEM_INFO* item;
 	PHD_VECTOR pos;
 
