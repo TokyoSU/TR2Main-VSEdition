@@ -230,21 +230,41 @@ void GetBaddieTarget(short creatureIdx, BOOL isMonk)
 	}
 }
 
-bool IsCreatureNearTarget(ITEM_INFO* item, ITEM_INFO* enemy)
+bool IsCreatureNearTarget(ITEM_INFO* item, ITEM_INFO* enemy, int distance)
 {
-	return ABS(item->pos.x - enemy->pos.x) < 512 &&
-		   ABS(item->pos.y - enemy->pos.y) < 512 &&
-		   ABS(item->pos.z - enemy->pos.z) < 512;
+	return ABS(item->pos.x - enemy->pos.x) < distance &&
+		   ABS(item->pos.y - enemy->pos.y) < distance &&
+		   ABS(item->pos.z - enemy->pos.z) < distance;
 }
 
-void DamageTarget(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damage)
+bool DamageTarget(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damage)
 {
 	if (enemy)
 	{
 		enemy->hitPoints -= damage;
-		enemy->hitStatus = 1;
+		enemy->hitStatus = TRUE;
 		CreatureEffect(item, bite, DoBloodSplat);
+		return true;
 	}
+	return false;
+}
+
+bool DamageLaraOrEnemy(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damageLara, int damageEnemy, bool touchBitsLara)
+{
+	if (enemy)
+	{
+		if (enemy == LaraItem && touchBitsLara)
+		{
+			DamageTarget(item, enemy, bite, damageLara);
+			return true;
+		}
+		else if (IsCreatureNearTarget(item, enemy))
+		{
+			DamageTarget(item, enemy, bite, damageEnemy);
+			return true;
+		}
+	}
+	return false;
 }
 
 void SetAnimation(ITEM_INFO* item, int animID, int stateID, int frameID)

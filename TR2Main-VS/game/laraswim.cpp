@@ -151,7 +151,9 @@ void LaraWaterCurrent(COLL_INFO* coll)
 	// Exit if creature is not set !
 	if (Lara.creature == NULL)
 	{
+#if defined(_DEBUG)
 		LogDebug("Lara.creature is null !");
+#endif
 		Lara.current_active = 0;
 		return;
 	}

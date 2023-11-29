@@ -117,8 +117,8 @@ x function is unused / included in another function
 // ======================================
 
 	game/bird.cpp
-0x0040C860:	 *	InitialiseEagle
-0x0040C8F0:	 *	EagleControl
+0x0040C860:	+	InitialiseEagle
+0x0040C8F0:	+	EagleControl
 
 	game/boat.cpp
 0x0040CB10:		InitialiseBoat

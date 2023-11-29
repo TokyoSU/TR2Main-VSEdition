@@ -75,13 +75,12 @@ BOOL EnableBaddieAI(short itemID, BOOL isAlways)
 
 	if (Lara.item_number == itemID && Lara.creature != NULL)
 	{
-		if (Lara.creature != NULL)
-			LogDebug("Lara.creature is already initialized !");
+		LogDebug("Lara.creature is already initialized !");
 		return TRUE;
 	}
-
+	
 	item = &Items[itemID];
-	if (Lara.item_number != itemID && item->data != NULL)
+	if (Lara.item_number != itemID && item->data != NULL) // NOTE: Lara.item_num != itemID check was not there in OG.
 		return TRUE;
 
 	// Max creatures reached, search for the farest one and replace it by the new one !
@@ -122,7 +121,6 @@ BOOL EnableBaddieAI(short itemID, BOOL isAlways)
 			item->status = ITEM_INVISIBLE;
 			DisableBaddieAI(creature->item_num);
 			InitialiseSlot(itemID, farestSlot);
-
 			new_item = &Items[itemID];
 			if (new_item != NULL)
 			{

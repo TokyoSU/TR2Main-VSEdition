@@ -580,8 +580,8 @@ void BaddyObjects() {
 	}
 	obj = &Objects[ID_EAGLE];
 	if (obj->loaded) {
-		obj->initialise = InitialiseEagle;
-		obj->control = EagleControl;
+		obj->initialise = InitialiseBird;
+		obj->control = BirdControl;
 		obj->collision = CreatureCollision;
 #if defined(FEATURE_MOD_CONFIG)
 		obj->hitPoints = GetModEagleHealth();
@@ -599,8 +599,8 @@ void BaddyObjects() {
 	}
 	obj = &Objects[ID_CROW];
 	if (obj->loaded) {
-		obj->initialise = InitialiseEagle;
-		obj->control = EagleControl;
+		obj->initialise = InitialiseBird;
+		obj->control = BirdControl;
 		obj->collision = CreatureCollision;
 #if defined(FEATURE_MOD_CONFIG)
 		obj->hitPoints = GetModCrowHealth();

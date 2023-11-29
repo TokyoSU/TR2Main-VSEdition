@@ -52,10 +52,12 @@ void CreatureDie(short itemID, BOOL explode); // 0x0040F440
 #define CreatureVault ((int(__cdecl*)(short,short,int,int)) 0x004100F0)
 void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillState); // 0x00410230
 void GetBaddieTarget(short creatureIdx, BOOL isMonk); // 0x004103A0
-bool IsCreatureNearTarget(ITEM_INFO* item, ITEM_INFO* enemy);
-// NOTE: Only for hand to hand.
-// NOTE: Not exist in the original game.
-void DamageTarget(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damage);
+bool IsCreatureNearTarget(ITEM_INFO* item, ITEM_INFO* enemy, int distance = CLICK(2));
+// NOTE: Only for hand to hand. (Not exist in the original game)
+bool DamageTarget(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damage);
+// NOTE: Only for hand to hand. (Not exist in the original game)
+bool DamageLaraOrEnemy(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damageLara, int damageEnemy, bool touchBitsLara);
+// NOTE: Force animation. (Not exist in the original game)
 void SetAnimation(ITEM_INFO* item, int animID, int stateID, int frameID = 0);
 
 #endif // BOX_H_INCLUDED

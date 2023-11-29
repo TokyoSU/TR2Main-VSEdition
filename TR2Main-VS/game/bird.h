@@ -27,7 +27,8 @@
  /*
   * Function list
   */
-#define InitialiseEagle ((void(__cdecl*)(short)) 0x0040C860)
-#define EagleControl ((void(__cdecl*)(short)) 0x0040C8F0)
+
+void InitialiseBird(short itemID); // 0x0040C860
+void BirdControl(short itemID); // 0x0040C8F0
 
 #endif // BIRD_H_INCLUDED

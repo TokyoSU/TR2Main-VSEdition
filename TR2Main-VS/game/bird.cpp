@@ -21,12 +21,160 @@
 
 #include "precompiled.h"
 #include "game/bird.h"
+#include "game/box.h"
 #include "global/vars.h"
+
+enum BIRD_STATE
+{
+	// No state 0.
+	BIRD_STATE_FLY = 1,
+	BIRD_STATE_IDLE = 2, // For crow
+	BIRD_STATE_PLANE = 3,
+	BIRD_STATE_DEATH_START = 4,
+	BIRD_STATE_DEATH_END = 5,
+	BIRD_STATE_ATTACK = 6,
+	BIRD_STATE_EAT = 7
+};
+
+#define EAGLE_IDLE_ANIM (5)
+#define EAGLE_DIE_ANIM (8)
+#define CROW_IDLE_ANIM (14)
+#define CROW_DIE_ANIM (1)
+
+#define EAGLE_DAMAGE 20
+#define CROW_DAMAGE 20
+#define EAGLE_DAMAGE_TO_OTHER 3
+#define CROW_DAMAGE_TO_OTHER 3
+
+const BITE_INFO EagleBite = { 15, 46, 21, 6 };
+const BITE_INFO CrowBite = { 2, 10, 60, 14 };
+
+static void InitialiseEagle(ITEM_INFO* item)
+{
+	item->animNumber = Objects[item->objectID].animIndex + EAGLE_IDLE_ANIM;
+	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->currentAnimState = BIRD_STATE_EAT;
+	item->goalAnimState = BIRD_STATE_EAT;
+}
+
+static void InitialiseCrow(ITEM_INFO* item)
+{
+	item->animNumber = Objects[item->objectID].animIndex + CROW_IDLE_ANIM;
+	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->currentAnimState = BIRD_STATE_IDLE;
+	item->goalAnimState = BIRD_STATE_IDLE;
+}
+
+void InitialiseBird(short itemID)
+{
+	ITEM_INFO* item = &Items[itemID];
+	InitialiseCreature(itemID);
+	if (item->objectID == ID_CROW)
+		InitialiseCrow(item);
+	else
+		InitialiseEagle(item);
+}
+
+void BirdControl(short itemID)
+{
+	if (!CreatureActive(itemID))
+		return;
+	ITEM_INFO* item = &Items[itemID];
+	CREATURE_INFO* bird = GetCreatureInfo(item);
+	AI_INFO ai = {};
+	short angle = 0;
+
+	if (item->hitPoints <= 0)
+	{
+		item->pos.rotX = 0; // Reset rotation to avoid weird behaviour.
+		switch (item->currentAnimState)
+		{
+		case BIRD_STATE_DEATH_START: // Fall.
+			if (item->pos.y >= item->floor)
+			{
+				item->pos.y = item->floor;
+				item->gravity = FALSE;
+				item->fallSpeed = 0;
+				item->goalAnimState = BIRD_STATE_DEATH_END;
+			}
+			break;
+		case BIRD_STATE_DEATH_END: // Fall end.
+			item->pos.y = item->floor;
+			break;
+		default:
+			if (item->currentAnimState != BIRD_STATE_DEATH_START && item->currentAnimState != BIRD_STATE_DEATH_END)
+			{
+				SetAnimation(item, item->objectID == ID_CROW ? CROW_DIE_ANIM : EAGLE_DIE_ANIM, BIRD_STATE_DEATH_START);
+				item->gravity = TRUE;
+				item->speed = 0;
+			}
+			break;
+		}
+	}
+	else
+	{
+		CreatureAIInfo(item, &ai);
+		CreatureMood(item, &ai, FALSE);
+		angle = CreatureTurn(item, ANGLE(3));
+
+		switch (item->currentAnimState)
+		{
+		case BIRD_STATE_EAT:
+		case BIRD_STATE_IDLE:
+			item->pos.y = item->floor;
+			if (bird->mood != MOOD_BORED)
+				item->goalAnimState = BIRD_STATE_FLY;
+			break;
+		case BIRD_STATE_FLY:
+			bird->flags = 0;
+
+			if (item->requiredAnimState)
+			{
+				item->goalAnimState = item->requiredAnimState;
+			}
+			else if (bird->mood != MOOD_BORED)
+			{
+				if (ai.ahead && ai.distance < 0x40000)
+					item->goalAnimState = BIRD_STATE_ATTACK;
+				else
+					item->goalAnimState = BIRD_STATE_PLANE;
+			}
+			else
+			{
+				item->goalAnimState = BIRD_STATE_IDLE;
+			}
+			break;
+		case BIRD_STATE_PLANE:
+			if (bird->mood != MOOD_BORED)
+			{
+				if (ai.ahead && ai.distance < 0x40000)
+					item->goalAnimState = BIRD_STATE_ATTACK;
+			}
+			else
+			{
+				item->requiredAnimState = BIRD_STATE_IDLE;
+				item->goalAnimState = BIRD_STATE_FLY;
+			}
+			break;
+		case BIRD_STATE_ATTACK:
+			if (bird->flags == 0)
+			{
+				if (item->objectID == ID_CROW && DamageLaraOrEnemy(item, bird->enemy, &CrowBite, CROW_DAMAGE, CROW_DAMAGE_TO_OTHER, item->touchBits))
+					bird->flags = 1;
+				else if (DamageLaraOrEnemy(item, bird->enemy, &EagleBite, EAGLE_DAMAGE, EAGLE_DAMAGE_TO_OTHER, item->touchBits))
+					bird->flags = 1;
+			}
+			break;
+		}
+	}
+
+	CreatureAnimation(itemID, angle, 0);
+}
 
  /*
   * Inject function
   */
 void Inject_Bird() {
-	//INJECT(0x0040C860, InitialiseEagle);
-	//INJECT(0x0040C8F0, EagleControl);
+	INJECT(0x0040C860, InitialiseBird);
+	INJECT(0x0040C8F0, BirdControl);
 }
