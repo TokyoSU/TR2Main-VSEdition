@@ -81,6 +81,7 @@ void BirdControl(short itemID)
 		return;
 	ITEM_INFO* item = &Items[itemID];
 	CREATURE_INFO* bird = GetCreatureInfo(item);
+	if (bird == NULL) return; // NOTE: Not exist in the original game.
 	AI_INFO ai = {};
 	short angle = 0;
 
