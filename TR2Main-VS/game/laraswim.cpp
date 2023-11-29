@@ -21,7 +21,77 @@
 
 #include "precompiled.h"
 #include "game/laraswim.h"
+#include "3dsystem/phd_math.h"
+#include "game/box.h"
+#include "game/control.h"
+#include "game/collide.h"
+#include "game/lara.h"
+#include "game/larafire.h"
+#include "game/laramisc.h"
 #include "global/vars.h"
+
+void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
+{
+	coll->badPos = 32512;
+	coll->badNeg = -400;
+	coll->badCeiling = 400;
+	coll->old.x = item->pos.x;
+	coll->old.y = item->pos.y;
+	coll->old.z = item->pos.z;
+	coll->radius = 300;
+	coll->trigger = NULL;
+	coll->lavaIsPit = FALSE;
+	coll->slopesArePits = FALSE;
+	coll->slopesAreWalls = FALSE;
+	coll->enableSpaz = FALSE;
+	coll->enableBaddiePush = TRUE;
+
+	if (CHK_ANY(InputStatus, IN_LOOK) && Lara.extra_anim == 0 && Lara.look)
+		LookLeftRight();
+	else
+		ResetLook();
+	Lara.look = TRUE;
+
+	if (Lara.extra_anim != 0)
+		ExtraFunctions[item->currentAnimState](item, coll);
+	else
+		LaraControlFunctions[item->currentAnimState](item, coll);
+
+	if (item->pos.rotZ >= -ANGLE(2) && item->pos.rotZ <= ANGLE(2))
+		item->pos.rotZ = 0;
+	else if (item->pos.rotZ < 0)
+		item->pos.rotZ += ANGLE(2);
+	else
+		item->pos.rotZ -= ANGLE(2);
+
+	CLAMP(item->pos.rotX, -ANGLE(85), ANGLE(85));
+	CLAMP(item->pos.rotZ, -ANGLE(22), ANGLE(22));
+
+	if (Lara.turn_rate >= -ANGLE(2) && Lara.turn_rate <= ANGLE(2))
+		Lara.turn_rate = 0;
+	else if (Lara.turn_rate < -ANGLE(2))
+		Lara.turn_rate += ANGLE(2);
+	else
+		Lara.turn_rate -= ANGLE(2);
+	item->pos.rotY += Lara.turn_rate;
+
+	if (Lara.current_active != 0 && Lara.water_status != LWS_Cheat)
+		LaraWaterCurrent(coll);
+
+	AnimateLara(item);
+	item->pos.y -= (phd_sin(item->pos.rotX) * item->fallSpeed) >> 16;
+	item->pos.x += (((phd_sin(item->pos.rotY) * item->fallSpeed) >> 16) * phd_cos(item->pos.rotX)) >> W2V_SHIFT;
+	item->pos.z += (((phd_cos(item->pos.rotY) * item->fallSpeed) >> 16) * phd_cos(item->pos.rotX)) >> W2V_SHIFT;
+
+	if (Lara.extra_anim == 0 && Lara.water_status != LWS_Cheat)
+		LaraBaddieCollision(item, coll);
+	if (Lara.extra_anim == 0 && Lara.skidoo == -1)
+		LaraCollisionFunctions[item->currentAnimState](item, coll);
+
+	UpdateLaraRoom(item, 0);
+	LaraGun();
+	TestTriggers(coll->trigger, FALSE);
+}
 
 void SwimTurn(ITEM_INFO* item) {
 	if (CHK_ANY(InputStatus, IN_FORWARD)) {
@@ -73,15 +143,92 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll) {
 	}
 }
 
+void LaraWaterCurrent(COLL_INFO* coll)
+{
+	auto* room = &RoomInfo[LaraItem->roomNumber];
+	LaraItem->boxNumber = room->floor[((LaraItem->pos.z - room->z) >> WALL_SHIFT) + ((LaraItem->pos.x - room->x) >> WALL_SHIFT) * room->xSize].box;
+
+	// Exit if creature is not set !
+	if (Lara.creature == NULL)
+	{
+		LogDebug("Lara.creature is null !");
+		Lara.current_active = 0;
+		return;
+	}
+
+	PHD_VECTOR target = {};
+	if (CalculateTarget(&target, LaraItem, &Lara.creature->LOT) == NO_TARGET)
+		return;
+
+	// Move lara to target.
+	target.x -= LaraItem->pos.x;
+	if (target.x > Lara.current_active)
+		LaraItem->pos.x += Lara.current_active;
+	else if (target.x < -Lara.current_active)
+		LaraItem->pos.x -= Lara.current_active;
+	else
+		LaraItem->pos.x += target.x;
+
+	target.z -= LaraItem->pos.z;
+	if (target.z > Lara.current_active)
+		LaraItem->pos.z += Lara.current_active;
+	else if (target.z < -Lara.current_active)
+		LaraItem->pos.z -= Lara.current_active;
+	else
+		LaraItem->pos.z += target.z;
+
+	target.y -= LaraItem->pos.y;
+	if (target.y > Lara.current_active)
+		LaraItem->pos.y += Lara.current_active;
+	else if (target.y < -Lara.current_active)
+		LaraItem->pos.y -= Lara.current_active;
+	else
+		LaraItem->pos.y += target.y;
+
+	// Reset, will be set again if lara is still on trigger !
+	Lara.current_active = 0;
+
+	// Do collision...
+	coll->facing = phd_atan((LaraItem->pos.z - coll->old.z), (LaraItem->pos.x - coll->old.x));
+	GetCollisionInfo(coll, LaraItem->pos.x, LaraItem->pos.y + 200, LaraItem->pos.z, LaraItem->roomNumber, 400);
+	
+	if (coll->collType == COLL_FRONT)
+	{
+		if (LaraItem->pos.rotX > ANGLE(35))
+			LaraItem->pos.rotX += ANGLE(2);
+		else if (LaraItem->pos.rotX < -ANGLE(35))
+			LaraItem->pos.rotX -= ANGLE(2);
+		else
+			LaraItem->fallSpeed = 0;
+	}
+	else if (coll->collType == COLL_TOP)
+		LaraItem->pos.rotX -= ANGLE(2);
+	else if (coll->collType == COLL_TOPFRONT)
+		LaraItem->fallSpeed = 0;
+	else if (coll->collType == COLL_LEFT)
+		LaraItem->pos.rotY += ANGLE(5);
+	else if (coll->collType == COLL_RIGHT)
+		LaraItem->pos.rotY -= ANGLE(5);
+
+	if (coll->sideMid.floor < 0)
+	{
+		LaraItem->pos.y += coll->sideMid.floor;
+		LaraItem->pos.rotX += ANGLE(2);
+	}
+
+	ShiftItem(LaraItem, coll);
+	coll->old.x = LaraItem->pos.x;
+	coll->old.y = LaraItem->pos.y;
+	coll->old.z = LaraItem->pos.z;
+}
+
 /*
  * Inject function
  */
 void Inject_LaraSwim() {
-	//INJECT(0x00432000, LaraUnderWater);
-
+	INJECT(0x00432000, LaraUnderWater);
 	INJECT(0x00432230, SwimTurn);
 	INJECT(0x004322C0, lara_as_swim);
-
 	//INJECT(0x00432330, lara_as_glide);
 	//INJECT(0x004323B0, lara_as_tread);
 	//INJECT(0x00432440, lara_as_dive);
@@ -96,5 +243,5 @@ void Inject_LaraSwim() {
 	//INJECT(0x00432550, GetWaterDepth);
 	//INJECT(0x004326F0, LaraTestWaterDepth);
 	//INJECT(0x004327C0, LaraSwimCollision);
-	//INJECT(0x00432920, LaraWaterCurrent);
+	INJECT(0x00432920, LaraWaterCurrent);
 }

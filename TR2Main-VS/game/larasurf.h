@@ -27,7 +27,8 @@
  /*
   * Function list
   */
-#define LaraSurface ((void(__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x00431710)
+
+void LaraSurface(ITEM_INFO* item, COLL_INFO* coll); // 0x00431710
 
   //0x00431870:		lara_as_surfswim
   //0x004318E0:		lara_as_surfback

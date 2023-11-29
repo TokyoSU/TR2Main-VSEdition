@@ -101,7 +101,7 @@ void CreatureDie(short itemID, BOOL explode) {
 	}
 
 	DisableBaddieAI(itemID);
-	item->flags |= IFL_INVISIBLE;
+	item->flags |= IFL_ONESHOT;
 	if (item->clear_body) {
 		item->nextActive = PrevItemActive;
 		PrevItemActive = itemID;

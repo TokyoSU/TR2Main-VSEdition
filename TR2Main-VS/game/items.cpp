@@ -66,9 +66,9 @@ void InitialiseItem(short itemIndex) {
 	item->looked_at = 0;
 	item->clear_body = 0;
 
-	if (CHK_ALL(item->flags, IFL_INVISIBLE)) {
+	if (CHK_ALL(item->flags, IFL_ONESHOT)) {
 		item->status = ITEM_INVISIBLE;
-		item->flags &= ~IFL_INVISIBLE;
+		item->flags &= ~IFL_ONESHOT;
 	}
 	else if (Objects[item->objectID].intelligent) {
 		item->status = ITEM_INVISIBLE;

@@ -36,8 +36,8 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI); // 0x0040E210
 //0x0040E780:		StalkBox
 //0x0040E880:		EscapeBox
 //0x0040E930:		ValidBox
-#define CreatureMood ((void(__cdecl*)(ITEM_INFO *, AI_INFO *, BOOL)) 0x0040E9E0)
-//0x0040EE50:		CalculateTarget
+#define CreatureMood ((void(__cdecl*)(ITEM_INFO*, AI_INFO*, BOOL)) 0x0040E9E0)
+#define CalculateTarget ((int(__cdecl*)(PHD_VECTOR*, ITEM_INFO*, LOT_INFO*)) 0x0040EE50)
 //0x0040F2B0:		CreatureCreature
 //0x0040F3B0:		BadFloor
 void CreatureDie(short itemID, BOOL explode); // 0x0040F440

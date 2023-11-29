@@ -145,7 +145,7 @@ x function is unused / included in another function
 0x0040E880:		EscapeBox
 0x0040E930:		ValidBox
 0x0040E9E0:	 *	CreatureMood
-0x0040EE50:		CalculateTarget
+0x0040EE50:	 *	CalculateTarget
 0x0040F2B0:		CreatureCreature
 0x0040F3B0:		BadFloor
 0x0040F440:	+	CreatureDie
@@ -194,10 +194,10 @@ x function is unused / included in another function
 0x00412FC0:	+	CollideStaticObjects
 0x004133B0:	+	GetNearByRooms
 0x00413480:	+	GetNewRoom
-0x004134E0:		ShiftItem
+0x004134E0:	 *	ShiftItem
 0x00413520:	 *	UpdateLaraRoom
 0x00413580:	 *	GetTiltType
-0x00413620:		LaraBaddieCollision
+0x00413620:	 *	LaraBaddieCollision
 0x004137C0:		EffectSpaz
 0x00413840:	 *	CreatureCollision
 0x004138C0:	 *	ObjectCollision
@@ -219,7 +219,7 @@ x function is unused / included in another function
 0x00414CE0:	 *	GetWaterHeight
 0x00414E50:	 *	GetHeight
 0x004150D0:	 *	RefreshCamera
-0x004151C0:	 *	TestTriggers
+0x004151C0:	+	TestTriggers
 0x004158A0:	 *	TriggerActive
 0x00415900:	 *	GetCeiling
 0x00415B60:		GetDoor
@@ -471,10 +471,10 @@ x function is unused / included in another function
 0x00427500:	 *	ClearBodyBag
 
 	game/lara.cpp
-0x00427560:	 *	LaraAboveWater
-0x00427700:		LookUpDown
-0x00427770:		LookLeftRight
-0x004277F0:		ResetLook
+0x00427560:	+	LaraAboveWater
+0x00427700:	 *	LookUpDown
+0x00427770:	 *	LookLeftRight
+0x004277F0:	 *	ResetLook
 0x00427880:		lara_as_walk
 0x00427910:		lara_as_run
 0x00427A60:		lara_as_stop
@@ -701,7 +701,7 @@ x function is unused / included in another function
 0x00431610:	+	LaraInitialiseMeshes
 
 	game/larasurf.cpp
-0x00431710:	 *	LaraSurface
+0x00431710:	+	LaraSurface
 0x00431870:		lara_as_surfswim
 0x004318E0:		lara_as_surfback
 0x00431940:		lara_as_surfleft
@@ -717,7 +717,7 @@ x function is unused / included in another function
 0x00431DE0:		LaraTestWaterClimbOut
 
 	game/laraswim.cpp
-0x00432000:	 *	LaraUnderWater
+0x00432000:	+	LaraUnderWater
 0x00432230:	+	SwimTurn
 0x004322C0:	+	lara_as_swim
 0x00432330:		lara_as_glide
@@ -734,7 +734,7 @@ x function is unused / included in another function
 0x00432550:	 *	GetWaterDepth
 0x004326F0:		LaraTestWaterDepth
 0x004327C0:		LaraSwimCollision
-0x00432920:		LaraWaterCurrent
+0x00432920:	+	LaraWaterCurrent
 
 	game/lot.cpp
 0x00432B10:	+	InitialiseLOTarray
@@ -829,8 +829,8 @@ x function is unused / included in another function
 0x00438B30:	 *	PuzzleHoleCollision
 0x00438DF0:		SwitchControl
 0x00438E30:	 *	SwitchTrigger
-0x00438EF0:		KeyTrigger
-0x00438F30:		PickupTrigger
+0x00438EF0:	 *	KeyTrigger
+0x00438F30:	 *	PickupTrigger
 0x00438F70:		SecretControl
 
 	game/rat.cpp
@@ -878,7 +878,7 @@ x function is unused / included in another function
 0x0043E2D0:	+	SkidooExplode
 0x0043E350:		SkidooCheckGetOff
 0x0043E590:	+	SkidooGuns
-0x0043E6B0:		SkidooControl
+0x0043E6B0:	 *	SkidooControl
 0x0043EB10:	+	DrawSkidoo
 0x0043EDF0:	 *	InitialiseSkidman
 0x0043EE80:	 *	SkidManControl

@@ -40,7 +40,7 @@
 
 void MineControl(short mineID) {
 	ITEM_INFO* mine = &Items[mineID];
-	if (CHK_ANY(mine->flags, IFL_INVISIBLE)) {
+	if (CHK_ANY(mine->flags, IFL_ONESHOT)) {
 		return;
 	}
 
@@ -68,7 +68,7 @@ void MineControl(short mineID) {
 		if (Lara.skidoo == itemID) {
 			ExplodingDeath(Lara.item_number, ~0, 0);
 			LaraItem->hitPoints = 0;
-			LaraItem->flags |= IFL_INVISIBLE;
+			LaraItem->flags |= IFL_ONESHOT;
 		}
 		item->objectID = ID_BOAT_BITS;
 		ExplodingDeath(itemID, ~0, 0);
@@ -99,7 +99,7 @@ void MineControl(short mineID) {
 
 	Splash(mine);
 	PlaySoundEffect(105, &mine->pos, 0);
-	mine->flags |= IFL_INVISIBLE;
+	mine->flags |= IFL_ONESHOT;
 	mine->collidable = 0;
 	mine->meshBits = 1;
 #ifdef FEATURE_INPUT_IMPROVED

@@ -262,7 +262,7 @@ void LaraControl(short itemID) {
 			S_CDStop();
 		}
 		++Lara.death_count;
-		if (CHK_ANY(item->flags, IFL_INVISIBLE)) { // Nothing left from Lara?
+		if (CHK_ANY(item->flags, IFL_ONESHOT)) { // Nothing left from Lara?
 			++Lara.death_count; // In this case death timer ticks twice faster
 			return;
 		}

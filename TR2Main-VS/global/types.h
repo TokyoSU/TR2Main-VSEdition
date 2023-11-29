@@ -88,7 +88,7 @@ typedef struct {
 #define PHD_45				(PHD_ONE/8)
 #define PHD_270				(PHD_90*3)
 #define PHD_DEGREE			(PHD_ONE/360)
-#define ANGLE(x)            ((x)*PHD_DEGREE)
+#define ANGLE(x)            ((x) * PHD_DEGREE)
 
 // String macros
 #ifdef FEATURE_HUD_IMPROVED
@@ -246,10 +246,13 @@ typedef struct {
 #define SPR_ITEM		(0x80000000)
 
 // Item flags
-#define IFL_INVISIBLE	(0x0100)
+#define IFL_DRAWN       (0x0020) // Clearing body.
+#define IFL_SWONESHOT   (0x0040) // For switch.
+#define IFL_ATONESHOT   (0x0080) // For anti-trigger.
+#define IFL_ONESHOT     (0x0100)
 #define IFL_CODEBITS	(0x3E00)
 #define IFL_REVERSE		(0x4000)
-#define IFL_CLEARBODY	(0x8000)
+#define IFL_CLEARBODY	-(0x8000)
 
 // Glow tint colors
 #define GLOW_FLARE_COLOR	(0xFF8080) // Flare
@@ -269,6 +272,11 @@ typedef struct {
 #define END_BIT		(0x8000)
 #define VALUE_BITS	(0x03FF)
 #define DATA_TYPE	(0x00FF)
+
+// Target types for CalculateTarget()
+#define NO_TARGET			(0x0000)
+#define PRIME_TARGET		(0x0001)
+#define SECONDARY_TARGET	(0x0002)
 
 /*
  * DirectX type definitions
@@ -1222,6 +1230,22 @@ typedef enum {
 	TT_DUMMY,
 	TT_ANTITRIGGER,
 } TRIGGER_TYPE;
+
+typedef enum
+{
+	TO_OBJECT,
+	TO_CAMERA,
+	TO_SINK,
+	TO_FLIPMAP,
+	TO_FLIPON,
+	TO_FLIPOFF,
+	TO_TARGET,
+	TO_FINISH,
+	TO_CD,
+	TO_FLIPEFFECT,
+	TO_SECRET,
+	TO_BODYBAG
+} TRIGOBJ_TYPES;
 
 typedef enum {
 	FT_FLOOR,
@@ -2278,7 +2302,7 @@ typedef struct LaraInfo_t {
 	UINT16 look : 1;
 	UINT16 burn : 1;
 	UINT16 keep_ducked : 1;
-	UINT16 CanMonkeySwing : 1;
+	UINT16 can_monkey_swing : 1;
 	UINT16 pad : 9;
 	int water_surface_dist;
 	PHD_VECTOR last_pos;

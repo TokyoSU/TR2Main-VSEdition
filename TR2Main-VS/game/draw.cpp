@@ -111,7 +111,7 @@ void DrawRooms(short currentRoom) {
 	}
 
 	// Draw Lara
-	if (Objects[ID_LARA].loaded && !(LaraItem->flags & IFL_INVISIBLE)) {
+	if (Objects[ID_LARA].loaded && !(LaraItem->flags & IFL_ONESHOT)) {
 		if (RoomInfo[LaraItem->roomNumber].flags & ROOM_UNDERWATER) {
 			S_SetupBelowWater(UnderwaterCamera);
 		}

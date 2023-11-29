@@ -21,13 +21,65 @@
 
 #include "precompiled.h"
 #include "game/larasurf.h"
+#include "3dsystem/phd_math.h"
+#include "game/collide.h"
+#include "game/control.h"
+#include "game/lara.h"
+#include "game/laraswim.h"
+#include "game/larafire.h"
+#include "game/laramisc.h"
 #include "global/vars.h"
+
+void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Camera.targetElevation = -ANGLE(22);
+	coll->badPos = 32512;
+	coll->badNeg = -128;
+	coll->badCeiling = 100;
+	coll->old.x = item->pos.x;
+	coll->old.y = item->pos.y;
+	coll->old.z = item->pos.z;
+	coll->radius = 100;
+	coll->trigger = NULL;
+	coll->lavaIsPit = FALSE;
+	coll->slopesArePits = FALSE;
+	coll->slopesAreWalls = FALSE;
+	coll->enableSpaz = FALSE;
+	coll->enableBaddiePush = FALSE;
+
+	if (CHK_ANY(InputStatus, IN_LOOK) && Lara.extra_anim == 0 && Lara.look)
+		LookLeftRight();
+	else
+		ResetLook();
+	Lara.look = TRUE;
+
+	LaraControlFunctions[item->currentAnimState](item, coll);
+	if (item->pos.rotZ >= -ANGLE(2) && item->pos.rotZ <= ANGLE(2))
+		item->pos.rotZ = 0;
+	else if (item->pos.rotZ < 0)
+		item->pos.rotZ += ANGLE(2);
+	else
+		item->pos.rotZ -= ANGLE(2);
+
+	if (Lara.current_active != 0 && Lara.water_status != LWS_Cheat)
+		LaraWaterCurrent(coll);
+
+	AnimateLara(item);
+	item->pos.x += item->fallSpeed * phd_sin(Lara.move_angle) >> 16;
+	item->pos.z += item->fallSpeed * phd_cos(Lara.move_angle) >> 16;
+	LaraBaddieCollision(item, coll);
+	if (Lara.skidoo == -1)
+		LaraCollisionFunctions[item->currentAnimState](item, coll);
+	UpdateLaraRoom(item, 100);
+	LaraGun();
+	TestTriggers(coll->trigger, FALSE);
+}
 
  /*
   * Inject function
   */
 void Inject_LaraSurf() {
-	//INJECT(0x00431710, LaraSurface);
+	INJECT(0x00431710, LaraSurface);
 	//INJECT(0x00431870, lara_as_surfswim);
 	//INJECT(0x004318E0, lara_as_surfback);
 	//INJECT(0x00431940, lara_as_surfleft);
@@ -42,3 +94,4 @@ void Inject_LaraSurf() {
 	//INJECT(0x00431CF0, LaraTestWaterStepOut);
 	//INJECT(0x00431DE0, LaraTestWaterClimbOut);
 }
+

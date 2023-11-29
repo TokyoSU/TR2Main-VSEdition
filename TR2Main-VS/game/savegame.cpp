@@ -513,10 +513,10 @@ void ExtractSaveGameInfo() {
 			if (obj->collision == PickUpCollision && item->status == ITEM_DISABLED) {
 				RemoveDrawnItem(i);
 			}
-			if ((item->objectID == ID_WINDOW1 || item->objectID == ID_WINDOW2) && CHK_ANY(item->flags, IFL_INVISIBLE)) {
+			if ((item->objectID == ID_WINDOW1 || item->objectID == ID_WINDOW2) && CHK_ANY(item->flags, IFL_ONESHOT)) {
 				item->meshBits = 0x100;
 			}
-			if (item->objectID == ID_MINE && CHK_ANY(item->flags, IFL_INVISIBLE)) {
+			if (item->objectID == ID_MINE && CHK_ANY(item->flags, IFL_ONESHOT)) {
 				item->meshBits = 1;
 			}
 		}

@@ -32,10 +32,10 @@ void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int he
 int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomID, int hite); // 0x00412FC0
 void GetNearByRooms(int x, int y, int z, int r, int h, short roomID); // 0x004133B0
 void GetNewRoom(int x, int y, int z, short roomID); // 0x00413480
-//0x004134E0:		ShiftItem
+#define ShiftItem ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004134E0)
 #define UpdateLaraRoom ((void(__cdecl*)(ITEM_INFO*, int)) 0x00413520)
 #define GetTiltType ((short(__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00413580)
-//0x00413620:		LaraBaddieCollision
+#define LaraBaddieCollision ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00413620)
 //0x004137C0:		EffectSpaz
 #define CreatureCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x00413840)
 #define ObjectCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x004138C0)

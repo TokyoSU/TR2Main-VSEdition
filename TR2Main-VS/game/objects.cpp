@@ -70,7 +70,7 @@ void SmashWindow(short itemID) {
 	item->collidable = 0;
 	item->meshBits = 0xFFFE;
 	ExplodingDeath(itemID, 0xFEFE, 0);
-	item->flags |= IFL_INVISIBLE;
+	item->flags |= IFL_ONESHOT;
 	if (item->status == ITEM_ACTIVE)
 		RemoveActiveItem(itemID);
 	item->status = ITEM_DISABLED;
@@ -81,7 +81,7 @@ void WindowControl(short itemID) {
 	int val;
 
 	item = &Items[itemID];
-	if (!CHK_ANY(item->flags, IFL_INVISIBLE)) {
+	if (!CHK_ANY(item->flags, IFL_ONESHOT)) {
 		if (Lara.skidoo == -1) {
 			if (item->touchBits) {
 				item->touchBits = 0;

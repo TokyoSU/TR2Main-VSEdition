@@ -35,8 +35,8 @@ void PickUpCollision(short itemID, ITEM_INFO* laraitem, COLL_INFO* coll); // 0x0
 #define PuzzleHoleCollision ((void(__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x00438B30)
 //0x00438DF0:		SwitchControl
 #define SwitchTrigger ((BOOL(__cdecl*)(int, int)) 0x00438E30)
-//0x00438EF0:		KeyTrigger
-//0x00438F30:		PickupTrigger
+#define KeyTrigger ((BOOL(__cdecl*)(int)) 0x00438EF0)
+#define PickupTrigger ((BOOL(__cdecl*)(int)) 0x00438F30)
 //0x00438F70:		SecretControl
 
 #endif // PICKUP_H_INCLUDED

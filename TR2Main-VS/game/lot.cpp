@@ -67,16 +67,21 @@ void DisableBaddieAI(short itemID)
 
 BOOL EnableBaddieAI(short itemID, BOOL isAlways)
 {
-	CREATURE_INFO* creature = NULL, * new_creature = NULL;
-	ITEM_INFO* item = NULL, * new_item = NULL;
-	PHD_VECTOR pos{};
-	int farestSlot = -1, slot = -1;
+	CREATURE_INFO* creature = NULL, *new_creature = NULL;
+	ITEM_INFO* item = NULL, *new_item = NULL;
+	PHD_VECTOR pos = {};
+	int farestSlot = -1;
 	int farestDistance = 0, distance = 0;
 
 	if (Lara.item_number == itemID && Lara.creature != NULL)
+	{
+		if (Lara.creature != NULL)
+			LogDebug("Lara.creature is already initialized !");
 		return TRUE;
-	new_item = item = &Items[itemID];
-	if (item->data != NULL)
+	}
+
+	item = &Items[itemID];
+	if (Lara.item_number != itemID && item->data != NULL)
 		return TRUE;
 
 	// Max creatures reached, search for the farest one and replace it by the new one !
@@ -106,7 +111,7 @@ BOOL EnableBaddieAI(short itemID, BOOL isAlways)
 			if (distance > farestDistance)
 			{
 				farestDistance = distance;
-				farestSlot = slot;
+				farestSlot = i;
 			}
 		}
 
@@ -116,15 +121,17 @@ BOOL EnableBaddieAI(short itemID, BOOL isAlways)
 			item = &Items[creature->item_num];
 			item->status = ITEM_INVISIBLE;
 			DisableBaddieAI(creature->item_num);
-
 			InitialiseSlot(itemID, farestSlot);
-			new_item = &Items[itemID];
-			new_creature = (CREATURE_INFO*)new_item->data;
-			LogDebug("Creature item_number: %d will takeover the farest creature item_number: %d slot since the baddies array is satured !", new_creature->item_num, creature->item_num);
 
+			new_item = &Items[itemID];
+			if (new_item != NULL)
+			{
+				new_creature = GetCreatureInfo(new_item);
+				if (new_creature != NULL)
+					LogDebug("Creature item_number: %d will takeover the farest creature item_number: %d slot since the baddies array is satured !", new_creature->item_num, creature->item_num);
+			}
 			return TRUE;
 		}
-
 		return FALSE;
 	}
 	else
@@ -160,7 +167,7 @@ void InitialiseSlot(short itemID, int creatureIdx)
 	creature->mood = MOOD_BORED;
 	creature->neck_rotation = 0;
 	creature->head_rotation = 0;
-	creature->maximum_turn = 182;
+	creature->maximum_turn = ANGLE(1);
 	creature->flags = 0;
 	creature->enemy = 0;
 	creature->LOT.step = 256;

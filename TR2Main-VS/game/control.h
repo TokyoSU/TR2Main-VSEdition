@@ -35,8 +35,7 @@ int ControlPhase(int nTicks, BOOL demoMode);
 #define GetWaterHeight ((int(__cdecl*)(int, int, int, short)) 0x00414CE0)
 #define GetHeight ((int(__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00414E50)
 #define RefreshCamera ((void(__cdecl*)(int,short*)) 0x004150D0)
-#define TestTriggers ((void(__cdecl*)(short*,BOOL)) 0x004151C0)
-//void TestTriggers(short* data, BOOL isHeavy); // 0x004151C0 (WIP)
+void TestTriggers(short* data, BOOL isHeavy); // 0x004151C0 (WIP)
 #define TriggerActive ((int(__cdecl*)(ITEM_INFO*)) 0x004158A0)
 #define GetCeiling ((int(__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00415900)
 // 0x00415B60:		GetDoor

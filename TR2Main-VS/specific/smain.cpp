@@ -443,7 +443,7 @@ void CheckCheatMode() {
 				// Explode Lara!
 				ExplodingDeath(Lara.item_number, 0xFFFFFFFF, 1);
 				LaraItem->hitPoints = 0;
-				LaraItem->flags |= IFL_INVISIBLE;
+				LaraItem->flags |= IFL_ONESHOT;
 #ifdef FEATURE_INPUT_IMPROVED
 				JoyRumbleExplode(LaraItem->pos.x, LaraItem->pos.y, LaraItem->pos.z, 0x1400, true);
 #endif // FEATURE_INPUT_IMPROVED

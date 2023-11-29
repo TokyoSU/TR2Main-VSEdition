@@ -22,17 +22,82 @@
 #include "precompiled.h"
 #include "game/lara.h"
 #include "3dsystem/3d_gen.h"
+#include "game/control.h"
+#include "game/collide.h"
 #include "game/draw.h"
+#include "game/skidoo.h"
+#include "game/larafire.h"
+#include "game/laramisc.h"
 #include "global/vars.h"
 
 #ifdef FEATURE_GAMEPLAY_FIXES
 bool IsLowCeilingJumpFix = true;
 #endif // FEATURE_GAMEPLAY_FIXES
 
+void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
+{
+	coll->old.x = item->pos.x;
+	coll->old.y = item->pos.y;
+	coll->old.z = item->pos.z;
+	coll->oldAnimState = item->currentAnimState;
+	coll->oldFrameNumber = item->frameNumber;
+	coll->radius = 100;
+	coll->trigger = NULL;
+	coll->lavaIsPit = FALSE;
+	coll->slopesArePits = FALSE;
+	coll->slopesAreWalls = FALSE;
+	coll->enableBaddiePush = TRUE;
+	coll->enableSpaz = TRUE;
+
+	if (CHK_ANY(InputStatus, IN_LOOK) && Lara.extra_anim == 0 && Lara.look)
+		LookLeftRight();
+	else
+		ResetLook();
+	Lara.look = TRUE;
+
+	if (Lara.skidoo != -1)
+	{
+		if (SkidooControl())
+			return;
+	}
+
+	if (Lara.extra_anim != 0)
+		ExtraFunctions[item->currentAnimState](item, coll);
+	else
+		LaraControlFunctions[item->currentAnimState](item, coll);
+
+	if (item->pos.rotZ >= -ANGLE(1) && item->pos.rotZ <= ANGLE(1))
+		item->pos.rotZ = 0;
+	else if (item->pos.rotZ < -ANGLE(1))
+		item->pos.rotZ += ANGLE(1);
+	else
+		item->pos.rotZ -= ANGLE(1);
+
+	if (Lara.turn_rate >= -ANGLE(2) && Lara.turn_rate <= ANGLE(2))
+		Lara.turn_rate = 0;
+	else if (Lara.turn_rate < -ANGLE(2))
+		Lara.turn_rate += ANGLE(2);
+	else
+		Lara.turn_rate -= ANGLE(2);
+	item->pos.rotY += Lara.turn_rate;
+
+	AnimateLara(item);
+	if (Lara.extra_anim == 0)
+	{
+		LaraBaddieCollision(item, coll);
+		if (Lara.skidoo == -1)
+			LaraCollisionFunctions[item->currentAnimState](item, coll);
+	}
+
+	UpdateLaraRoom(item, -381);
+	LaraGun();
+	TestTriggers(coll->trigger, FALSE);
+}
+
 void lara_col_jumper(ITEM_INFO* item, COLL_INFO* coll) {
-	coll->badPos = 0x7F00;
-	coll->badNeg = -0x0180;
-	coll->badCeiling = 0x00C0;
+	coll->badPos = 32512;
+	coll->badNeg = -384;
+	coll->badCeiling = 192;
 
 	GetLaraCollisionInfo(item, coll);
 	LaraDeflectEdgeJump(item, coll);
@@ -49,7 +114,7 @@ void lara_col_jumper(ITEM_INFO* item, COLL_INFO* coll) {
 #ifdef FEATURE_GAMEPLAY_FIXES
 	if (IsLowCeilingJumpFix) return;
 #endif // FEATURE_GAMEPLAY_FIXES
-	if (ABS(coll->sideMid.ceiling - coll->sideMid.floor) < 0x02FA) {
+	if (ABS(coll->sideMid.ceiling - coll->sideMid.floor) < 762) {
 		item->currentAnimState = AS_FASTFALL;
 		item->goalAnimState = AS_FASTFALL;
 		item->animNumber = 32;
@@ -804,7 +869,7 @@ void GetLJAInt(ITEM_INFO* item, PHD_VECTOR* pos, short* frame1, short* frame2, i
  * Inject function
  */
 void Inject_Lara() {
-	//INJECT(0x00427560, LaraAboveWater);
+	INJECT(0x00427560, LaraAboveWater);
 	//INJECT(0x00427700, LookUpDown);
 	//INJECT(0x00427770, LookLeftRight);
 	//INJECT(0x004277F0, ResetLook);
