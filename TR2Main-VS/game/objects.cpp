@@ -238,7 +238,7 @@ void Inject_Objects() {
 	//INJECT(0x004342C0, EarthQuake);
 	//INJECT(0x004343A0, ControlCutShotgun);
 	//INJECT(0x004343E0, InitialiseFinalLevel);
-	//INJECT(0x004344B0, FinalLevelCounter);
+	//INJECT(0x004344B0, FinalLevelCounter); // TODO: Decompile it for savegame !
 	//INJECT(0x004346C0, MiniCopterControl);
 	//INJECT(0x004347A0, InitialiseDyingMonk);
 	//INJECT(0x00434820, DyingMonk);

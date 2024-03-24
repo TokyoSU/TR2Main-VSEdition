@@ -2537,8 +2537,8 @@ void InsertSprite_Sorted(int z, int x0, int y0, int x1, int y1, int spriteIdx, s
 }
 
 void InsertFlatRect_Sorted(int x0, int y0, int x1, int y1, int z, BYTE colorIdx) {
-	double rhw, sz;
 	D3DCOLOR color;
+	float rhw, sz;
 
 	if (x0 >= x1 || y0 >= y1)
 		return;
@@ -2562,7 +2562,7 @@ void InsertFlatRect_Sorted(int x0, int y0, int x1, int y1, int z, BYTE colorIdx)
 	Info3dPtr += sizeof(D3DTLVERTEX*) / sizeof(short);
 
 	color = shadeColor(GamePalette8[colorIdx].red, GamePalette8[colorIdx].green, GamePalette8[colorIdx].blue, 0xFF, 0, false);
-	rhw = RhwFactor / (double)z;
+	rhw = RhwFactor / (float)z;
 	sz = FltResZBuf - rhw * FltResZORhw;
 
 	HWR_VertexPtr[0].sx = (float)x0;

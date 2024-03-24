@@ -54,7 +54,6 @@ void InitialiseStartInfo() {
 
 	for (int i = 0; i < 24; ++i) {
 		START_INFO* start = &SaveGame.start[i];
-
 		ModifyStartInfo(i);
 		start->available = 0; // make level not available
 		memset(&start->statistics, 0, sizeof(STATISTICS_INFO));

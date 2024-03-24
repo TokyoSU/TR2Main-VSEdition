@@ -829,5 +829,6 @@ extern TEXT_STR_INFO* CtrlTextB[ARRAY_SIZE(Layout->key)];
 #define PickUpPosition				VAR_U_(0x00466008, PHD_VECTOR)
 #define PickUpBoundsUW				ARRAY_(0x00466030, short, [12])
 #define PickUpPositionUW			VAR_U_(0x00466048, PHD_VECTOR)
+#define BaddiesSlots                VAR_U_(0x005206C0, CREATURE_INFO*)
 
 #endif // GLOBAL_VARS_H_INCLUDED

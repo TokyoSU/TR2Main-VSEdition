@@ -61,7 +61,6 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 		enemy = LaraItem;
 
 	short* zone = creature->LOT.fly != 0 ? FlyZones[FlipStatus] : GroundZones[creature->LOT.step >> 8][FlipStatus];
-	
 	room = &RoomInfo[item->roomNumber];
 	item->boxNumber = room->floor[((item->pos.z - room->z) >> WALL_SHIFT) + room->xSize * ((item->pos.x - room->x) >> WALL_SHIFT)].box;
 	AI->zone_number = zone[item->boxNumber];

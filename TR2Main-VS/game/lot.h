@@ -24,19 +24,17 @@
 
 #include "global/types.h"
 
-#define MAX_CREATURES 12
-
-extern CREATURE_INFO* BaddiesSlots;
-extern int BaddiesSlotUsed;
+#define MAX_CREATURES 5
 
  /*
   * Function list
   */
-void InitialiseLOTarray(); // 0x00432B10
-void DisableBaddieAI(short itemID); // 0x00432B70
-BOOL EnableBaddieAI(short itemID, BOOL isAlways); // 0x00432BC0
-void InitialiseSlot(short itemID, int creatureIdx); // 0x00432D70
-void CreateZone(ITEM_INFO* item); // 0x00432F80
-void ClearLOT(LOT_INFO* LOT); // 0x00433040
+
+#define InitialiseLOTarray ((void(__cdecl*)(void)) 0x00432B10)
+#define DisableBaddieAI ((void(__cdecl*)(short)) 0x00432B70)
+#define EnableBaddieAI ((BOOL(__cdecl*)(short,BOOL)) 0x00432BC0)
+#define InitialiseSlot ((void(__cdecl*)(short,int)) 0x00432D70)
+#define CreateZone ((void(__cdecl*)(ITEM_INFO*)) 0x00432F80)
+#define ClearLOT ((void(__cdecl*)(LOT_INFO*)) 0x00433040)
 
 #endif // LOT_H_INCLUDED
