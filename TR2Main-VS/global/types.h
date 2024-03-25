@@ -71,6 +71,7 @@ typedef struct {
 // Flag check macros
 #define CHK_ALL(a,b)	(((a)&(b))==(b))
 #define CHK_ANY(a,b)	(((a)&(b))!=0)
+#define CHK_NOP(a,b)    (((a)&(b))!=b)
 
 // Geometry values
 #define WALL_SIZE           (1024)
@@ -234,6 +235,11 @@ typedef struct {
 #define SFX_UNDERWATER		(1)
 #define SFX_ALWAYS			(2)
 
+// SFX flags for animation command.
+#define SFX_LANDANDWATER    (0x0000)
+#define SFX_LANDONLY        (0x4000)
+#define SFX_WATERONLY       (0x8000)
+
 // Sprite flags
 #define SPR_RGB			(0x00FFFFFF)
 #define SPR_ABS			(0x01000000)
@@ -249,8 +255,6 @@ typedef struct {
 
 // Item flags
 #define IFL_DRAWN       (0x0020) // Clearing body.
-#define IFL_SWONESHOT   (0x0040) // For switch.
-#define IFL_ATONESHOT   (0x0080) // For anti-trigger.
 #define IFL_ONESHOT     (0x0100)
 #define IFL_CODEBITS	(0x3E00)
 #define IFL_REVERSE		(0x4000)

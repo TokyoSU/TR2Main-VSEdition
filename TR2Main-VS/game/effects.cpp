@@ -236,11 +236,30 @@ void Splash(ITEM_INFO* item) {
 			fx->pos.x = item->pos.x;
 			fx->pos.y = y;
 			fx->pos.z = item->pos.z;
-			fx->pos.rotY = 2 * GetRandomDraw() - 32768;
+			fx->pos.rotY = 2 * GetRandomDraw() - 0x8000;
 			fx->frame_number = 0;
 			fx->object_number = ID_SPLASH;
 			fx->speed = GetRandomDraw() / 256;
 		}
+	}
+}
+
+void CreateSplash(int x, int y, int z, short roomNumber)
+{
+	FX_INFO* fx = NULL;
+	short roomID = roomNumber;
+	int waterHeight = GetWaterHeight(x, y, z, roomNumber);
+	GetFloor(x, y, z, &roomID);
+	short fxID = CreateEffect(roomID);
+	if (fxID != -1) {
+		fx = &Effects[fxID];
+		fx->pos.x = x;
+		fx->pos.y = waterHeight;
+		fx->pos.z = z;
+		fx->pos.rotY = 0;
+		fx->frame_number = 0;
+		fx->object_number = ID_SPLASH;
+		fx->speed = 0;
 	}
 }
 

@@ -325,6 +325,145 @@ void LaraControl(short itemID) {
 	Lara.last_pos.z = item->pos.z;
 }
 
+static bool CheckIfAnimCommandIsValid(USHORT type, bool checkWaterWithNoHeight = true)
+{
+	switch (type)
+	{
+	case SFX_LANDANDWATER:
+		return true;
+	case SFX_LANDONLY:
+		return Lara.water_surface_dist >= 0 || Lara.water_surface_dist == NO_HEIGHT;
+	case SFX_WATERONLY:
+		if (checkWaterWithNoHeight)
+			return Lara.water_surface_dist < 0 && Lara.water_surface_dist != NO_HEIGHT;
+		else
+			return Lara.water_surface_dist < 0;
+		break;
+	}
+	return false;
+}
+
+void AnimateLara(ITEM_INFO* item)
+{
+	ANIM_STRUCT* anim = NULL;
+	USHORT type = 0, num = 0;
+	short* command = NULL;
+
+	item->frameNumber++;
+	anim = &Anims[item->animNumber];
+	if (anim->numberChanges > 0 && GetChange(item, anim))
+	{
+		anim = &Anims[item->animNumber];
+		item->currentAnimState = anim->currentAnimState;
+	}
+
+	if (item->frameNumber > anim->frameEnd)
+	{
+		if (anim->numberCommands > 0)
+		{
+			command = &AnimCommands[anim->commandIndex];
+			for (int i = anim->numberCommands; i > 0; i--)
+			{
+				switch (*command++)
+				{
+				case 1:
+					TranslateItem(item, command[0], command[1], command[2]);
+					command += 3;
+					break;
+				case 2:
+					item->fallSpeed = *command++;
+					item->speed = *command++;
+					item->gravity = TRUE;
+					if (Lara.calc_fallspeed)
+					{
+						item->fallSpeed = Lara.calc_fallspeed;
+						Lara.calc_fallspeed = 0;
+					}
+					break;
+				case 3:
+					if (Lara.gun_status != LGS_Special)
+						Lara.gun_status = LGS_Armless;
+					break;
+				case 5:
+				case 6:
+					command += 2;
+					break;
+				}
+			}
+		}
+		item->animNumber = anim->jumpAnimNum;
+		item->frameNumber = anim->jumpFrameNum;
+		anim = &Anims[item->animNumber];
+		item->currentAnimState = anim->currentAnimState;
+	}
+
+	if (anim->numberCommands > 0)
+	{
+		command = &AnimCommands[anim->commandIndex];
+		for (int i = anim->numberCommands; i > 0; i--)
+		{
+			switch (*command++)
+			{
+			case 1:
+				command += 3;
+				break;
+			case 2:
+				command += 2;
+				break;
+			case 5:
+				if (item->frameNumber == command[0])
+				{
+					type = command[1] & 0xC000;
+					if (CheckIfAnimCommandIsValid(type, true))
+					{
+						num = command[1] & 0x3FFF;
+						if (type == SFX_WATERONLY &&
+							Lara.water_status != LWS_Surface &&
+							Lara.water_status != LWS_Wade &&
+							Lara.water_status != LWS_Underwater)
+							CreateSplash(item->pos.x, item->pos.y, item->pos.z, item->roomNumber);
+						PlaySoundEffect(num, &item->pos, SFX_ALWAYS);
+					}
+				}
+				command += 2;
+				break;
+			case 6:
+				if (item->frameNumber == command[0])
+				{
+					type = command[1] & 0xC000;
+					if (CheckIfAnimCommandIsValid(type, false))
+					{
+						num = command[1] & 0x3FFF;
+						EffectFunctions[num](item);
+					}
+				}
+				command += 2;
+				break;
+			}
+		}
+	}
+
+	if (item->gravity)
+	{
+		int velocity = anim->velocity + anim->acceleration * (item->frameNumber - anim->frameBase - 1);
+		item->speed -= velocity >> 16;
+		velocity += anim->acceleration;
+		item->speed += velocity >> 16;
+		item->fallSpeed += (item->fallSpeed >= 128) ? 1 : 6;
+		item->pos.y += item->fallSpeed;
+	}
+	else
+	{
+		int velocity = anim->velocity;
+		if (anim->acceleration)
+			velocity += anim->acceleration * (item->frameNumber - anim->frameBase);
+		item->speed = velocity >> 16;
+	}
+
+	item->pos.x += item->speed * phd_sin(Lara.move_angle) >> W2V_SHIFT;
+	item->pos.z += item->speed * phd_cos(Lara.move_angle) >> W2V_SHIFT;
+}
+
 void UseItem(short itemID) {
 	if (itemID <= ID_NONE || itemID >= ID_NUMBER_OBJECTS)
 		return;
@@ -763,7 +902,7 @@ void LaraInitialiseMeshes(int levelID)
  */
 void Inject_LaraMisc() {
 	INJECT(0x00430380, LaraControl);
-	//INJECT(0x00430A10, AnimateLara);
+	INJECT(0x00430A10, AnimateLara);
 	INJECT(0x00430D10, UseItem);
 	INJECT(0x00430ED0, LaraCheatGetStuff);
 	INJECT(0x00430F90, ControlLaraExtra);

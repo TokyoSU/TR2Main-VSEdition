@@ -28,7 +28,7 @@
   * Function list
   */
 void LaraControl(short itemID);
-#define AnimateLara ((void(__cdecl*)(ITEM_INFO*)) 0x00430A10)
+void AnimateLara(ITEM_INFO* item); // 0x00430A10
 void UseItem(short itemID); // 0x00430D10
 void LaraCheatGetStuff(); // 0x00430ED0
 void ControlLaraExtra(short itemID); // 0x00430F90

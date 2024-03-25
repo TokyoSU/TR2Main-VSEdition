@@ -40,6 +40,7 @@ void CreateBubble(PHD_3DPOS* pos, short roomNumber); // 0x0041C880
 void LaraBubbles(ITEM_INFO* item); // 0x0041C8F0
 void ControlBubble1(short fxID); // 0x0041C970
 void Splash(ITEM_INFO* item); // 0x0041CA70
+void CreateSplash(int x, int y, int z, short roomNumber);
 void WadeSplash(ITEM_INFO* item, int height);
 void ControlSplash1(short fxID); // 0x0041CB40
 void ControlWaterSprite(short fxID); // 0x0041CBC0

@@ -200,17 +200,18 @@ void TestTriggers(short* data, BOOL isHeavy)
 	LOT_INFO* LOT = NULL;
 	ITEM_INFO* item = NULL, *camera_item = NULL;
 	OBJECT_VECTOR* fixed_cam = NULL;
-	int quadrant = 0, value = 0, type = 0, flags = 0, timer = 0, flip = 0, flip_enabled = 0, effect = -1, switch_off = 0;
+	int value = 0, type = 0, flags = 0, timer = 0, flip = 0, flip_enabled = 0, effect = -1, switch_off = 0;
+	USHORT quadrant = 0;
 	short trigger = 0, camera_flags = 0, camera_timer = 0;
 
 	if (!isHeavy)
 		Lara.climb_status = 0;
+
 	if (data == NULL)
 		return;
 
 	if ((*data & DATA_TYPE) == FT_LAVA)
 	{
-		LogDebug("Lava trigger");
 		if (!isHeavy && (LaraItem->pos.y == LaraItem->floor || Lara.water_status != LWS_AboveWater))
 			LavaBurn(LaraItem);
 		if (*data & END_BIT)
@@ -220,10 +221,9 @@ void TestTriggers(short* data, BOOL isHeavy)
 
 	if ((*data & DATA_TYPE) == FT_CLIMB)
 	{
-		LogDebug("Climb trigger");
 		if (!isHeavy)
 		{
-			quadrant = unsigned short(LaraItem->pos.rotY + 8192) >> 14;
+			quadrant = USHORT(LaraItem->pos.rotY + 0x2000) / 0x4000;
 			if ((1 << (quadrant + 8)) & *data)
 				Lara.climb_status = 1;
 		}
@@ -250,7 +250,6 @@ void TestTriggers(short* data, BOOL isHeavy)
 		switch (type)
 		{
 		case TT_SWITCH:
-			LogDebug("Switch trigger");
 			value = *(data++) & VALUE_BITS;
 			if (!SwitchTrigger(value, timer))
 				return;
@@ -258,24 +257,20 @@ void TestTriggers(short* data, BOOL isHeavy)
 			break;
 		case TT_PAD:
 		case TT_ANTIPAD:
-			LogDebug("Pad/Antipad trigger");
 			if (LaraItem->pos.y != LaraItem->floor)
 				return;
 			break;
 		case TT_KEY:
-			LogDebug("Key trigger");
 			value = *(data++) & VALUE_BITS;
 			if (!KeyTrigger(value))
 				return;
 			break;
 		case TT_PICKUP:
-			LogDebug("Pickup trigger");
 			value = *(data++) & VALUE_BITS;
 			if (!PickupTrigger(value))
 				return;
 			break;
 		case TT_COMBAT:
-			LogDebug("Combat trigger");
 			if (Lara.gun_status != LGS_Ready)
 				return;
 			break;
@@ -295,24 +290,30 @@ void TestTriggers(short* data, BOOL isHeavy)
 		{
 		case TO_OBJECT:
 			item = &Items[value];
-			if (item->flags & IFL_ONESHOT)
+			if (CHK_ANY(item->flags, IFL_ONESHOT))
 				break;
 
-			LogDebug("Object triggered: %d", item->objectID);
 			item->timer = timer;
 			if (timer != 1)
-				item->timer *= 30;
+				item->timer *= FRAMES_PER_SECOND;
 
 			if (type == TT_SWITCH)
+			{
 				item->flags ^= (flags & IFL_CODEBITS);
+			}
 			else if (type == TT_ANTIPAD || type == TT_ANTITRIGGER)
+			{
 				item->flags &= ~(IFL_CODEBITS | IFL_REVERSE);
-			else if (flags & IFL_CODEBITS)
+				if (CHK_ANY(flags, IFL_ONESHOT))
+					item->flags |= IFL_ONESHOT;
+			}
+			else if (CHK_ANY(flags, IFL_CODEBITS))
 				item->flags |= (flags & IFL_CODEBITS);
 
-			if ((item->flags & IFL_CODEBITS) != IFL_CODEBITS)
+			if (CHK_NOP(item->flags, IFL_CODEBITS))
 				break;
-			if (flags & IFL_ONESHOT)
+
+			if (CHK_ANY(flags, IFL_ONESHOT))
 				item->flags |= IFL_ONESHOT;
 
 			if (!item->active)
@@ -346,11 +347,10 @@ void TestTriggers(short* data, BOOL isHeavy)
 
 			break;
 		case TO_CAMERA:
-			LogDebug("Camera trigger");
 			trigger = *(data++);
 			camera_flags = trigger;
-			camera_timer = trigger & 0xff;
-			if (Camera.fixed[value].flags & IFL_ONESHOT)
+			camera_timer = trigger & 0xFF;
+			if (CHK_ANY(Camera.fixed[value].flags, IFL_ONESHOT))
 				break;
 
 			Camera.number = value;
@@ -363,8 +363,8 @@ void TestTriggers(short* data, BOOL isHeavy)
 
 			if (Camera.number != Camera.last || type == TT_SWITCH)
 			{
-				Camera.timer = camera_timer * 30;
-				if (camera_flags & IFL_ONESHOT)
+				Camera.timer = camera_timer * FRAMES_PER_SECOND;
+				if (CHK_ANY(camera_flags, IFL_ONESHOT))
 					Camera.fixed[value].flags |= IFL_ONESHOT;
 				Camera.speed = ((camera_flags & IFL_CODEBITS) >> 6) + 1;
 				Camera.type = isHeavy ? CAM_Heavy : CAM_Fixed;
@@ -372,7 +372,6 @@ void TestTriggers(short* data, BOOL isHeavy)
 
 			break;
 		case TO_TARGET:
-			LogDebug("Target trigger");
 			if (value < 0 || value > NUMBER_ITEMS) // NOTE: not exist in the og.
 			{
 				LogWarn("Failed to call TO_TARGET trigger, value returned was less than 0 or more than 1024 !");
@@ -381,7 +380,6 @@ void TestTriggers(short* data, BOOL isHeavy)
 			camera_item = &Items[value];
 			break;
 		case TO_SINK:
-			LogDebug("Sink trigger");
 			fixed_cam = &Camera.fixed[value];
 
 			if (Lara.creature == NULL)
@@ -409,9 +407,8 @@ void TestTriggers(short* data, BOOL isHeavy)
 			
 			break;
 		case TO_FLIPMAP:
-			LogDebug("Flipmap trigger");
 			flip_enabled = 1;
-			if (FlipMaps[value] & IFL_ONESHOT)
+			if (CHK_ANY(FlipMaps[value], IFL_ONESHOT))
 				break;
 
 			if (type == TT_SWITCH)
@@ -419,9 +416,9 @@ void TestTriggers(short* data, BOOL isHeavy)
 			else if (flags & IFL_CODEBITS)
 				FlipMaps[value] |= (flags & IFL_CODEBITS);
 
-			if ((FlipMaps[value] & IFL_CODEBITS) == IFL_CODEBITS)
+			if (CHK_ALL(FlipMaps[value], IFL_CODEBITS))
 			{
-				if (flags & IFL_ONESHOT)
+				if (CHK_ANY(flags, IFL_ONESHOT))
 					FlipMaps[value] |= IFL_ONESHOT;
 				if (FlipStatus == 0)
 					flip = 1;
@@ -431,34 +428,25 @@ void TestTriggers(short* data, BOOL isHeavy)
 
 			break;
 		case TO_FLIPON:
-			LogDebug("Flipon trigger");
 			flip_enabled = 1;
-			if ((FlipMaps[value] & IFL_CODEBITS) == IFL_CODEBITS && !FlipStatus)
+			if (CHK_ALL(FlipMaps[value], IFL_CODEBITS) && !FlipStatus)
 				flip = 1;
 			break;
 		case TO_FLIPOFF:
-			LogDebug("Flipoff trigger");
 			flip_enabled = 1;
-			if ((FlipMaps[value] & IFL_CODEBITS) == IFL_CODEBITS && FlipStatus)
+			if (CHK_ALL(FlipMaps[value], IFL_CODEBITS) && FlipStatus)
 				flip = 1;
 			break;
 		case TO_FLIPEFFECT:
-			LogDebug("Flipeffect trigger");
 			effect = value;
 			break;
 		case TO_FINISH:
-			LogDebug("Finish trigger");
 			IsLevelComplete = TRUE;
 			break;
 		case TO_CD:
-			LogDebug("CD trigger");
 			TriggerCDTrack(value, flags, type);
 			break;
-		case TO_SECRET:
-			LogDebug("Secret trigger");
-			break;
 		case TO_BODYBAG:
-			LogDebug("Bodybag trigger");
 			ClearBodyBag();
 			break;
 		}
