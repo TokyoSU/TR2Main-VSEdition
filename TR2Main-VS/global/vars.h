@@ -72,7 +72,7 @@
 #define EffectFunctions			(*(void(__cdecl *(*)[32])(ITEM_INFO*))				0x004641F8)
 #define ExtraFunctions			(*(void(__cdecl *(*)[11])(ITEM_INFO*,COLL_INFO*))	0x00465DF0)
 #define LaraControlFunctions	(*(void(__cdecl *(*)[71])(ITEM_INFO*,COLL_INFO*))	0x00465CD0)
-#define LaraCollisionFunctions	(*(void(__cdecl *(*)[71])(ITEM_INFO*,COLL_INFO*))	0x00465E20)
+extern void (*LaraCollisionFunctions[71])(ITEM_INFO* item, COLL_INFO* coll); // 0x00465E20
 
 // Initialized variables
 #define PerspectiveDistance			VAR_I_(0x00464060, DWORD,			0x3000000)

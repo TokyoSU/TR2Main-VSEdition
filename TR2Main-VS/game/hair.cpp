@@ -54,7 +54,7 @@ void HairControl(BOOL isCutscene) {
 	SPHERE_INFO spheres[5] = {};
 	UINT16* rotation;
 	int* bone, x, y, z, i, j, water, height, random, dx, dy, dz, sum, distance;
-	short* frame, * mesh, roomID;
+	short* frame, *mesh, roomID;
 	static int wind = 0;
 
 	if (Lara.hit_direction >= 0) {
@@ -76,6 +76,7 @@ void HairControl(BOOL isCutscene) {
 	else {
 		frame = GetBestFrame(LaraItem);
 	}
+
 	phd_PushUnitMatrix();
 	PhdMatrixPtr->_03 = LaraItem->pos.x << W2V_SHIFT;
 	PhdMatrixPtr->_13 = LaraItem->pos.y << W2V_SHIFT;
@@ -276,11 +277,8 @@ void HairControl(BOOL isCutscene) {
 }
 
 void DrawHair() {
-	int i;
-	short** mesh;
-
-	mesh = &MeshPtr[Objects[ID_LARA_HAIR].meshIndex];
-	for (i = 0; i < 6; ++i) {
+	short** mesh = &MeshPtr[Objects[ID_LARA_HAIR].meshIndex];
+	for (int i = 0; i < 6; ++i) {
 		phd_PushMatrix();
 		phd_TranslateAbs(HairPos[i].x, HairPos[i].y, HairPos[i].z);
 		phd_RotY(HairPos[i].rotY);
@@ -294,7 +292,7 @@ void DrawHair() {
   * Inject function
   */
 void Inject_Hair() {
-	//INJECT(0x00420E80, InitialiseHair);
-	//INJECT(0x00420F00, HairControl);
-	//INJECT(0x00421900, DrawHair);
+	INJECT(0x00420E80, InitialiseHair);
+	INJECT(0x00420F00, HairControl);
+	INJECT(0x00421900, DrawHair);
 }

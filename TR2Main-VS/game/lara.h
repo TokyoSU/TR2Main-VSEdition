@@ -100,63 +100,65 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll); // 0x00427560
   // 0x00428B30:		extra_as_finalanim
   // 0x00428BE0:		LaraFallen
   // 0x00428C40:		LaraCollideStop
-  // 0x00428D00:		lara_col_walk
-  // 0x00428EA0:		lara_col_run
-  // 0x00429020:		lara_col_stop
-  // 0x004290B0:		lara_col_forwardjump
-  // ----------:		lara_col_pose
-  // 0x00429190:		lara_col_fastback
-  // 0x00429250:		lara_col_turn_r
-  // 0x004292F0:		lara_col_turn_l
-  // 0x00429310:		lara_col_death
-  // 0x00429380:		lara_col_fastfall
-  // 0x00429420:		lara_col_hang
-  // 0x00429550:		lara_col_reach
-  // 0x004295E0:		lara_col_splat
-  // ----------:		lara_col_land
-  // 0x00429640:		lara_col_compress
-  // 0x004296E0:		lara_col_back
-  // ----------:		lara_col_null
-  // 0x004297E0:		lara_col_fastturn
-  // 0x00429800:		lara_col_stepright
-  // 0x004298C0:		lara_col_stepleft
-  // 0x004298E0:		lara_col_slide
-  // 0x00429900:		lara_col_backjump
-  // 0x00429930:		lara_col_rightjump
-  // 0x00429960:		lara_col_leftjump
-  // 0x00429990:		lara_col_upjump
-  // 0x00429AD0:		lara_col_fallback
-  // 0x00429B60:		lara_col_hangleft
-  // 0x00429BA0:		lara_col_hangright
-  // 0x00429BE0:		lara_col_slideback
-  // ----------:		lara_col_pushblock
-  // ----------:		lara_col_pullblock
-  // ----------:		lara_col_ppready
-  // ----------:		lara_col_pickup
-  // ----------:		lara_col_switchon
-  // ----------:		lara_col_switchoff
-  // ----------:		lara_col_usekey
-  // ----------:		lara_col_usepuzzle
-  // 0x00429C10:		lara_col_roll
-  // 0x00429CB0:		lara_col_roll2
-  // 0x00429D80:		lara_col_special
-  // ----------:		lara_col_usemidas
-  // ----------:		lara_col_diemidas
-  // 0x00429DA0:		lara_col_swandive
-  // 0x00429E10:		lara_col_fastdive
-  // ----------:		lara_col_gymnast
-  // ----------:		lara_col_waterout
-  // ----------:		lara_col_laratest1
-  // ----------:		lara_col_laratest2
-  // ----------:		lara_col_laratest3
-  // 0x00429E90:		lara_col_wade
-  // ----------:		lara_col_twist
-  // 0x0042A000:		lara_default_col
+  
+#define lara_col_walk ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00428D00)
+#define lara_col_run ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00428EA0)
+#define lara_col_stop ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429020)
+#define lara_col_forwardjump ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004290B0)
+#define lara_col_fastback ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429190)
+#define lara_col_turn_r ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429250)
+#define lara_col_turn_l ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004292F0)
+#define lara_col_death ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429310)
+#define lara_col_fastfall ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429380)
+#define lara_col_hang ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429420)
+#define lara_col_reach ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429550)
+#define lara_col_splat ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004295E0)
+#define lara_col_compress ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429640)
+#define lara_col_back ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004296E0)
+#define lara_col_fastturn ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004297E0)
+#define lara_col_stepright ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429800)
+#define lara_col_stepleft ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004298C0)
+#define lara_col_slide ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004298E0)
+#define lara_col_backjump ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429900)
+#define lara_col_rightjump ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429930)
+#define lara_col_leftjump ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429960)
+#define lara_col_upjump ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429990)
+#define lara_col_fallback ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429AD0)
+#define lara_col_hangleft ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429B60)
+#define lara_col_hangright ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429BA0)
+#define lara_col_slideback ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429BE0)
+#define lara_col_roll ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429C10)
+#define lara_col_roll2 ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429CB0)
+#define lara_col_special ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429D80)
+#define lara_col_swandive ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429DA0)
+#define lara_col_fastdive ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429E10)
+#define lara_col_wade ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00429E90)
+#define lara_default_col ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x0042A000)
+extern void lara_col_null(ITEM_INFO* item, COLL_INFO* coll);
+
+// ----------:		lara_col_pose
+// ----------:		lara_col_land
+// ----------:		lara_col_null
+// ----------:		lara_col_pushblock
+// ----------:		lara_col_pullblock
+// ----------:		lara_col_ppready
+// ----------:		lara_col_pickup
+// ----------:		lara_col_switchon
+// ----------:		lara_col_switchoff
+// ----------:		lara_col_usekey
+// ----------:		lara_col_usepuzzle
+// ----------:		lara_col_usemidas
+// ----------:		lara_col_diemidas
+// ----------:		lara_col_gymnast
+// ----------:		lara_col_waterout
+// ----------:		lara_col_laratest1
+// ----------:		lara_col_laratest2
+// ----------:		lara_col_laratest3
+// ----------:		lara_col_twist
+// ----------:		lara_col_deathslide
 
 void lara_col_jumper(ITEM_INFO* item, COLL_INFO* coll); // 0x0042A040
-
-// 0x0042A120:		lara_col_kick
-// ----------:		lara_col_deathslide
+#define lara_col_kick ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x0042A120)
 
 #define GetLaraCollisionInfo ((void (__cdecl*)(ITEM_INFO *item, COLL_INFO *coll)) 0x0042A130)
 

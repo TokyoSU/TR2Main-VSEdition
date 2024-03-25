@@ -28,11 +28,89 @@
 #include "game/skidoo.h"
 #include "game/larafire.h"
 #include "game/laramisc.h"
+#include "game/laraswim.h"
+#include "game/laraclimb.h"
+#include "game/larasurf.h"
 #include "global/vars.h"
 
 #ifdef FEATURE_GAMEPLAY_FIXES
 bool IsLowCeilingJumpFix = true;
 #endif // FEATURE_GAMEPLAY_FIXES
+
+void (*LaraCollisionFunctions[71])(ITEM_INFO* item, COLL_INFO* coll)
+{
+    lara_col_walk,
+    lara_col_run,
+    lara_col_stop,
+    lara_col_forwardjump,
+    lara_col_fastturn,
+    lara_col_fastback,
+    lara_col_turn_r,
+    lara_col_turn_l,
+    lara_col_death,
+    lara_col_fastfall,
+    lara_col_hang,
+    lara_col_reach,
+    lara_col_splat,
+    lara_col_swim,
+    lara_col_fastturn,
+    lara_col_compress,
+    lara_col_back,
+    lara_col_swim,
+    lara_col_swim,
+    lara_col_special,
+    lara_col_fastturn,
+    lara_col_stepright,
+    lara_col_stepleft,
+    lara_col_roll2,
+    lara_col_slide,
+    lara_col_backjump,
+    lara_col_rightjump,
+    lara_col_leftjump,
+    lara_col_upjump,
+    lara_col_fallback,
+    lara_col_hangleft,
+    lara_col_hangright,
+    lara_col_slideback,
+    lara_col_surftread,
+    lara_col_surfswim,
+    lara_col_swim,
+    lara_col_special,
+    lara_col_special,
+    lara_col_special,
+    lara_col_special,
+    lara_col_special,
+    lara_col_special,
+    lara_col_special,
+    lara_col_special,
+    lara_col_uwdeath,
+    lara_col_roll,
+    lara_col_null,
+    lara_col_surfback,
+    lara_col_surfleft,
+    lara_col_surfright,
+    lara_col_special,
+    lara_col_special,
+    lara_col_swandive,
+    lara_col_fastdive,
+    lara_col_special,
+    lara_col_special,
+    lara_col_climbstnc,
+    lara_col_climbing,
+    lara_col_climbleft,
+    lara_col_null,
+    lara_col_climbright,
+    lara_col_climbdown,
+    lara_col_null,
+    lara_col_null,
+    lara_col_null,
+    lara_col_wade,
+    lara_col_swim,
+    lara_col_special,
+    lara_col_null,
+    lara_col_null,
+    lara_col_null
+};
 
 void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -40,6 +118,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->old.y = item->pos.y;
 	coll->old.z = item->pos.z;
 	coll->oldAnimState = item->currentAnimState;
+	coll->oldAnimNumber = item->animNumber;
 	coll->oldFrameNumber = item->frameNumber;
 	coll->radius = 100;
 	coll->trigger = NULL;
@@ -94,6 +173,10 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	TestTriggers(coll->trigger, FALSE);
 }
 
+void lara_col_null(ITEM_INFO* item, COLL_INFO* coll)
+{
+}
+
 void lara_col_jumper(ITEM_INFO* item, COLL_INFO* coll) {
 	coll->badPos = 32512;
 	coll->badNeg = -384;
@@ -137,7 +220,7 @@ void GetLaraJointAbsPosition(PHD_VECTOR* pos, int meshID)
 	short* frames[2]{}, *framePtr = NULL, *hitframePtr = NULL;
 	short interp = 0;
 
-	frac = GetFrames(LaraItem, frames, &rate);
+	frac = GetFrames(item, frames, &rate);
 	if (frac)
 	{
 		GetLJAInt(item, pos, frames[0], frames[1], frac, rate, meshID);

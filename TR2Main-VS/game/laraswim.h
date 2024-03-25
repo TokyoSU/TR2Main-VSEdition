@@ -31,21 +31,14 @@
 void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll); // 0x00432000
 void SwimTurn(ITEM_INFO* item); // 0x00432230
 void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll); // 0x004322C0
-
 //0x00432330:		lara_as_glide
 //0x004323B0:		lara_as_tread
 //0x00432440:		lara_as_dive
 //0x00432460:		lara_as_uwdeath
 //0x004324C0:		lara_as_waterroll
-//0x004324D0:		lara_col_swim
-//----------:		lara_col_glide
-//----------:		lara_col_tread
-//----------:		lara_col_dive
-//0x004324F0:		lara_col_uwdeath
-//----------:		lara_col_waterroll
-
+#define lara_col_swim ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004324D0)
+#define lara_col_uwdeath ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004324F0)
 #define GetWaterDepth ((int(__cdecl*)(int, int, int, short)) 0x00432550)
-
 //0x004326F0:		LaraTestWaterDepth
 //0x004327C0:		LaraSwimCollision
 void LaraWaterCurrent(COLL_INFO* coll); // 0x00432920

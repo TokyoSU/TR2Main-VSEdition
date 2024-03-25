@@ -542,35 +542,35 @@ x function is unused / included in another function
 0x00428B30:		extra_as_finalanim
 0x00428BE0:		LaraFallen
 0x00428C40:		LaraCollideStop
-0x00428D00:		lara_col_walk
-0x00428EA0:		lara_col_run
-0x00429020:		lara_col_stop
-0x004290B0:		lara_col_forwardjump
+0x00428D00:	 *	lara_col_walk
+0x00428EA0:	 *	lara_col_run
+0x00429020:	 *	lara_col_stop
+0x004290B0:	 *	lara_col_forwardjump
 ----------:		lara_col_pose
-0x00429190:		lara_col_fastback
-0x00429250:		lara_col_turn_r
-0x004292F0:		lara_col_turn_l
-0x00429310:		lara_col_death
-0x00429380:		lara_col_fastfall
-0x00429420:		lara_col_hang
-0x00429550:		lara_col_reach
-0x004295E0:		lara_col_splat
+0x00429190:	 *	lara_col_fastback
+0x00429250:	 *	lara_col_turn_r
+0x004292F0:	 *	lara_col_turn_l
+0x00429310:	 *	lara_col_death
+0x00429380:	 *	lara_col_fastfall
+0x00429420:	 *	lara_col_hang
+0x00429550:	 *	lara_col_reach
+0x004295E0:	 *	lara_col_splat
 ----------:		lara_col_land
-0x00429640:		lara_col_compress
-0x004296E0:		lara_col_back
+0x00429640:	 *	lara_col_compress
+0x004296E0:	 *	lara_col_back
 ----------:		lara_col_null
-0x004297E0:		lara_col_fastturn
-0x00429800:		lara_col_stepright
-0x004298C0:		lara_col_stepleft
-0x004298E0:		lara_col_slide
-0x00429900:		lara_col_backjump
-0x00429930:		lara_col_rightjump
-0x00429960:		lara_col_leftjump
-0x00429990:		lara_col_upjump
-0x00429AD0:		lara_col_fallback
-0x00429B60:		lara_col_hangleft
-0x00429BA0:		lara_col_hangright
-0x00429BE0:		lara_col_slideback
+0x004297E0:	 *	lara_col_fastturn
+0x00429800:	 *	lara_col_stepright
+0x004298C0:	 *	lara_col_stepleft
+0x004298E0:	 *	lara_col_slide
+0x00429900:	 *	lara_col_backjump
+0x00429930:	 *	lara_col_rightjump
+0x00429960:	 *	lara_col_leftjump
+0x00429990:	 *	lara_col_upjump
+0x00429AD0:	 *	lara_col_fallback
+0x00429B60:	 *	lara_col_hangleft
+0x00429BA0:	 *	lara_col_hangright
+0x00429BE0:	 *	lara_col_slideback
 ----------:		lara_col_pushblock
 ----------:		lara_col_pullblock
 ----------:		lara_col_ppready
@@ -579,23 +579,23 @@ x function is unused / included in another function
 ----------:		lara_col_switchoff
 ----------:		lara_col_usekey
 ----------:		lara_col_usepuzzle
-0x00429C10:		lara_col_roll
-0x00429CB0:		lara_col_roll2
-0x00429D80:		lara_col_special
+0x00429C10:	 *	lara_col_roll
+0x00429CB0:	 *	lara_col_roll2
+0x00429D80:	 *	lara_col_special
 ----------:		lara_col_usemidas
 ----------:		lara_col_diemidas
-0x00429DA0:		lara_col_swandive
-0x00429E10:		lara_col_fastdive
+0x00429DA0:	 *	lara_col_swandive
+0x00429E10:	 *	lara_col_fastdive
 ----------:		lara_col_gymnast
 ----------:		lara_col_waterout
 ----------:		lara_col_laratest1
 ----------:		lara_col_laratest2
 ----------:		lara_col_laratest3
-0x00429E90:		lara_col_wade
+0x00429E90:	 *	lara_col_wade
 ----------:		lara_col_twist
-0x0042A000:		lara_default_col
+0x0042A000:	 *	lara_default_col
 0x0042A040:	+	lara_col_jumper
-0x0042A120:		lara_col_kick
+0x0042A120:	 *	lara_col_kick
 ----------:		lara_col_deathslide
 0x0042A130:	 *	GetLaraCollisionInfo
 0x0042A170:		lara_slide_slope
@@ -651,12 +651,12 @@ x function is unused / included in another function
 0x0042D9F0:		lara_as_climbing
 0x0042DA10:		lara_as_climbend
 0x0042DA30:		lara_as_climbdown
-0x0042DA50:		lara_col_climbleft
-0x0042DAB0:		lara_col_climbright
-0x0042DB10:		lara_col_climbstnc
-0x0042DD20:		lara_col_climbing
+0x0042DA50:	 *	lara_col_climbleft
+0x0042DAB0:	 *	lara_col_climbright
+0x0042DB10:	 *	lara_col_climbstnc
+0x0042DD20:	 *	lara_col_climbing
 ----------:		lara_col_climbend
-0x0042DE70:		lara_col_climbdown
+0x0042DE70:	 *	lara_col_climbdown
 0x0042E010:		LaraCheckForLetGo
 0x0042E0C0:		LaraTestClimb
 0x0042E330:		LaraTestClimbPos
@@ -707,11 +707,11 @@ x function is unused / included in another function
 0x00431940:		lara_as_surfleft
 0x004319A0:		lara_as_surfright
 0x00431A00:		lara_as_surftread
-0x00431AC0:		lara_col_surfswim
-0x00431B00:		lara_col_surfback
-0x00431B30:		lara_col_surfleft
-0x00431B60:		lara_col_surfright
-0x00431B90:		lara_col_surftread
+0x00431AC0:	 *	lara_col_surfswim
+0x00431B00:	 *	lara_col_surfback
+0x00431B30:	 *	lara_col_surfleft
+0x00431B60:	 *	lara_col_surfright
+0x00431B90:	 *	lara_col_surftread
 0x00431BF0:		LaraSurfaceCollision
 0x00431CF0:		LaraTestWaterStepOut
 0x00431DE0:		LaraTestWaterClimbOut
@@ -725,11 +725,11 @@ x function is unused / included in another function
 0x00432440:		lara_as_dive
 0x00432460:		lara_as_uwdeath
 0x004324C0:		lara_as_waterroll
-0x004324D0:		lara_col_swim
+0x004324D0:	 *	lara_col_swim
 ----------:		lara_col_glide
 ----------:		lara_col_tread
 ----------:		lara_col_dive
-0x004324F0:		lara_col_uwdeath
+0x004324F0:	 *	lara_col_uwdeath
 ----------:		lara_col_waterroll
 0x00432550:	 *	GetWaterDepth
 0x004326F0:		LaraTestWaterDepth
@@ -737,12 +737,12 @@ x function is unused / included in another function
 0x00432920:	+	LaraWaterCurrent
 
 	game/lot.cpp
-0x00432B10:	+	InitialiseLOTarray
-0x00432B70:	+	DisableBaddieAI
-0x00432BC0:	+	EnableBaddieAI
-0x00432D70:	+	InitialiseSlot
-0x00432F80:	+	CreateZone
-0x00433040:	+	ClearLOT
+0x00432B10:	 *	InitialiseLOTarray
+0x00432B70:	 *	DisableBaddieAI
+0x00432BC0:	 *	EnableBaddieAI
+0x00432D70:	 *	InitialiseSlot
+0x00432F80:	 *	CreateZone
+0x00433040:	 *	ClearLOT
 
 	game/missile.cpp
 0x00433090:	+	ControlMissile
