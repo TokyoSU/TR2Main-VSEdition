@@ -88,7 +88,8 @@ void MonkControl(short itemID)
 		switch (item->currentAnimState)
 		{
 		case MONK_STOP1:
-			monk->flags = 0;
+			monk->flags &= ~0x1000;
+			monk->flags &= 0xFFF;
 
 			if (IsMonkAngry || !ai.ahead || Lara.target != item)
 			{
@@ -119,7 +120,8 @@ void MonkControl(short itemID)
 			}
 			break;
 		case MONK_STOP2:
-			monk->flags = 0;
+			monk->flags &= ~0x1000;
+			monk->flags &= 0xFFF;
 
 			if (IsMonkAngry || !ai.ahead || Lara.target != item)
 			{
@@ -176,7 +178,8 @@ void MonkControl(short itemID)
 			}
 			break;
 		case MONK_RUN:
-			monk->flags = 0;
+			monk->flags &= ~0x1000;
+			monk->flags &= 0xFFF;
 			if (IsMonkAngry)
 				monk->maximum_turn = 910;
 			else
@@ -226,7 +229,7 @@ void MonkControl(short itemID)
 		case MONK_ATTACK3:
 		case MONK_ATTACK4:
 		case MONK_ATTACK5:
-			if (!monk->flags && monk->enemy != NULL)
+			if (!(monk->flags & 0x1000) && monk->enemy != NULL)
 			{
 				if (monk->enemy == LaraItem)
 				{
@@ -234,7 +237,7 @@ void MonkControl(short itemID)
 					{
 						monk->enemy->hitPoints -= MONK_DAMAGE;
 						monk->enemy->hitStatus = 1;
-						monk->flags = 1;
+						monk->flags |= 0x1000;
 						PlaySoundEffect(245, &item->pos, 0);
 						CreatureEffect(item, &MonkBite, DoBloodSplat);
 					}
@@ -243,7 +246,7 @@ void MonkControl(short itemID)
 				{
 					DamageTarget(item, monk->enemy, &MonkBite, MONK_DAMAGE_TO_OTHER_ENEMIES);
 					PlaySoundEffect(245, &item->pos, 0);
-					monk->flags = 1;
+					monk->flags |= 0x1000;
 				}
 			}
 			break;

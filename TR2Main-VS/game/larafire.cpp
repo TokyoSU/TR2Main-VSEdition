@@ -442,7 +442,8 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* dest, int damage) {
 	if (!IsMonkAngry && (item->objectID == ID_MONK1 || item->objectID == ID_MONK2) && item->data != NULL)
 	{
 		CREATURE_INFO* creature = GetCreatureInfo(item);
-		if ((creature->flags & 0x0FFF) > 10 || creature->mood == MOOD_BORED)
+		creature->flags += damage;
+		if ((creature->flags & 0xFFF) > 10 || creature->mood == MOOD_BORED)
 			IsMonkAngry = true;
 	}
 }
