@@ -25,6 +25,7 @@
 #include "game/text.h"
 #include "specific/output.h"
 #include "specific/sndpc.h"
+#include "modding/mod_utils.h"
 #include "global/vars.h"
 
 #define AMMO_XPOS_PC	(-10)
@@ -116,7 +117,8 @@ void DrawGameInfo(BOOL pickupState) {
 		flashState = FlashIt();
 		DrawHealthBar(flashState);
 		DrawAirBar(flashState);
-		DrawEnemyHealthBar();
+		if (IsEnemyBarEnabled())
+			DrawEnemyHealthBar();
 		DrawPickups(pickupState);
 		DrawAssaultTimer();
 	}

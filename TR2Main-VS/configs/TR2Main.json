@@ -178,6 +178,9 @@
         " 'giantYetiHealth': (default: 200) Slot: BIRD_MONSTER                ",
         " 'dinoHealth': (default: 100) Slot: TYRANNOSAUR                      ",
         "                                                                     ",
+        " - 'enableenemybar' is used to                                       ",
+        "  draw the enemy bar or not. (default: true).                        ",
+        "                                                                     ",
         " - 'laraignoremonkifnotangry' is used so lara will not target        ",
         "  monks until they are angry, useful if you want to target other     ",
         "  enemies like mercenary without causing friendly fire.              ",
@@ -385,7 +388,8 @@
 	{
         "comment": "Title",
         "filename": "TITLE",
-        "comment2": "Example of the enemy health command, only the title level will have a dog with 250hp, the other level will have default value.",
+        "comment2": "Example of the 'enemy health' and 'enable enemy bar' command, only the title level will have a dog with 250hp and no enemy bar, the other level will have default value.",
+        "enableenemybar": false,
         "dogHealth": 250,
     },
 	{

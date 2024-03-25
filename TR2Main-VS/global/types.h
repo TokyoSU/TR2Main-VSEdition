@@ -73,6 +73,8 @@ typedef struct {
 #define CHK_ANY(a,b)	(((a)&(b))!=0)
 
 // Geometry values
+#define WALL_SIZE           (1024)
+#define CLICK_SIZE          (256)
 #define WALL_SHIFT			(10)
 #define NO_HEIGHT			(-0x7F00)
 

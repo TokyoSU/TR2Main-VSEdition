@@ -428,8 +428,6 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 }
 
 void HitTarget(ITEM_INFO* item, GAME_VECTOR* dest, int damage) {
-	CREATURE_INFO* creature = NULL;
-
 	if (item->hitPoints > 0 && item->hitPoints <= damage) {
 		++SaveGame.statistics.kills;
 	}
@@ -441,9 +439,9 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* dest, int damage) {
 		DoBloodSplat(dest->x, dest->y, dest->z, item->speed, item->pos.rotY, item->roomNumber);
 	}
 
-	if (IsMonkAngry == FALSE && (item->objectID == ID_MONK1 || item->objectID == ID_MONK2) && item->data != NULL)
+	if (!IsMonkAngry && (item->objectID == ID_MONK1 || item->objectID == ID_MONK2) && item->data != NULL)
 	{
-		creature = (CREATURE_INFO*)item->data;
+		CREATURE_INFO* creature = GetCreatureInfo(item);
 		if ((creature->flags & 0x0FFF) > 10 || creature->mood == MOOD_BORED)
 			IsMonkAngry = true;
 	}

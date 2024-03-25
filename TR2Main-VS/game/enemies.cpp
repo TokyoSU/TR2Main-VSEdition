@@ -32,6 +32,11 @@
 #define MONK_DAMAGE 150
 #define MONK_DEATH_ANIM 20
 #define MONK_TOUCHBITS MESH_BITS(14)
+#define MONK_CLOSE_RANGE SQR(WALL_SIZE/2)
+#define MONK_LONG_RANGE SQR(WALL_SIZE)
+#define MONK_ATTACK5_RANGE SQR(WALL_SIZE*3)
+#define MONK_WALK_RANGE SQR(WALL_SIZE*2)
+#define MONK_HIT_RANGE (CLICK_SIZE*2)
 
 enum MonkState
 {
@@ -59,6 +64,7 @@ void MonkControl(short itemID)
 	CREATURE_INFO* monk = GetCreatureInfo(item);
 	if (monk == NULL) return; // NOTE: Not exist in the original game.
 	AI_INFO ai{};
+	int rand = 0;
 	short tilt = 0, head = 0, angle = 0;
 
 	if (item->hitPoints <= 0)
@@ -92,31 +98,19 @@ void MonkControl(short itemID)
 					{
 						item->goalAnimState = MONK_RUN;
 					}
-					else
+					else if (ai.ahead && ai.distance < MONK_CLOSE_RANGE)
 					{
-						if (ai.ahead && ai.distance < 0x40000)
-						{
-							if (GetRandomControl() >= 0x7000)
-								item->goalAnimState = MONK_STOP2;
-							else
-								item->goalAnimState = MONK_ATTACK1;
-						}
+						if (GetRandomControl() >= 0x7000)
+							item->goalAnimState = MONK_STOP2;
 						else
-						{
-							if (!ai.ahead) {
-								item->goalAnimState = MONK_RUN;
-							}
-							else if (ai.distance >= 0x100000) {
-								if (!ai.ahead || ai.distance >= 0x400000)
-									item->goalAnimState = MONK_RUN;
-								else
-									item->goalAnimState = MONK_WALK;
-							}
-							else {
-								item->goalAnimState = MONK_ATTACK4;
-							}
-						}
+							item->goalAnimState = MONK_ATTACK1;
 					}
+					else if (ai.ahead && ai.distance < MONK_LONG_RANGE)
+						item->goalAnimState = MONK_ATTACK4;
+					else if (ai.ahead && ai.distance < MONK_WALK_RANGE)
+						item->goalAnimState = MONK_WALK;
+					else
+						item->goalAnimState = MONK_RUN;
 				}
 				else
 				{
@@ -132,38 +126,24 @@ void MonkControl(short itemID)
 				if (monk->mood != MOOD_BORED)
 				{
 					if (monk->mood == MOOD_ESCAPE)
-					{
 						item->goalAnimState = MONK_RUN;
-					}
-					else
+					else if (ai.ahead && ai.distance < MONK_CLOSE_RANGE)
 					{
-						if (ai.ahead && ai.distance < 0x40000)
-						{
-							if (GetRandomControl() >= 0x3000)
-							{
-								if (GetRandomControl() >= 0x6000)
-									item->goalAnimState = MONK_STOP1;
-								else
-									item->goalAnimState = MONK_AIM;
-							}
-							else
-							{
-								item->goalAnimState = MONK_ATTACK2;
-							}
-						}
+						rand = GetRandomControl();
+						if (rand < 0x3000)
+							item->goalAnimState = MONK_ATTACK2;
+						else if (rand < 0x6000)
+							item->goalAnimState = MONK_AIM;
 						else
-						{
-							if (!ai.ahead || ai.distance >= 0x400000)
-								item->goalAnimState = MONK_RUN;
-							else
-								item->goalAnimState = MONK_WALK;
-						}
+							item->goalAnimState = MONK_STOP1;
 					}
+					else if (ai.ahead && ai.distance < MONK_WALK_RANGE)
+						item->goalAnimState = MONK_WALK;
+					else
+						item->goalAnimState = MONK_RUN;
 				}
 				else
-				{
 					item->goalAnimState = MONK_WALK;
-				}
 			}
 			break;
 		case MONK_WALK:

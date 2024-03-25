@@ -109,6 +109,7 @@ typedef struct {
 	char loadingPix[256];
 	DWORD waterColor;
 
+	bool enemyBarEnabled;
 	BAR_CONFIG healthbar;
 	BAR_CONFIG airbar;
 	BAR_CONFIG enemyhealthbar;
@@ -653,6 +654,10 @@ BAR_CONFIG* GetModLaraAirBar() {
 	return &ModConfig.airbar;
 }
 
+bool IsEnemyBarEnabled() {
+	return ModConfig.enemyBarEnabled;
+}
+
 BAR_CONFIG* GetModEnemyBar() {
 	return &ModConfig.enemyhealthbar;
 }
@@ -1102,6 +1107,7 @@ static bool ParseLevelConfiguration(json_value* root) {
 	ModConfig.laraIgnoreMonkIfNotAngry = ParseBooleanConfigByName(root, "laraignoremonkifnotangry");
 	ModConfig.makeMercenaryAttackLaraFirst = ParseBooleanConfigByName(root, "mercenaryattacklaradirectly");
 	ModConfig.makeMonkAttackLaraFirst = ParseBooleanConfigByName(root, "monksattacklaradirectly");
+	ModConfig.enemyBarEnabled = ParseBooleanConfigByName(root, "enableenemybar", true);
 
 	ParseSemitransConfiguration(GetJsonField(root, json_object, "semitransparent", NULL));
 	ParseReflectConfiguration(GetJsonField(root, json_object, "reflective", NULL));

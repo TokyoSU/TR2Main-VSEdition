@@ -129,6 +129,7 @@ bool GetModMakeMercenaryAttackLaraDirectly();
 
 BAR_CONFIG* GetModLaraHealthBar();
 BAR_CONFIG* GetModLaraAirBar();
+bool IsEnemyBarEnabled();
 BAR_CONFIG* GetModEnemyBar();
 
 const char* GetModLoadingPix();
