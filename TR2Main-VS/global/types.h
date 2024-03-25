@@ -1889,7 +1889,7 @@ typedef struct CollInfo_t {
 	char zTilt;
 	char hitByBaddie;
 	char hitStatic;
-	UINT16 slopesAreWalls : 2;
+	UINT16 slopesAreWalls : 1;
 	UINT16 slopesArePits : 1;
 	UINT16 lavaIsPit : 1;
 	UINT16 enableBaddiePush : 1;
@@ -1915,13 +1915,13 @@ typedef struct ObjectInfo_t {
 	short shadowSize;
 	UINT16 loaded : 1;
 	UINT16 intelligent : 1;
+	UINT16 non_lot : 1;
 	UINT16 save_position : 1;
 	UINT16 save_hitpoints : 1;
 	UINT16 save_flags : 1;
 	UINT16 save_anim : 1;
 	UINT16 semi_transparent : 1;
 	UINT16 water_creature : 1;
-	UINT16 pad : 8;
 } OBJECT_INFO;
 
 typedef struct PhdMatrix_t {
@@ -1945,10 +1945,10 @@ typedef struct DoorInfos_t {
 
 typedef struct FloorInfo_t {
 	unsigned short index;
-	short box;
-	BYTE pitRoom;
+	unsigned short box;
+	char pitRoom;
 	char floor;
-	BYTE skyRoom;
+	char skyRoom;
 	char ceiling;
 } FLOOR_INFO;
 

@@ -48,9 +48,10 @@ void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int he
 	coll->sideMid.ceiling = c;
 	coll->sideMid.type = HeightType;
 	coll->trigger = TriggerPtr;
-	tilt = GetTiltType(floor, x, LaraItem->pos.y, z);
-	coll->xTilt = tilt;
-	coll->zTilt = tilt >> 8;
+	// NOTE: It use LaraItem->pos.y as for the y argument, it should use y from this function instead, there is not only lara using this function !
+	tilt = GetTiltType(floor, x, y, z);
+	coll->xTilt = (char)(tilt);
+	coll->zTilt = (char)(tilt >> 8);
 	switch (coll->quadrant) {
 	case 0:
 		frontX = coll->radius * phd_sin(coll->facing) >> W2V_SHIFT;

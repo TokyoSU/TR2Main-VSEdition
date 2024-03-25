@@ -135,7 +135,7 @@ x function is unused / included in another function
 0x0040E0D0:	+	GondolaControl
 
 	game/box.cpp
-0x0040E190:	 *	InitialiseCreature
+0x0040E190:	+	InitialiseCreature
 0x0040E1C0:	 *	CreatureActive
 0x0040E210:	 *	CreatureAIInfo
 0x0040E470:		SearchLOT
@@ -212,9 +212,9 @@ x function is unused / included in another function
 
 	game/control.cpp
 0x00414370:	+	ControlPhase
-0x004146C0:	 *	AnimateItem
-0x00414A30:		GetChange
-0x00414AE0:		TranslateItem
+0x004146C0:	+	AnimateItem
+0x00414A30:	 *	GetChange
+0x00414AE0:	 *	TranslateItem
 0x00414B40:	 *	GetFloor
 0x00414CE0:	 *	GetWaterHeight
 0x00414E50:	 *	GetHeight

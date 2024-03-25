@@ -275,6 +275,11 @@ void AnimateItem(ITEM_INFO* item)
 					}
 					else
 					{
+						short roomNum = item->roomNumber;
+						GetFloor(item->pos.x, item->pos.y, item->pos.z, &roomNum);
+						if (type == SFX_WATERONLY)
+							CreateSplash(item->pos.x, item->pos.y, item->pos.z, item->roomNumber);
+
 						if (item->roomNumber == 255)
 						{
 							item->pos.x = LaraItem->pos.x;
@@ -288,13 +293,7 @@ void AnimateItem(ITEM_INFO* item)
 						else if (CHK_ANY(RoomInfo[item->roomNumber].flags, ROOM_UNDERWATER))
 						{
 							if (type == SFX_LANDANDWATER || type == SFX_WATERONLY)
-							{
-								short roomNum = item->roomNumber;
-								GetFloor(item->pos.x, item->pos.y - CLICK_SIZE, item->pos.z, &roomNum);
-								if (type == SFX_WATERONLY && !(RoomInfo[roomNum].flags & ROOM_UNDERWATER))
-									CreateSplash(item->pos.x, item->pos.y, item->pos.z, item->roomNumber);
 								PlaySoundEffect(num, &item->pos, NULL);
-							}
 						}
 						else if (type == SFX_LANDANDWATER || type == SFX_LANDONLY)
 							PlaySoundEffect(num, &item->pos, NULL);

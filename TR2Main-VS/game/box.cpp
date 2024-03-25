@@ -28,11 +28,20 @@
 #include "game/effects.h"
 #include "game/lot.h"
 #include "game/missile.h"
+#include "specific/game.h"
 #include "global/vars.h"
 
 #if defined(FEATURE_MOD_CONFIG)
 #include "modding/mod_utils.h"
 #endif
+
+void InitialiseCreature(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	item->collidable = TRUE;
+	item->data = NULL;
+	item->pos.rotY += (GetRandomControl() - 0x4000) >> 1;
+}
 
 void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 {
@@ -280,7 +289,7 @@ void SetAnimation(ITEM_INFO* item, int animID, int stateID, int frameID)
  * Inject function
  */
 void Inject_Box() {
-	//INJECT(0x0040E190, InitialiseCreature);
+	INJECT(0x0040E190, InitialiseCreature);
 	//INJECT(0x0040E1C0, CreatureActive);
 	INJECT(0x0040E210, CreatureAIInfo);
 	//INJECT(0x0040E470, SearchLOT);
