@@ -1,4 +1,5 @@
 # TR2Main
+Original repositories: https://github.com/Arsunt/TR2Main
 
 This is an open source implementation of the classic Tomb Raider II game (1997), made by reverse engineering of the original game for PC and PS1. Right now it's a dynamic library injecting the original game EXE to allow step-by-step decompilation, fixing, and improvement, but someday it will become single EXE file.
 
