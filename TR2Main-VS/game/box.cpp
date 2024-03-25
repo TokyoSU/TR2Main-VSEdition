@@ -36,7 +36,7 @@
 
 void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 {
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	CREATURE_INFO* creature = GetCreatureInfo(item);
 	if (creature == NULL) return;
 #if defined(FEATURE_MOD_CONFIG)
 	if ((item->objectID == ID_BANDIT1 || item->objectID == ID_BANDIT2 || item->objectID == ID_BANDIT2B) && !GetModMakeMercenaryAttackLaraDirectly())
@@ -60,21 +60,23 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 	if (enemy == NULL)
 		enemy = LaraItem;
 
-	short* zone = creature->LOT.fly != 0 ? FlyZones[FlipStatus] : GroundZones[creature->LOT.step >> 8][FlipStatus];
+	short* zone = creature->LOT.fly != 0 ? FlyZones[FlipStatus] : GroundZones[FlipStatus + 2 * (creature->LOT.step >> 8)];
 	room = &RoomInfo[item->roomNumber];
-	item->boxNumber = room->floor[((item->pos.z - room->z) >> WALL_SHIFT) + room->xSize * ((item->pos.x - room->x) >> WALL_SHIFT)].box;
+	item->boxNumber = room->floor[((item->pos.z - room->z) >> WALL_SHIFT) + ((item->pos.x - room->x) >> WALL_SHIFT) * room->xSize].box;
 	AI->zone_number = zone[item->boxNumber];
 	
 	room = &RoomInfo[enemy->roomNumber];
-	enemy->boxNumber = room->floor[((enemy->pos.z - room->z) >> WALL_SHIFT) + room->xSize * ((enemy->pos.x - room->x) >> WALL_SHIFT)].box;
+	enemy->boxNumber = room->floor[((enemy->pos.z - room->z) >> WALL_SHIFT) + ((enemy->pos.x - room->x) >> WALL_SHIFT) * room->xSize].box;
 	AI->enemy_zone = zone[enemy->boxNumber];
 
-	if ((Boxes[enemy->boxNumber].overlapIndex & creature->LOT.block_mask) || (creature->LOT.node[item->boxNumber].search_number == (creature->LOT.search_number | 0x8000)))
-		zone[enemy->boxNumber] |= 0x8000;
+	if (Boxes[enemy->boxNumber].overlapIndex & creature->LOT.block_mask)
+		AI->enemy_zone |= 0x4000;
+	else if (creature->LOT.node[item->boxNumber].search_number == (creature->LOT.search_number | 0x8000))
+		AI->enemy_zone |= 0x4000;
 
 	obj = &Objects[item->objectID];
-	x = enemy->pos.x - (item->pos.x + (obj->pivotLength * phd_sin(item->pos.rotY) >> W2V_SHIFT));
-	z = enemy->pos.z - (item->pos.z + (obj->pivotLength * phd_cos(item->pos.rotY) >> W2V_SHIFT));
+	x = enemy->pos.x - (obj->pivotLength * phd_sin(item->pos.rotY) >> W2V_SHIFT) - item->pos.x;
+	z = enemy->pos.z - (obj->pivotLength * phd_cos(item->pos.rotY) >> W2V_SHIFT) - item->pos.z;
 	angle = phd_atan(z, x);
 	if (creature->enemy)
 		AI->distance = SQR(x) + SQR(z);
@@ -161,7 +163,7 @@ void GetBaddieTarget(short creatureIdx, BOOL isMonk)
 	int bestdistance = 0, x = 0, y = 0, z = 0, distance = 0;
 
 	item = &Items[creatureIdx];
-	creature = (CREATURE_INFO*)item->data;
+	creature = GetCreatureInfo(item);
 	if (creature == NULL) 
 		return;
 
@@ -250,7 +252,7 @@ bool DamageTarget(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int 
 
 bool DamageLaraOrEnemy(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damageLara, int damageEnemy, bool touchBitsLara)
 {
-	if (enemy)
+	if (enemy != NULL)
 	{
 		if (enemy == LaraItem && touchBitsLara)
 		{

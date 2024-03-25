@@ -27,8 +27,9 @@
  /*
   * Function list
   */
-int ControlPhase(int nTicks, BOOL demoMode);
-#define AnimateItem ((void(__cdecl*)(ITEM_INFO*)) 0x004146C0)
+
+int ControlPhase(int nTicks, BOOL demoMode); // 0x00414370
+void AnimateItem(ITEM_INFO* item); // 0x004146C0
 #define GetChange ((int(__cdecl*)(ITEM_INFO*,ANIM_STRUCT*)) 0x00414A30)
 #define TranslateItem ((void(__cdecl*)(ITEM_INFO*,int,int,int)) 0x00414AE0)
 #define GetFloor ((FLOOR_INFO*(__cdecl*)(int, int, int, short*)) 0x00414B40)

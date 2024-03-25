@@ -686,7 +686,7 @@ extern STATIC_INFO StaticObjects[256];
 #define CD_Flags					ARRAY_(0x005261C0, short, [64])
 #define FlipMaps					ARRAY_(0x00526260, int, [10])
 #define LosRooms					ARRAY_(0x005262A0, int, [20])
-#define GroundZones					ARRAY_(0x005263A0, short*, [4][2])
+#define GroundZones					ARRAY_(0x005263A0, short*, [8])
 #define FlyZones					ARRAY_(0x005263C0, short*, [2])
 
 /*

@@ -21,6 +21,7 @@
 
 #include "precompiled.h"
 #include "game/control.h"
+#include "3dsystem/phd_math.h"
 #include "game/camera.h"
 #include "game/demo.h"
 #include "game/effects.h"
@@ -31,6 +32,7 @@
 #include "game/traps.h"
 #include "game/lot.h"
 #include "game/pickup.h"
+#include "game/sound.h"
 #include "game/savegame.h"
 #include "specific/game.h"
 #include "specific/input.h"
@@ -187,6 +189,146 @@ int ControlPhase(int nTicks, BOOL demoMode) {
 	UpdateJoyOutput(!IsDemoLevelType);
 #endif // FEATURE_INPUT_IMPROVED
 	return 0;
+}
+
+void AnimateItem(ITEM_INFO* item)
+{
+	ANIM_STRUCT* anim = NULL;
+	USHORT type = 0;
+	short num = 0;
+	short* command = NULL;
+
+	item->hitStatus = FALSE;
+	item->touchBits = 0;
+	item->frameNumber++;
+
+	anim = &Anims[item->animNumber];
+	if (anim->numberChanges > 0 && GetChange(item, anim))
+	{
+		anim = &Anims[item->animNumber];
+		item->currentAnimState = anim->currentAnimState;
+		if (item->requiredAnimState == item->currentAnimState)
+			item->requiredAnimState = 0;
+	}
+
+	if (item->frameNumber > anim->frameEnd)
+	{
+		if (anim->numberCommands > 0)
+		{
+			command = &AnimCommands[anim->commandIndex];
+			for (int i = anim->numberCommands; i > 0; i--)
+			{
+				switch (*command++)
+				{
+				case 1:
+					TranslateItem(item, command[0], command[1], command[2]);
+					command += 3;
+					break;
+				case 2:
+					item->fallSpeed = *command++;
+					item->speed = *command++;
+					item->gravity = TRUE;
+					break;
+				case 4:
+					item->status = ITEM_DISABLED;
+					break;
+				case 5:
+				case 6:
+					command += 2;
+					break;
+				}
+			}
+		}
+		item->animNumber = anim->jumpAnimNum;
+		item->frameNumber = anim->jumpFrameNum;
+		anim = &Anims[item->animNumber];
+		if (item->currentAnimState != anim->currentAnimState)
+		{
+			item->currentAnimState = anim->currentAnimState;
+			item->goalAnimState = item->currentAnimState;
+		}
+		if (item->requiredAnimState == item->currentAnimState)
+			item->requiredAnimState = 0;
+	}
+
+	if (anim->numberCommands > 0)
+	{
+		command = &AnimCommands[anim->commandIndex];
+		for (int i = anim->numberCommands; i > 0; i--)
+		{
+			switch (*command++)
+			{
+			case 1:
+				command += 3;
+				break;
+			case 2:
+				command += 2;
+				break;
+			case 5:
+				if (item->frameNumber == command[0])
+				{
+					type = command[1] & 0xC000;
+					num = command[1] & 0x3FFF;
+					if (Objects[item->objectID].water_creature)
+					{
+						PlaySoundEffect(num, &item->pos, SFX_UNDERWATER);
+					}
+					else
+					{
+						if (item->roomNumber == 255)
+						{
+							item->pos.x = LaraItem->pos.x;
+							item->pos.y = LaraItem->pos.y - 762;
+							item->pos.z = LaraItem->pos.z;
+							if (item->objectID == ID_LARA_HARPOON)
+								PlaySoundEffect(num, &item->pos, SFX_ALWAYS);
+							else
+								PlaySoundEffect(num, &item->pos, NULL);
+						}
+						else if (CHK_ANY(RoomInfo[item->roomNumber].flags, ROOM_UNDERWATER))
+						{
+							if (type == SFX_LANDANDWATER || type == SFX_WATERONLY)
+							{
+								short roomNum = item->roomNumber;
+								GetFloor(item->pos.x, item->pos.y - CLICK_SIZE, item->pos.z, &roomNum);
+								if (type == SFX_WATERONLY && !(RoomInfo[roomNum].flags & ROOM_UNDERWATER))
+									CreateSplash(item->pos.x, item->pos.y, item->pos.z, item->roomNumber);
+								PlaySoundEffect(num, &item->pos, NULL);
+							}
+						}
+						else if (type == SFX_LANDANDWATER || type == SFX_LANDONLY)
+							PlaySoundEffect(num, &item->pos, NULL);
+					}
+				}
+				command += 2;
+				break;
+			case 6:
+				if (item->frameNumber == command[0])
+				{
+					num = command[1] & 0x3FFF;
+					EffectFunctions[num](item);
+				}
+				command += 2;
+				break;
+			}
+		}
+	}
+
+	if (item->gravity)
+	{
+		item->fallSpeed += (item->fallSpeed >= 128) ? 1 : 6;
+		item->pos.y += item->fallSpeed;
+	}
+	else
+	{
+		int velocity = anim->velocity;
+		if (anim->acceleration)
+			velocity += anim->acceleration * (item->frameNumber - anim->frameBase);
+		item->speed = velocity >> 16;
+	}
+
+	item->pos.x += item->speed * phd_sin(item->pos.rotY) >> W2V_SHIFT;
+	item->pos.z += item->speed * phd_cos(item->pos.rotY) >> W2V_SHIFT;
 }
 
 #define END_BIT     0x8000
@@ -707,7 +849,7 @@ void TriggerNormalCDTrack(short value, UINT16 flags, short type) {
  */
 void Inject_Control() {
 	INJECT(0x00414370, ControlPhase);
-	//INJECT(0x004146C0, AnimateItem);
+	INJECT(0x004146C0, AnimateItem);
 	//INJECT(0x00414A30, GetChange);
 	//INJECT(0x00414AE0, TranslateItem);
 	//INJECT(0x00414B40, GetFloor);
