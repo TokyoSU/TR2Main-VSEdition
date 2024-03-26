@@ -469,7 +469,7 @@ void Inject_LaraFire() {
 	//INJECT(0x0042ECB0, CheckForHoldingState);
 	//INJECT(0x0042ECF0, InitialiseNewWeapon);
 	//INJECT(0x0042EE30, LaraTargetInfo);
-	//INJECT(0x0042EFD0, LaraGetNewTarget);
+	INJECT(0x0042EFD0, LaraGetNewTarget);
 	//INJECT(0x0042F1F0, find_target_point);
 	//INJECT(0x0042F2A0, AimWeapon);
 	INJECT(0x0042F370, FireWeapon);

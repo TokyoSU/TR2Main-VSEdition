@@ -1889,7 +1889,7 @@ typedef struct CollInfo_t {
 	char zTilt;
 	char hitByBaddie;
 	char hitStatic;
-	UINT16 slopesAreWalls : 2;
+	UINT16 slopesAreWalls : 1;
 	UINT16 slopesArePits : 1;
 	UINT16 lavaIsPit : 1;
 	UINT16 enableBaddiePush : 1;

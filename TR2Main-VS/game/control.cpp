@@ -275,10 +275,13 @@ void AnimateItem(ITEM_INFO* item)
 					}
 					else
 					{
-						short roomNum = item->roomNumber;
-						GetFloor(item->pos.x, item->pos.y, item->pos.z, &roomNum);
-						if (type == SFX_WATERONLY)
-							CreateSplash(item->pos.x, item->pos.y, item->pos.z, item->roomNumber);
+						if (item->roomNumber != 255)
+						{
+							short roomNum = item->roomNumber;
+							GetFloor(item->pos.x, item->pos.y, item->pos.z, &roomNum);
+							if (type == SFX_WATERONLY)
+								CreateSplash(item->pos.x, item->pos.y, item->pos.z, item->roomNumber);
+						}
 
 						if (item->roomNumber == 255)
 						{

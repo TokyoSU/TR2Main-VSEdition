@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed antitrigger.
 - Fixed oneshot trigger not oneshotting.
 - Fixed entities not colliding with lara.
+- Fixed drawing harpoon crash, that was introduced with the enemies splash effect trying to check the current room, problem is harpoon code use room 255 which is considered like NULL which not exist.
 
 ### Internal changes.
 - Decompiled spider.cpp
