@@ -5,7 +5,54 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased: v0.9.0.3]
+## [Unreleased: v0.9.0.4]
+
+## [0.9.0.3b] - 2024-03-24
+
+### Warnings:
+
+- Some of the functions decompiled was removed to fix bugs, think like sinks and savegame problem should be fixed.
+- Since the TR2Main.json have some addition, check it before sending a issue.
+
+### TR2Main features.
+- Added enemy bars.
+- Added json configuration for starting weapons and ammos.
+- Added json configuration for entities health.
+- Added json configuration for health bar, air bar and enemy bar position and color.
+- Added json configuration for mercenary and monks to attack lara directly.
+- Added json configuration for lara combat camera, to avoid targeting monks if they are not angry. (Can still explode with grenade, they will be hostile directly !)
+- Added json configuration to enable/disable the enemy bar per level.
+- Added blood effect to mercenary when monk attack them.
+- Added water splash when lara move on water surface (only when moving above it), it won't play if she is wading or underwater.
+- Added water splash when entities move on water surface (only if sound as water-only) (underwater creatures ignored).
+
+### Minor changes.
+- Fixed zone loading (it was regressed to fix bug, but it seem arsunt did some check for TR2gold enemies to avoid loading specific zone which cause crash if you trigger them).
+- Fixed underwater creature dying, i tried the TR2X structure OBJECT_INFO which is wrong apparently :'D since the fish was dying when triggered.
+- Fixed monks attacking lara directly during battle. (decompilation bug)
+- Fixed crash when lara goes on slope (walking or running). (decompilation bug)
+- Fixed antitrigger.
+- Fixed oneshot trigger not oneshotting.
+- Fixed entities not colliding with lara.
+
+### Internal changes.
+- Decompiled spider.cpp
+- Decompiled monks in enemies.cpp
+- Removed lot.cpp decompiled code to fix almost all pathfinding problem and crash.
+- Decreased creatures max count from 12 to 5 (default).
+
+### TombEditor warnings:
+
+- Since the items count has been increased, you need to change it in the TrCatalog.xml:
+```
+<limit name="ItemMaxCount" value="256" />
+<limit name="ItemSafeCount" value="256" />
+```
+to
+```
+<limit name="ItemMaxCount" value="1024" />
+<limit name="ItemSafeCount" value="1024" />
+```
 
 ## [0.9.0.2] - 2023-09-29
 
@@ -29,9 +76,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Decompiled monks in enemies.cpp
 - Decompiled lot.cpp
 
-## [0.9.0.1] - 2023-09-24 - Fix count: 3
-
-### Warning:
+### TombEditor warnings:
 
 - Since the items count has been increased, you need to change it in the TrCatalog.xml:
 ```
@@ -43,6 +88,8 @@ to
 <limit name="ItemMaxCount" value="1024" />
 <limit name="ItemSafeCount" value="1024" />
 ```
+
+## [0.9.0.1] - 2023-09-24 - Fix count: 3
 
 ### TR2Main bugfixes
 - Fixed gamepad/joystick wrong check, it was only checking for the left motor, not both.
@@ -63,6 +110,19 @@ to
 
 ### Minor changes.
 - Improved WinMain function argument to the recommanded syntax for visual studio.
+
+### TombEditor warnings:
+
+- Since the items count has been increased, you need to change it in the TrCatalog.xml:
+```
+<limit name="ItemMaxCount" value="256" />
+<limit name="ItemSafeCount" value="256" />
+```
+to
+```
+<limit name="ItemMaxCount" value="1024" />
+<limit name="ItemSafeCount" value="1024" />
+```
 
 ## [0.9.0] - 2023-06-05
 ### New features
