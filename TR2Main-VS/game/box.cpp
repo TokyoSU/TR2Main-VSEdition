@@ -69,18 +69,16 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 	if (enemy == NULL)
 		enemy = LaraItem;
 
-	short* zone = creature->LOT.fly != 0 ? FlyZones[FlipStatus] : GroundZones[FlipStatus + 2 * (creature->LOT.step >> 8)];
+	short* zone = creature->LOT.fly != 0 ? FlyZones[FlipStatus] : GroundZones[2 * (creature->LOT.step >> 8) + FlipStatus];
 	room = &RoomInfo[item->roomNumber];
-	item->boxNumber = room->floor[((item->pos.z - room->z) >> WALL_SHIFT) + ((item->pos.x - room->x) >> WALL_SHIFT) * room->xSize].box;
+	item->boxNumber = room->floor[((item->pos.z - room->z) >> WALL_SHIFT) + room->xSize * ((item->pos.x - room->x) >> WALL_SHIFT)].box;
 	AI->zone_number = zone[item->boxNumber];
 	
 	room = &RoomInfo[enemy->roomNumber];
-	enemy->boxNumber = room->floor[((enemy->pos.z - room->z) >> WALL_SHIFT) + ((enemy->pos.x - room->x) >> WALL_SHIFT) * room->xSize].box;
+	enemy->boxNumber = room->floor[((enemy->pos.z - room->z) >> WALL_SHIFT) + room->xSize * ((enemy->pos.x - room->x) >> WALL_SHIFT)].box;
 	AI->enemy_zone = zone[enemy->boxNumber];
 
-	if (Boxes[enemy->boxNumber].overlapIndex & creature->LOT.block_mask)
-		AI->enemy_zone |= 0x4000;
-	else if (creature->LOT.node[item->boxNumber].search_number == (creature->LOT.search_number | 0x8000))
+	if ((Boxes[enemy->boxNumber].overlapIndex & creature->LOT.block_mask) || creature->LOT.node[item->boxNumber].search_number == (creature->LOT.search_number | 0x8000))
 		AI->enemy_zone |= 0x4000;
 
 	obj = &Objects[item->objectID];
