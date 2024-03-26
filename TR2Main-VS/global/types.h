@@ -2245,7 +2245,7 @@ typedef struct CreatureInfo_t {
 	ITEM_INFO* enemy;
 } CREATURE_INFO;
 
-static CREATURE_INFO* GetCreatureInfo(ITEM_INFO* item) {
+static inline CREATURE_INFO* GetCreatureInfo(ITEM_INFO* item) {
 	return static_cast<CREATURE_INFO*>(item->data);
 }
 
@@ -2374,6 +2374,10 @@ typedef struct WeaponInfo_t {
 	short flashTime;
 	short sampleNum;
 } WEAPON_INFO;
+
+static inline short GetSectorBoxXZ(ITEM_INFO* item, ROOM_INFO* room) {
+	return room->floor[((item->pos.z - room->z) >> WALL_SHIFT) + ((item->pos.x - room->x) >> WALL_SHIFT) * room->xSize].box;
+}
 
 #pragma pack(pop)
 

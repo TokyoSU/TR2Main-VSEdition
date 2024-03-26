@@ -71,11 +71,11 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 
 	short* zone = creature->LOT.fly != 0 ? FlyZones[FlipStatus] : GroundZones[2 * (creature->LOT.step >> 8) + FlipStatus];
 	room = &RoomInfo[item->roomNumber];
-	item->boxNumber = room->floor[((item->pos.z - room->z) >> WALL_SHIFT) + room->xSize * ((item->pos.x - room->x) >> WALL_SHIFT)].box;
+	item->boxNumber = GetSectorBoxXZ(item, room);
 	AI->zone_number = zone[item->boxNumber];
 	
 	room = &RoomInfo[enemy->roomNumber];
-	enemy->boxNumber = room->floor[((enemy->pos.z - room->z) >> WALL_SHIFT) + room->xSize * ((enemy->pos.x - room->x) >> WALL_SHIFT)].box;
+	enemy->boxNumber = GetSectorBoxXZ(enemy, room);
 	AI->enemy_zone = zone[enemy->boxNumber];
 
 	if ((Boxes[enemy->boxNumber].overlapIndex & creature->LOT.block_mask) || creature->LOT.node[item->boxNumber].search_number == (creature->LOT.search_number | 0x8000))
