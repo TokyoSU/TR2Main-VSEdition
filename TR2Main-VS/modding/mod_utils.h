@@ -123,7 +123,8 @@ int GetModDragonHealth();
 int GetModGiantYetiHealth();
 int GetModDinoHealth();
 
-bool GetModLaraIgnoreMonkIfNotAngry();
+bool IsModDisableGiantYetiNextLevelOnDeath();
+bool IsModLaraIgnoreMonkIfNotAngry();
 bool GetModMakeMonkAttackLaraDirectly();
 bool GetModMakeMercenaryAttackLaraDirectly();
 

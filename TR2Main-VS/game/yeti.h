@@ -27,6 +27,7 @@
  /*
   * Function list
   */
+
 void GiantYetiControl(short itemID); // 0x00443100
 void YetiControl(short itemID); // 0x00443400
 

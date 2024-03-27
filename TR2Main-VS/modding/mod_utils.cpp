@@ -102,6 +102,7 @@ typedef struct {
 	int giantYetiHealth;
 	int dinoHealth;
 
+	bool disableGiantYetiNextLevelOnDeath;
 	bool laraIgnoreMonkIfNotAngry;
 	bool makeMonkAttackLaraFirst;
 	bool makeMercenaryAttackLaraFirst;
@@ -634,7 +635,11 @@ int GetModDinoHealth() {
 	return ModConfig.dinoHealth;
 }
 
-bool GetModLaraIgnoreMonkIfNotAngry() {
+bool IsModDisableGiantYetiNextLevelOnDeath() {
+	return ModConfig.disableGiantYetiNextLevelOnDeath;
+}
+
+bool IsModLaraIgnoreMonkIfNotAngry() {
 	return ModConfig.laraIgnoreMonkIfNotAngry;
 }
 
@@ -903,7 +908,7 @@ static bool ParseBooleanConfigByName(json_value* root, const char* name, bool de
 
 static int ParseIntegerConfigByName(json_value* root, const char* name, int defaultValue = -1) {
 	json_value* field = GetJsonField(root, json_integer, name, NULL);
-	if (field) {
+	if (field && field->u.integer > 0) {
 		return (int)field->u.integer;
 	}
 	return defaultValue;
@@ -911,7 +916,7 @@ static int ParseIntegerConfigByName(json_value* root, const char* name, int defa
 
 static DWORD ParseLongConfigByName(json_value* root, const char* name, DWORD defaultValue = -1) {
 	json_value* field = GetJsonField(root, json_integer, name, NULL);
-	if (field) {
+	if (field && field->u.integer > 0) {
 		return (DWORD)field->u.integer;
 	}
 	return defaultValue;
@@ -1104,6 +1109,7 @@ static bool ParseLevelConfiguration(json_value* root) {
 	ModConfig.dragonHealth = ParseIntegerConfigByName(root, "dragonHealth", 300);
 	ModConfig.giantYetiHealth = ParseIntegerConfigByName(root, "giantYetiHealth", 200);
 	ModConfig.dinoHealth = ParseIntegerConfigByName(root, "dinoHealth", 100);
+	ModConfig.disableGiantYetiNextLevelOnDeath = ParseBooleanConfigByName(root, "disableGiantYetiNextLevelOnDeath");
 	ModConfig.laraIgnoreMonkIfNotAngry = ParseBooleanConfigByName(root, "laraignoremonkifnotangry");
 	ModConfig.makeMercenaryAttackLaraFirst = ParseBooleanConfigByName(root, "mercenaryattacklaradirectly");
 	ModConfig.makeMonkAttackLaraFirst = ParseBooleanConfigByName(root, "monksattacklaradirectly");

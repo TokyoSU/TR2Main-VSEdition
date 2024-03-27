@@ -295,7 +295,7 @@ void BaddyObjects() {
 	}
 	obj = &Objects[ID_SPIDER_or_WOLF];
 	if (obj->loaded) {
-#ifdef FEATURE_GOLD
+#if defined(FEATURE_GOLD)
 		obj->initialise = IsGold() ? InitialiseWolf : InitialiseCreature;
 		obj->control = IsGold() ? WolfControl : SpiderControl;
 #if defined(FEATURE_MOD_CONFIG)
@@ -325,7 +325,7 @@ void BaddyObjects() {
 	if (obj->loaded) {
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
-#ifdef FEATURE_GOLD
+#if defined(FEATURE_GOLD)
 		obj->control = IsGold() ? BearControl : BigSpiderControl;
 #if defined(FEATURE_MOD_CONFIG)
 		obj->hitPoints = IsGold() ? GetModBearHealth() : GetModBigSpiderHealth();
@@ -547,7 +547,7 @@ void BaddyObjects() {
 #endif
 		obj->radius = 102;
 		obj->pivotLength = 0;
-#ifdef FEATURE_GOLD
+#if defined(FEATURE_GOLD)
 		obj->shadowSize = IsGold() ? 0 : 128;
 #else
 		obj->shadowSize = 128;
@@ -641,7 +641,6 @@ void BaddyObjects() {
 #else
 		obj->hitPoints = 5;
 #endif
-		obj->hitPoints = 5;
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
@@ -710,7 +709,6 @@ void BaddyObjects() {
 		obj->save_hitpoints = 1;
 		obj->save_flags = 1;
 		obj->save_anim = 1;
-		obj->hitPoints = 50;
 		obj->radius = 102;
 		obj->pivotLength = 0;
 		AnimBones[obj->boneIndex + 6 * 4] |= 0x08;

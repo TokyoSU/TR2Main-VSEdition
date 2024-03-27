@@ -24,6 +24,7 @@
 #include "game/box.h"
 #include "game/effects.h"
 #include "specific/game.h"
+#include "modding/mod_utils.h"
 #include "global/vars.h"
 
 enum YETI_STATES
@@ -73,6 +74,8 @@ enum BIRDY_STATES
 #define YETI_ATTACK3_DAMAGE_TO_OTHER 2
 #define YETI_TOUCHR MESH_BITS(10)
 #define YETI_TOUCHL MESH_BITS(13)
+#define BIRDY_ATTACK1_RANGE SQR(WALL_SIZE)
+#define BIRDY_ATTACK2_RANGE SQR(WALL_SIZE*2)
 #define BIRDY_DAMAGE 200
 #define BIRDY_DAMAGE_TO_OTHER 4
 #define BIRDY_DEATH_ANIM 20
@@ -98,7 +101,8 @@ void GiantYetiControl(short itemID)
 	{
 		if (item->currentAnimState != BIRDY_DEATH)
 			SetAnimation(item, BIRDY_DEATH_ANIM, BIRDY_DEATH);
-		if (item->frameNumber == Anims[item->animNumber].frameEnd)
+
+		if (item->frameNumber == Anims[item->animNumber].frameEnd && !IsModDisableGiantYetiNextLevelOnDeath())
 			IsLevelComplete = TRUE;
 	}
 	else
@@ -113,7 +117,7 @@ void GiantYetiControl(short itemID)
 		{
 		case BIRDY_WAIT1:
 			birdy->maximum_turn = 0;
-			if (AI.ahead && AI.distance < 0x100000)
+			if (AI.ahead && AI.distance < BIRDY_ATTACK1_RANGE)
 			{
 				if (GetRandomControl() >= 0x4000)
 					item->goalAnimState = BIRDY_AIM3;
@@ -134,28 +138,28 @@ void GiantYetiControl(short itemID)
 			break;
 		case BIRDY_WALK:
 			birdy->maximum_turn = 728;
-			if (AI.ahead && AI.distance < 0x400000)
+			if (AI.ahead && AI.distance < BIRDY_ATTACK2_RANGE)
 				item->goalAnimState = BIRDY_AIM2;
 			else if ((birdy->mood == MOOD_BORED || birdy->mood == MOOD_STALK) && AI.ahead)
 				item->goalAnimState = BIRDY_WAIT1;
 			break;
 		case BIRDY_AIM1:
 			birdy->flags = 0;
-			if (AI.ahead && AI.distance < 0x100000)
+			if (AI.ahead && AI.distance < BIRDY_ATTACK1_RANGE)
 				item->goalAnimState = BIRDY_PUNCH1;
 			else
 				item->goalAnimState = BIRDY_WAIT1;
 			break;
 		case BIRDY_AIM2:
 			birdy->flags = 0;
-			if (AI.ahead && AI.distance < 0x400000)
+			if (AI.ahead && AI.distance < BIRDY_ATTACK2_RANGE)
 				item->goalAnimState = BIRDY_PUNCH2;
 			else
 				item->goalAnimState = BIRDY_WALK;
 			break;
 		case BIRDY_AIM3:
 			birdy->flags = 0;
-			if (AI.ahead && AI.distance < 0x100000)
+			if (AI.ahead && AI.distance < BIRDY_ATTACK1_RANGE)
 				item->goalAnimState = BIRDY_PUNCH3;
 			else
 				item->goalAnimState = BIRDY_WAIT1;
@@ -166,18 +170,18 @@ void GiantYetiControl(short itemID)
 		case BIRDY_PUNCH3:
 			if (birdy->enemy == LaraItem)
 			{
-				if (!CHK_ANY(birdy->flags, 1) && CHK_ANY(item->touchBits, YETI_TOUCHL))
+				if (!(birdy->flags & 1) && CHK_ANY(item->touchBits, BIRDY_TOUCHL))
 				{
 					DamageTarget(item, birdy->enemy, &BirdyBiteHandL, BIRDY_DAMAGE);
 					birdy->flags |= 1;
 				}
-				if (!CHK_ANY(birdy->flags, 2) && CHK_ANY(item->touchBits, YETI_TOUCHR))
+				if (!(birdy->flags & 2) && CHK_ANY(item->touchBits, BIRDY_TOUCHR))
 				{
 					DamageTarget(item, birdy->enemy, &BirdyBiteHandR, BIRDY_DAMAGE);
 					birdy->flags |= 2;
 				}
 			}
-			else if (!CHK_ANY(birdy->flags, 1) && IsCreatureNearTarget(item, birdy->enemy))
+			else if (!(birdy->flags & 1) && IsCreatureNearTarget(item, birdy->enemy))
 			{
 				DamageTarget(item, birdy->enemy, item->currentAnimState == BIRDY_PUNCHR ? &BirdyBiteHandR : &BirdyBiteHandL, BIRDY_DAMAGE_TO_OTHER);
 				birdy->flags |= 1;
@@ -364,13 +368,13 @@ void YetiControl(short itemID)
 
 			if (yeti->enemy == LaraItem)
 			{
-				if (!CHK_ANY(yeti->flags, 2) && CHK_ANY(item->touchBits, YETI_TOUCHR))
+				if (!(yeti->flags & 2) && CHK_ANY(item->touchBits, YETI_TOUCHR))
 				{
 					DamageTarget(item, yeti->enemy, &YetiBiteHandR, YETI_ATTACK1_DAMAGE);
 					yeti->flags |= 2;
 				}
 			}
-			else if (!CHK_ANY(yeti->flags, 1) && IsCreatureNearTarget(item, yeti->enemy))
+			else if (!(yeti->flags & 1) && IsCreatureNearTarget(item, yeti->enemy))
 			{
 				DamageTarget(item, yeti->enemy, &YetiBiteHandL, YETI_ATTACK1_DAMAGE_TO_OTHER);
 				yeti->flags |= 1;
@@ -386,19 +390,19 @@ void YetiControl(short itemID)
 				// The original game didn't damage lara with both hand separated, it checked for both hand at the same time, dealing YETI_ATTACK2_DAMAGE 1 time only (full damage).
 				// Now it check for both and deal only damage if the left or right hand touch the target (or both).
 
-				if (!CHK_ANY(yeti->flags, 1) && CHK_ANY(item->touchBits, YETI_TOUCHL))
+				if (!(yeti->flags & 1) && CHK_ANY(item->touchBits, YETI_TOUCHL))
 				{
 					DamageTarget(item, yeti->enemy, &YetiBiteHandL, YETI_ATTACK2_DAMAGE/2);
 					yeti->flags |= 1;
 				}
 
-				if (!CHK_ANY(yeti->flags, 2) && CHK_ANY(item->touchBits, YETI_TOUCHR))
+				if (!(yeti->flags & 2) && CHK_ANY(item->touchBits, YETI_TOUCHR))
 				{
 					DamageTarget(item, yeti->enemy, &YetiBiteHandR, YETI_ATTACK2_DAMAGE/2);
 					yeti->flags |= 2;
 				}
 			}
-			else if (!CHK_ANY(yeti->flags, 1) && IsCreatureNearTarget(item, yeti->enemy))
+			else if (!(yeti->flags & 1) && IsCreatureNearTarget(item, yeti->enemy))
 			{
 				DamageTarget(item, yeti->enemy, &YetiBiteHandL, YETI_ATTACK2_DAMAGE_TO_OTHER);
 				yeti->flags |= 1;
@@ -410,19 +414,19 @@ void YetiControl(short itemID)
 
 			if (yeti->enemy == LaraItem)
 			{
-				if (!CHK_ANY(yeti->flags, 1) && CHK_ANY(item->touchBits, YETI_TOUCHL))
+				if (!(yeti->flags & 1) && CHK_ANY(item->touchBits, YETI_TOUCHL))
 				{
 					DamageTarget(item, yeti->enemy, &YetiBiteHandL, YETI_ATTACK3_DAMAGE);
 					yeti->flags |= 1;
 				}
 
-				if (!CHK_ANY(yeti->flags, 2) && CHK_ANY(item->touchBits, YETI_TOUCHR))
+				if (!(yeti->flags & 2) && CHK_ANY(item->touchBits, YETI_TOUCHR))
 				{
 					DamageTarget(item, yeti->enemy, &YetiBiteHandR, YETI_ATTACK3_DAMAGE);
 					yeti->flags |= 2;
 				}
 			}
-			else if (!CHK_ANY(yeti->flags, 1) && IsCreatureNearTarget(item, yeti->enemy))
+			else if (!(yeti->flags & 1) && IsCreatureNearTarget(item, yeti->enemy))
 			{
 				DamageTarget(item, yeti->enemy, &YetiBiteHandL, YETI_ATTACK3_DAMAGE_TO_OTHER);
 				yeti->flags |= 1;

@@ -271,7 +271,7 @@ void LaraGetNewTarget(WEAPON_INFO* weapon)
 		if (targetItem->hitPoints <= 0)
 			continue;
 #if defined(FEATURE_MOD_CONFIG)
-		if (GetModLaraIgnoreMonkIfNotAngry())
+		if (IsModLaraIgnoreMonkIfNotAngry())
 		{
 			if ((targetItem->objectID == ID_MONK1 || targetItem->objectID == ID_MONK2) && !IsMonkAngry)
 				continue;
