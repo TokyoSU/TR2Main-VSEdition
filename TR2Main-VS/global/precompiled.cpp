@@ -1,4 +1,5 @@
 #include "precompiled.h"
+#include <mimalloc-new-delete.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
 

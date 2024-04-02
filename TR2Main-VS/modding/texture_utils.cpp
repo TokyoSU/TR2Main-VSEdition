@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2021 Michael Chaban. All rights reserved.
+ * Copyright (c) 2017-2024 Michael Chaban. All rights reserved.
  * Original game is created by Core Design Ltd. in 1997.
  * Lara Croft and Tomb Raider are trademarks of Embracer Group AB.
  *
@@ -315,26 +315,23 @@ static void sortMaps() {
 	}
 }
 
-static int searchMap(const char* name, MAP* mapArray, DWORD mapCount) {
+static int searchMap(LPCSTR name, MAP* mapArray, DWORD mapCount) {
 	if (!name || !*name) return -1;
 	MAP keyItem = { 0, name };
 	MAP* foundItem = (MAP*)bsearch(&keyItem, mapArray, mapCount, sizeof(MAP), compareMap);
 	return foundItem ? foundItem->id : -1;
 }
 
-static bool ParseSpriteInfo(json_value* root, int id) {
-	if (root == NULL || root->type != json_object || id < 0 || id >= button_sprites_number) {
-		return false;
-	}
+static bool ParseSpriteInfo(Value& root, int id) {
 	PHD_SPRITE* info = &PhdSpriteInfo[BTN_SPR_IDX + id];
 
-	BYTE u = GetJsonIntegerFieldValue(root, "u", 0);
-	BYTE v = GetJsonIntegerFieldValue(root, "v", 0);
-	int x = GetJsonIntegerFieldValue(root, "x", 0);
-	int y = GetJsonIntegerFieldValue(root, "y", 0);
-	int width = GetJsonIntegerFieldValue(root, "width", 0);
-	int height = GetJsonIntegerFieldValue(root, "height", 0);
-	ButtonSpriteSpacing[id] = GetJsonIntegerFieldValue(root, "spacing", 0);
+	BYTE u = GetValueByNameInt<BYTE>(root, "u", 0);
+	BYTE v = GetValueByNameInt<BYTE>(root, "v", 0);
+	int x = GetValueByNameInt<int>(root, "x", 0);
+	int y = GetValueByNameInt<int>(root, "y", 0);
+	int width = GetValueByNameInt<int>(root, "width", 0);
+	int height = GetValueByNameInt<int>(root, "height", 0);
+	ButtonSpriteSpacing[id] = GetValueByNameInt<BYTE>(root, "spacing", 0);
 
 	info->offset = (v << 8) | u;
 	info->width = ABS(width) * 256;
@@ -347,24 +344,28 @@ static bool ParseSpriteInfo(json_value* root, int id) {
 	return true;
 }
 
-static bool ParseButtonSprites(json_value* root) {
-	if (root == NULL || root->type != json_object) {
-		return false;
-	}
+static bool ParseButtonSprites(Value& root) {
 	sortMaps();
-	for (DWORD i = 0; i < root->u.object.length; ++i) {
-		if (root->u.object.values[i].value->type != json_object) continue;
-		int id = searchMap(root->u.object.values[i].name, btnMap, ARRAY_SIZE(btnMap));
-		ParseSpriteInfo(root->u.object.values[i].value, id);
+
+	if (root.IsArray())
+	{
+		Value& list = root.GetArray();
+		for (SizeType i = 0; i < list.Size(); ++i) {
+			Value& btnList = list[i];
+			int id = searchMap(btnList.GetString(), btnMap, ARRAY_SIZE(btnMap));
+			ParseSpriteInfo(btnList, id);
+		}
 	}
+
 	return true;
 }
 
-static BYTE FindPaletteEntry(RGB888* palette, int red, int green, int blue) {
-	UINT16 result = 0;
+static BYTE FindPaletteEntry(RGB888* palette, BYTE red, BYTE green, BYTE blue) {
+	BYTE result = 0;
 	int diffMin = INT_MAX;
+
 	// skip index 0 as it is reserved as semitransparent
-	for (int i = 1; i < 256; ++i) {
+	for (BYTE i = 1; i < UCHAR_MAX; ++i) {
 		int diffRed = red - GamePalette8[i].red;
 		int diffGreen = green - GamePalette8[i].green;
 		int diffBlue = blue - GamePalette8[i].blue;
@@ -374,6 +375,7 @@ static BYTE FindPaletteEntry(RGB888* palette, int red, int green, int blue) {
 			result = i;
 		}
 	}
+
 	return result;
 }
 
@@ -453,39 +455,25 @@ bool LoadButtonSprites() {
 		for (int i = 0; i < button_sprites_number; ++i) {
 			PhdSpriteInfo[BTN_SPR_IDX + i].texPage = pageIndex;
 		}
-		DWORD jsonSize = 0;
-#if (DIRECT3D_VERSION >= 0x900)
-		bool isExternalJson = false;
-		LPVOID jsonData = NULL;
-		if (isExternalTexture && PathFileExists("textures/buttons.json")) {
-			DWORD bytesRead = 0;
-			HANDLE hFile = CreateFile("textures/buttons.json", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, NULL);
-			if (hFile != INVALID_HANDLE_VALUE) {
-				isExternalJson = true;
-				jsonSize = GetFileSize(hFile, NULL);
-				jsonData = malloc(jsonSize);
-				ReadFile(hFile, jsonData, jsonSize, &bytesRead, NULL);
-				CloseHandle(hFile);
-			}
+
+#if defined(FEATURE_MOD_CONFIG)
+		if (!PathFileExists("textures/buttons.png"))
+			return false;
+		std::ifstream file("textures/buttons.json");
+		std::string json((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+		StringStream ss(json.c_str());
+		CursorStreamWrapper<StringStream> csw(ss);
+		Document doc;
+		doc.ParseStream(csw);
+		if (doc.HasParseError()) {
+			size_t lineID = csw.GetLine();
+			if (lineID > 0)
+				lineID--;
+			ParseJsonError("textures/buttons.json", lineID, doc.GetParseError());
+			return false;
 		}
-		if (!isExternalJson) {
-			jsonData = (LPVOID)GetResourceData("BUTTONS.JSON", &jsonSize);
-		}
-#else // (DIRECT3D_VERSION >= 0x900)
-		LPCVOID jsonData = GetResourceData("BUTTONS.JSON", &jsonSize);
-#endif // (DIRECT3D_VERSION >= 0x900)
-		if (jsonData && jsonSize) {
-			json_value* json = json_parse((const json_char*)jsonData, jsonSize);
-			if (json != NULL) {
-				ButtonSpriteLoaded = ParseButtonSprites(json);
-				json_value_free(json);
-			}
-		}
-#if (DIRECT3D_VERSION >= 0x900)
-		if (isExternalJson && jsonData) {
-			free(jsonData);
-		}
-#endif // (DIRECT3D_VERSION >= 0x900)
+		ButtonSpriteLoaded = ParseButtonSprites(doc);
+#endif
 	}
 	return ButtonSpriteLoaded;
 }
@@ -766,34 +754,24 @@ double GetTexPagesGlyphYStretch(int id) {
 }
 #endif // FEATURE_HUD_IMPROVED
 
-static bool ParseLevelTexPagesConfiguration(json_value* root) {
-	if (root == NULL || root->type != json_object) {
-		return false;
-	}
-	json_value* field = NULL;
-
-	field = GetJsonField(root, json_boolean, "legacy_colors", NULL);
-	if (field) {
-		TexPagesConfig.isLegacyColors = field->u.boolean;
-	}
-
-	field = GetJsonField(root, json_double, "uv_adjust", NULL);
-	if (field) {
-		TexPagesConfig.adjustment = field->u.dbl;
-	}
+static bool ParseLevelTexPagesConfiguration(Value& root) {
+	TexPagesConfig.isLegacyColors = GetValueByNameBool(root, "legacy_colors", false);
+	TexPagesConfig.adjustment = GetValueByNameDouble(root, "uv_adjust", 0.0);
 
 #ifdef FEATURE_HUD_IMPROVED
-	json_value* glyphs = GetJsonField(root, json_array, "glyphs", NULL);
-	if (glyphs) {
-		for (DWORD i = 0; i < glyphs->u.array.length; ++i) {
-			json_value* glyph = glyphs->u.array.values[i];
-			int id = GetJsonIntegerFieldValue(glyph, "id", -1);
+	if (root.HasMember("glyphs") && root["glyphs"].IsArray())
+	{
+		Value& glyphsList = root["glyphs"].GetArray();
+		for (SizeType i = 0; i < glyphsList.Size(); i++)
+		{
+			Value& glyph = glyphsList[i];
+			int id = GetValueByNameInt<int>(glyph, "id", -1);
 			if (id < 0 || id >= (int)ARRAY_SIZE(TexPagesConfig.glyphs)) continue;
-			TexPagesConfig.glyphs[id].spacing = GetJsonIntegerFieldValue(glyph, "spacing", 0);
-			TexPagesConfig.glyphs[id].xOffset = GetJsonIntegerFieldValue(glyph, "x_offset", 0);
-			TexPagesConfig.glyphs[id].yOffset = GetJsonIntegerFieldValue(glyph, "y_offset", 0);
-			TexPagesConfig.glyphs[id].xStretch = GetJsonFloatFieldValue(glyph, "x_stretch", 1.0);
-			TexPagesConfig.glyphs[id].yStretch = GetJsonFloatFieldValue(glyph, "y_stretch", 1.0);
+			TexPagesConfig.glyphs[id].spacing = GetValueByNameInt<int>(glyph, "spacing", 0);
+			TexPagesConfig.glyphs[id].xOffset = GetValueByNameInt<int>(glyph, "x_offset", 0);
+			TexPagesConfig.glyphs[id].yOffset = GetValueByNameInt<int>(glyph, "y_offset", 0);
+			TexPagesConfig.glyphs[id].xStretch = GetValueByNameDouble(glyph, "x_stretch", 1.0);
+			TexPagesConfig.glyphs[id].yStretch = GetValueByNameDouble(glyph, "y_stretch", 1.0);
 		}
 	}
 #endif // FEATURE_HUD_IMPROVED
@@ -801,15 +779,35 @@ static bool ParseLevelTexPagesConfiguration(json_value* root) {
 	return true;
 }
 
-static bool ParseTexPagesConfiguration(char* levelName, json_value* root) {
-	if (root == NULL || root->type != json_object) {
-		return false;
-	}
+static bool ParseTexPagesConfiguration(LPCSTR levelName, Value& root) {
+
 	// parsing default configs
-	ParseLevelTexPagesConfiguration(GetJsonField(root, json_object, "default", NULL));
+	if (root.HasMember("default"))
+		ParseLevelTexPagesConfiguration(root["default"]);
+
 	// parsing level specific configs
-	json_value* levels = GetJsonField(root, json_array, "levels", NULL);
-	if (levels) ParseLevelTexPagesConfiguration(GetJsonObjectByStringField(levels, "filename", levelName, false, NULL));
+	if (root.HasMember("levels") && root["levels"].IsArray())
+	{
+		Value& levels = root["levels"].GetArray();
+		for (SizeType i = 0; i < levels.Size(); i++)
+		{
+			Value& level = levels[i];
+			// Filename member required for detecting current level !
+			if (level.HasMember("filename")) {
+				// If the filename is equal then load it !
+				if (strcasecmp(level["filename"].GetString(), levelName) == 0) {
+					ParseLevelTexPagesConfiguration(level);
+					break;
+				}
+			}
+			else
+			{
+				LogWarn("Failed to load level configuration (json), current level: %s not have a 'filename' entry !", levelName);
+				return false;
+			}
+		}
+	}
+
 	return true;
 }
 
@@ -820,29 +818,34 @@ void UnloadTexPagesConfiguration() {
 bool LoadTexPagesConfiguration(LPCTSTR levelFilePath) {
 	UnloadTexPagesConfiguration();
 	if (!PathFileExists(TEXPAGE_CONFIG_NAME)) {
+		LogWarn("Failed to load json: %s, does not exist !", TEXPAGE_CONFIG_NAME);
 		return false;
 	}
+
+	std::ifstream file(TEXPAGE_CONFIG_NAME);
+	std::string json((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	StringStream ss(json.c_str());
+	CursorStreamWrapper<StringStream> csw(ss);
+	Document doc;
+	doc.ParseStream(csw);
+
+	if (doc.HasParseError()) {
+		size_t lineID = csw.GetLine();
+		if (lineID > 0)
+			lineID--;
+		ParseJsonError(TEXPAGE_CONFIG_NAME, lineID, doc.GetParseError());
+		return false;
+	}
+
 	char levelName[256] = { 0 };
 	strncpy(levelName, PathFindFileName(levelFilePath), sizeof(levelName) - 1);
 	char* ext = PathFindExtension(levelName);
 	if (ext != NULL) *ext = 0;
 
-	DWORD bytesRead = 0;
-	HANDLE hFile = CreateFile(TEXPAGE_CONFIG_NAME, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, NULL);
-	if (hFile == INVALID_HANDLE_VALUE) {
-		return false;
-	}
-	DWORD cfgSize = GetFileSize(hFile, NULL);
-	void* cfgData = malloc(cfgSize);
-	ReadFile(hFile, cfgData, cfgSize, &bytesRead, NULL);
-	CloseHandle(hFile);
+	for (size_t i = 0; i < strlen(levelName); i++)
+		levelName[i] = std::toupper(levelName[i]);
 
-	json_value* json = json_parse((const json_char*)cfgData, cfgSize);
-	if (json != NULL) {
-		TexPagesConfig.isLoaded = ParseTexPagesConfiguration(levelName, json);
-	}
-	json_value_free(json);
-	free(cfgData);
+	TexPagesConfig.isLoaded = ParseTexPagesConfiguration(levelName, doc);
 	return TexPagesConfig.isLoaded;
 }
 #endif // (DIRECT3D_VERSION >= 0x900)

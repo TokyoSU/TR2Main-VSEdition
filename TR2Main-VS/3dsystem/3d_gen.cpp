@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2021 Michael Chaban. All rights reserved.
+ * Copyright (c) 2017-2024 Michael Chaban. All rights reserved.
  * Original game is created by Core Design Ltd. in 1997.
  * Lara Croft and Tomb Raider are trademarks of Embracer Group AB.
  *
@@ -119,10 +119,10 @@ void SetMeshReflectState(int objID, int meshIdx) {
 
 #ifdef FEATURE_MOD_CONFIG
 	// Check if config is presented
-	if (IsModReflectConfigLoaded()) {
+	if (Mod.reflect.isLoaded) {
 		POLYFILTER_NODE* node = NULL;
 		if (meshIdx < 0) {
-			for (node = GetModReflectStaticsFilter(); node != NULL; node = node->next) {
+			for (node = Mod.reflect.statics; node != NULL; node = node->next) {
 				if (node->id == objID) {
 					ReflectFilter = node->filter;
 					IsReflect = true;
@@ -131,7 +131,7 @@ void SetMeshReflectState(int objID, int meshIdx) {
 			}
 		}
 		else if (objID >= 0 && objID < ID_NUMBER_OBJECTS) {
-			POLYFILTER_NODE** obj = GetModReflectObjectsFilter();
+			POLYFILTER_NODE** obj = Mod.reflect.objects;
 			for (node = obj[objID]; node != NULL; node = node->next) {
 				if (node->id == meshIdx) {
 					ReflectFilter = node->filter;
@@ -241,8 +241,7 @@ static bool InsertEnvmap(short* ptrObj, int vtxCount, bool colored, LPVOID param
 }
 
 static void phd_PutEnvmapPolygons(short* ptrEnv) {
-	if (ptrEnv == NULL || !IsReflect
-		|| SavedAppSettings.RenderMode != RM_Hardware) return;
+	if (ptrEnv == NULL || !IsReflect || SavedAppSettings.RenderMode != RM_Hardware) return;
 	short* ptrObj = ptrEnv;
 
 	ptrObj += 5; // skip x, y, z, radius, flags
@@ -253,7 +252,6 @@ static void phd_PutEnvmapPolygons(short* ptrEnv) {
 	if (vtxCount <= 0) return;
 
 	PHD_UV* uv = new PHD_UV[vtxCount];
-
 	for (int i = 0; i < vtxCount; ++i) {
 		// make sure that reflection will be drawn after normal poly
 		PhdVBuf[i].zv -= (double)(W2V_SCALE / 2);
@@ -283,8 +281,7 @@ static void phd_PutEnvmapPolygons(short* ptrEnv) {
 		uv[i].v = PHD_ONE / PHD_IONE * (y + PHD_IONE) / 2;
 		ptrObj += 3;
 	}
-
-	EnumeratePolys(ptrEnv, false, InsertEnvmap, &ReflectFilter, (LPVOID)uv);
+	Mod.EnumeratePolys(ptrEnv, false, InsertEnvmap, &ReflectFilter, (LPVOID)uv);
 	delete[] uv;
 }
 #endif // FEATURE_VIDEOFX_IMPROVED

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2021 Michael Chaban. All rights reserved.
+ * Copyright (c) 2017-2024 Michael Chaban. All rights reserved.
  * Original game is created by Core Design Ltd. in 1997.
  * Lara Croft and Tomb Raider are trademarks of Embracer Group AB.
  *
@@ -42,13 +42,17 @@
 // Macros values.
 
 #define WEAPON_UNLIMITED 10001
+
 #define PISTOLS_AMMO_DEFAULT 1000
 #define AUTOPISTOLS_AMMO_CLIPS 40
 #define UZIS_AMMO_CLIPS 80
 #define SHOTGUN_AMMO_CLIPS 12
+#define SHOTGUN_AMMO_SHOOT 6
 #define HARPOON_AMMO_CLIPS 3
 #define M16_AMMO_CLIPS 40
 #define GRENADE_AMMO_CLIPS 2
+
+#define FLARE_AMMO_CLIPS 6
 
 /*
  * General Variables

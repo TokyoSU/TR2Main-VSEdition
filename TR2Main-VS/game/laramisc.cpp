@@ -644,7 +644,7 @@ void InitialiseLaraInventory(int levelID) {
 
 	if (GF_RemoveWeapons) {
 		start->has_pistols = 0;
-		start->has_magnums = 0;
+		start->has_autopistol = 0;
 		start->has_uzis = 0;
 		start->has_shotgun = 0;
 		start->has_m16 = 0;
@@ -661,7 +661,7 @@ void InitialiseLaraInventory(int levelID) {
 		start->harpoonAmmo = 0;
 		start->shotgunAmmo = 0;
 		start->uziAmmo = 0;
-		start->magnumAmmo = 0;
+		start->autopistolAmmo = 0;
 		start->pistolAmmo = 0;
 		start->flares = 0;
 		start->largeMedipacks = 0;
@@ -677,7 +677,7 @@ void InitialiseLaraInventory(int levelID) {
 		start->has_uzis = 0;
 	}
 	if (!Objects[ID_MAGNUM_OPTION].loaded) {
-		start->has_magnums = 0;
+		start->has_autopistol = 0;
 	}
 	if (!Objects[ID_SHOTGUN_OPTION].loaded) {
 		start->has_shotgun = 0;
@@ -699,8 +699,8 @@ void InitialiseLaraInventory(int levelID) {
 	if (!start->has_uzis && !Objects[ID_UZI_AMMO_OPTION].loaded) {
 		start->uziAmmo = 0;
 	}
-	if (!start->has_magnums && !Objects[ID_MAGNUM_AMMO_OPTION].loaded) {
-		start->magnumAmmo = 0;
+	if (!start->has_autopistol && !Objects[ID_MAGNUM_AMMO_OPTION].loaded) {
+		start->autopistolAmmo = 0;
 	}
 	if (!start->has_shotgun && !Objects[ID_SHOTGUN_AMMO_OPTION].loaded) {
 		start->shotgunAmmo = 0;
@@ -719,7 +719,7 @@ void InitialiseLaraInventory(int levelID) {
 	switch (start->gunType) {
 		// if the current weapon is absent then fall through
 	case LGT_Pistols: if (start->has_pistols) break; // fall through
-	case LGT_Magnums: if (start->has_magnums) break; // fall through
+	case LGT_Magnums: if (start->has_autopistol) break; // fall through
 	case LGT_Uzis: if (start->has_uzis) break; // fall through
 	case LGT_Shotgun: if (start->has_shotgun) break; // fall through
 	case LGT_M16: if (start->has_m16) break; // fall through
@@ -741,13 +741,13 @@ void InitialiseLaraInventory(int levelID) {
 	}
 
 	// Magnums
-	if (start->has_magnums) {
+	if (start->has_autopistol) {
 		Inv_AddItem(ID_MAGNUM_ITEM);
-		Lara.magnum_ammo = start->magnumAmmo;
+		Lara.magnum_ammo = start->autopistolAmmo;
 		GlobalItemReplace(ID_MAGNUM_ITEM, ID_MAGNUM_AMMO_ITEM);
 	}
 	else {
-		for (i = 0; i < start->magnumAmmo / AUTOPISTOLS_AMMO_CLIPS; ++i) {
+		for (i = 0; i < start->autopistolAmmo / AUTOPISTOLS_AMMO_CLIPS; ++i) {
 			Inv_AddItem(ID_MAGNUM_AMMO_ITEM);
 		}
 		Lara.magnum_ammo = 0;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2021 Michael Chaban. All rights reserved.
+ * Copyright (c) 2017-2024 Michael Chaban. All rights reserved.
  * Original game is created by Core Design Ltd. in 1997.
  * Lara Croft and Tomb Raider are trademarks of Embracer Group AB.
  *
@@ -117,7 +117,7 @@ void DrawGameInfo(BOOL pickupState) {
 		flashState = FlashIt();
 		DrawHealthBar(flashState);
 		DrawAirBar(flashState);
-		if (IsEnemyBarEnabled())
+		if (Mod.enemyBarEnabled)
 			DrawEnemyHealthBar();
 		DrawPickups(pickupState);
 		DrawAssaultTimer();

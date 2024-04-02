@@ -102,7 +102,7 @@ void GiantYetiControl(short itemID)
 		if (item->currentAnimState != BIRDY_DEATH)
 			SetAnimation(item, BIRDY_DEATH_ANIM, BIRDY_DEATH);
 
-		if (item->frameNumber == Anims[item->animNumber].frameEnd && !IsModDisableGiantYetiNextLevelOnDeath())
+		if (item->frameNumber == Anims[item->animNumber].frameEnd && !Mod.disableGiantYetiNextLevelOnDeath)
 			IsLevelComplete = TRUE;
 	}
 	else

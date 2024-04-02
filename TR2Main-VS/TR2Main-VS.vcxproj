@@ -102,7 +102,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\global</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)json-parser;$(ProjectDir)global</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -129,7 +129,7 @@ xcopy /y "$(TargetDir)fmtd.dll" "$(LocalDebuggerWorkingDirectory)"</Command>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\global</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)json-parser;$(ProjectDir)global</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -158,7 +158,7 @@ xcopy /y "$(TargetDir)d3dx9d_43.dll" "$(LocalDebuggerWorkingDirectory)"</Command
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\global</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)json-parser;$(ProjectDir)global</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -189,7 +189,7 @@ xcopy /y "$(TargetDir)fmt.dll" "$(LocalDebuggerWorkingDirectory)"</Command>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\global</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)json-parser;$(ProjectDir)global</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -293,23 +293,17 @@ xcopy /y "$(TargetDir)d3dx9_43.dll" "$(LocalDebuggerWorkingDirectory)"</Command>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">precompiled.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release_DX9|Win32'">precompiled.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="json-parser\json.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_DX9|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_DX9|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="modding\background_new.cpp" />
     <ClCompile Include="modding\cd_pauld.cpp" />
     <ClCompile Include="modding\file_utils.cpp" />
     <ClCompile Include="modding\gdi_utils.cpp" />
     <ClCompile Include="modding\joy_output.cpp" />
     <ClCompile Include="modding\json_utils.cpp" />
-    <ClCompile Include="modding\mod_utils.cpp" />
     <ClCompile Include="modding\pause.cpp" />
     <ClCompile Include="modding\psx_bar.cpp" />
     <ClCompile Include="modding\raw_input.cpp" />
     <ClCompile Include="modding\texture_utils.cpp" />
+    <ClCompile Include="modding\mod_utils.cpp" />
     <ClCompile Include="modding\xinput_ex.cpp" />
     <ClCompile Include="specific\background.cpp" />
     <ClCompile Include="specific\display.cpp" />
@@ -400,18 +394,55 @@ xcopy /y "$(TargetDir)d3dx9_43.dll" "$(LocalDebuggerWorkingDirectory)"</Command>
     <ClInclude Include="global\resource.h" />
     <ClInclude Include="global\types.h" />
     <ClInclude Include="global\vars.h" />
-    <ClInclude Include="json-parser\json.h" />
+    <ClInclude Include="json-parser\rapidjson\allocators.h" />
+    <ClInclude Include="json-parser\rapidjson\cursorstreamwrapper.h" />
+    <ClInclude Include="json-parser\rapidjson\document.h" />
+    <ClInclude Include="json-parser\rapidjson\encodedstream.h" />
+    <ClInclude Include="json-parser\rapidjson\encodings.h" />
+    <ClInclude Include="json-parser\rapidjson\error\en.h" />
+    <ClInclude Include="json-parser\rapidjson\error\error.h" />
+    <ClInclude Include="json-parser\rapidjson\filereadstream.h" />
+    <ClInclude Include="json-parser\rapidjson\filewritestream.h" />
+    <ClInclude Include="json-parser\rapidjson\fwd.h" />
+    <ClInclude Include="json-parser\rapidjson\internal\biginteger.h" />
+    <ClInclude Include="json-parser\rapidjson\internal\clzll.h" />
+    <ClInclude Include="json-parser\rapidjson\internal\diyfp.h" />
+    <ClInclude Include="json-parser\rapidjson\internal\dtoa.h" />
+    <ClInclude Include="json-parser\rapidjson\internal\ieee754.h" />
+    <ClInclude Include="json-parser\rapidjson\internal\itoa.h" />
+    <ClInclude Include="json-parser\rapidjson\internal\meta.h" />
+    <ClInclude Include="json-parser\rapidjson\internal\pow10.h" />
+    <ClInclude Include="json-parser\rapidjson\internal\regex.h" />
+    <ClInclude Include="json-parser\rapidjson\internal\stack.h" />
+    <ClInclude Include="json-parser\rapidjson\internal\strfunc.h" />
+    <ClInclude Include="json-parser\rapidjson\internal\strtod.h" />
+    <ClInclude Include="json-parser\rapidjson\internal\swap.h" />
+    <ClInclude Include="json-parser\rapidjson\istreamwrapper.h" />
+    <ClInclude Include="json-parser\rapidjson\memorybuffer.h" />
+    <ClInclude Include="json-parser\rapidjson\memorystream.h" />
+    <ClInclude Include="json-parser\rapidjson\msinttypes\inttypes.h" />
+    <ClInclude Include="json-parser\rapidjson\msinttypes\stdint.h" />
+    <ClInclude Include="json-parser\rapidjson\ostreamwrapper.h" />
+    <ClInclude Include="json-parser\rapidjson\pointer.h" />
+    <ClInclude Include="json-parser\rapidjson\prettywriter.h" />
+    <ClInclude Include="json-parser\rapidjson\rapidjson.h" />
+    <ClInclude Include="json-parser\rapidjson\reader.h" />
+    <ClInclude Include="json-parser\rapidjson\schema.h" />
+    <ClInclude Include="json-parser\rapidjson\stream.h" />
+    <ClInclude Include="json-parser\rapidjson\stringbuffer.h" />
+    <ClInclude Include="json-parser\rapidjson\uri.h" />
+    <ClInclude Include="json-parser\rapidjson\writer.h" />
     <ClInclude Include="modding\background_new.h" />
     <ClInclude Include="modding\cd_pauld.h" />
     <ClInclude Include="modding\file_utils.h" />
     <ClInclude Include="modding\gdi_utils.h" />
     <ClInclude Include="modding\joy_output.h" />
     <ClInclude Include="modding\json_utils.h" />
-    <ClInclude Include="modding\mod_utils.h" />
     <ClInclude Include="modding\pause.h" />
     <ClInclude Include="modding\psx_bar.h" />
     <ClInclude Include="modding\raw_input.h" />
     <ClInclude Include="modding\texture_utils.h" />
+    <ClInclude Include="modding\mod_utils.h" />
     <ClInclude Include="modding\xinput_ex.h" />
     <ClInclude Include="specific\background.h" />
     <ClInclude Include="specific\display.h" />

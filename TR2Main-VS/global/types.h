@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2021 Michael Chaban. All rights reserved.
+ * Copyright (c) 2017-2024 Michael Chaban. All rights reserved.
  * Original game is created by Core Design Ltd. in 1997.
  * Lara Croft and Tomb Raider are trademarks of Embracer Group AB.
  *
@@ -49,6 +49,13 @@ typedef struct {
 /*
  * Defined values
  */
+
+
+ // Filter is presented by an array of poly index and polys number (starting from the index).
+ // The filter must be always terminated by an index 0.
+ // If the first item has index=~0 then there are no polys of such type to process.
+ // If the first item has index=0 and number=0 then all polys of such type must be processed.
+#define POLYFILTER_SIZE 256
 
  // General values
 #define REQ_LEVEL_VERSION	(45)
@@ -1268,6 +1275,92 @@ typedef enum {
  */
 #pragma pack(push, 1)
 
+typedef struct { short idx; short num; } POLYINDEX;
+
+typedef struct {
+	short n_vtx, n_gt4, n_gt3, n_g4, n_g3;
+	POLYINDEX gt4[POLYFILTER_SIZE];
+	POLYINDEX gt3[POLYFILTER_SIZE];
+	POLYINDEX g4[POLYFILTER_SIZE];
+	POLYINDEX g3[POLYFILTER_SIZE];
+} POLYFILTER;
+
+typedef struct PolyfilterNode_t {
+	int id;
+	POLYFILTER filter;
+	struct PolyfilterNode_t* next;
+} POLYFILTER_NODE;
+
+typedef struct {
+	int PC_xpos, PC_ypos;
+	INV_COLOURS PC_color[2]; // Left, Right (ICLR_flags)
+	int PSX_xpos, PSX_ypos;
+	DWORD PSX_leftcolor[6];
+	DWORD PSX_rightcolor[6];
+	DWORD PSX_framecolor[6];
+} BAR_CONFIG;
+
+typedef bool (*ENUM_POLYS_CB) (short* ptrObj, int vtxCount, bool colored, LPVOID param);
+
+typedef struct {
+	bool isLoaded;
+	POLYINDEX* animtex;
+	POLYFILTER_NODE* rooms;
+	POLYFILTER_NODE* statics;
+	POLYFILTER_NODE* objects[ID_NUMBER_OBJECTS];
+} SEMITRANS_CONFIG;
+
+typedef struct {
+	bool isLoaded;
+	POLYFILTER_NODE* statics;
+	POLYFILTER_NODE* objects[ID_NUMBER_OBJECTS];
+} REFLECT_CONFIG;
+
+typedef struct {
+	BAR_CONFIG health;
+	BAR_CONFIG air;
+} LARA_BAR_CONFIG;
+
+typedef struct {
+	short dog;
+	short mouse;
+	short cult1;
+	short cult1A;
+	short cult1B;
+	short cult2;
+	short shark;
+	short tiger;
+	short barracuda;
+	short smallSpider; // spider or wolf (separated)
+	short wolf; // spider or wolf (separated)
+	short bigSpider; // big spider or bear (separated)
+	short bear; // big spider or bear (separated)
+	short yeti;
+	short jelly;
+	short diver;
+	short worker1;
+	short worker2;
+	short worker3;
+	short worker4;
+	short worker5;
+	short cult3;
+	short monk1;
+	short monk2;
+	short eagle;
+	short crow;
+	short bigEel;
+	short eel;
+	short bandit1;
+	short bandit2;
+	short bandit2B;
+	short skidman;
+	short xianLord;
+	short warrior;
+	short dragon;
+	short giantYeti;
+	short dino;
+} ENEMY_HEALTH_INFO;
+
  // NOTE: there were int items in the original code,
  // but it's more important to have wider range
  // since negative numbers are not used anyway
@@ -1715,7 +1808,7 @@ typedef struct StatisticsInfo_t {
 
 typedef struct StartInfo_t {
 	UINT16 pistolAmmo;
-	UINT16 magnumAmmo;
+	UINT16 autopistolAmmo;
 	UINT16 uziAmmo;
 	UINT16 shotgunAmmo;
 	UINT16 m16Ammo;
@@ -1729,7 +1822,7 @@ typedef struct StartInfo_t {
 	BYTE gunType;
 	UINT16 available : 1;
 	UINT16 has_pistols : 1;
-	UINT16 has_magnums : 1;
+	UINT16 has_autopistol : 1;
 	UINT16 has_uzis : 1;
 	UINT16 has_shotgun : 1;
 	UINT16 has_m16 : 1;

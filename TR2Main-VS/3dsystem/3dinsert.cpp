@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2021 Michael Chaban. All rights reserved.
+ * Copyright (c) 2017-2024 Michael Chaban. All rights reserved.
  * Original game is created by Core Design Ltd. in 1997.
  * Lara Croft and Tomb Raider are trademarks of Embracer Group AB.
  *
@@ -29,9 +29,11 @@
 #include "modding/texture_utils.h"
 #endif // defined(FEATURE_HUD_IMPROVED) || (DIRECT3D_VERSION >= 0x900)
 
-#ifdef FEATURE_VIDEOFX_IMPROVED
+#if defined(FEATURE_VIDEOFX_IMPROVED)
 #include "specific/texture.h"
+#if defined(FEATURE_MOD_CONFIG)
 #include "modding/mod_utils.h"
+#endif
 
 extern DWORD ShadowMode;
 extern DWORD AlphaBlendMode;
@@ -84,7 +86,7 @@ static D3DCOLOR shadeColor(DWORD red, DWORD green, DWORD blue, DWORD alpha, DWOR
 
 	if (IsShadeEffect) {
 #if defined(FEATURE_VIDEOFX_IMPROVED) && defined(FEATURE_MOD_CONFIG)
-		D3DCOLOR water = GetModWaterColor();
+		D3DCOLOR water = Mod.waterColor;
 		if (CustomWaterColorEnabled && water) {
 			red = red * RGB_GETRED(water) / 256;
 			green = green * RGB_GETGREEN(water) / 256;

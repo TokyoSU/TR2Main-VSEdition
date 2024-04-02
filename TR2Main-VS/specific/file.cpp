@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2021 Michael Chaban. All rights reserved.
+ * Copyright (c) 2017-2024 Michael Chaban. All rights reserved.
  * Original game is created by Core Design Ltd. in 1997.
  * Lara Croft and Tomb Raider are trademarks of Embracer Group AB.
  *
@@ -31,6 +31,7 @@
 #include "specific/output.h"
 #include "specific/texture.h"
 #include "specific/winvid.h"
+#include "modding/mod_utils.h"
 #include "global/vars.h"
 
 #define REQ_SCRIPT_VERSION	(3)
@@ -89,26 +90,26 @@ static bool MarkSemitransMesh(int objID, int meshIdx, POLYFILTER* filter) {
 		if (!obj->loaded || meshIdx >= obj->nMeshes) return false; // no such object/mesh for patching
 		ptrObj = MeshPtr[obj->meshIndex + meshIdx];
 	}
-	return EnumeratePolys(ptrObj, false, MarkSemitransPoly, filter, NULL);
+	return Mod.EnumeratePolys(ptrObj, false, MarkSemitransPoly, filter, NULL);
 }
 
 static void MarkSemitransObjects() {
 #ifdef FEATURE_MOD_CONFIG
 	// Check if config is presented
-	if (IsModSemitransConfigLoaded()) {
+	if (Mod.semitrans.isLoaded) {
 		POLYFILTER_NODE* node = NULL;
-		POLYFILTER_NODE** obj = GetModSemitransObjectsFilter();
+		POLYFILTER_NODE** obj = Mod.semitrans.objects;
 		for (int i = 0; i < ID_NUMBER_OBJECTS; ++i) {
 			for (node = obj[i]; node != NULL; node = node->next) {
 				MarkSemitransMesh(i, node->id, &node->filter);
 			}
 		}
-		for (node = GetModSemitransStaticsFilter(); node != NULL; node = node->next) {
+		for (node = Mod.semitrans.statics; node != NULL; node = node->next) {
 			MarkSemitransMesh(node->id, -1, &node->filter);
 		}
-		for (node = GetModSemitransRoomsFilter(); node != NULL; node = node->next) {
+		for (node = Mod.semitrans.rooms; node != NULL; node = node->next) {
 			if (node->id >= 0 && node->id < RoomCount) {
-				EnumeratePolys(RoomInfo[node->id].data, true, MarkSemitransPoly, &node->filter, NULL);
+				Mod.EnumeratePolys(RoomInfo[node->id].data, true, MarkSemitransPoly, &node->filter, NULL);
 			}
 		}
 		return;
@@ -160,7 +161,7 @@ static void MarkSemitransTextureRanges() {
 	short* ptr = AnimatedTextureRanges;
 
 #ifdef FEATURE_MOD_CONFIG
-	filter = GetModSemitransAnimtexFilter();
+	filter = Mod.semitrans.animtex;
 	// Check if filter is presented
 	if (filter != NULL && (filter[0].idx || filter[0].num)) {
 		int polyIndex = 0;
@@ -230,7 +231,7 @@ void UpdateDepthQ(bool isReset) {
 bool BarefootSfxEnabled = true;
 
 static void LoadBareFootSFX(int* sampleIndexes, int sampleCount) {
-	if (!BarefootSfxEnabled || !IsModBarefoot() || !sampleIndexes || sampleCount < 1) return;
+	if (!BarefootSfxEnabled || !Mod.isBarefoot || !sampleIndexes || sampleCount < 1) return;
 
 	LPCTSTR sfxFileName = GetFullPath("data\\barefoot.sfx");
 	if (!PathFileExists(sfxFileName)) return;
@@ -800,7 +801,7 @@ BOOL LoadItems(HANDLE hFile) {
 			wsprintf(StringToShow, "LoadItems(): Bad Object number (%d) on Item %d", Items[i].objectID, i);
 			return FALSE;
 		}
-		InitialiseItem(i);
+		InitialiseItem((short)i);
 	}
 	return TRUE;
 }
@@ -1230,14 +1231,14 @@ EXIT:
 BOOL S_LoadLevelFile(LPCTSTR fileName, int levelID, GF_LEVEL_TYPE levelType) {
 	S_UnloadLevelFile();
 	LoadLevelType = levelType; // NOTE: this line is not presented in the original game
-#ifdef FEATURE_MOD_CONFIG
-	LoadModConfiguration(fileName);
+#if defined(FEATURE_MOD_CONFIG)
+	Mod.LoadJson(fileName);
 	BOOL result = LoadLevel(fileName, levelID);
-#ifdef FEATURE_BACKGROUND_IMPROVED
-	if (LoadingScreensEnabled && GetModLoadingPix() && (levelType == GFL_NORMAL || levelType == GFL_SAVED)) {
+#if defined(FEATURE_BACKGROUND_IMPROVED)
+	if (LoadingScreensEnabled && Mod.loadingPixFound && (levelType == GFL_NORMAL || levelType == GFL_SAVED)) {
 		RGB888 palette[256];
 		memcpy(palette, GamePalette8, sizeof(GamePalette8));
-		if (!BGND2_LoadPicture(GetModLoadingPix(), FALSE, FALSE)) {
+		if (!BGND2_LoadPicture(Mod.loadingPix, FALSE, FALSE)) {
 			BGND2_ShowPicture(30, 90, 10, 2, TRUE);
 			S_DontDisplayPicture();
 			InputStatus = 0;
@@ -1258,9 +1259,11 @@ void S_UnloadLevelFile() {
 	memset(TexturePageBuffer8, 0, sizeof(TexturePageBuffer8));
 	*LevelFileName = 0;
 	TextureInfoCount = 0;
-#ifdef FEATURE_MOD_CONFIG
-	UnloadModConfiguration();
+
+#if defined(FEATURE_MOD_CONFIG)
+	Mod.Release();
 #endif // FEATURE_MOD_CONFIG
+
 #if (DIRECT3D_VERSION >= 0x900)
 	UnloadTexPagesConfiguration();
 #endif // (DIRECT3D_VERSION >= 0x900)

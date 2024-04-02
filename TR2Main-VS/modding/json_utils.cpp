@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2021 Michael Chaban. All rights reserved.
+ * Copyright (c) 2017-2024 Michael Chaban. All rights reserved.
  * Original game is created by Core Design Ltd. in 1997.
  * Lara Croft and Tomb Raider are trademarks of Embracer Group AB.
  *
@@ -18,58 +18,105 @@
  * You should have received a copy of the GNU General Public License
  * along with TR2Main.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 #include "precompiled.h"
-#include "modding/json_utils.h"
-#include "global/vars.h"
+#include "json_utils.h"
 
-json_value* GetJsonField(json_value* root, json_type fieldType, const char* name, DWORD* pIndex) {
-	if (root == NULL || root->type != json_object) {
-		return NULL;
-	}
-	json_value* result = NULL;
-	DWORD len = name ? strlen(name) : 0;
-	DWORD i = pIndex ? *pIndex : 0;
-	for (; i < root->u.object.length; ++i) {
-		if (root->u.object.values[i].value->type == fieldType) {
-			if (!name || (len == root->u.object.values[i].name_length
-				&& !strncmp(root->u.object.values[i].name, name, len)))
-			{
-				result = root->u.object.values[i].value;
-				break;
-			}
-		}
-	}
-	if (pIndex) *pIndex = i;
-	return result;
+double GetValueByNameDouble(Value& data, LPCSTR name, double defaultValue)
+{
+    if (data.HasMember(name))
+        return data[name].GetDouble();
+    return defaultValue;
 }
 
-json_value* GetJsonObjectByStringField(json_value* root, const char* name, const char* str, bool caseSensitive, DWORD* pIndex) {
-	if (root == NULL || root->type != json_array || !name || !*name || !str) {
-		return NULL;
-	}
-	json_value* result = NULL;
-	DWORD len = strlen(str);
-	DWORD i = pIndex ? *pIndex : 0;
-	for (; i < root->u.array.length; ++i) {
-		json_value* key = GetJsonField(root->u.array.values[i], json_string, name, NULL);
-		if (key && len == key->u.string.length &&
-			(caseSensitive ? strncmp(key->u.string.ptr, str, len) : !strncasecmp(key->u.string.ptr, str, len)))
-		{
-			result = root->u.array.values[i];
-			break;
-		}
-	}
-	if (pIndex) *pIndex = i;
-	return result;
+D3DCOLOR GetColorByName(Value& data, LPCSTR name, D3DCOLOR defaultValue)
+{
+    if (data.HasMember(name) && data[name].GetStringLength() == 6)
+        return strtol(data[name].GetString(), NULL, 16);
+    return defaultValue;
 }
 
-int GetJsonIntegerFieldValue(json_value* root, const char* name, int defaultValue) {
-	json_value* field = GetJsonField(root, json_integer, name, NULL);
-	return field ? field->u.integer : defaultValue;
+bool GetValueByNameBool(Value& data, LPCSTR name, bool defaultValue)
+{
+    if (data.HasMember(name))
+        return data[name].GetBool();
+    return defaultValue;
 }
 
-double GetJsonFloatFieldValue(json_value* root, const char* name, double defaultValue) {
-	json_value* field = GetJsonField(root, json_double, name, NULL);
-	return field ? field->u.dbl : defaultValue;
+LPCSTR GetValueByNameString(Value& data, LPCSTR name, SizeType* destStringSize, LPCSTR defaultValue)
+{
+    if (data.HasMember(name))
+    {
+        *destStringSize = data[name].GetStringLength();
+        return data[name].GetString();
+    }
+    *destStringSize = 0;
+    return defaultValue;
+}
+
+void ParseJsonError(LPCSTR filePath, size_t line, int parseCode) {
+    std::string str = "Failed to load json";
+
+    str.append(", Filename: "); str.append(filePath);
+    str.append(", Line: "); str.append(std::to_string(line));
+
+    str.append(", Error: ");
+    switch (parseCode)
+    {
+    case kParseErrorDocumentEmpty:
+        str.append("The document is empty.");
+        break;
+    case kParseErrorDocumentRootNotSingular:
+        str.append("The document data must not follow by other values.");
+        break;
+    case kParseErrorValueInvalid:
+        str.append("Invalid value.");
+        break;
+    case kParseErrorObjectMissName:
+        str.append("Missing a name for object member. (Or a ',' is not followed by any object)");
+        break;
+    case kParseErrorObjectMissColon:
+        str.append("Missing a colon after a name of object member.");
+        break;
+    case kParseErrorObjectMissCommaOrCurlyBracket:
+        str.append("Missing a comma or '}' after an object member.");
+        break;
+    case kParseErrorArrayMissCommaOrSquareBracket:
+        str.append("Missing a comma or ']' after an array element.");
+        break;
+    case kParseErrorStringUnicodeEscapeInvalidHex:
+        str.append("Incorrect hex digit after \\u escape in string.");
+        break;
+    case kParseErrorStringUnicodeSurrogateInvalid:
+        str.append("The surrogate pair in string is invalid.");
+        break;
+    case kParseErrorStringEscapeInvalid:
+        str.append("Invalid escape character in string.");
+        break;
+    case kParseErrorStringMissQuotationMark:
+        str.append("Missing a closing quotation mark in string.");
+        break;
+    case kParseErrorStringInvalidEncoding:
+        str.append("Invalid encoding in string.");
+        break;
+    case kParseErrorNumberTooBig:
+        str.append("Number too big to be stored in double.");
+        break;
+    case kParseErrorNumberMissFraction:
+        str.append("Miss fraction part in number.");
+        break;
+    case kParseErrorNumberMissExponent:
+        str.append("Miss exponent in number.");
+        break;
+    case kParseErrorTermination:
+        str.append("Parsing was terminated.");
+        break;
+    case kParseErrorUnspecificSyntaxError:
+        str.append("Unspecific syntax error.");
+        break;
+    default:
+        str.append("Unknown error !");
+        break;
+    }
+
+    LogWarn(str.c_str());
 }

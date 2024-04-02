@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2021 Michael Chaban. All rights reserved.
+ * Copyright (c) 2017-2024 Michael Chaban. All rights reserved.
  * Original game is created by Core Design Ltd. in 1997.
  * Lara Croft and Tomb Raider are trademarks of Embracer Group AB.
  *
@@ -744,9 +744,9 @@ void S_DrawHealthBar(int percent) {
 	int barWidth = GetRenderScale(100);
 	int barHeight = GetRenderScale(5);
 #if defined(FEATURE_MOD_CONFIG)
-	BAR_CONFIG* barconfig = GetModLaraHealthBar();
-	int barXOffset = GetRenderScale((PsxBarPosEnabled && !IsInventoryActive) ? barconfig->PSX_xpos : barconfig->PC_xpos);
-	int barYOffset = GetRenderScale((PsxBarPosEnabled && !IsInventoryActive) ? barconfig->PSX_ypos : barconfig->PC_ypos);
+	BAR_CONFIG& barconfig = Mod.laraBar.health;
+	int barXOffset = GetRenderScale((PsxBarPosEnabled && !IsInventoryActive) ? barconfig.PSX_xpos : barconfig.PC_xpos);
+	int barYOffset = GetRenderScale((PsxBarPosEnabled && !IsInventoryActive) ? barconfig.PSX_ypos : barconfig.PC_ypos);
 #else
 	int barXOffset = GetRenderScale((PsxBarPosEnabled && !IsInventoryActive) ? 20 : 8);
 	int barYOffset = GetRenderScale((PsxBarPosEnabled && !IsInventoryActive) ? 18 : 8);
@@ -789,8 +789,8 @@ void S_DrawHealthBar(int percent) {
 	// Health bar
 	if (bar > 0) {
 #if defined(FEATURE_MOD_CONFIG)
-		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[barconfig->PC_color[0]]);
-		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[barconfig->PC_color[1]]);
+		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[barconfig.PC_color[0]]);
+		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[barconfig.PC_color[1]]);
 #else
 		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[ICLR_Red]);
 		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[ICLR_Orange]);
@@ -838,9 +838,9 @@ void S_DrawEnemyHealthBar(int percent, int originalHP) {
 	int barWidth = GetRenderScale(originalHP);
 	int barHeight = GetRenderScale(5);
 #if defined(FEATURE_MOD_CONFIG)
-	BAR_CONFIG* barconfig = GetModEnemyBar();
-	int barXOffset = GetRenderScale(PsxBarPosEnabled ? barconfig->PSX_xpos : barconfig->PC_xpos);
-	int barYOffset = GetRenderScale(PsxBarPosEnabled ? barconfig->PSX_ypos : barconfig->PC_ypos);
+	BAR_CONFIG& barconfig = Mod.enemyBar;
+	int barXOffset = GetRenderScale(PsxBarPosEnabled ? barconfig.PSX_xpos : barconfig.PC_xpos);
+	int barYOffset = GetRenderScale(PsxBarPosEnabled ? barconfig.PSX_ypos : barconfig.PC_ypos);
 #else
 	int barXOffset = GetRenderScale(PsxBarPosEnabled ? 20 : 8);
 	int barYOffset = GetRenderScale(PsxBarPosEnabled ? 29 : 18);
@@ -881,8 +881,8 @@ void S_DrawEnemyHealthBar(int percent, int originalHP) {
 	// Health bar
 	if (bar > 0) {
 #if defined(FEATURE_MOD_CONFIG)
-		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[barconfig->PC_color[0]]);
-		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[barconfig->PC_color[1]]);
+		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[barconfig.PC_color[0]]);
+		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[barconfig.PC_color[1]]);
 #else
 		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[ICLR_Red]);
 		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[ICLR_Red]);
@@ -929,9 +929,9 @@ void S_DrawAirBar(int percent) {
 	int barWidth = GetRenderScale(100);
 	int barHeight = GetRenderScale(5);
 #if defined(FEATURE_MOD_CONFIG)
-	BAR_CONFIG* barconfig = GetModLaraAirBar();
-	int barXOffset = GetRenderScale(PsxBarPosEnabled ? barconfig->PSX_xpos : barconfig->PC_xpos);
-	int barYOffset = GetRenderScale(PsxBarPosEnabled ? barconfig->PSX_ypos : barconfig->PC_ypos);
+	BAR_CONFIG& barconfig = Mod.laraBar.air;
+	int barXOffset = GetRenderScale(PsxBarPosEnabled ? barconfig.PSX_xpos : barconfig.PC_xpos);
+	int barYOffset = GetRenderScale(PsxBarPosEnabled ? barconfig.PSX_ypos : barconfig.PC_ypos);
 #else
 	int barXOffset = GetRenderScale(PsxBarPosEnabled ? 20 : 8);
 	int barYOffset = GetRenderScale(PsxBarPosEnabled ? 32 : 8);
@@ -966,8 +966,8 @@ void S_DrawAirBar(int percent) {
 	// Air bar
 	if (bar > 0) {
 #if defined(FEATURE_MOD_CONFIG)
-		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[barconfig->PC_color[0]]);
-		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[barconfig->PC_color[1]]);
+		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[barconfig.PC_color[0]]);
+		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[barconfig.PC_color[1]]);
 #else
 		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[ICLR_Blue]);
 		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[ICLR_White]);

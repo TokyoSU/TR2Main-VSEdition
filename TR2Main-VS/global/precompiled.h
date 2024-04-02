@@ -22,6 +22,10 @@
 #ifndef TR2MAIN_PRECOMPILED_HEADER
 #define TR2MAIN_PRECOMPILED_HEADER
 
+ // Optimize allocation via mimalloc for malloc() and new/delete
+#include <mimalloc.h>
+#include <mimalloc-override.h>
+
 #define FEATURE_NOCD_DATA
 #define FEATURE_ASSAULT_SAVE
 #define FEATURE_AUDIO_IMPROVED
@@ -69,6 +73,8 @@
 #endif // !FEATURE_NOLEGACY_OPTIONS
 #endif // (DIRECT3D_VERSION >= 0x900)
 
+#include <istream>
+#include <fstream>
 #include <stdio.h>
 #include <windows.h>
 #include <string>
@@ -90,6 +96,11 @@
 #define strncasecmp _strnicmp
 #define strcasecmp _stricmp
 #endif
+
+#include "rapidjson/rapidjson.h"
+#include "rapidjson/document.h"
+#include "rapidjson/cursorstreamwrapper.h"
+using namespace rapidjson;
 
 extern void LogInit();
 extern void LogDebug(const char* message, ...);

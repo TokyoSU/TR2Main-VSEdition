@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2021 Michael Chaban. All rights reserved.
+ * Copyright (c) 2017-2024 Michael Chaban. All rights reserved.
  * Original game is created by Core Design Ltd. in 1997.
  * Lara Croft and Tomb Raider are trademarks of Embracer Group AB.
  *
@@ -18,1162 +18,554 @@
  * You should have received a copy of the GNU General Public License
  * along with TR2Main.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 #include "precompiled.h"
-#include "modding/mod_utils.h"
 #include "modding/json_utils.h"
-#include "global/vars.h"
 
-#ifdef FEATURE_MOD_CONFIG
+#if defined(FEATURE_MOD_CONFIG)
+#include "modding/mod_utils.h"
 #define MOD_CONFIG_NAME "TR2Main.json"
 
-typedef struct {
-	bool isLoaded;
-	POLYINDEX* animtex;
-	POLYFILTER_NODE* rooms;
-	POLYFILTER_NODE* statics;
-	POLYFILTER_NODE* objects[ID_NUMBER_OBJECTS];
-} SEMITRANS_CONFIG;
-
-typedef struct {
-	bool isLoaded;
-	POLYFILTER_NODE* statics;
-	POLYFILTER_NODE* objects[ID_NUMBER_OBJECTS];
-} REFLECT_CONFIG;
-
-typedef struct {
-	bool isLoaded;
-	bool isBarefoot;
-
-	bool pistolsAtStart;
-	bool shotgunAtStart;
-	bool uzisAtStart;
-	bool autopistolsAtStart;
-	bool m16AtStart;
-	bool grenadeAtStart;
-	bool harpoonAtStart;
-
-	int shotgunAmmoAtStart;
-	int uzisAmmoAtStart;
-	int autopistolsAmmoAtStart;
-	int m16AmmoAtStart;
-	int grenadeAmmoAtStart;
-	int harpoonAmmoAtStart;
-
-	int smallMedikitAtStart;
-	int bigMedikitAtStart;
-	int flareCountAtStart;
-	
-	int dogHealth;
-	int mouseHealth;
-	int cult1Health;
-	int cult1AHealth;
-	int cult1BHealth;
-	int cult2Health;
-	int sharkHealth;
-	int tigerHealth;
-	int barracudaHealth;
-	int smallSpiderHealth; // spider or wolf (separated)
-	int wolfHealth;
-	int bigSpiderHealth; // big spider or bear (separated)
-	int bearHealth;
-	int yetiHealth;
-	int jellyHealth;
-	int diverHealth;
-	int worker1Health;
-	int worker2Health;
-	int worker3Health;
-	int worker4Health;
-	int worker5Health;
-	int cult3Health;
-	int monk1Health;
-	int monk2Health;
-	int eagleHealth;
-	int crowHealth;
-	int bigEelHealth;
-	int eelHealth;
-	int bandit1Health;
-	int bandit2Health;
-	int bandit2BHealth;
-	int skidmanHealth;
-	int xianLordHealth;
-	int warriorHealth;
-	int dragonHealth;
-	int giantYetiHealth;
-	int dinoHealth;
-
-	bool disableGiantYetiNextLevelOnDeath;
-	bool laraIgnoreMonkIfNotAngry;
-	bool makeMonkAttackLaraFirst;
-	bool makeMercenaryAttackLaraFirst;
-
-	char loadingPix[256];
-	DWORD waterColor;
-
-	bool enemyBarEnabled;
-	BAR_CONFIG healthbar;
-	BAR_CONFIG airbar;
-	BAR_CONFIG enemyhealthbar;
-
-	SEMITRANS_CONFIG semitrans;
-	REFLECT_CONFIG reflect;
-} MOD_CONFIG;
-
-static MOD_CONFIG ModConfig;
-
-static POLYFILTER* CreatePolyfilterNode(POLYFILTER_NODE** root, int id) {
-	if (root == NULL) return NULL;
-	POLYFILTER_NODE* node = (POLYFILTER_NODE*)malloc(sizeof(POLYFILTER_NODE));
-	if (node == NULL) return NULL;
-	node->id = id;
-	node->next = *root;
-	memset(&node->filter, 0, sizeof(node->filter));
-	*root = node;
-	return &node->filter;
-}
-
-static void FreePolyfilterNodes(POLYFILTER_NODE** root) {
-	if (root == NULL) return;
-	POLYFILTER_NODE* node = *root;
-	while (node) {
-		POLYFILTER_NODE* next = node->next;
-		free(node);
-		node = next;
-	}
-	*root = NULL;
-}
-#endif // FEATURE_MOD_CONFIG
-
-static bool IsCompatibleFilter(short* ptrObj, bool isRoomMesh, POLYFILTER* filter) {
-	if (!ptrObj || !filter || !filter->n_vtx) return true;
-	if (!isRoomMesh) {
-		ptrObj += 5; // skip x, y, z, radius, flags
-	}
-	short num = *(ptrObj++); // get vertex counter
-	if (num != filter->n_vtx) return false;
-	ptrObj += num * (isRoomMesh ? 6 : 3); // skip vertices
-	if (!isRoomMesh) {
-		num = *(ptrObj++); // get normal counter
-		ptrObj += (num > 0) ? num * 3 : ABS(num); // skip normals/shades
-	}
-	num = *(ptrObj++); // get gt4 number
-	if (num != filter->n_gt4) return false;
-	ptrObj += num * 5; // skip gt4 polys
-	num = *(ptrObj++); // get gt3 number
-	if (num != filter->n_gt3) return false;
-	if (!isRoomMesh) {
-		ptrObj += num * 4; // skip gt3 polys
-		num = *(ptrObj++); // get g4 number
-		if (num != filter->n_g4) return false;
-		ptrObj += num * 5; // skip g4 polys
-		num = *(ptrObj++); // get g3 number
-		if (num != filter->n_g3) return false;
-	}
-	return true;
-}
-
-static short* EnumeratePolysSpecific(short* ptrObj, int vtxCount, bool colored, ENUM_POLYS_CB callback, POLYINDEX* filter, LPVOID param) {
-	int polyNumber = *ptrObj++;
-	if (filter == NULL || (!filter[0].idx && !filter[0].num)) {
-		for (int i = 0; i < polyNumber; ++i) {
-			if (!callback(ptrObj, vtxCount, colored, param)) return NULL;
-			ptrObj += vtxCount + 1;
-		}
-	}
-	else {
-		int polyIndex = 0;
-		for (int i = 0; i < POLYFILTER_SIZE; i++) {
-			if (filter[i].idx < polyIndex || filter[i].idx >= polyNumber) {
-				break;
-			}
-			int skip = filter[i].idx - polyIndex;
-			if (skip > 0) {
-				ptrObj += skip * (vtxCount + 1);
-				polyIndex += skip;
-			}
-			int number = MIN(filter[i].num, polyNumber - polyIndex);
-			for (int j = 0; j < number; ++j) {
-				if (!callback(ptrObj, vtxCount, colored, param)) return NULL;
-				ptrObj += vtxCount + 1;
-			}
-			polyIndex += number;
-		}
-		ptrObj += (polyNumber - polyIndex) * (vtxCount + 1);
-	}
-	return ptrObj;
-}
-
-bool EnumeratePolys(short* ptrObj, bool isRoomMesh, ENUM_POLYS_CB callback, POLYFILTER* filter, LPVOID param) {
-	if (ptrObj == NULL || callback == NULL) return false; // wrong parameters
-	if (!IsCompatibleFilter(ptrObj, isRoomMesh, filter)) return false; // filter is not compatible
-
-	short num;
-	if (!isRoomMesh) {
-		ptrObj += 5; // skip x, y, z, radius, flags
-	}
-	num = *(ptrObj++); // get vertex counter
-	ptrObj += num * (isRoomMesh ? 6 : 3); // skip vertices
-	if (!isRoomMesh) {
-		num = *(ptrObj++); // get normal counter
-		ptrObj += (num > 0) ? num * 3 : ABS(num); // skip normals/shades
-	}
-	ptrObj = EnumeratePolysSpecific(ptrObj, 4, false, callback, filter ? filter->gt4 : NULL, param); // enumerate textured quads
-	if (ptrObj == NULL) return true;
-	ptrObj = EnumeratePolysSpecific(ptrObj, 3, false, callback, filter ? filter->gt3 : NULL, param); // enumerate textured triangles
-	if (!isRoomMesh) {
-		if (ptrObj == NULL) return true;
-		ptrObj = EnumeratePolysSpecific(ptrObj, 4, true, callback, filter ? filter->g4 : NULL, param); // enumerate colored quads
-		if (ptrObj == NULL) return true;
-		ptrObj = EnumeratePolysSpecific(ptrObj, 3, true, callback, filter ? filter->g3 : NULL, param); // enumerate colored triangles
-	}
-	return true;
-}
-
-#ifdef FEATURE_MOD_CONFIG
-bool IsModConfigLoaded() {
-	return ModConfig.isLoaded;
-}
-
-bool IsModBarefoot() {
-	return ModConfig.isBarefoot;
-}
-
-bool IsModPistolsAtStart() {
-	return ModConfig.pistolsAtStart;
-}
-
-bool IsModShotgunAtStart() {
-	return ModConfig.shotgunAtStart;
-}
-
-bool IsModUzisAtStart() {
-	return ModConfig.uzisAtStart;
-}
-
-bool IsModAutopistolsAtStart() {
-	return ModConfig.autopistolsAtStart;
-}
-
-bool IsModM16AtStart() {
-	return ModConfig.m16AtStart;
-}
-
-bool IsModGrenadeAtStart() {
-	return ModConfig.grenadeAtStart;
-}
-
-bool IsModHarpoonAtStart() {
-	return ModConfig.harpoonAtStart;
-}
-
-int GetModShotgunAmmoCountAtStart() {
-	return ModConfig.shotgunAmmoAtStart * (SHOTGUN_AMMO_CLIPS / 2);
-}
-
-int GetModUzisAmmoCountAtStart() {
-	return ModConfig.uzisAmmoAtStart;
-}
-
-int GetModAutopistolsAmmoCountAtStart() {
-	return ModConfig.autopistolsAmmoAtStart;
-}
-
-int GetModM16AmmoCountAtStart() {
-	return ModConfig.m16AmmoAtStart;
-}
-
-int GetModGrenadeAmmoCountAtStart() {
-	return ModConfig.grenadeAmmoAtStart;
-}
-
-int GetModHarpoonAmmoCountAtStart() {
-	return ModConfig.harpoonAmmoAtStart;
-}
-
-int GetModFlareCountAtStart() {
-	return ModConfig.flareCountAtStart;
-}
-
-int GetModSmallMedikitCountAtStart() {
-	return ModConfig.smallMedikitAtStart;
-}
-
-int GetModBigMedikitCountAtStart() {
-	return ModConfig.bigMedikitAtStart;
-}
-
-int GetModDogHealth() {
-	if (ModConfig.dogHealth <= 0)
-	{
-		LogWarn("Failed to get the dog health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.dogHealth;
-}
-
-int GetModMouseHealth() {
-	if (ModConfig.mouseHealth <= 0)
-	{
-		LogWarn("Failed to get the mouse/rat health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.mouseHealth;
-}
-
-int GetModCult1Health() {
-	if (ModConfig.cult1Health <= 0)
-	{
-		LogWarn("Failed to get the cult1 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.cult1Health;
-}
-
-int GetModCult1AHealth() {
-	if (ModConfig.cult1AHealth <= 0)
-	{
-		LogWarn("Failed to get the cult1A health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.cult1AHealth;
-}
-
-int GetModCult1BHealth() {
-	if (ModConfig.cult1BHealth <= 0)
-	{
-		LogWarn("Failed to get the cult1B health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.cult1BHealth;
-}
-
-int GetModCult2Health() {
-	if (ModConfig.cult2Health <= 0)
-	{
-		LogWarn("Failed to get the cult2 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.cult2Health;
-}
-
-int GetModSharkHealth() {
-	if (ModConfig.sharkHealth <= 0)
-	{
-		LogWarn("Failed to get the shark health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.sharkHealth;
-}
-
-int GetModTigerHealth() {
-	if (ModConfig.tigerHealth <= 0)
-	{
-		LogWarn("Failed to get the tiger health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.tigerHealth;
-}
-
-int GetModBarracudaHealth() {
-	if (ModConfig.barracudaHealth <= 0)
-	{
-		LogWarn("Failed to get the barracuda health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.barracudaHealth;
-}
-
-int GetModSmallSpiderHealth() {
-	if (ModConfig.smallSpiderHealth <= 0)
-	{
-		LogWarn("Failed to get the small spider health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.smallSpiderHealth;
-}
-
-int GetModWolfHealth() {
-	if (ModConfig.wolfHealth <= 0)
-	{
-		LogWarn("Failed to get the wolf (gold) health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.wolfHealth;
-}
-
-int GetModBigSpiderHealth() {
-	if (ModConfig.bigSpiderHealth <= 0)
-	{
-		LogWarn("Failed to get the big spider health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.bigSpiderHealth;
-}
-
-int GetModBearHealth() {
-	if (ModConfig.bearHealth <= 0)
-	{
-		LogWarn("Failed to get the bear (gold) health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.bearHealth;
-}
-
-int GetModYetiHealth() {
-	if (ModConfig.yetiHealth <= 0)
-	{
-		LogWarn("Failed to get the yeti health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.yetiHealth;
-}
-
-int GetModJellyHealth() {
-	if (ModConfig.jellyHealth <= 0)
-	{
-		LogWarn("Failed to get the jelly health from the level command and default value was not used, set the health to not targetable to avoid problem !");
-		return HP_DONT_TARGET;
-	}
-	return ModConfig.jellyHealth;
-}
-
-int GetModDiverHealth() {
-	if (ModConfig.diverHealth <= 0)
-	{
-		LogWarn("Failed to get the diver health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.diverHealth;
-}
-
-int GetModWorker1Health() {
-	if (ModConfig.worker1Health <= 0)
-	{
-		LogWarn("Failed to get the worker1 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.worker1Health;
-}
-
-int GetModWorker2Health() {
-	if (ModConfig.worker2Health <= 0)
-	{
-		LogWarn("Failed to get the worker2 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.worker2Health;
-}
-
-int GetModWorker3Health() {
-	if (ModConfig.worker3Health <= 0)
-	{
-		LogWarn("Failed to get the worker3 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.worker3Health;
-}
-
-int GetModWorker4Health() {
-	if (ModConfig.worker4Health <= 0)
-	{
-		LogWarn("Failed to get the worker4 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.worker4Health;
-}
-
-int GetModWorker5Health() {
-	if (ModConfig.worker5Health <= 0)
-	{
-		LogWarn("Failed to get the worker5 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.worker5Health;
-}
-
-int GetModCult3Health() {
-	if (ModConfig.cult3Health <= 0)
-	{
-		LogWarn("Failed to get the cult3 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.cult3Health;
-}
-
-int GetModMonk1Health() {
-	if (ModConfig.monk1Health <= 0)
-	{
-		LogWarn("Failed to get the monk1 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.monk1Health;
-}
-
-int GetModMonk2Health() {
-	if (ModConfig.monk2Health <= 0)
-	{
-		LogWarn("Failed to get the monk2 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.monk2Health;
-}
-
-int GetModEagleHealth() {
-	if (ModConfig.eagleHealth <= 0)
-	{
-		LogWarn("Failed to get the eagle health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.eagleHealth;
-}
-
-int GetModCrowHealth() {
-	if (ModConfig.crowHealth <= 0)
-	{
-		LogWarn("Failed to get the crow health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.crowHealth;
-}
-
-int GetModBigEelHealth() {
-	if (ModConfig.eagleHealth <= 0)
-	{
-		LogWarn("Failed to get the eagle health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.bigEelHealth;
-}
-
-int GetModEelHealth() {
-	if (ModConfig.eelHealth <= 0)
-	{
-		LogWarn("Failed to get the big eel health from the level command and default value was not used, set the health to not targetable to avoid problem !");
-		return HP_DONT_TARGET;
-	}
-	return ModConfig.eelHealth;
-}
-
-int GetModBandit1Health() {
-	if (ModConfig.bandit1Health <= 0)
-	{
-		LogWarn("Failed to get the bandit1 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.bandit1Health;
-}
-
-int GetModBandit2Health() {
-	if (ModConfig.bandit2Health <= 0)
-	{
-		LogWarn("Failed to get the bandit2 health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.bandit2Health;
-}
-
-int GetModBandit2BHealth() {
-	if (ModConfig.bandit2BHealth <= 0)
-	{
-		LogWarn("Failed to get the bandit2B health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.bandit2BHealth;
-}
-
-int GetModSkidmanHealth() {
-	if (ModConfig.skidmanHealth <= 0)
-	{
-		LogWarn("Failed to get the skidman health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.skidmanHealth;
-}
-
-int GetModXianLordHealth() {
-	if (ModConfig.xianLordHealth <= 0)
-	{
-		LogWarn("Failed to get the xianlord health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.xianLordHealth;
-}
-
-int GetModWarriorHealth() {
-	if (ModConfig.warriorHealth <= 0)
-	{
-		LogWarn("Failed to get the warrior health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.warriorHealth;
-}
-
-int GetModDragonHealth() {
-	if (ModConfig.dragonHealth <= 0)
-	{
-		LogWarn("Failed to get the dragon health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.dragonHealth;
-}
-
-int GetModGiantYetiHealth() {
-	if (ModConfig.giantYetiHealth <= 0)
-	{
-		LogWarn("Failed to get the giant yeti health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.giantYetiHealth;
-}
-
-int GetModDinoHealth() {
-	if (ModConfig.dinoHealth <= 0)
-	{
-		LogWarn("Failed to get the dino health from the level command and default value was not used, set the health to 1 to avoid them dying !");
-		return 1;
-	}
-	return ModConfig.dinoHealth;
-}
-
-bool IsModDisableGiantYetiNextLevelOnDeath() {
-	return ModConfig.disableGiantYetiNextLevelOnDeath;
-}
-
-bool IsModLaraIgnoreMonkIfNotAngry() {
-	return ModConfig.laraIgnoreMonkIfNotAngry;
-}
-
-bool GetModMakeMonkAttackLaraDirectly() {
-	return ModConfig.makeMonkAttackLaraFirst;
-}
-
-bool GetModMakeMercenaryAttackLaraDirectly() {
-	return ModConfig.makeMercenaryAttackLaraFirst;
-}
-
-BAR_CONFIG* GetModLaraHealthBar() {
-	return &ModConfig.healthbar;
-}
-
-BAR_CONFIG* GetModLaraAirBar() {
-	return &ModConfig.airbar;
-}
-
-bool IsEnemyBarEnabled() {
-	return ModConfig.enemyBarEnabled;
-}
-
-BAR_CONFIG* GetModEnemyBar() {
-	return &ModConfig.enemyhealthbar;
-}
-
-const char* GetModLoadingPix() {
-	return *ModConfig.loadingPix ? ModConfig.loadingPix : NULL;
-}
-
-DWORD GetModWaterColor() {
-	return ModConfig.waterColor;
-}
-
-bool IsModSemitransConfigLoaded() {
-	return ModConfig.semitrans.isLoaded;
-}
-
-POLYINDEX* GetModSemitransAnimtexFilter() {
-	return ModConfig.semitrans.animtex;
-}
-
-POLYFILTER_NODE* GetModSemitransRoomsFilter() {
-	return ModConfig.semitrans.rooms;
-}
-
-POLYFILTER_NODE* GetModSemitransStaticsFilter() {
-	return ModConfig.semitrans.statics;
-}
-
-POLYFILTER_NODE** GetModSemitransObjectsFilter() {
-	return ModConfig.semitrans.objects;
-}
-
-bool IsModReflectConfigLoaded() {
-	return ModConfig.reflect.isLoaded;
-}
-
-POLYFILTER_NODE* GetModReflectStaticsFilter() {
-	return ModConfig.reflect.statics;
-}
-
-POLYFILTER_NODE** GetModReflectObjectsFilter() {
-	return ModConfig.reflect.objects;
-}
-
-static int ParsePolyString(const char* str, POLYINDEX* lst, DWORD lstLen) {
-	if (!lst || !lstLen) {
-		return -1;
-	}
-
-	lst[0].idx = ~0;
-	lst[0].num = ~0;
-
-	POLYINDEX* lstBuf = (POLYINDEX*)malloc(lstLen * sizeof(POLYINDEX));
-	if (lstBuf == NULL) {
-		return -2;
-	}
-
-	char* strBuf = _strdup(str);
-	if (strBuf == NULL) {
-		free(lstBuf);
-		return -2;
-	}
-
-	DWORD bufLen = 0;
-	char* token = strtok(strBuf, ",");
-	while (token != NULL) {
-		char* range = strchr(token, '-');
-		if (range) {
-			int from = atoi(token);
-			int to = atoi(range + 1);
-			lstBuf[bufLen].idx = MIN(to, from);
-			lstBuf[bufLen].num = ABS(to - from) + 1;
-		}
-		else {
-			lstBuf[bufLen].idx = atoi(token);
-			lstBuf[bufLen].num = 1;
-		}
-		if (++bufLen >= lstLen) {
-			break;
-		}
-		token = strtok(NULL, ",");
-	}
-
-	free(strBuf);
-	if (!bufLen) {
-		free(lstBuf);
-		return 0;
-	}
-
-	for (DWORD i = 0; i < bufLen - 1; ++i) {
-		for (DWORD j = i + 1; j < bufLen; ++j) {
-			if (lstBuf[i].idx > lstBuf[j].idx) {
-				POLYINDEX t;
-				SWAP(lstBuf[i], lstBuf[j], t);
-			}
-		}
-	}
-
-	lst[0] = lstBuf[0];
-	DWORD resLen = 1;
-
-	for (DWORD i = 1; i < bufLen; ++i) {
-		int bound = lst[resLen - 1].idx + lst[resLen - 1].num;
-		if (lstBuf[i].idx > bound) {
-			lst[resLen] = lstBuf[i];
-			++resLen;
-		}
-		else {
-			int ext = lstBuf[i].idx + lstBuf[i].num;
-			if (ext > bound) {
-				lst[resLen - 1].num += ext - bound;
-			}
-		}
-	}
-	if (resLen < lstLen) {
-		lst[resLen].idx = 0;
-		lst[resLen].num = 0;
-	}
-
-	free(lstBuf);
-	return resLen;
-}
-
-static int ParsePolyValue(json_value* value, POLYINDEX* lst, DWORD lstLen) {
-	if (!lst || !lstLen) {
-		return -1;
-	}
-
-	lst[0].idx = ~0;
-	lst[0].num = ~0;
-	if (value == NULL) {
-		return 0;
-	}
-
-	const char* str = value->u.string.ptr;
-	if (!str || !*str || !strcasecmp(str, "none")) {
-		return 0;
-	}
-	if (!strcasecmp(str, "all")) {
-		lst[0].idx = 0;
-		lst[0].num = 0;
-		return 1;
-	}
-	return ParsePolyString(str, lst, lstLen);
-}
-
-static bool ParsePolyfilterConfiguration(json_value* root, const char* name, POLYFILTER_NODE** pNodes) {
-	FreePolyfilterNodes(pNodes);
-	if (root == NULL || root->type != json_array || !name || !*name) {
-		return false;
-	}
-	for (DWORD i = 0; i < root->u.array.length; ++i) {
-		json_value* item = root->u.array.values[i];
-		json_value* field = GetJsonField(item, json_integer, name, NULL);
-		if (!field || field->u.integer < 0) continue;
-		POLYFILTER* filter = CreatePolyfilterNode(pNodes, (int)field->u.integer);
-		if (!filter) continue;
-		field = GetJsonField(item, json_object, "filter", NULL);
-		if (field) {
-			filter->n_vtx = GetJsonIntegerFieldValue(field, "v", 0);
-			filter->n_gt4 = GetJsonIntegerFieldValue(field, "t4", 0);
-			filter->n_gt3 = GetJsonIntegerFieldValue(field, "t3", 0);
-			filter->n_g4 = GetJsonIntegerFieldValue(field, "c4", 0);
-			filter->n_g3 = GetJsonIntegerFieldValue(field, "c3", 0);
-		}
-		json_value* t4list = GetJsonField(item, json_string, "t4list", NULL);
-		json_value* t3list = GetJsonField(item, json_string, "t3list", NULL);
-		json_value* c4list = GetJsonField(item, json_string, "c4list", NULL);
-		json_value* c3list = GetJsonField(item, json_string, "c3list", NULL);
-		// If no lists presented, consider that lists set to "all"
-		if (t4list || t3list || c4list || c3list) {
-			ParsePolyValue(t4list, filter->gt4, ARRAY_SIZE(filter->gt4));
-			ParsePolyValue(t3list, filter->gt3, ARRAY_SIZE(filter->gt3));
-			ParsePolyValue(c4list, filter->g4, ARRAY_SIZE(filter->g4));
-			ParsePolyValue(c3list, filter->g3, ARRAY_SIZE(filter->g3));
-		}
-	}
-	return true;
-}
-
-static bool ParseSemitransConfiguration(json_value* root) {
-	if (root == NULL || root->type != json_object) {
-		return false;
-	}
-	json_value* field = NULL;
-
-	field = GetJsonField(root, json_string, "animtex", NULL);
-	if (field) {
-		if (ModConfig.semitrans.animtex) {
-			free(ModConfig.semitrans.animtex);
-			ModConfig.semitrans.animtex = NULL;
-		}
-		if (strcasecmp(field->u.string.ptr, "auto")) {
-			ModConfig.semitrans.animtex = (POLYINDEX*)malloc(sizeof(POLYINDEX) * POLYFILTER_SIZE);
-			if (ModConfig.semitrans.animtex) {
-				ParsePolyValue(field, ModConfig.semitrans.animtex, POLYFILTER_SIZE);
-			}
-		}
-	}
-	json_value* objects = GetJsonField(root, json_array, "objects", NULL);
-	if (objects) {
-		for (DWORD i = 0; i < objects->u.array.length; ++i) {
-			json_value* object = objects->u.array.values[i];
-			field = GetJsonField(object, json_integer, "object", NULL);
-			if (!field || field->u.integer < 0 || field->u.integer >= ARRAY_SIZE(ModConfig.semitrans.objects)) continue;
-			ParsePolyfilterConfiguration(GetJsonField(object, json_array, "meshes", NULL), "mesh", &ModConfig.semitrans.objects[field->u.integer]);
-		}
-	}
-	ParsePolyfilterConfiguration(GetJsonField(root, json_array, "statics", NULL), "static", &ModConfig.semitrans.statics);
-	ParsePolyfilterConfiguration(GetJsonField(root, json_array, "rooms", NULL), "room", &ModConfig.semitrans.rooms);
-	ModConfig.semitrans.isLoaded = true;
-	return true;
-}
-
-static bool ParseReflectConfiguration(json_value* root) {
-	if (root == NULL || root->type != json_object) {
-		return false;
-	}
-
-	json_value* field = NULL;
-	json_value* objects = GetJsonField(root, json_array, "objects", NULL);
-	if (objects) {
-		for (DWORD i = 0; i < objects->u.array.length; ++i) {
-			json_value* object = objects->u.array.values[i];
-			field = GetJsonField(object, json_integer, "object", NULL);
-			if (!field || field->u.integer < 0 || field->u.integer >= ARRAY_SIZE(ModConfig.reflect.objects)) continue;
-			ParsePolyfilterConfiguration(GetJsonField(object, json_array, "meshes", NULL), "mesh", &ModConfig.reflect.objects[field->u.integer]);
-		}
-	}
-
-	ParsePolyfilterConfiguration(GetJsonField(root, json_array, "statics", NULL), "static", &ModConfig.reflect.statics);
-	ModConfig.reflect.isLoaded = true;
-	return true;
-}
-
-static bool ParseBooleanConfigByName(json_value* root, const char* name, bool defaultValue = false) {
-	json_value* field = GetJsonField(root, json_boolean, name, NULL);
-	if (field) {
-		return (bool)field->u.boolean;
-	}
-	return defaultValue;
-}
-
-static int ParseIntegerConfigByName(json_value* root, const char* name, int defaultValue = -1) {
-	json_value* field = GetJsonField(root, json_integer, name, NULL);
-	if (field && field->u.integer > 0) {
-		return (int)field->u.integer;
-	}
-	return defaultValue;
-}
-
-static DWORD ParseLongConfigByName(json_value* root, const char* name, DWORD defaultValue = -1) {
-	json_value* field = GetJsonField(root, json_integer, name, NULL);
-	if (field && field->u.integer > 0) {
-		return (DWORD)field->u.integer;
-	}
-	return defaultValue;
-}
-
-static DWORD ParseColorConfigByName(json_value* root, const char* name, DWORD defaultValue = -1) {
-	json_value* field = GetJsonField(root, json_string, name, NULL);
-	if (field && field->u.string.length == 6) {
-		return strtol(field->u.string.ptr, NULL, 16);
-	}
-	return defaultValue;
-}
-
-static bool ParseHealthBarConfiguration(json_value* root, BAR_CONFIG* barConfig) {
-	if (root == NULL || root->type != json_object) {
-		return false;
-	}
-	barConfig->PC_xpos = ParseIntegerConfigByName(root, "PC_x", 8);
-	barConfig->PC_ypos = ParseIntegerConfigByName(root, "PC_y", 8);
-	barConfig->PC_color[0] = (INV_COLOURS)ParseIntegerConfigByName(root, "PC_color0", 3);
-	barConfig->PC_color[1] = (INV_COLOURS)ParseIntegerConfigByName(root, "PC_color1", 4);
-	barConfig->PSX_xpos = ParseIntegerConfigByName(root, "PSX_x", 20);
-	barConfig->PSX_ypos = ParseIntegerConfigByName(root, "PSX_y", 18);
-	barConfig->PSX_leftcolor[0] = ParseColorConfigByName(root, "PSX_leftcolor0", RGB_MAKE(0x68, 0, 0));
-	barConfig->PSX_leftcolor[1] = ParseColorConfigByName(root, "PSX_leftcolor1", RGB_MAKE(0x70, 0, 0));
-	barConfig->PSX_leftcolor[2] = ParseColorConfigByName(root, "PSX_leftcolor2", RGB_MAKE(0x98, 0, 0));
-	barConfig->PSX_leftcolor[3] = ParseColorConfigByName(root, "PSX_leftcolor3", RGB_MAKE(0xD8, 0, 0));
-	barConfig->PSX_leftcolor[4] = ParseColorConfigByName(root, "PSX_leftcolor4", RGB_MAKE(0xE4, 0, 0));
-	barConfig->PSX_leftcolor[5] = ParseColorConfigByName(root, "PSX_leftcolor5", RGB_MAKE(0xF0, 0, 0));
-	barConfig->PSX_rightcolor[0] = ParseColorConfigByName(root, "PSX_rightcolor0", RGB_MAKE(0, 0x44, 0));
-	barConfig->PSX_rightcolor[1] = ParseColorConfigByName(root, "PSX_rightcolor1", RGB_MAKE(0, 0x74, 0));
-	barConfig->PSX_rightcolor[2] = ParseColorConfigByName(root, "PSX_rightcolor2", RGB_MAKE(0, 0x9C, 0));
-	barConfig->PSX_rightcolor[3] = ParseColorConfigByName(root, "PSX_rightcolor3", RGB_MAKE(0, 0xD4, 0));
-	barConfig->PSX_rightcolor[4] = ParseColorConfigByName(root, "PSX_rightcolor4", RGB_MAKE(0, 0xE8, 0));
-	barConfig->PSX_rightcolor[5] = ParseColorConfigByName(root, "PSX_rightcolor5", RGB_MAKE(0, 0xFC, 0));
-	barConfig->PSX_framecolor[0] = ParseColorConfigByName(root, "PSX_framecolor0", RGB_MAKE(0, 0, 0));
-	barConfig->PSX_framecolor[1] = ParseColorConfigByName(root, "PSX_framecolor1", RGB_MAKE(0, 0, 0));
-	barConfig->PSX_framecolor[2] = ParseColorConfigByName(root, "PSX_framecolor2", RGB_MAKE(0x50, 0x84, 0x84));
-	barConfig->PSX_framecolor[3] = ParseColorConfigByName(root, "PSX_framecolor3", RGB_MAKE(0xA0, 0xA0, 0xA0));
-	barConfig->PSX_framecolor[4] = ParseColorConfigByName(root, "PSX_framecolor4", RGB_MAKE(0x28, 0x42, 0x42));
-	barConfig->PSX_framecolor[5] = ParseColorConfigByName(root, "PSX_framecolor5", RGB_MAKE(0x50, 0x50, 0x50));
-	return true;
-}
-
-static bool ParseAirBarConfiguration(json_value* root, BAR_CONFIG* barConfig) {
-	if (root == NULL || root->type != json_object) {
-		return false;
-	}
-	barConfig->PC_xpos = ParseIntegerConfigByName(root, "PC_x", 8);
-	barConfig->PC_ypos = ParseIntegerConfigByName(root, "PC_y", 8);
-	barConfig->PC_color[0] = (INV_COLOURS)ParseIntegerConfigByName(root, "PC_color0", 3);
-	barConfig->PC_color[1] = (INV_COLOURS)ParseIntegerConfigByName(root, "PC_color1", 4);
-	barConfig->PSX_xpos = ParseIntegerConfigByName(root, "PSX_x", 20);
-	barConfig->PSX_ypos = ParseIntegerConfigByName(root, "PSX_y", 18);
-	barConfig->PSX_leftcolor[0] = ParseColorConfigByName(root, "PSX_leftcolor0", RGB_MAKE(0, 0x40, 0x54));
-	barConfig->PSX_leftcolor[1] = ParseColorConfigByName(root, "PSX_leftcolor1", RGB_MAKE(0, 0x50, 0x64));
-	barConfig->PSX_leftcolor[2] = ParseColorConfigByName(root, "PSX_leftcolor2", RGB_MAKE(0, 0x68, 0x74));
-	barConfig->PSX_leftcolor[3] = ParseColorConfigByName(root, "PSX_leftcolor3", RGB_MAKE(0, 0x78, 0x84));
-	barConfig->PSX_leftcolor[4] = ParseColorConfigByName(root, "PSX_leftcolor4", RGB_MAKE(0, 0x84, 0x8E));
-	barConfig->PSX_leftcolor[5] = ParseColorConfigByName(root, "PSX_leftcolor5", RGB_MAKE(0, 0x90, 0x98));
-	barConfig->PSX_rightcolor[0] = ParseColorConfigByName(root, "PSX_rightcolor0", RGB_MAKE(0, 0x40, 0));
-	barConfig->PSX_rightcolor[1] = ParseColorConfigByName(root, "PSX_rightcolor1", RGB_MAKE(0, 0x50, 0));
-	barConfig->PSX_rightcolor[2] = ParseColorConfigByName(root, "PSX_rightcolor2", RGB_MAKE(0, 0x68, 0));
-	barConfig->PSX_rightcolor[3] = ParseColorConfigByName(root, "PSX_rightcolor3", RGB_MAKE(0, 0x78, 0));
-	barConfig->PSX_rightcolor[4] = ParseColorConfigByName(root, "PSX_rightcolor4", RGB_MAKE(0, 0x84, 0));
-	barConfig->PSX_rightcolor[5] = ParseColorConfigByName(root, "PSX_rightcolor5", RGB_MAKE(0, 0x90, 0));
-	barConfig->PSX_framecolor[0] = ParseColorConfigByName(root, "PSX_framecolor0", RGB_MAKE(0, 0, 0));
-	barConfig->PSX_framecolor[1] = ParseColorConfigByName(root, "PSX_framecolor1", RGB_MAKE(0, 0, 0));
-	barConfig->PSX_framecolor[2] = ParseColorConfigByName(root, "PSX_framecolor2", RGB_MAKE(0x50, 0x84, 0x84));
-	barConfig->PSX_framecolor[3] = ParseColorConfigByName(root, "PSX_framecolor3", RGB_MAKE(0xA0, 0xA0, 0xA0));
-	barConfig->PSX_framecolor[4] = ParseColorConfigByName(root, "PSX_framecolor4", RGB_MAKE(0x28, 0x42, 0x42));
-	barConfig->PSX_framecolor[5] = ParseColorConfigByName(root, "PSX_framecolor5", RGB_MAKE(0x50, 0x50, 0x50));
-	return true;
-}
-
-static bool ParseEnemyBarConfiguration(json_value* root, BAR_CONFIG* barConfig) {
-	if (root == NULL || root->type != json_object) {
-		return false;
-	}
-	barConfig->PC_xpos = ParseIntegerConfigByName(root, "PC_x", 8);
-	barConfig->PC_ypos = ParseIntegerConfigByName(root, "PC_y", 8);
-	barConfig->PC_color[0] = (INV_COLOURS)ParseIntegerConfigByName(root, "PC_color0", 3);
-	barConfig->PC_color[1] = (INV_COLOURS)ParseIntegerConfigByName(root, "PC_color1", 4);
-	barConfig->PSX_xpos = ParseIntegerConfigByName(root, "PSX_x", 20);
-	barConfig->PSX_ypos = ParseIntegerConfigByName(root, "PSX_y", 18);
-	barConfig->PSX_leftcolor[0] = ParseColorConfigByName(root, "PSX_leftcolor0", RGB_MAKE(0x68, 0, 0));
-	barConfig->PSX_leftcolor[1] = ParseColorConfigByName(root, "PSX_leftcolor1", RGB_MAKE(0x70, 0, 0));
-	barConfig->PSX_leftcolor[2] = ParseColorConfigByName(root, "PSX_leftcolor2", RGB_MAKE(0x98, 0, 0));
-	barConfig->PSX_leftcolor[3] = ParseColorConfigByName(root, "PSX_leftcolor3", RGB_MAKE(0xD8, 0, 0));
-	barConfig->PSX_leftcolor[4] = ParseColorConfigByName(root, "PSX_leftcolor4", RGB_MAKE(0xE4, 0, 0));
-	barConfig->PSX_leftcolor[5] = ParseColorConfigByName(root, "PSX_leftcolor5", RGB_MAKE(0xFF, 0, 0));
-	barConfig->PSX_rightcolor[0] = ParseColorConfigByName(root, "PSX_rightcolor0", RGB_MAKE(0x31, 0, 0));
-	barConfig->PSX_rightcolor[1] = ParseColorConfigByName(root, "PSX_rightcolor1", RGB_MAKE(0x3A, 0, 0));
-	barConfig->PSX_rightcolor[2] = ParseColorConfigByName(root, "PSX_rightcolor2", RGB_MAKE(0x40, 0, 0));
-	barConfig->PSX_rightcolor[3] = ParseColorConfigByName(root, "PSX_rightcolor3", RGB_MAKE(0x78, 0, 0));
-	barConfig->PSX_rightcolor[4] = ParseColorConfigByName(root, "PSX_rightcolor4", RGB_MAKE(0x9E, 0, 0));
-	barConfig->PSX_rightcolor[5] = ParseColorConfigByName(root, "PSX_rightcolor5", RGB_MAKE(0xDC, 0, 0));
-	barConfig->PSX_framecolor[0] = ParseColorConfigByName(root, "PSX_framecolor0", RGB_MAKE(0, 0, 0));
-	barConfig->PSX_framecolor[1] = ParseColorConfigByName(root, "PSX_framecolor1", RGB_MAKE(0, 0, 0));
-	barConfig->PSX_framecolor[2] = ParseColorConfigByName(root, "PSX_framecolor2", RGB_MAKE(0x50, 0x84, 0x84));
-	barConfig->PSX_framecolor[3] = ParseColorConfigByName(root, "PSX_framecolor3", RGB_MAKE(0xA0, 0xA0, 0xA0));
-	barConfig->PSX_framecolor[4] = ParseColorConfigByName(root, "PSX_framecolor4", RGB_MAKE(0x28, 0x42, 0x42));
-	barConfig->PSX_framecolor[5] = ParseColorConfigByName(root, "PSX_framecolor5", RGB_MAKE(0x50, 0x50, 0x50));
-	return true;
-}
-
-static bool ParseDefaultLevelConfiguration(json_value* root) {
-	if (root == NULL || root->type != json_object) {
-		return false;
-	}
-
-	ModConfig.pistolsAtStart = ParseBooleanConfigByName(root, "pistolsatstart", true);
-	ModConfig.shotgunAtStart = ParseBooleanConfigByName(root, "shotgunatstart", true);
-	ModConfig.uzisAtStart = ParseBooleanConfigByName(root, "uzisatstart");
-	ModConfig.autopistolsAtStart = ParseBooleanConfigByName(root, "autopistolsatstart");
-	ModConfig.m16AtStart = ParseBooleanConfigByName(root, "m16atstart");
-	ModConfig.grenadeAtStart = ParseBooleanConfigByName(root, "grenadeatstart");
-	ModConfig.harpoonAtStart = ParseBooleanConfigByName(root, "harpoonatstart");
-
-	ModConfig.shotgunAmmoAtStart = ParseIntegerConfigByName(root, "shotgunammoatstart", ModConfig.shotgunAtStart ? 2 : 0);
-	ModConfig.uzisAmmoAtStart = ParseIntegerConfigByName(root, "uzisammoatstart");
-	ModConfig.autopistolsAmmoAtStart = ParseIntegerConfigByName(root, "autopistolsammoatstart");
-	ModConfig.m16AmmoAtStart = ParseIntegerConfigByName(root, "m16ammoatstart");
-	ModConfig.grenadeAmmoAtStart = ParseIntegerConfigByName(root, "grenadeammoatstart");
-	ModConfig.harpoonAmmoAtStart = ParseIntegerConfigByName(root, "harpoonammoatstart");
-
-	ModConfig.flareCountAtStart = ParseIntegerConfigByName(root, "flaresatstart", 2);
-	ModConfig.smallMedikitAtStart = ParseIntegerConfigByName(root, "smallmedikitatstart", 1);
-	ModConfig.bigMedikitAtStart = ParseIntegerConfigByName(root, "bigmedikitatstart", 1);
-
-	ParseHealthBarConfiguration(GetJsonField(root, json_object, "larahealthbar", NULL), &ModConfig.healthbar);
-	ParseAirBarConfiguration(GetJsonField(root, json_object, "laraairbar", NULL), &ModConfig.airbar);
-	ParseEnemyBarConfiguration(GetJsonField(root, json_object, "enemyhealthbar", NULL), &ModConfig.enemyhealthbar);
-
-	ParseSemitransConfiguration(GetJsonField(root, json_object, "semitransparent", NULL));
-	ParseReflectConfiguration(GetJsonField(root, json_object, "reflective", NULL));
-	return true;
-}
-
-static bool ParseLevelConfiguration(json_value* root) {
-	if (root == NULL || root->type != json_object) {
-		return false;
-	}
-	json_value* field = NULL;
-	field = GetJsonField(root, json_string, "picture", NULL);
-	if (field) {
-		snprintf(ModConfig.loadingPix, sizeof(ModConfig.loadingPix), "data\\%.*s.pcx", field->u.string.length, field->u.string.ptr);
-	}
-	field = GetJsonField(root, json_string, "watercolor", NULL);
-	if (field && field->u.string.length == 6) {
-		ModConfig.waterColor = strtol(field->u.string.ptr, NULL, 16);
-	}
-
-	ModConfig.isBarefoot = ParseBooleanConfigByName(root, "barefoot");
-
-	ModConfig.dogHealth = ParseIntegerConfigByName(root, "dogHealth", 10);
-	ModConfig.mouseHealth = ParseIntegerConfigByName(root, "mouseHealth", 4);
-	ModConfig.cult1Health = ParseIntegerConfigByName(root, "cult1Health", 25);
-	ModConfig.cult1AHealth = ParseIntegerConfigByName(root, "cult1AHealth", 25);
-	ModConfig.cult1BHealth = ParseIntegerConfigByName(root, "cult1BHealth", 25);
-	ModConfig.cult2Health = ParseIntegerConfigByName(root, "cult2Health", 60);
-	ModConfig.sharkHealth = ParseIntegerConfigByName(root, "sharkHealth", 30);
-	ModConfig.tigerHealth = ParseIntegerConfigByName(root, "tigerHealth", 20);
-	ModConfig.barracudaHealth = ParseIntegerConfigByName(root, "barracudaHealth", 12);
-	ModConfig.smallSpiderHealth = ParseIntegerConfigByName(root, "smallSpiderHealth", 5);
-	ModConfig.wolfHealth = ParseIntegerConfigByName(root, "wolfHealth", 10);
-	ModConfig.bigSpiderHealth = ParseIntegerConfigByName(root, "bigSpiderHealth", 40);
-	ModConfig.bearHealth = ParseIntegerConfigByName(root, "bearHealth", 30);
-	ModConfig.yetiHealth = ParseIntegerConfigByName(root, "yetiHealth", 30);
-	ModConfig.jellyHealth = ParseIntegerConfigByName(root, "jellyHealth", 10);
-	ModConfig.diverHealth = ParseIntegerConfigByName(root, "diverHealth", 20);
-	ModConfig.worker1Health = ParseIntegerConfigByName(root, "worker1Health", 25);
-	ModConfig.worker2Health = ParseIntegerConfigByName(root, "worker2Health", 20);
-	ModConfig.worker3Health = ParseIntegerConfigByName(root, "worker3Health", 27);
-	ModConfig.worker4Health = ParseIntegerConfigByName(root, "worker4Health", 27);
-	ModConfig.worker5Health = ParseIntegerConfigByName(root, "worker5Health", 20);
-	ModConfig.cult3Health = ParseIntegerConfigByName(root, "cult3Health", 150);
-	ModConfig.monk1Health = ParseIntegerConfigByName(root, "monk1Health", 30);
-	ModConfig.monk2Health = ParseIntegerConfigByName(root, "monk2Health", 30);
-	ModConfig.eagleHealth = ParseIntegerConfigByName(root, "eagleHealth", 20);
-	ModConfig.crowHealth = ParseIntegerConfigByName(root, "crowHealth", 15);
-	ModConfig.bigEelHealth = ParseIntegerConfigByName(root, "bigEelHealth", 20);
-	ModConfig.eelHealth = ParseIntegerConfigByName(root, "eelHealth", 5);
-	ModConfig.bandit1Health = ParseIntegerConfigByName(root, "bandit1Health", 45);
-	ModConfig.bandit2Health = ParseIntegerConfigByName(root, "bandit2Health", 50);
-	ModConfig.bandit2BHealth = ParseIntegerConfigByName(root, "bandit2BHealth", 50);
-	ModConfig.skidmanHealth = ParseIntegerConfigByName(root, "skidmanHealth", 100);
-	ModConfig.xianLordHealth = ParseIntegerConfigByName(root, "xianLordHealth", 100);
-	ModConfig.warriorHealth = ParseIntegerConfigByName(root, "warriorHealth", 80);
-	ModConfig.dragonHealth = ParseIntegerConfigByName(root, "dragonHealth", 300);
-	ModConfig.giantYetiHealth = ParseIntegerConfigByName(root, "giantYetiHealth", 200);
-	ModConfig.dinoHealth = ParseIntegerConfigByName(root, "dinoHealth", 100);
-	ModConfig.disableGiantYetiNextLevelOnDeath = ParseBooleanConfigByName(root, "disableGiantYetiNextLevelOnDeath");
-	ModConfig.laraIgnoreMonkIfNotAngry = ParseBooleanConfigByName(root, "laraignoremonkifnotangry");
-	ModConfig.makeMercenaryAttackLaraFirst = ParseBooleanConfigByName(root, "mercenaryattacklaradirectly");
-	ModConfig.makeMonkAttackLaraFirst = ParseBooleanConfigByName(root, "monksattacklaradirectly");
-	ModConfig.enemyBarEnabled = ParseBooleanConfigByName(root, "enableenemybar", true);
-
-	ParseSemitransConfiguration(GetJsonField(root, json_object, "semitransparent", NULL));
-	ParseReflectConfiguration(GetJsonField(root, json_object, "reflective", NULL));
-	return true;
-}
-
-static bool ParseModConfiguration(char* levelName, json_value* root) {
-	if (root == NULL || root->type != json_object) {
-		return false;
-	}
-	// parsing default configs
-	ParseDefaultLevelConfiguration(GetJsonField(root, json_object, "default", NULL));
-
-	// parsing level specific configs
-	json_value* levels = GetJsonField(root, json_array, "levels", NULL);
-	if (levels) ParseLevelConfiguration(GetJsonObjectByStringField(levels, "filename", levelName, false, NULL));
-	return true;
-}
-
-void UnloadModConfiguration() {
-	if (ModConfig.semitrans.animtex) {
-		free(ModConfig.semitrans.animtex);
-		ModConfig.semitrans.animtex = NULL;
-	}
-	FreePolyfilterNodes(&ModConfig.semitrans.rooms);
-	FreePolyfilterNodes(&ModConfig.semitrans.statics);
-	FreePolyfilterNodes(&ModConfig.reflect.statics);
-	for (DWORD i = 0; i < ARRAY_SIZE(ModConfig.semitrans.objects); ++i) {
-		FreePolyfilterNodes(&ModConfig.semitrans.objects[i]);
-		FreePolyfilterNodes(&ModConfig.reflect.objects[i]);
-	}
-	memset(&ModConfig, 0, sizeof(ModConfig));
-}
-
-bool LoadModConfiguration(LPCTSTR levelFilePath) {
-	UnloadModConfiguration();
-	if (!PathFileExists(MOD_CONFIG_NAME)) {
-		return false;
-	}
-	char levelName[256] = { 0 };
-	strncpy(levelName, PathFindFileName(levelFilePath), sizeof(levelName) - 1);
-	char* ext = PathFindExtension(levelName);
-	if (ext != NULL) *ext = 0;
-
-	DWORD bytesRead = 0;
-	HANDLE hFile = CreateFile(MOD_CONFIG_NAME, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, NULL);
-	if (hFile == INVALID_HANDLE_VALUE) {
-		return false;
-	}
-	DWORD cfgSize = GetFileSize(hFile, NULL);
-	void* cfgData = malloc(cfgSize);
-	ReadFile(hFile, cfgData, cfgSize, &bytesRead, NULL);
-	CloseHandle(hFile);
-
-	json_value* json = json_parse((const json_char*)cfgData, cfgSize);
-	if (json != NULL) {
-		ModConfig.isLoaded = ParseModConfiguration(levelName, json);
-	}
-	json_value_free(json);
-	free(cfgData);
-	return ModConfig.isLoaded;
-}
-#endif // FEATURE_MOD_CONFIG
+ModConfig Mod;
+void ModConfig::Initialize() {
+    ZeroMemory(&Mod, sizeof(Mod));
+}
+
+void ModConfig::Release() {
+    if (semitrans.animtex != NULL) {
+        free(semitrans.animtex);
+        semitrans.animtex = NULL;
+    }
+    FreePolyfilterNodes(&semitrans.rooms);
+    FreePolyfilterNodes(&semitrans.statics);
+    FreePolyfilterNodes(&reflect.statics);
+    for (DWORD i = 0; i < ARRAY_SIZE(semitrans.objects); ++i) {
+        FreePolyfilterNodes(&semitrans.objects[i]);
+        FreePolyfilterNodes(&reflect.objects[i]);
+    }
+    ZeroMemory(&Mod, sizeof(Mod));
+}
+
+bool ModConfig::LoadJson(LPCSTR filePath) {
+    if (!PathFileExists(filePath)) {
+        LogWarn("Failed to load json: %s, does not exist !", filePath);
+        return false;
+    }
+
+    std::ifstream file(MOD_CONFIG_NAME);
+    std::string json((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    StringStream ss(json.c_str());
+    CursorStreamWrapper<StringStream> csw(ss);
+    Document doc;
+    doc.ParseStream(csw);
+
+    if (doc.HasParseError()) {
+        size_t lineID = csw.GetLine();
+        if (lineID > 0)
+            lineID--;
+        ParseJsonError(MOD_CONFIG_NAME, lineID, doc.GetParseError());
+        return false;
+    }
+
+    char levelName[256] = { 0 };
+    strncpy(levelName, PathFindFileName(filePath), sizeof(levelName) - 1);
+    char* ext = PathFindExtension(levelName);
+    if (ext != NULL) *ext = 0;
+
+    LogDebug("Level configuration loaded !");
+    LogDebug("LevelFilename: %s", levelName);
+
+    for (size_t i = 0; i < strlen(levelName); i++)
+        levelName[i] = std::toupper(levelName[i]);
+
+    if (doc.HasMember("default"))
+        ParseDefaultConfiguration(doc["default"]);
+    if (doc.HasMember("levels"))
+        ParseLevelConfiguration(doc["levels"], levelName);
+    return isLoaded;
+}
+
+void ModConfig::LoadHealthBarConfig(Value& data, BAR_CONFIG* result) {
+    result->PC_xpos = GetValueByNameInt<int>(data, "PC_x", 8);
+    result->PC_ypos = GetValueByNameInt<int>(data, "PC_y", 8);
+    result->PC_color[0] = (INV_COLOURS)GetValueByNameInt<int>(data, "PC_color0", 3);
+    result->PC_color[1] = (INV_COLOURS)GetValueByNameInt<int>(data, "PC_color1", 4);
+    result->PSX_xpos = GetValueByNameInt<int>(data, "PSX_x", 20);
+    result->PSX_ypos = GetValueByNameInt<int>(data, "PSX_y", 18);
+    result->PSX_leftcolor[0] = GetColorByName(data, "PSX_leftcolor0", RGB_MAKE(0x68, 0, 0));
+    result->PSX_leftcolor[1] = GetColorByName(data, "PSX_leftcolor1", RGB_MAKE(0x70, 0, 0));
+    result->PSX_leftcolor[2] = GetColorByName(data, "PSX_leftcolor2", RGB_MAKE(0x98, 0, 0));
+    result->PSX_leftcolor[3] = GetColorByName(data, "PSX_leftcolor3", RGB_MAKE(0xD8, 0, 0));
+    result->PSX_leftcolor[4] = GetColorByName(data, "PSX_leftcolor4", RGB_MAKE(0xE4, 0, 0));
+    result->PSX_leftcolor[5] = GetColorByName(data, "PSX_leftcolor5", RGB_MAKE(0xF0, 0, 0));
+    result->PSX_rightcolor[0] = GetColorByName(data, "PSX_rightcolor0", RGB_MAKE(0, 0x44, 0));
+    result->PSX_rightcolor[1] = GetColorByName(data, "PSX_rightcolor1", RGB_MAKE(0, 0x74, 0));
+    result->PSX_rightcolor[2] = GetColorByName(data, "PSX_rightcolor2", RGB_MAKE(0, 0x9C, 0));
+    result->PSX_rightcolor[3] = GetColorByName(data, "PSX_rightcolor3", RGB_MAKE(0, 0xD4, 0));
+    result->PSX_rightcolor[4] = GetColorByName(data, "PSX_rightcolor4", RGB_MAKE(0, 0xE8, 0));
+    result->PSX_rightcolor[5] = GetColorByName(data, "PSX_rightcolor5", RGB_MAKE(0, 0xFC, 0));
+    result->PSX_framecolor[0] = GetColorByName(data, "PSX_framecolor0", RGB_MAKE(0, 0, 0));
+    result->PSX_framecolor[1] = GetColorByName(data, "PSX_framecolor1", RGB_MAKE(0, 0, 0));
+    result->PSX_framecolor[2] = GetColorByName(data, "PSX_framecolor2", RGB_MAKE(0x50, 0x84, 0x84));
+    result->PSX_framecolor[3] = GetColorByName(data, "PSX_framecolor3", RGB_MAKE(0xA0, 0xA0, 0xA0));
+    result->PSX_framecolor[4] = GetColorByName(data, "PSX_framecolor4", RGB_MAKE(0x28, 0x42, 0x42));
+    result->PSX_framecolor[5] = GetColorByName(data, "PSX_framecolor5", RGB_MAKE(0x50, 0x50, 0x50));
+}
+
+void ModConfig::LoadAirBarConfig(Value& data, BAR_CONFIG* result) {
+    result->PC_xpos = GetValueByNameInt<int>(data, "PC_x", 8);
+    result->PC_ypos = GetValueByNameInt<int>(data, "PC_y", 8);
+    result->PC_color[0] = (INV_COLOURS)GetValueByNameInt<int>(data, "PC_color0", 3);
+    result->PC_color[1] = (INV_COLOURS)GetValueByNameInt<int>(data, "PC_color1", 4);
+    result->PSX_xpos = GetValueByNameInt<int>(data, "PSX_x", 20);
+    result->PSX_ypos = GetValueByNameInt<int>(data, "PSX_y", 18);
+    result->PSX_leftcolor[0] = GetColorByName(data, "PSX_leftcolor0", RGB_MAKE(0, 0x40, 0x54));
+    result->PSX_leftcolor[1] = GetColorByName(data, "PSX_leftcolor1", RGB_MAKE(0, 0x50, 0x64));
+    result->PSX_leftcolor[2] = GetColorByName(data, "PSX_leftcolor2", RGB_MAKE(0, 0x68, 0x74));
+    result->PSX_leftcolor[3] = GetColorByName(data, "PSX_leftcolor3", RGB_MAKE(0, 0x78, 0x84));
+    result->PSX_leftcolor[4] = GetColorByName(data, "PSX_leftcolor4", RGB_MAKE(0, 0x84, 0x8E));
+    result->PSX_leftcolor[5] = GetColorByName(data, "PSX_leftcolor5", RGB_MAKE(0, 0x90, 0x98));
+    result->PSX_rightcolor[0] = GetColorByName(data, "PSX_rightcolor0", RGB_MAKE(0, 0x40, 0));
+    result->PSX_rightcolor[1] = GetColorByName(data, "PSX_rightcolor1", RGB_MAKE(0, 0x50, 0));
+    result->PSX_rightcolor[2] = GetColorByName(data, "PSX_rightcolor2", RGB_MAKE(0, 0x68, 0));
+    result->PSX_rightcolor[3] = GetColorByName(data, "PSX_rightcolor3", RGB_MAKE(0, 0x78, 0));
+    result->PSX_rightcolor[4] = GetColorByName(data, "PSX_rightcolor4", RGB_MAKE(0, 0x84, 0));
+    result->PSX_rightcolor[5] = GetColorByName(data, "PSX_rightcolor5", RGB_MAKE(0, 0x90, 0));
+    result->PSX_framecolor[0] = GetColorByName(data, "PSX_framecolor0", RGB_MAKE(0, 0, 0));
+    result->PSX_framecolor[1] = GetColorByName(data, "PSX_framecolor1", RGB_MAKE(0, 0, 0));
+    result->PSX_framecolor[2] = GetColorByName(data, "PSX_framecolor2", RGB_MAKE(0x50, 0x84, 0x84));
+    result->PSX_framecolor[3] = GetColorByName(data, "PSX_framecolor3", RGB_MAKE(0xA0, 0xA0, 0xA0));
+    result->PSX_framecolor[4] = GetColorByName(data, "PSX_framecolor4", RGB_MAKE(0x28, 0x42, 0x42));
+    result->PSX_framecolor[5] = GetColorByName(data, "PSX_framecolor5", RGB_MAKE(0x50, 0x50, 0x50));
+}
+
+void ModConfig::LoadEnemyHealthConfig(Value& data) {
+    SizeType pictureStrSize = 0;
+    const char* pictureName = GetValueByNameString(data, "picture", &pictureStrSize, NULL);
+    if (pictureStrSize > 0)
+    {
+        snprintf(loadingPix, sizeof(loadingPix), "data\\%.*s.pcx", pictureStrSize, pictureName);
+        loadingPixFound = true;
+    }
+
+    waterColor = GetColorByName(data, "watercolor", RGB_MAKE(255, 255, 255));
+    isBarefoot = GetValueByNameBool(data, "barefoot", false);
+
+    // Reset the enemyHealth structure to 1 hp to avoid them dying when triggered !
+    memset(&enemyHealth, 1, sizeof(enemyHealth));
+    enemyHealth.dog = GetValueByNameInt<short>(data, "dogHealth", 10);
+    enemyHealth.mouse = GetValueByNameInt<short>(data, "mouseHealth", 4);
+    enemyHealth.cult1 = GetValueByNameInt<short>(data, "cult1Health", 25);
+    enemyHealth.cult1A = GetValueByNameInt<short>(data, "cult1AHealth", 25);
+    enemyHealth.cult1B = GetValueByNameInt<short>(data, "cult1BHealth", 25);
+    enemyHealth.cult2 = GetValueByNameInt<short>(data, "cult2Health", 60);
+    enemyHealth.shark = GetValueByNameInt<short>(data, "sharkHealth", 30);
+    enemyHealth.tiger = GetValueByNameInt<short>(data, "tigerHealth", 20);
+    enemyHealth.barracuda = GetValueByNameInt<short>(data, "barracudaHealth", 12);
+    enemyHealth.smallSpider = GetValueByNameInt<short>(data, "smallSpiderHealth", 5);
+    enemyHealth.wolf = GetValueByNameInt<short>(data, "wolfHealth", 10);
+    enemyHealth.bigSpider = GetValueByNameInt<short>(data, "bigSpiderHealth", 40);
+    enemyHealth.bear = GetValueByNameInt<short>(data, "bearHealth", 30);
+    enemyHealth.yeti = GetValueByNameInt<short>(data, "yetiHealth", 30);
+    enemyHealth.jelly = GetValueByNameInt<short>(data, "jellyHealth", 10);
+    enemyHealth.diver = GetValueByNameInt<short>(data, "diverHealth", 20);
+    enemyHealth.worker1 = GetValueByNameInt<short>(data, "worker1Health", 25);
+    enemyHealth.worker2 = GetValueByNameInt<short>(data, "worker2Health", 20);
+    enemyHealth.worker3 = GetValueByNameInt<short>(data, "worker3Health", 27);
+    enemyHealth.worker4 = GetValueByNameInt<short>(data, "worker4Health", 27);
+    enemyHealth.worker5 = GetValueByNameInt<short>(data, "worker5Health", 20);
+    enemyHealth.cult3 = GetValueByNameInt<short>(data, "cult3Health", 150);
+    enemyHealth.monk1 = GetValueByNameInt<short>(data, "monk1Health", 30);
+    enemyHealth.monk2 = GetValueByNameInt<short>(data, "monk2Health", 30);
+    enemyHealth.eagle = GetValueByNameInt<short>(data, "eagleHealth", 20);
+    enemyHealth.crow = GetValueByNameInt<short>(data, "crowHealth", 15);
+    enemyHealth.bigEel = GetValueByNameInt<short>(data, "bigEelHealth", 20);
+    enemyHealth.eel = GetValueByNameInt<short>(data, "eelHealth", 5);
+    enemyHealth.bandit1 = GetValueByNameInt<short>(data, "bandit1Health", 45);
+    enemyHealth.bandit2 = GetValueByNameInt<short>(data, "bandit2Health", 50);
+    enemyHealth.bandit2B = GetValueByNameInt<short>(data, "bandit2BHealth", 50);
+    enemyHealth.skidman = GetValueByNameInt<short>(data, "skidmanHealth", 100);
+    enemyHealth.xianLord = GetValueByNameInt<short>(data, "xianLordHealth", 100);
+    enemyHealth.warrior = GetValueByNameInt<short>(data, "warriorHealth", 80);
+    enemyHealth.dragon = GetValueByNameInt<short>(data, "dragonHealth", 300);
+    enemyHealth.giantYeti = GetValueByNameInt<short>(data, "giantYetiHealth", 200);
+    enemyHealth.dino = GetValueByNameInt<short>(data, "dinoHealth", 100);
+
+    disableGiantYetiNextLevelOnDeath = GetValueByNameBool(data, "disableGiantYetiNextLevelOnDeath", false);
+    laraIgnoreMonkIfNotAngry = GetValueByNameBool(data, "laraignoremonkifnotangry", true);
+    makeMercenaryAttackLaraFirst = GetValueByNameBool(data, "mercenaryattacklaradirectly", false);
+    makeMonkAttackLaraFirst = GetValueByNameBool(data, "monksattacklaradirectly", false);
+    enemyBarEnabled = GetValueByNameBool(data, "enableenemybar", true);
+}
+
+void ModConfig::LoadSemitransConfig(Value& data, SEMITRANS_CONFIG* semitrans) {
+    if (data.HasMember("animtex"))
+    {
+        LPCSTR animTexStr = data["animtex"].GetString();
+        if (strcasecmp(animTexStr, "auto"))
+        {
+            semitrans->animtex = (POLYINDEX*)malloc(sizeof(POLYINDEX) * POLYFILTER_SIZE);
+            if (semitrans->animtex)
+                ParsePolyValue(animTexStr, semitrans->animtex, POLYFILTER_SIZE);
+        }
+    }
+    if (data.HasMember("objects"))
+    {
+        Value& objectList = data["objects"].GetArray();
+        for (SizeType i = 0; i < objectList.Size(); i++)
+        {
+            Value& obj = objectList[i];
+            int objID = GetValueByNameInt(obj, "object", -1);
+            if (objID < 0 || objID >= ID_NUMBER_OBJECTS)
+                continue;
+            if (obj.HasMember("objects"))
+                LoadPolyfilterConfig(obj["meshes"], "mesh", &semitrans->objects[objID]);
+        }
+    }
+    if (data.HasMember("statics"))
+        LoadPolyfilterConfig(data["statics"], "static", &semitrans->statics);
+    if (data.HasMember("rooms"))
+        LoadPolyfilterConfig(data["rooms"], "room", &semitrans->rooms);
+    semitrans->isLoaded = true;
+}
+
+void ModConfig::LoadPolyfilterConfig(Value& data, LPCSTR name, POLYFILTER_NODE** filterNodes)
+{
+    FreePolyfilterNodes(filterNodes);
+
+    Value& polyList = data.GetArray();
+    if (!polyList.IsArray())
+    {
+        LogWarn("Failed to load polyfilter node for type name: %s, type is not an array !", name);
+        return;
+    }
+
+    for (SizeType i = 0; i < polyList.Size(); i++)
+    {
+        Value& poly = polyList[i];
+
+        int meshID = GetValueByNameInt(poly, name, -1);
+        if (meshID < 0) continue;
+
+        POLYFILTER* meshFilter = CreatePolyfilterNode(filterNodes, meshID);
+        if (meshFilter == NULL) continue;
+
+        if (poly.HasMember("filter"))
+        {
+            Value& filterData = poly["filter"];
+            meshFilter->n_vtx = GetValueByNameInt(filterData, "v", 0);
+            meshFilter->n_gt4 = GetValueByNameInt(filterData, "t4", 0);
+            meshFilter->n_gt3 = GetValueByNameInt(filterData, "t3", 0);
+            meshFilter->n_g4 = GetValueByNameInt(filterData, "c4", 0);
+            meshFilter->n_g3 = GetValueByNameInt(filterData, "c3", 0);
+        }
+
+        SizeType size = 0;
+        LPCSTR t4list = GetValueByNameString(poly, "t4list", &size, NULL);
+        LPCSTR t3list = GetValueByNameString(poly, "t3list", &size, NULL);
+        LPCSTR c4list = GetValueByNameString(poly, "c4list", &size, NULL);
+        LPCSTR c3list = GetValueByNameString(poly, "c3list", &size, NULL);
+        if (t4list || t3list || c4list || c3list)
+        {
+            ParsePolyValue(t4list, meshFilter->gt4, ARRAY_SIZE(meshFilter->gt4));
+            ParsePolyValue(t3list, meshFilter->gt3, ARRAY_SIZE(meshFilter->gt3));
+            ParsePolyValue(c4list, meshFilter->g4, ARRAY_SIZE(meshFilter->g4));
+            ParsePolyValue(c3list, meshFilter->g3, ARRAY_SIZE(meshFilter->g3));
+        }
+    }
+}
+
+void ModConfig::LoadReflectConfig(Value& data, REFLECT_CONFIG* reflect) {
+    if (data.HasMember("objects") && data["objects"].IsArray())
+    {
+        Value& objectList = data["objects"].GetArray();
+        for (SizeType i = 0; i < objectList.Size(); i++)
+        {
+            Value& obj = objectList[i];
+            int objID = GetValueByNameInt(obj, "object", -1);
+            if (objID < 0 || objID >= ID_NUMBER_OBJECTS)
+                continue;
+            LoadPolyfilterConfig(obj["meshes"], "mesh", &reflect->objects[objID]);
+        }
+    }
+    if (data.HasMember("statics"))
+        LoadPolyfilterConfig(data["statics"], "static", &reflect->statics);
+    reflect->isLoaded = true;
+}
+
+void ModConfig::ParseDefaultConfiguration(Value& data) {
+    pistolAtStart = GetValueByNameBool(data, "pistolsatstart", true);
+    shotgunAtStart = GetValueByNameBool(data, "shotgunatstart", true);
+    uzisAtStart = GetValueByNameBool(data, "uzisatstart", false);
+    autoPistolAtStart = GetValueByNameBool(data, "autopistolsatstart", false);
+    m16AtStart = GetValueByNameBool(data, "m16atstart", false);
+    grenadeAtStart = GetValueByNameBool(data, "grenadeatstart", false);
+    harpoonAtStart = GetValueByNameBool(data, "harpoonatstart", false);
+
+    shotgunAmmoAtStart = GetValueByNameInt<short>(data, "shotgunammoatstart", 2);
+    uzisAmmoAtStart = GetValueByNameInt<short>(data, "uzisammoatstart", 0);
+    autoPistolAmmoAtStart = GetValueByNameInt<short>(data, "autopistolsammoatstart", 0);
+    m16AmmoAtStart = GetValueByNameInt<short>(data, "m16ammoatstart", 0);
+    grenadeAmmoAtStart = GetValueByNameInt<short>(data, "grenadeammoatstart", 0);
+    harpoonAmmoAtStart = GetValueByNameInt<short>(data, "harpoonammoatstart", 0);
+
+    flareAtStart = GetValueByNameInt<short>(data, "flaresatstart", 2);
+    smallMediAtStart = GetValueByNameInt<short>(data, "smallmedikitatstart", 1);
+    bigMediAtStart = GetValueByNameInt<short>(data, "bigmedikitatstart", 1);
+
+    LoadHealthBarConfig(data["larahealthbar"], &laraBar.health);
+    LoadAirBarConfig(data["laraairbar"], &laraBar.air);
+    LoadHealthBarConfig(data["enemyhealthbar"], &enemyBar);
+
+    LoadSemitransConfig(data["semitransparent"], &semitrans);
+    LoadReflectConfig(data["reflective"], &reflect);
+}
+
+void ModConfig::ParseLevelConfiguration(Value& data, LPCSTR currentLevel) {
+    if (!data.IsArray()) {
+        LogWarn("Failed to load level configuration (json), 'levels' is not an array !");
+        return;
+    }
+
+    Value& levelData = data.GetArray();
+    SizeType levelCount = levelData.Size();
+    if (levelCount <= 0) {
+        LogWarn("Failed to load level configuration (json), no level in the array !");
+        return;
+    }
+
+    for (SizeType i = 0; i < levelCount; i++)
+    {
+        Value& level = levelData[i];
+        // Filename member required for detecting current level !
+        if (level.HasMember("filename")) {
+            // If the filename is equal then load it !
+            if (strcasecmp(level["filename"].GetString(), currentLevel) == 0) {
+                LogDebug("Found level: %s", level["filename"].GetString());
+                LoadEnemyHealthConfig(level);
+                if (level.HasMember("semitransparent")) LoadSemitransConfig(level["semitransparent"], &semitrans);
+                if (level.HasMember("reflective")) LoadReflectConfig(level["reflective"], &reflect);
+                break;
+            }
+        }
+        else
+        {
+            LogWarn("Failed to load level configuration (json), current level: %s not have a 'filename' entry !", currentLevel);
+            break;
+        }
+    }
+}
+
+POLYFILTER* ModConfig::CreatePolyfilterNode(POLYFILTER_NODE** data, int id)
+{
+    if (data == NULL) return NULL;
+    POLYFILTER_NODE* node = (POLYFILTER_NODE*)malloc(sizeof(POLYFILTER_NODE));
+    if (node == NULL) return NULL;
+    node->id = id;
+    node->next = *data;
+    memset(&node->filter, 0, sizeof(node->filter));
+    *data = node;
+    return &node->filter;
+}
+
+void ModConfig::FreePolyfilterNodes(POLYFILTER_NODE** data)
+{
+    if (data == NULL) return;
+    POLYFILTER_NODE* node = *data;
+    while (node) {
+        POLYFILTER_NODE* next = node->next;
+        free(node);
+        node = next;
+    }
+    *data = NULL;
+}
+
+bool ModConfig::IsCompatibleFilter(short* ptrObj, bool isRoomMesh, POLYFILTER* filter)
+{
+    if (!ptrObj || !filter || !filter->n_vtx) return true;
+    if (!isRoomMesh) {
+        ptrObj += 5; // skip x, y, z, radius, flags
+    }
+    short num = *(ptrObj++); // get vertex counter
+    if (num != filter->n_vtx) return false;
+    ptrObj += num * (isRoomMesh ? 6 : 3); // skip vertices
+    if (!isRoomMesh) {
+        num = *(ptrObj++); // get normal counter
+        ptrObj += (num > 0) ? num * 3 : ABS(num); // skip normals/shades
+    }
+    num = *(ptrObj++); // get gt4 number
+    if (num != filter->n_gt4) return false;
+    ptrObj += num * 5; // skip gt4 polys
+    num = *(ptrObj++); // get gt3 number
+    if (num != filter->n_gt3) return false;
+    if (!isRoomMesh) {
+        ptrObj += num * 4; // skip gt3 polys
+        num = *(ptrObj++); // get g4 number
+        if (num != filter->n_g4) return false;
+        ptrObj += num * 5; // skip g4 polys
+        num = *(ptrObj++); // get g3 number
+        if (num != filter->n_g3) return false;
+    }
+    return true;
+}
+
+short* ModConfig::EnumeratePolysSpecific(short* ptrObj, int vtxCount, bool colored, ENUM_POLYS_CB callback, POLYINDEX* filter, LPVOID param)
+{
+    int polyNumber = *ptrObj++;
+    if (filter == NULL || (!filter[0].idx && !filter[0].num)) {
+        for (int i = 0; i < polyNumber; ++i) {
+            if (!callback(ptrObj, vtxCount, colored, param)) return NULL;
+            ptrObj += vtxCount + 1;
+        }
+    }
+    else {
+        int polyIndex = 0;
+        for (int i = 0; i < POLYFILTER_SIZE; i++) {
+            if (filter[i].idx < polyIndex || filter[i].idx >= polyNumber) {
+                break;
+            }
+            int skip = filter[i].idx - polyIndex;
+            if (skip > 0) {
+                ptrObj += skip * (vtxCount + 1);
+                polyIndex += skip;
+            }
+            int number = MIN(filter[i].num, polyNumber - polyIndex);
+            for (int j = 0; j < number; ++j) {
+                if (!callback(ptrObj, vtxCount, colored, param)) return NULL;
+                ptrObj += vtxCount + 1;
+            }
+            polyIndex += number;
+        }
+        ptrObj += (polyNumber - polyIndex) * (vtxCount + 1);
+    }
+    return ptrObj;
+}
+
+bool ModConfig::EnumeratePolys(short* ptrObj, bool isRoomMesh, ENUM_POLYS_CB callback, POLYFILTER* filter, LPVOID param)
+{
+    if (ptrObj == NULL || callback == NULL) return false; // wrong parameters
+    if (!IsCompatibleFilter(ptrObj, isRoomMesh, filter)) return false; // filter is not compatible
+
+    short num;
+    if (!isRoomMesh) {
+        ptrObj += 5; // skip x, y, z, radius, flags
+    }
+    num = *(ptrObj++); // get vertex counter
+    ptrObj += num * (isRoomMesh ? 6 : 3); // skip vertices
+    if (!isRoomMesh) {
+        num = *(ptrObj++); // get normal counter
+        ptrObj += (num > 0) ? num * 3 : ABS(num); // skip normals/shades
+    }
+    ptrObj = EnumeratePolysSpecific(ptrObj, 4, false, callback, filter ? filter->gt4 : NULL, param); // enumerate textured quads
+    if (ptrObj == NULL) return true;
+    ptrObj = EnumeratePolysSpecific(ptrObj, 3, false, callback, filter ? filter->gt3 : NULL, param); // enumerate textured triangles
+    if (!isRoomMesh) {
+        if (ptrObj == NULL) return true;
+        ptrObj = EnumeratePolysSpecific(ptrObj, 4, true, callback, filter ? filter->g4 : NULL, param); // enumerate colored quads
+        if (ptrObj == NULL) return true;
+        ptrObj = EnumeratePolysSpecific(ptrObj, 3, true, callback, filter ? filter->g3 : NULL, param); // enumerate colored triangles
+    }
+    return true;
+}
+
+int ModConfig::ParsePolyString(LPCSTR str, POLYINDEX* lst, DWORD lstLen) {
+    if (!lst || !lstLen) {
+        return -1;
+    }
+
+    lst[0].idx = ~0;
+    lst[0].num = ~0;
+
+    POLYINDEX* lstBuf = (POLYINDEX*)malloc(lstLen * sizeof(POLYINDEX));
+    if (lstBuf == NULL) {
+        return -2;
+    }
+
+    char* strBuf = _strdup(str);
+    if (strBuf == NULL) {
+        free(lstBuf);
+        return -2;
+    }
+
+    DWORD bufLen = 0;
+    char* token = strtok(strBuf, ",");
+    while (token != NULL) {
+        char* range = strchr(token, '-');
+        if (range) {
+            int from = atoi(token);
+            int to = atoi(range + 1);
+            lstBuf[bufLen].idx = MIN(to, from);
+            lstBuf[bufLen].num = ABS(to - from) + 1;
+        }
+        else {
+            lstBuf[bufLen].idx = atoi(token);
+            lstBuf[bufLen].num = 1;
+        }
+        if (++bufLen >= lstLen) {
+            break;
+        }
+        token = strtok(NULL, ",");
+    }
+
+    free(strBuf);
+    if (!bufLen) {
+        free(lstBuf);
+        return 0;
+    }
+
+    for (DWORD i = 0; i < bufLen - 1; ++i) {
+        for (DWORD j = i + 1; j < bufLen; ++j) {
+            if (lstBuf[i].idx > lstBuf[j].idx) {
+                POLYINDEX t;
+                SWAP(lstBuf[i], lstBuf[j], t);
+            }
+        }
+    }
+
+    lst[0] = lstBuf[0];
+    DWORD resLen = 1;
+
+    for (DWORD i = 1; i < bufLen; ++i) {
+        int bound = lst[resLen - 1].idx + lst[resLen - 1].num;
+        if (lstBuf[i].idx > bound) {
+            lst[resLen] = lstBuf[i];
+            ++resLen;
+        }
+        else {
+            int ext = lstBuf[i].idx + lstBuf[i].num;
+            if (ext > bound) {
+                lst[resLen - 1].num += ext - bound;
+            }
+        }
+    }
+    if (resLen < lstLen) {
+        lst[resLen].idx = 0;
+        lst[resLen].num = 0;
+    }
+
+    free(lstBuf);
+    return resLen;
+}
+
+int ModConfig::ParsePolyValue(LPCSTR value, POLYINDEX* lst, DWORD lstLen) {
+    if (!lst || !lstLen) {
+        return -1;
+    }
+
+    lst[0].idx = ~0;
+    lst[0].num = ~0;
+    if (value == NULL) {
+        return 0;
+    }
+
+    const char* str = value;
+    if (!str || !*str || !strcasecmp(str, "none")) {
+        return 0;
+    }
+    if (!strcasecmp(str, "all")) {
+        lst[0].idx = 0;
+        lst[0].num = 0;
+        return 1;
+    }
+    return ParsePolyString(str, lst, lstLen);
+}
+#endif

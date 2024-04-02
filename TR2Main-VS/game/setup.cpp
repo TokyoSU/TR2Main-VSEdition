@@ -106,7 +106,7 @@ void BaddyObjects() {
 		obj->control = DogControl;
 		obj->shadowSize = 128;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModDogHealth();
+		obj->hitPoints = Mod.enemyHealth.dog;
 #else
 		obj->hitPoints = 10;
 #endif
@@ -125,7 +125,7 @@ void BaddyObjects() {
 		obj->collision = CreatureCollision;
 		obj->control = MouseControl;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModMouseHealth();
+		obj->hitPoints = Mod.enemyHealth.mouse;
 #else
 		obj->hitPoints = 4;
 #endif
@@ -145,7 +145,7 @@ void BaddyObjects() {
 		obj->collision = CreatureCollision;
 		obj->control = Cult1Control;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModCult1Health();
+		obj->hitPoints = Mod.enemyHealth.cult1;
 #else
 		obj->hitPoints = 25;
 #endif
@@ -170,7 +170,7 @@ void BaddyObjects() {
 		obj->control = Cult1Control;
 		obj->collision = CreatureCollision;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModCult1AHealth();
+		obj->hitPoints = Mod.enemyHealth.cult1A;
 #else
 		obj->hitPoints = 25;
 #endif
@@ -195,7 +195,7 @@ void BaddyObjects() {
 		obj->collision = CreatureCollision;
 		obj->control = Cult1Control;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModCult1BHealth();
+		obj->hitPoints = Mod.enemyHealth.cult1B;
 #else
 		obj->hitPoints = 25;
 #endif
@@ -215,7 +215,7 @@ void BaddyObjects() {
 		obj->collision = CreatureCollision;
 		obj->control = Cult2Control;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModCult2Health();
+		obj->hitPoints = Mod.enemyHealth.cult2;
 #else
 		obj->hitPoints = 60;
 #endif
@@ -237,7 +237,7 @@ void BaddyObjects() {
 		obj->control = SharkControl;
 		obj->drawRoutine = DrawUnclippedItem;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModSharkHealth();
+		obj->hitPoints = Mod.enemyHealth.shark;
 #else
 		obj->hitPoints = 30;
 #endif
@@ -258,7 +258,7 @@ void BaddyObjects() {
 		obj->collision = CreatureCollision;
 		obj->control = TigerControl;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModTigerHealth();
+		obj->hitPoints = Mod.enemyHealth.tiger;
 #else
 		obj->hitPoints = 20;
 #endif
@@ -278,7 +278,7 @@ void BaddyObjects() {
 		obj->collision = CreatureCollision;
 		obj->control = BaracuddaControl;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModBarracudaHealth();
+		obj->hitPoints = Mod.enemyHealth.barracuda;
 #else
 		obj->hitPoints = 12;
 #endif
@@ -299,7 +299,7 @@ void BaddyObjects() {
 		obj->initialise = IsGold() ? InitialiseWolf : InitialiseCreature;
 		obj->control = IsGold() ? WolfControl : SpiderControl;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = IsGold() ? GetModWolfHealth() : GetModSmallSpiderHealth();
+		obj->hitPoints = IsGold() ? Mod.enemyHealth.wolf : Mod.enemyHealth.smallSpider;
 #else
 		obj->hitPoints = IsGold() ? 10 : 5;
 #endif
@@ -307,7 +307,7 @@ void BaddyObjects() {
 #else
 		obj->control = SpiderControl;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModSmallSpiderHealth();
+		obj->hitPoints = Mod.enemyHealth.smallSpider;
 #else
 		obj->hitPoints = 5;
 #endif
@@ -328,14 +328,14 @@ void BaddyObjects() {
 #if defined(FEATURE_GOLD)
 		obj->control = IsGold() ? BearControl : BigSpiderControl;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = IsGold() ? GetModBearHealth() : GetModBigSpiderHealth();
+		obj->hitPoints = IsGold() ? Mod.enemyHealth.bear : Mod.enemyHealth.bigSpider;
 #else
 		obj->hitPoints = IsGold() ? 30 : 40;
 #endif
 #else
 		obj->control = BigSpiderControl;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModBigSpiderHealth();
+		obj->hitPoints = Mod.enemyHealth.bigSpider;
 #else
 		obj->hitPoints = 40;
 #endif
@@ -354,7 +354,7 @@ void BaddyObjects() {
 		obj->collision = CreatureCollision;
 		obj->control = YetiControl;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModYetiHealth();
+		obj->hitPoints = Mod.enemyHealth.yeti;
 #else
 		obj->hitPoints = 30;
 #endif
@@ -375,7 +375,7 @@ void BaddyObjects() {
 		obj->collision = CreatureCollision;
 		obj->control = JellyControl;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModJellyHealth();
+		obj->hitPoints = Mod.enemyHealth.jelly;
 #else
 		obj->hitPoints = 10;
 #endif
@@ -395,7 +395,7 @@ void BaddyObjects() {
 		obj->collision = CreatureCollision;
 		obj->control = DiverControl;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModDiverHealth();
+		obj->hitPoints = Mod.enemyHealth.diver;
 #else
 		obj->hitPoints = 20;
 #endif
@@ -417,7 +417,7 @@ void BaddyObjects() {
 		obj->collision = CreatureCollision;
 		obj->control = Worker1Control;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModWorker1Health();
+		obj->hitPoints = Mod.enemyHealth.worker1;
 #else
 		obj->hitPoints = 25;
 #endif
@@ -438,7 +438,7 @@ void BaddyObjects() {
 		obj->collision = CreatureCollision;
 		obj->control = Worker2Control;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModWorker2Health();
+		obj->hitPoints = Mod.enemyHealth.worker2;
 #else
 		obj->hitPoints = 20;
 #endif
@@ -459,7 +459,7 @@ void BaddyObjects() {
 		obj->collision = CreatureCollision;
 		obj->control = Worker3Control;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModWorker3Health();
+		obj->hitPoints = Mod.enemyHealth.worker3;
 #else
 		obj->hitPoints = 27;
 #endif
@@ -480,7 +480,7 @@ void BaddyObjects() {
 		obj->collision = CreatureCollision;
 		obj->control = Worker3Control;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModWorker4Health();
+		obj->hitPoints = Mod.enemyHealth.worker4;
 #else
 		obj->hitPoints = 27;
 #endif
@@ -501,7 +501,7 @@ void BaddyObjects() {
 		obj->collision = CreatureCollision;
 		obj->control = Worker2Control;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModWorker5Health();
+		obj->hitPoints = Mod.enemyHealth.worker5;
 #else
 		obj->hitPoints = 20;
 #endif
@@ -522,7 +522,7 @@ void BaddyObjects() {
 		obj->control = Cult3Control;
 		obj->collision = CreatureCollision;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModCult3Health();
+		obj->hitPoints = Mod.enemyHealth.cult3;
 #else
 		obj->hitPoints = 150;
 #endif
@@ -541,7 +541,7 @@ void BaddyObjects() {
 		obj->control = MonkControl;
 		obj->collision = CreatureCollision;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModMonk1Health();
+		obj->hitPoints = Mod.enemyHealth.monk1;
 #else
 		obj->hitPoints = 30;
 #endif
@@ -565,7 +565,7 @@ void BaddyObjects() {
 		obj->control = MonkControl;
 		obj->collision = CreatureCollision;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModMonk2Health();
+		obj->hitPoints = Mod.enemyHealth.monk2;
 #else
 		obj->hitPoints = 30;
 #endif
@@ -584,7 +584,7 @@ void BaddyObjects() {
 		obj->control = BirdControl;
 		obj->collision = CreatureCollision;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModEagleHealth();
+		obj->hitPoints = Mod.enemyHealth.eagle;
 #else
 		obj->hitPoints = 20;
 #endif
@@ -603,7 +603,7 @@ void BaddyObjects() {
 		obj->control = BirdControl;
 		obj->collision = CreatureCollision;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModCrowHealth();
+		obj->hitPoints = Mod.enemyHealth.crow;
 #else
 		obj->hitPoints = 15;
 #endif
@@ -622,7 +622,7 @@ void BaddyObjects() {
 		obj->collision = CreatureCollision;
 		obj->control = BigEelControl;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModBigEelHealth();
+		obj->hitPoints = Mod.enemyHealth.bigEel;
 #else
 		obj->hitPoints = 20;
 #endif
@@ -637,7 +637,7 @@ void BaddyObjects() {
 		obj->collision = CreatureCollision;
 		obj->control = EelControl;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModEelHealth();
+		obj->hitPoints = Mod.enemyHealth.eel;
 #else
 		obj->hitPoints = 5;
 #endif
@@ -652,7 +652,7 @@ void BaddyObjects() {
 		obj->collision = CreatureCollision;
 		obj->control = BanditControl;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModBandit1Health();
+		obj->hitPoints = Mod.enemyHealth.bandit1;
 #else
 		obj->hitPoints = 45;
 #endif
@@ -673,7 +673,7 @@ void BaddyObjects() {
 		obj->collision = CreatureCollision;
 		obj->control = Bandit2Control;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModBandit2Health();
+		obj->hitPoints = Mod.enemyHealth.bandit2;
 #else
 		obj->hitPoints = 50;
 #endif
@@ -699,7 +699,7 @@ void BaddyObjects() {
 		obj->collision = CreatureCollision;
 		obj->control = Bandit2Control;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModBandit2BHealth();
+		obj->hitPoints = Mod.enemyHealth.bandit2B;
 #else
 		obj->hitPoints = 50;
 #endif
@@ -722,7 +722,7 @@ void BaddyObjects() {
 		obj->collision = SkidmanCollision;
 		obj->drawRoutine = DrawSkidoo;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModSkidmanHealth();
+		obj->hitPoints = Mod.enemyHealth.skidman;
 #else
 		obj->hitPoints = 100;
 #endif
@@ -754,7 +754,7 @@ void BaddyObjects() {
 		obj->control = XianLordControl;
 		obj->drawRoutine = DrawXianLord;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModXianLordHealth();
+		obj->hitPoints = Mod.enemyHealth.xianLord;
 #else
 		obj->hitPoints = 100;
 #endif
@@ -779,7 +779,7 @@ void BaddyObjects() {
 		obj->control = WarriorControl;
 		obj->drawRoutine = DrawXianLord;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModWarriorHealth();
+		obj->hitPoints = Mod.enemyHealth.warrior;
 #else
 		obj->hitPoints = 80;
 #endif
@@ -803,7 +803,7 @@ void BaddyObjects() {
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModDragonHealth();
+		obj->hitPoints = Mod.enemyHealth.dragon;
 #else
 		obj->hitPoints = 300;
 #endif
@@ -844,7 +844,7 @@ void BaddyObjects() {
 		obj->collision = CreatureCollision;
 		obj->control = GiantYetiControl;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModGiantYetiHealth();
+		obj->hitPoints = Mod.enemyHealth.giantYeti;
 #else
 		obj->hitPoints = 200;
 #endif
@@ -862,7 +862,7 @@ void BaddyObjects() {
 		obj->collision = CreatureCollision;
 		obj->control = DinoControl;
 #if defined(FEATURE_MOD_CONFIG)
-		obj->hitPoints = GetModDinoHealth();
+		obj->hitPoints = Mod.enemyHealth.dino;
 #else
 		obj->hitPoints = 100;
 #endif

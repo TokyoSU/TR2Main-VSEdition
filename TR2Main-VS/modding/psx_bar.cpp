@@ -102,8 +102,8 @@ static void PSX_DrawBar(int x0, int y0, int x1, int y1, int bar, int pixel, D3DC
 	// The bar
 	if (bar > 0) {
 		int i;
-		int dy[4];
-		D3DCOLOR dl[4], dr[4];
+		int dy[4] = {};
+		D3DCOLOR dl[4] = {}, dr[4] = {};
 		int dh = (y1 - y0) - pixel * 2;
 
 		for (i = 0; i < 4; ++i) {
@@ -129,13 +129,13 @@ static void PSX_DrawBar(int x0, int y0, int x1, int y1, int bar, int pixel, D3DC
 
 void PSX_DrawHealthBar(int x0, int y0, int x1, int y1, int bar, int pixel, int alpha) {
 #if defined(FEATURE_MOD_CONFIG)
-	BAR_CONFIG* barconfig = GetModLaraHealthBar();
+	BAR_CONFIG& barconfig = Mod.laraBar.health;
 	D3DCOLOR left[6];
 	D3DCOLOR right[6];
 	D3DCOLOR frame[6];
-	memcpy_s(left, sizeof(left), barconfig->PSX_leftcolor, sizeof(barconfig->PSX_leftcolor));
-	memcpy_s(right, sizeof(right), barconfig->PSX_rightcolor, sizeof(barconfig->PSX_rightcolor));
-	memcpy_s(frame, sizeof(frame), barconfig->PSX_framecolor, sizeof(barconfig->PSX_framecolor));
+	memcpy_s(left, sizeof(left), barconfig.PSX_leftcolor, sizeof(barconfig.PSX_leftcolor));
+	memcpy_s(right, sizeof(right), barconfig.PSX_rightcolor, sizeof(barconfig.PSX_rightcolor));
+	memcpy_s(frame, sizeof(frame), barconfig.PSX_framecolor, sizeof(barconfig.PSX_framecolor));
 #else
 	D3DCOLOR left[6] = { 0xFF680000, 0xFF700000, 0xFF980000, 0xFFD80000, 0xFFE40000, 0xFFF00000 };
 	D3DCOLOR right[6] = { 0xFF004400, 0xFF007400, 0xFF009C00, 0xFF00D400, 0xFF00E800, 0xFF00FC00 };
@@ -151,13 +151,13 @@ void PSX_DrawHealthBar(int x0, int y0, int x1, int y1, int bar, int pixel, int a
 
 void PSX_DrawEnemyBar(int x0, int y0, int x1, int y1, int bar, int pixel, int alpha) {
 #if defined(FEATURE_MOD_CONFIG)
-	BAR_CONFIG* barconfig = GetModEnemyBar();
+	BAR_CONFIG& barconfig = Mod.enemyBar;
 	D3DCOLOR left[6];
 	D3DCOLOR right[6];
 	D3DCOLOR frame[6];
-	memcpy_s(left, sizeof(left), barconfig->PSX_leftcolor, sizeof(barconfig->PSX_leftcolor));
-	memcpy_s(right, sizeof(right), barconfig->PSX_rightcolor, sizeof(barconfig->PSX_rightcolor));
-	memcpy_s(frame, sizeof(frame), barconfig->PSX_framecolor, sizeof(barconfig->PSX_framecolor));
+	memcpy_s(left, sizeof(left), barconfig.PSX_leftcolor, sizeof(barconfig.PSX_leftcolor));
+	memcpy_s(right, sizeof(right), barconfig.PSX_rightcolor, sizeof(barconfig.PSX_rightcolor));
+	memcpy_s(frame, sizeof(frame), barconfig.PSX_framecolor, sizeof(barconfig.PSX_framecolor));
 #else
 	D3DCOLOR left[6] = { 0xFF680000, 0xFF700000, 0xFF980000, 0xFFD80000, 0xFFE40000, 0xFFFF0000 };
 	D3DCOLOR right[6] = { 0xFF310000, 0xFF3A0000, 0xFF400000, 0xFF780000, 0xFF9E0000, 0xFFDC0000 };
@@ -173,13 +173,13 @@ void PSX_DrawEnemyBar(int x0, int y0, int x1, int y1, int bar, int pixel, int al
 
 void PSX_DrawAirBar(int x0, int y0, int x1, int y1, int bar, int pixel, int alpha) {
 #if defined(FEATURE_MOD_CONFIG)
-	BAR_CONFIG* barconfig = GetModLaraAirBar();
+	BAR_CONFIG& barconfig = Mod.laraBar.air;
 	D3DCOLOR left[6];
 	D3DCOLOR right[6];
 	D3DCOLOR frame[6];
-	memcpy_s(left, sizeof(left), barconfig->PSX_leftcolor, sizeof(barconfig->PSX_leftcolor));
-	memcpy_s(right, sizeof(right), barconfig->PSX_rightcolor, sizeof(barconfig->PSX_rightcolor));
-	memcpy_s(frame, sizeof(frame), barconfig->PSX_framecolor, sizeof(barconfig->PSX_framecolor));
+	memcpy_s(left, sizeof(left), barconfig.PSX_leftcolor, sizeof(barconfig.PSX_leftcolor));
+	memcpy_s(right, sizeof(right), barconfig.PSX_rightcolor, sizeof(barconfig.PSX_rightcolor));
+	memcpy_s(frame, sizeof(frame), barconfig.PSX_framecolor, sizeof(barconfig.PSX_framecolor));
 #else
 	D3DCOLOR left[6] = { 0xFF004054, 0xFF005064, 0xFF006874, 0xFF007884, 0xFF00848E, 0xFF009098 };
 	D3DCOLOR right[6] = { 0xFF004000, 0xFF005000, 0xFF006800, 0xFF007800, 0xFF008400, 0xFF009000 };

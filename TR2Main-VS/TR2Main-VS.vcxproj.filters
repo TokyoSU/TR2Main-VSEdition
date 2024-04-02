@@ -113,12 +113,6 @@
     <ClCompile Include="modding\joy_output.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="modding\json_utils.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="modding\mod_utils.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="modding\pause.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -308,7 +302,10 @@
     <ClCompile Include="global\precompiled.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="json-parser\json.c">
+    <ClCompile Include="modding\mod_utils.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="modding\json_utils.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -401,12 +398,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="modding\joy_output.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="modding\json_utils.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="modding\mod_utils.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="modding\pause.h">
@@ -607,7 +598,124 @@
     <ClInclude Include="3dsystem\scalespr.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="json-parser\json.h">
+    <ClInclude Include="modding\mod_utils.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\writer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\allocators.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\cursorstreamwrapper.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\document.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\encodedstream.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\encodings.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\filereadstream.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\filewritestream.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\fwd.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\istreamwrapper.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\memorybuffer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\memorystream.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\ostreamwrapper.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\pointer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\prettywriter.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\rapidjson.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\reader.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\schema.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\stream.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\stringbuffer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\uri.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\msinttypes\inttypes.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\msinttypes\stdint.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\internal\biginteger.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\internal\clzll.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\internal\diyfp.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\internal\dtoa.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\internal\ieee754.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\internal\itoa.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\internal\meta.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\internal\pow10.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\internal\regex.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\internal\stack.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\internal\strfunc.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\internal\strtod.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\internal\swap.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\error\en.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="json-parser\rapidjson\error\error.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="modding\json_utils.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2021 Michael Chaban. All rights reserved.
+ * Copyright (c) 2017-2024 Michael Chaban. All rights reserved.
  * Original game is created by Core Design Ltd. in 1997.
  * Lara Croft and Tomb Raider are trademarks of Embracer Group AB.
  *
@@ -468,7 +468,7 @@ void GF_ModifyInventory(int levelID, BOOL isSecret) {
 		GF_Add2InvItems[ADDINV_UZI_AMMO] = 0;
 		GF_SecretInvItems[ADDINV_UZI_AMMO] = 0;
 	}
-	if (!start->has_magnums && !Objects[ID_MAGNUM_AMMO_OPTION].loaded) {
+	if (!start->has_autopistol && !Objects[ID_MAGNUM_AMMO_OPTION].loaded) {
 		GF_Add2InvItems[ADDINV_MAGNUM_AMMO] = 0;
 		GF_SecretInvItems[ADDINV_MAGNUM_AMMO] = 0;
 	}
@@ -498,13 +498,13 @@ void GF_ModifyInventory(int levelID, BOOL isSecret) {
 	// Shotgun
 	if (Inv_RequestItem(ID_SHOTGUN_ITEM)) {
 		if (isSecret) {
-			Lara.shotgun_ammo += 12 * GF_SecretInvItems[ADDINV_SHOTGUN_AMMO];
+			Lara.shotgun_ammo += SHOTGUN_AMMO_CLIPS * GF_SecretInvItems[ADDINV_SHOTGUN_AMMO];
 			for (i = 0; i < GF_SecretInvItems[ADDINV_SHOTGUN_AMMO]; ++i) {
 				AddDisplayPickup(ID_SHOTGUN_AMMO_ITEM);
 			}
 		}
 		else {
-			Lara.shotgun_ammo += 12 * GF_Add2InvItems[ADDINV_SHOTGUN_AMMO];
+			Lara.shotgun_ammo += SHOTGUN_AMMO_CLIPS * GF_Add2InvItems[ADDINV_SHOTGUN_AMMO];
 		}
 	}
 	else if ((!isSecret && GF_Add2InvItems[ADDINV_SHOTGUN]) || (isSecret && GF_SecretInvItems[ADDINV_SHOTGUN])) {
@@ -512,14 +512,14 @@ void GF_ModifyInventory(int levelID, BOOL isSecret) {
 		Inv_AddItem(ID_SHOTGUN_ITEM);
 		if (isSecret) {
 			AddDisplayPickup(ID_SHOTGUN_ITEM);
-			Lara.shotgun_ammo += 12 * GF_SecretInvItems[ADDINV_SHOTGUN_AMMO];
+			Lara.shotgun_ammo += SHOTGUN_AMMO_CLIPS * GF_SecretInvItems[ADDINV_SHOTGUN_AMMO];
 			// NOTE: This loop is absent in the original code
 			for (i = 0; i < GF_SecretInvItems[ADDINV_SHOTGUN_AMMO]; ++i) {
 				AddDisplayPickup(ID_SHOTGUN_AMMO_ITEM);
 			}
 		}
 		else {
-			Lara.shotgun_ammo += 12 * GF_Add2InvItems[ADDINV_SHOTGUN_AMMO];
+			Lara.shotgun_ammo += SHOTGUN_AMMO_CLIPS * GF_Add2InvItems[ADDINV_SHOTGUN_AMMO];
 		}
 	}
 	else {
@@ -539,29 +539,29 @@ void GF_ModifyInventory(int levelID, BOOL isSecret) {
 	// Magnums
 	if (Inv_RequestItem(ID_MAGNUM_ITEM)) {
 		if (isSecret) {
-			Lara.magnum_ammo += 40 * GF_SecretInvItems[ADDINV_MAGNUM_AMMO];
+			Lara.magnum_ammo += AUTOPISTOLS_AMMO_CLIPS * GF_SecretInvItems[ADDINV_MAGNUM_AMMO];
 			for (i = 0; i < GF_SecretInvItems[ADDINV_MAGNUM_AMMO]; ++i) {
 				AddDisplayPickup(ID_MAGNUM_AMMO_ITEM);
 			}
 		}
 		else {
-			Lara.magnum_ammo += 40 * GF_Add2InvItems[ADDINV_MAGNUM_AMMO];
+			Lara.magnum_ammo += AUTOPISTOLS_AMMO_CLIPS * GF_Add2InvItems[ADDINV_MAGNUM_AMMO];
 		}
 	}
 	else if ((!isSecret && GF_Add2InvItems[ADDINV_MAGNUM]) || (isSecret && GF_SecretInvItems[ADDINV_MAGNUM])) {
-		start->has_magnums = 1;
+		start->has_autopistol = 1;
 		Inv_AddItem(ID_MAGNUM_ITEM);
 		if (isSecret) {
 			AddDisplayPickup(ID_MAGNUM_ITEM);
 			// NOTE: here was GF_Add2InvItems instead of GF_SecretInvItems in the original code. This is fixed
-			Lara.magnum_ammo += 40 * GF_SecretInvItems[ADDINV_MAGNUM_AMMO];
+			Lara.magnum_ammo += AUTOPISTOLS_AMMO_CLIPS * GF_SecretInvItems[ADDINV_MAGNUM_AMMO];
 			// NOTE: here was ADDINV_MAGNUM instead of ADDINV_MAGNUM_AMMO in the original code. This is fixed
 			for (i = 0; i < GF_SecretInvItems[ADDINV_MAGNUM_AMMO]; ++i) {
 				AddDisplayPickup(ID_MAGNUM_AMMO_ITEM);
 			}
 		}
 		else {
-			Lara.magnum_ammo += 40 * GF_Add2InvItems[ADDINV_MAGNUM_AMMO];
+			Lara.magnum_ammo += AUTOPISTOLS_AMMO_CLIPS * GF_Add2InvItems[ADDINV_MAGNUM_AMMO];
 		}
 	}
 	else {
@@ -581,13 +581,13 @@ void GF_ModifyInventory(int levelID, BOOL isSecret) {
 	// Uzis
 	if (Inv_RequestItem(ID_UZI_ITEM)) {
 		if (isSecret) {
-			Lara.uzi_ammo += 80 * GF_SecretInvItems[ADDINV_UZI_AMMO];
+			Lara.uzi_ammo += UZIS_AMMO_CLIPS * GF_SecretInvItems[ADDINV_UZI_AMMO];
 			for (i = 0; i < GF_SecretInvItems[ADDINV_UZI_AMMO]; ++i) {
 				AddDisplayPickup(ID_UZI_AMMO_ITEM);
 			}
 		}
 		else {
-			Lara.uzi_ammo += 80 * GF_Add2InvItems[ADDINV_UZI_AMMO];
+			Lara.uzi_ammo += UZIS_AMMO_CLIPS * GF_Add2InvItems[ADDINV_UZI_AMMO];
 		}
 	}
 	else if ((!isSecret && GF_Add2InvItems[ADDINV_UZI]) || (isSecret && GF_SecretInvItems[ADDINV_UZI])) {
@@ -595,13 +595,13 @@ void GF_ModifyInventory(int levelID, BOOL isSecret) {
 		Inv_AddItem(ID_UZI_ITEM);
 		if (isSecret) {
 			AddDisplayPickup(ID_UZI_ITEM);
-			Lara.uzi_ammo += 80 * GF_SecretInvItems[ADDINV_UZI_AMMO];
+			Lara.uzi_ammo += UZIS_AMMO_CLIPS * GF_SecretInvItems[ADDINV_UZI_AMMO];
 			for (i = 0; i < GF_SecretInvItems[ADDINV_UZI_AMMO]; ++i) {
 				AddDisplayPickup(ID_UZI_AMMO_ITEM);
 			}
 		}
 		else {
-			Lara.uzi_ammo += 80 * GF_Add2InvItems[ADDINV_UZI_AMMO];
+			Lara.uzi_ammo += UZIS_AMMO_CLIPS * GF_Add2InvItems[ADDINV_UZI_AMMO];
 		}
 	}
 	else {
@@ -621,13 +621,13 @@ void GF_ModifyInventory(int levelID, BOOL isSecret) {
 	// Harpoon
 	if (Inv_RequestItem(ID_HARPOON_ITEM)) {
 		if (isSecret) {
-			Lara.harpoon_ammo += 3 * GF_SecretInvItems[ADDINV_HARPOON_AMMO];
+			Lara.harpoon_ammo += HARPOON_AMMO_CLIPS * GF_SecretInvItems[ADDINV_HARPOON_AMMO];
 			for (i = 0; i < GF_SecretInvItems[ADDINV_HARPOON_AMMO]; ++i) {
 				AddDisplayPickup(ID_HARPOON_AMMO_ITEM);
 			}
 		}
 		else {
-			Lara.harpoon_ammo += 3 * GF_Add2InvItems[ADDINV_HARPOON_AMMO];
+			Lara.harpoon_ammo += HARPOON_AMMO_CLIPS * GF_Add2InvItems[ADDINV_HARPOON_AMMO];
 		}
 	}
 	else if ((!isSecret && GF_Add2InvItems[ADDINV_HARPOON]) || (isSecret && GF_SecretInvItems[ADDINV_HARPOON])) {
@@ -635,13 +635,13 @@ void GF_ModifyInventory(int levelID, BOOL isSecret) {
 		Inv_AddItem(ID_HARPOON_ITEM);
 		if (isSecret) {
 			AddDisplayPickup(ID_HARPOON_ITEM);
-			Lara.harpoon_ammo += 3 * GF_SecretInvItems[ADDINV_HARPOON_AMMO];
+			Lara.harpoon_ammo += HARPOON_AMMO_CLIPS * GF_SecretInvItems[ADDINV_HARPOON_AMMO];
 			for (i = 0; i < GF_SecretInvItems[ADDINV_HARPOON_AMMO]; ++i) {
 				AddDisplayPickup(ID_HARPOON_AMMO_ITEM);
 			}
 		}
 		else {
-			Lara.harpoon_ammo += 3 * GF_Add2InvItems[ADDINV_HARPOON_AMMO];
+			Lara.harpoon_ammo += HARPOON_AMMO_CLIPS * GF_Add2InvItems[ADDINV_HARPOON_AMMO];
 		}
 	}
 	else {
@@ -661,13 +661,13 @@ void GF_ModifyInventory(int levelID, BOOL isSecret) {
 	// M16
 	if (Inv_RequestItem(ID_M16_ITEM)) {
 		if (isSecret) {
-			Lara.m16_ammo += 40 * GF_SecretInvItems[ADDINV_M16_AMMO];
+			Lara.m16_ammo += M16_AMMO_CLIPS * GF_SecretInvItems[ADDINV_M16_AMMO];
 			for (i = 0; i < GF_SecretInvItems[ADDINV_M16_AMMO]; ++i) {
 				AddDisplayPickup(ID_M16_AMMO_ITEM);
 			}
 		}
 		else {
-			Lara.m16_ammo += 40 * GF_Add2InvItems[ADDINV_M16_AMMO];
+			Lara.m16_ammo += M16_AMMO_CLIPS * GF_Add2InvItems[ADDINV_M16_AMMO];
 		}
 	}
 	else if ((!isSecret && GF_Add2InvItems[ADDINV_M16]) || (isSecret && GF_SecretInvItems[ADDINV_M16])) {
@@ -675,13 +675,13 @@ void GF_ModifyInventory(int levelID, BOOL isSecret) {
 		Inv_AddItem(ID_M16_ITEM);
 		if (isSecret) {
 			AddDisplayPickup(ID_M16_ITEM);
-			Lara.m16_ammo += 40 * GF_SecretInvItems[ADDINV_M16_AMMO];
+			Lara.m16_ammo += M16_AMMO_CLIPS * GF_SecretInvItems[ADDINV_M16_AMMO];
 			for (i = 0; i < GF_SecretInvItems[ADDINV_M16_AMMO]; ++i) {
 				AddDisplayPickup(ID_M16_AMMO_ITEM);
 			}
 		}
 		else {
-			Lara.m16_ammo += 40 * GF_Add2InvItems[ADDINV_M16_AMMO];
+			Lara.m16_ammo += M16_AMMO_CLIPS * GF_Add2InvItems[ADDINV_M16_AMMO];
 		}
 	}
 	else {
@@ -701,13 +701,13 @@ void GF_ModifyInventory(int levelID, BOOL isSecret) {
 	// Grenade
 	if (Inv_RequestItem(ID_GRENADE_ITEM)) {
 		if (isSecret) {
-			Lara.grenade_ammo += 2 * GF_SecretInvItems[ADDINV_GRENADE_AMMO];
+			Lara.grenade_ammo += GRENADE_AMMO_CLIPS * GF_SecretInvItems[ADDINV_GRENADE_AMMO];
 			for (i = 0; i < GF_SecretInvItems[ADDINV_GRENADE_AMMO]; ++i) {
 				AddDisplayPickup(ID_GRENADE_AMMO_ITEM);
 			}
 		}
 		else {
-			Lara.grenade_ammo += 2 * GF_Add2InvItems[ADDINV_GRENADE_AMMO];
+			Lara.grenade_ammo += GRENADE_AMMO_CLIPS * GF_Add2InvItems[ADDINV_GRENADE_AMMO];
 		}
 	}
 	else if ((!isSecret && GF_Add2InvItems[ADDINV_GRENADE]) || (isSecret && GF_SecretInvItems[ADDINV_GRENADE])) {
@@ -715,13 +715,13 @@ void GF_ModifyInventory(int levelID, BOOL isSecret) {
 		Inv_AddItem(ID_GRENADE_ITEM);
 		if (isSecret) {
 			AddDisplayPickup(ID_GRENADE_ITEM);
-			Lara.grenade_ammo += 2 * GF_SecretInvItems[ADDINV_GRENADE_AMMO];
+			Lara.grenade_ammo += GRENADE_AMMO_CLIPS * GF_SecretInvItems[ADDINV_GRENADE_AMMO];
 			for (i = 0; i < GF_SecretInvItems[ADDINV_GRENADE_AMMO]; ++i) {
 				AddDisplayPickup(ID_GRENADE_AMMO_ITEM);
 			}
 		}
 		else {
-			Lara.grenade_ammo += 2 * GF_Add2InvItems[ADDINV_GRENADE_AMMO];
+			Lara.grenade_ammo += GRENADE_AMMO_CLIPS * GF_Add2InvItems[ADDINV_GRENADE_AMMO];
 		}
 	}
 	else {
