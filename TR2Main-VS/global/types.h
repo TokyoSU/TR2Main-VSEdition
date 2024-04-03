@@ -1292,9 +1292,17 @@ typedef struct PolyfilterNode_t {
 } POLYFILTER_NODE;
 
 typedef struct {
-	int PC_xpos, PC_ypos;
+	bool isCentered;
+	bool basedOnEnemyHealth;
+
+	int PC_xpos;
+	int PC_ypos;
 	INV_COLOURS PC_color[2]; // Left, Right (ICLR_flags)
-	int PSX_xpos, PSX_ypos;
+
+	int PSX_xpos;
+	int PSX_ypos;
+	int CENTER_xpos;
+	int CENTER_ypos;
 	DWORD PSX_leftcolor[6];
 	DWORD PSX_rightcolor[6];
 	DWORD PSX_framecolor[6];

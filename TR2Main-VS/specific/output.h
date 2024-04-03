@@ -27,9 +27,11 @@
  /*
   * Function list
   */
-int GetRenderScale(int unit);
-int GetRenderHeightDownscaled();
-int GetRenderWidthDownscaled();
+int GetRenderScale(int unit, bool enableGUIScaling = true);
+int GetRenderScaleCustSize(int unit, int width, int height, bool enableGUIScaling = true);
+int GetRenderDownscaled(int unit, bool enableGUIScaling = true);
+int GetRenderHeightDownscaled(bool enableGUIScaling = true);
+int GetRenderWidthDownscaled(bool enableGUIScaling = true);
 int GetRenderHeight(); // 0x00450BA0
 int GetRenderWidth(); // 0x00450BB0
 void S_InitialisePolyList(BOOL clearBackBuffer); // 0x00450BC0

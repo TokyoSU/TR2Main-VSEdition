@@ -101,6 +101,7 @@
 #include "rapidjson/document.h"
 #include "rapidjson/cursorstreamwrapper.h"
 using namespace rapidjson;
+#undef GetObject
 
 extern void LogInit();
 extern void LogDebug(const char* message, ...);

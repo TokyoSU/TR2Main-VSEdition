@@ -85,12 +85,16 @@ bool ModConfig::LoadJson(LPCSTR filePath) {
 }
 
 void ModConfig::LoadHealthBarConfig(Value& data, BAR_CONFIG* result) {
+    result->isCentered = GetValueByNameBool(data, "isCentered", false);
+    result->basedOnEnemyHealth = GetValueByNameBool(data, "basedOnEnemyHealth", true);
     result->PC_xpos = GetValueByNameInt<int>(data, "PC_x", 8);
     result->PC_ypos = GetValueByNameInt<int>(data, "PC_y", 8);
     result->PC_color[0] = (INV_COLOURS)GetValueByNameInt<int>(data, "PC_color0", 3);
     result->PC_color[1] = (INV_COLOURS)GetValueByNameInt<int>(data, "PC_color1", 4);
     result->PSX_xpos = GetValueByNameInt<int>(data, "PSX_x", 20);
     result->PSX_ypos = GetValueByNameInt<int>(data, "PSX_y", 18);
+    result->CENTER_xpos = GetValueByNameInt<int>(data, "CENTER_x", 0);
+    result->CENTER_ypos = GetValueByNameInt<int>(data, "CENTER_y", 0);
     result->PSX_leftcolor[0] = GetColorByName(data, "PSX_leftcolor0", RGB_MAKE(0x68, 0, 0));
     result->PSX_leftcolor[1] = GetColorByName(data, "PSX_leftcolor1", RGB_MAKE(0x70, 0, 0));
     result->PSX_leftcolor[2] = GetColorByName(data, "PSX_leftcolor2", RGB_MAKE(0x98, 0, 0));
@@ -112,12 +116,16 @@ void ModConfig::LoadHealthBarConfig(Value& data, BAR_CONFIG* result) {
 }
 
 void ModConfig::LoadAirBarConfig(Value& data, BAR_CONFIG* result) {
+    result->isCentered = GetValueByNameBool(data, "is_centered", false);
+    result->basedOnEnemyHealth = false;
     result->PC_xpos = GetValueByNameInt<int>(data, "PC_x", 8);
     result->PC_ypos = GetValueByNameInt<int>(data, "PC_y", 8);
     result->PC_color[0] = (INV_COLOURS)GetValueByNameInt<int>(data, "PC_color0", 3);
     result->PC_color[1] = (INV_COLOURS)GetValueByNameInt<int>(data, "PC_color1", 4);
     result->PSX_xpos = GetValueByNameInt<int>(data, "PSX_x", 20);
     result->PSX_ypos = GetValueByNameInt<int>(data, "PSX_y", 18);
+    result->CENTER_xpos = GetValueByNameInt<int>(data, "CENTER_x", 0);
+    result->CENTER_ypos = GetValueByNameInt<int>(data, "CENTER_y", 0);
     result->PSX_leftcolor[0] = GetColorByName(data, "PSX_leftcolor0", RGB_MAKE(0, 0x40, 0x54));
     result->PSX_leftcolor[1] = GetColorByName(data, "PSX_leftcolor1", RGB_MAKE(0, 0x50, 0x64));
     result->PSX_leftcolor[2] = GetColorByName(data, "PSX_leftcolor2", RGB_MAKE(0, 0x68, 0x74));
@@ -313,6 +321,7 @@ void ModConfig::ParseDefaultConfiguration(Value& data) {
     bigMediAtStart = GetValueByNameInt<short>(data, "bigmedikitatstart", 1);
 
     LoadHealthBarConfig(data["larahealthbar"], &laraBar.health);
+    laraBar.health.basedOnEnemyHealth = false;
     LoadAirBarConfig(data["laraairbar"], &laraBar.air);
     LoadHealthBarConfig(data["enemyhealthbar"], &enemyBar);
 

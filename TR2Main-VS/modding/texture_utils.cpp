@@ -344,18 +344,177 @@ static bool ParseSpriteInfo(Value& root, int id) {
 	return true;
 }
 
+static bool ParseButton(Value& root, LPCSTR name)
+{
+	if (root.HasMember(name))
+	{
+		Value& btn = root[name];
+		int id = searchMap(name, btnMap, ARRAY_SIZE(btnMap));
+		if (id != -1)
+			ParseSpriteInfo(btn, id);
+		return true;
+	}
+	return false;
+}
+
 static bool ParseButtonSprites(Value& root) {
 	sortMaps();
 
-	if (root.IsArray())
-	{
-		Value& list = root.GetArray();
-		for (SizeType i = 0; i < list.Size(); ++i) {
-			Value& btnList = list[i];
-			int id = searchMap(btnList.GetString(), btnMap, ARRAY_SIZE(btnMap));
-			ParseSpriteInfo(btnList, id);
-		}
-	}
+	ParseButton(root, "esc");
+	ParseButton(root, "f1");
+	ParseButton(root, "f2");
+	ParseButton(root, "f3");
+	ParseButton(root, "f4");
+	ParseButton(root, "f5");
+	ParseButton(root, "f6");
+	ParseButton(root, "f7");
+	ParseButton(root, "f8");
+	ParseButton(root, "f9");
+	ParseButton(root, "f10");
+	ParseButton(root, "f11");
+	ParseButton(root, "f12");
+
+	ParseButton(root, "tab");
+	ParseButton(root, "1");
+	ParseButton(root, "2");
+	ParseButton(root, "3");
+	ParseButton(root, "4");
+	ParseButton(root, "5");
+	ParseButton(root, "6");
+	ParseButton(root, "7");
+	ParseButton(root, "8");
+	ParseButton(root, "9");
+	ParseButton(root, "0");
+	ParseButton(root, "-");
+	ParseButton(root, "=");
+	ParseButton(root, "backspace");
+
+	ParseButton(root, "capslock");
+	ParseButton(root, "q");
+	ParseButton(root, "w");
+	ParseButton(root, "e");
+	ParseButton(root, "r");
+	ParseButton(root, "t");
+	ParseButton(root, "y");
+	ParseButton(root, "u");
+	ParseButton(root, "i");
+	ParseButton(root, "o");
+	ParseButton(root, "p");
+	ParseButton(root, "[");
+	ParseButton(root, "]");
+	ParseButton(root, "return");
+
+	ParseButton(root, "ctrl");
+	ParseButton(root, "a");
+	ParseButton(root, "s");
+	ParseButton(root, "d");
+	ParseButton(root, "f");
+	ParseButton(root, "g");
+	ParseButton(root, "h");
+	ParseButton(root, "j");
+	ParseButton(root, "k");
+	ParseButton(root, "l");
+	ParseButton(root, ";");
+	ParseButton(root, "'");
+	ParseButton(root, "`");
+	ParseButton(root, "shift");
+
+	ParseButton(root, "alt");
+	ParseButton(root, "\\");
+	ParseButton(root, "z");
+	ParseButton(root, "x");
+	ParseButton(root, "c");
+	ParseButton(root, "v");
+	ParseButton(root, "b");
+	ParseButton(root, "n");
+	ParseButton(root, "m");
+	ParseButton(root, ",");
+	ParseButton(root, ".");
+	ParseButton(root, "/");
+	ParseButton(root, "<");
+	ParseButton(root, "space");
+
+	ParseButton(root, "printscreen");
+	ParseButton(root, "scrolllock");
+	ParseButton(root, "pause");
+	ParseButton(root, "insert");
+	ParseButton(root, "home");
+	ParseButton(root, "pageup");
+	ParseButton(root, "delete");
+	ParseButton(root, "end");
+	ParseButton(root, "pagedown");
+	ParseButton(root, "left");
+	ParseButton(root, "right");
+	ParseButton(root, "up");
+	ParseButton(root, "down");
+	ParseButton(root, "numlock");
+
+	ParseButton(root, "pad0");
+	ParseButton(root, "pad1");
+	ParseButton(root, "pad2");
+	ParseButton(root, "pad3");
+	ParseButton(root, "pad4");
+	ParseButton(root, "pad5");
+	ParseButton(root, "pad6");
+	ParseButton(root, "pad7");
+	ParseButton(root, "pad8");
+	ParseButton(root, "pad9");
+	ParseButton(root, "pad/");
+	ParseButton(root, "pad*");
+	ParseButton(root, "pad-");
+	ParseButton(root, "pad+");
+	ParseButton(root, "enter");
+
+	ParseButton(root, "di1");
+	ParseButton(root, "di2");
+	ParseButton(root, "di3");
+	ParseButton(root, "di4");
+	ParseButton(root, "di5");
+	ParseButton(root, "di6");
+	ParseButton(root, "di7");
+	ParseButton(root, "di8");
+	ParseButton(root, "di9");
+	ParseButton(root, "di10");
+	ParseButton(root, "di11");
+	ParseButton(root, "di12");
+	ParseButton(root, "di13");
+	ParseButton(root, "di14");
+	ParseButton(root, "di15");
+	ParseButton(root, "di16");
+
+	ParseButton(root, "ps1");
+	ParseButton(root, "ps2");
+	ParseButton(root, "ps3");
+	ParseButton(root, "ps4");
+	ParseButton(root, "ps5");
+	ParseButton(root, "ps6");
+	ParseButton(root, "ps7");
+	ParseButton(root, "ps8");
+	ParseButton(root, "ps9");
+	ParseButton(root, "ps10");
+	ParseButton(root, "ps11");
+	ParseButton(root, "ps12");
+	ParseButton(root, "ps13");
+	ParseButton(root, "ps14");
+	ParseButton(root, "ps15");
+	ParseButton(root, "ps16");
+
+	ParseButton(root, "xi1");
+	ParseButton(root, "xi2");
+	ParseButton(root, "xi3");
+	ParseButton(root, "xi4");
+	ParseButton(root, "xi5");
+	ParseButton(root, "xi6");
+	ParseButton(root, "xi7");
+	ParseButton(root, "xi8");
+	ParseButton(root, "xi9");
+	ParseButton(root, "xi10");
+	ParseButton(root, "xi11");
+	ParseButton(root, "xi12");
+	ParseButton(root, "xi13");
+	ParseButton(root, "xi14");
+	ParseButton(root, "xi15");
+	ParseButton(root, "xi16");
 
 	return true;
 }
@@ -418,12 +577,9 @@ static int LoadButtonSpriteTexturePage(bool* isExternal) {
 	if (isExternal) *isExternal = false;
 #endif // (DIRECT3D_VERSION >= 0x900)
 
-	LPCBYTE pcxData = (LPCBYTE)GetResourceData("BUTTONS.PCX", &pcxSize);
-	if (!pcxData || !pcxSize || GetPcxResolution(pcxData, pcxSize, &width, &height)
-		|| width != height || (SavedAppSettings.RenderMode != RM_Hardware && width != 256))
-	{
+	LPCBYTE pcxData = (LPCBYTE)GetResourceData("buttons.pcx", &pcxSize);
+	if (!pcxData || !pcxSize || GetPcxResolution(pcxData, pcxSize, &width, &height) || width != height || (SavedAppSettings.RenderMode != RM_Hardware && width != 256))
 		return -1;
-	}
 
 	RGB888 bmpPal[256] = { {0,0,0} };
 	BYTE* bitmap = (BYTE*)malloc(width * height);
@@ -447,7 +603,7 @@ static int LoadButtonSpriteTexturePage(bool* isExternal) {
 }
 
 bool LoadButtonSprites() {
-	ButtonSpriteLoaded = false;
+	ButtonSpriteLoaded = true;
 	memset(&PhdSpriteInfo[BTN_SPR_IDX], 0, sizeof(PHD_SPRITE) * button_sprites_number);
 	bool isExternalTexture = false;
 	int pageIndex = LoadButtonSpriteTexturePage(&isExternalTexture);
@@ -455,24 +611,30 @@ bool LoadButtonSprites() {
 		for (int i = 0; i < button_sprites_number; ++i) {
 			PhdSpriteInfo[BTN_SPR_IDX + i].texPage = pageIndex;
 		}
-
 #if defined(FEATURE_MOD_CONFIG)
-		if (!PathFileExists("textures/buttons.png"))
-			return false;
-		std::ifstream file("textures/buttons.json");
-		std::string json((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-		StringStream ss(json.c_str());
-		CursorStreamWrapper<StringStream> csw(ss);
-		Document doc;
-		doc.ParseStream(csw);
-		if (doc.HasParseError()) {
-			size_t lineID = csw.GetLine();
-			if (lineID > 0)
-				lineID--;
-			ParseJsonError("textures/buttons.json", lineID, doc.GetParseError());
-			return false;
+		if (isExternalTexture)
+		{
+			if (!PathFileExists("textures/buttons.png"))
+			{
+				LogWarn("Failed to load button texture at: %s, not found !", "textures/buttons.png");
+				ButtonSpriteLoaded = false;
+				return false;
+			}
+			std::ifstream file("textures/buttons.json");
+			std::string json((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+			StringStream ss(json.c_str());
+			CursorStreamWrapper<StringStream> csw(ss);
+			Document doc;
+			doc.ParseStream(csw);
+			if (doc.HasParseError()) {
+				size_t lineID = csw.GetLine();
+				if (lineID > 0)
+					lineID--;
+				ParseJsonError("textures/buttons.json", lineID, doc.GetParseError());
+				return false;
+			}
+			ButtonSpriteLoaded = ParseButtonSprites(doc);
 		}
-		ButtonSpriteLoaded = ParseButtonSprites(doc);
 #endif
 	}
 	return ButtonSpriteLoaded;
@@ -756,7 +918,7 @@ double GetTexPagesGlyphYStretch(int id) {
 
 static bool ParseLevelTexPagesConfiguration(Value& root) {
 	TexPagesConfig.isLegacyColors = GetValueByNameBool(root, "legacy_colors", false);
-	TexPagesConfig.adjustment = GetValueByNameDouble(root, "uv_adjust", 0.0);
+	TexPagesConfig.adjustment = GetValueByNameDouble(root, "uv_adjust", 1.0);
 
 #ifdef FEATURE_HUD_IMPROVED
 	if (root.HasMember("glyphs") && root["glyphs"].IsArray())
@@ -765,9 +927,9 @@ static bool ParseLevelTexPagesConfiguration(Value& root) {
 		for (SizeType i = 0; i < glyphsList.Size(); i++)
 		{
 			Value& glyph = glyphsList[i];
-			int id = GetValueByNameInt<int>(glyph, "id", -1);
+			int id = GetValueByNameInt<int>(glyph, "id", 0);
 			if (id < 0 || id >= (int)ARRAY_SIZE(TexPagesConfig.glyphs)) continue;
-			TexPagesConfig.glyphs[id].spacing = GetValueByNameInt<int>(glyph, "spacing", 0);
+			TexPagesConfig.glyphs[id].spacing = GetValueByNameInt<int>(glyph, "spacing", 8);
 			TexPagesConfig.glyphs[id].xOffset = GetValueByNameInt<int>(glyph, "x_offset", 0);
 			TexPagesConfig.glyphs[id].yOffset = GetValueByNameInt<int>(glyph, "y_offset", 0);
 			TexPagesConfig.glyphs[id].xStretch = GetValueByNameDouble(glyph, "x_stretch", 1.0);

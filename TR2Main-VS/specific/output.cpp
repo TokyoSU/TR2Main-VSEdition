@@ -164,10 +164,20 @@ static bool SWR_StretchBlt(SWR_BUFFER* dstBuf, RECT* dstRect, SWR_BUFFER* srcBuf
 }
 #endif // (DIRECT3D_VERSION >= 0x900)
 
-int GetRenderScale(int unit) {
-#ifdef FEATURE_HUD_IMPROVED
-	int baseWidth = 640 / (IsVidSizeLock ? InvGUI_Scale : GameGUI_Scale);
-	int baseHeight = 480 / (IsVidSizeLock ? InvGUI_Scale : GameGUI_Scale);
+int GetRenderScale(int unit, bool enableGUIScaling) {
+#if defined(FEATURE_HUD_IMPROVED)
+	int baseWidth = 0;
+	int baseHeight = 0;
+	if (enableGUIScaling)
+	{
+		baseWidth = int(double(PhdWinMaxX) / (IsVidSizeLock ? InvGUI_Scale : GameGUI_Scale));
+		baseHeight = int(double(PhdWinMaxY) / (IsVidSizeLock ? InvGUI_Scale : GameGUI_Scale));
+	}
+	else
+	{
+		baseWidth = PhdWinMaxX;
+		baseHeight = PhdWinMaxY;
+	}
 #else // !FEATURE_HUD_IMPROVED
 	int baseWidth = 640;
 	int baseHeight = 480;
@@ -177,12 +187,39 @@ int GetRenderScale(int unit) {
 	return MIN(scaleX, scaleY);
 }
 
-int GetRenderHeightDownscaled() {
-	return PhdWinHeight * PHD_ONE / GetRenderScale(PHD_ONE);
+int GetRenderScaleCustSize(int unit, int width, int height, bool enableGUIScaling) {
+#if defined(FEATURE_HUD_IMPROVED)
+	int baseWidth = 0;
+	int baseHeight = 0;
+	if (enableGUIScaling)
+	{
+		baseWidth = int(double(width) / (IsVidSizeLock ? InvGUI_Scale : GameGUI_Scale));
+		baseHeight = int(double(height) / (IsVidSizeLock ? InvGUI_Scale : GameGUI_Scale));
+	}
+	else
+	{
+		baseWidth = width;
+		baseHeight = height;
+	}
+#else // !FEATURE_HUD_IMPROVED
+	int baseWidth = 640;
+	int baseHeight = 480;
+#endif // FEATURE_HUD_IMPROVED
+	int scaleX = (PhdWinWidth > baseWidth) ? MulDiv(PhdWinWidth, unit, baseWidth) : unit;
+	int scaleY = (PhdWinHeight > baseHeight) ? MulDiv(PhdWinHeight, unit, baseHeight) : unit;
+	return MIN(scaleX, scaleY);
 }
 
-int GetRenderWidthDownscaled() {
-	return PhdWinWidth * PHD_ONE / GetRenderScale(PHD_ONE);
+int GetRenderDownscaled(int unit, bool enableGUIScaling) {
+	return unit * PHD_ONE / GetRenderScale(PHD_ONE, enableGUIScaling);
+}
+
+int GetRenderHeightDownscaled(bool enableGUIScaling) {
+	return GetRenderDownscaled(PhdWinHeight, enableGUIScaling);
+}
+
+int GetRenderWidthDownscaled(bool enableGUIScaling) {
+	return GetRenderDownscaled(PhdWinWidth, enableGUIScaling);
 }
 
 int GetRenderHeight() {
@@ -741,20 +778,30 @@ void S_LightRoom(ROOM_INFO* room) {
 
 void S_DrawHealthBar(int percent) {
 #ifdef FEATURE_HUD_IMPROVED
-	int barWidth = GetRenderScale(100);
-	int barHeight = GetRenderScale(5);
-#if defined(FEATURE_MOD_CONFIG)
-	BAR_CONFIG& barconfig = Mod.laraBar.health;
-	int barXOffset = GetRenderScale((PsxBarPosEnabled && !IsInventoryActive) ? barconfig.PSX_xpos : barconfig.PC_xpos);
-	int barYOffset = GetRenderScale((PsxBarPosEnabled && !IsInventoryActive) ? barconfig.PSX_ypos : barconfig.PC_ypos);
-#else
-	int barXOffset = GetRenderScale((PsxBarPosEnabled && !IsInventoryActive) ? 20 : 8);
-	int barYOffset = GetRenderScale((PsxBarPosEnabled && !IsInventoryActive) ? 18 : 8);
-#endif
-
 	int pixel = GetRenderScale(1);
-	int x0, x1;
+	int barWidth = GetRenderScale(100);
+	CLAMP(barWidth, PhdWinMinX + (pixel * 4), PhdWinMaxX - (pixel * 4));
+	int barHeight = GetRenderScale(5);
 
+	BAR_CONFIG& barconfig = Mod.laraBar.health;
+	int barXOffset;
+	int barYOffset;
+	if (barconfig.isCentered)
+	{
+		int posX = GetRenderScale(barconfig.CENTER_xpos);
+		int posY = GetRenderScale(barconfig.CENTER_ypos);
+		barXOffset = GetRenderDownscaled(PhdWinCenterX, false) - posX;
+		barYOffset = GetRenderDownscaled(PhdWinCenterY, false) - posY;
+	}
+	else
+	{
+		barXOffset = GetRenderScale(PsxBarPosEnabled ? barconfig.PSX_xpos : barconfig.PC_xpos);
+		barYOffset = GetRenderScale(PsxBarPosEnabled ? barconfig.PSX_ypos : barconfig.PC_ypos);
+	}
+	CLAMP(barXOffset, PhdWinMinX + (pixel * 2), PhdWinMaxX - (pixel * 2));
+	CLAMP(barYOffset, PhdWinMinY + (pixel * 2), PhdWinMaxY - barHeight - (pixel * 2));
+
+	int x0, x1;
 	if (PsxBarPosEnabled) {
 		x1 = PhdWinMinX + DumpWidth - barXOffset;
 		x0 = x1 - barWidth;
@@ -834,20 +881,32 @@ void S_DrawHealthBar(int percent) {
 
 void S_DrawEnemyHealthBar(int percent, int originalHP) {
 	if (IsInventoryActive) return; // NOTE: Remove the bar if lara is in inventory !
-#ifdef FEATURE_HUD_IMPROVED
-	int barWidth = GetRenderScale(originalHP);
-	int barHeight = GetRenderScale(5);
-#if defined(FEATURE_MOD_CONFIG)
-	BAR_CONFIG& barconfig = Mod.enemyBar;
-	int barXOffset = GetRenderScale(PsxBarPosEnabled ? barconfig.PSX_xpos : barconfig.PC_xpos);
-	int barYOffset = GetRenderScale(PsxBarPosEnabled ? barconfig.PSX_ypos : barconfig.PC_ypos);
-#else
-	int barXOffset = GetRenderScale(PsxBarPosEnabled ? 20 : 8);
-	int barYOffset = GetRenderScale(PsxBarPosEnabled ? 29 : 18);
-#endif
-	int pixel = GetRenderScale(1);
-	int x0, x1;
 
+#if defined(FEATURE_HUD_IMPROVED)
+	BAR_CONFIG& barconfig = Mod.enemyBar;
+	int pixel = GetRenderScale(1);
+	int barWidth = barconfig.basedOnEnemyHealth ? GetRenderScale(originalHP) : GetRenderScale(100);
+	CLAMP(barWidth, PhdWinMinX + (pixel * 4), PhdWinMaxX - (pixel * 4));
+	int barHeight = GetRenderScale(5);
+	int barXOffset;
+	int barYOffset;
+	if (barconfig.isCentered)
+	{
+		int posX = GetRenderScale(barconfig.CENTER_xpos);
+		int posY = GetRenderScale(barconfig.CENTER_ypos);
+		posX += barconfig.basedOnEnemyHealth ? (barWidth/2) : GetRenderScale(50);
+		barXOffset = GetRenderDownscaled(PhdWinCenterX, false) - posX;
+		barYOffset = GetRenderDownscaled(PhdWinCenterY, false) - posY;
+	}
+	else
+	{
+		barXOffset = GetRenderScale(PsxBarPosEnabled ? barconfig.PSX_xpos : barconfig.PC_xpos);
+		barYOffset = GetRenderScale(PsxBarPosEnabled ? barconfig.PSX_ypos : barconfig.PC_ypos);
+	}
+	CLAMP(barXOffset, PhdWinMinX + (pixel * 2), PhdWinMaxX - (pixel * 2));
+	CLAMP(barYOffset, PhdWinMinY + barHeight + (pixel * 2), PhdWinMaxY - barHeight - (pixel * 2));
+
+	int x0, x1;
 	if (PsxBarPosEnabled) {
 		x1 = PhdWinMinX + DumpWidth - barXOffset;
 		x0 = x1 - barWidth;
@@ -926,23 +985,39 @@ void S_DrawEnemyHealthBar(int percent, int originalHP) {
 
 void S_DrawAirBar(int percent) {
 #ifdef FEATURE_HUD_IMPROVED
-	int barWidth = GetRenderScale(100);
-	int barHeight = GetRenderScale(5);
-#if defined(FEATURE_MOD_CONFIG)
-	BAR_CONFIG& barconfig = Mod.laraBar.air;
-	int barXOffset = GetRenderScale(PsxBarPosEnabled ? barconfig.PSX_xpos : barconfig.PC_xpos);
-	int barYOffset = GetRenderScale(PsxBarPosEnabled ? barconfig.PSX_ypos : barconfig.PC_ypos);
-#else
-	int barXOffset = GetRenderScale(PsxBarPosEnabled ? 20 : 8);
-	int barYOffset = GetRenderScale(PsxBarPosEnabled ? 32 : 8);
-#endif
 	int pixel = GetRenderScale(1);
+	int barWidth = GetRenderScale(100);
+	CLAMP(barWidth, PhdWinMinX + (pixel * 4), PhdWinMaxX - (pixel * 4));
+	int barHeight = GetRenderScale(5);
+	BAR_CONFIG& barconfig = Mod.laraBar.air;
+	int barXOffset;
+	int barYOffset;
+	if (barconfig.isCentered)
+	{
+		int posX = GetRenderScale(barconfig.CENTER_xpos, false);
+		int posY = GetRenderScale(barconfig.CENTER_ypos, false);
+		barXOffset = GetRenderDownscaled(PhdWinCenterX, false) - posX;
+		barYOffset = GetRenderDownscaled(PhdWinCenterY, false) - posY;
+}
+	else
+	{
+		barXOffset = GetRenderScale(PsxBarPosEnabled ? barconfig.PSX_xpos : barconfig.PC_xpos, false);
+		barYOffset = GetRenderScale(PsxBarPosEnabled ? barconfig.PSX_ypos : barconfig.PC_ypos, false);
+	}
+	CLAMP(barXOffset, PhdWinMinX + (pixel * 2), PhdWinMaxX + (pixel * 2));
+	CLAMP(barYOffset, PhdWinMinY + (pixel * 2), PhdWinMaxY - barHeight - (pixel * 2));
 
-	int x1 = PhdWinMinX + DumpWidth - barXOffset;
-	int x0 = x1 - barWidth;
+	int x0, x1;
+	if (PsxBarPosEnabled) {
+		x1 = PhdWinMinX + DumpWidth - barXOffset;
+		x0 = x1 - barWidth;
+	}
+	else {
+		x0 = PhdWinMinX + barXOffset;
+		x1 = x0 + barWidth;
+	}
 	int y0 = PhdWinMinY + barYOffset;
 	int y1 = y0 + barHeight;
-
 	int bar = barWidth * percent / PHD_ONE;
 
 	// Disable underwater shading
