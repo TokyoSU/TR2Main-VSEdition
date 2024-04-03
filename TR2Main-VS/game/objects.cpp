@@ -97,6 +97,39 @@ void WindowControl(short itemID) {
 	}
 }
 
+void OpenNearestDoor()
+{
+	for (int item_num = 0; item_num < LevelItemCount; item_num++) {
+		ITEM_INFO* item = &Items[item_num];
+		int dx = item->pos.x - LaraItem->pos.x;
+		int dy = item->pos.y - LaraItem->pos.y;
+		int dz = item->pos.z - LaraItem->pos.z;
+		int dist = SQR(dx) + SQR(dy) + SQR(dz);
+		if (dist > SQR(WALL_SIZE * 2)) {
+			continue;
+		}
+
+		if ((item->objectID < ID_DOOR_TYPE1 || item->objectID > ID_DOOR_TYPE8)
+		&&   item->objectID != ID_TRAPDOOR_TYPE1
+		&&   item->objectID != ID_TRAPDOOR_TYPE2
+		&&   item->objectID != ID_TRAPDOOR_TYPE3) {
+			continue;
+		}
+
+		if (TriggerActive(item))
+		{
+			item->goalAnimState = item->currentAnimState == 0 ? 1 : 0;
+		}
+		else if (!(item->flags & IFL_CODEBITS))
+		{
+			item->flags |= IFL_CODEBITS;
+			item->timer = 0;
+			item->active = 1;
+			item->status = ITEM_ACTIVE;
+		}
+	}
+}
+
 void InitialiseLift(short itemID) {
 	ITEM_INFO* item;
 	int* data;

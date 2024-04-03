@@ -42,6 +42,7 @@ void BellControl(short itemID); // 0x00434DB0
 void InitialiseWindow(short itemID); // 0x00434E30
 void SmashWindow(short itemID); // 0x00434EB0
 void WindowControl(short itemID); // 0x00434F80
+void OpenNearestDoor();
 //0x00435020:		SmashIceControl
 //0x00435100:		ShutThatDoor
 //0x00435150:		OpenThatDoor

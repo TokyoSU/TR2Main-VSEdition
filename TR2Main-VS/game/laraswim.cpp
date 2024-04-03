@@ -25,10 +25,13 @@
 #include "game/box.h"
 #include "game/control.h"
 #include "game/collide.h"
+#include "game/objects.h"
 #include "game/lara.h"
 #include "game/larafire.h"
 #include "game/laramisc.h"
 #include "global/vars.h"
+
+static int OpenDoorsCheatCooldown = 0;
 
 void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -83,10 +86,24 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	item->pos.x += (((phd_sin(item->pos.rotY) * item->fallSpeed) >> 16) * phd_cos(item->pos.rotX)) >> W2V_SHIFT;
 	item->pos.z += (((phd_cos(item->pos.rotY) * item->fallSpeed) >> 16) * phd_cos(item->pos.rotX)) >> W2V_SHIFT;
 
-	if (Lara.extra_anim == 0 && Lara.water_status != LWS_Cheat)
-		LaraBaddieCollision(item, coll);
-	if (Lara.extra_anim == 0 && Lara.skidoo == -1)
-		LaraCollisionFunctions[item->currentAnimState](item, coll);
+	if (Lara.extra_anim == 0)
+	{
+		if (Lara.water_status != LWS_Cheat)
+			LaraBaddieCollision(item, coll);
+		if (Lara.skidoo == -1)
+			LaraCollisionFunctions[item->currentAnimState](item, coll);
+	}
+
+	// TODO: finish door cheat code.
+	if (Lara.water_status == LWS_Cheat) {
+		if (OpenDoorsCheatCooldown) {
+			OpenDoorsCheatCooldown--;
+		}
+		else if (InputStatus & IN_DRAW) {
+			OpenDoorsCheatCooldown = FRAMES_PER_SECOND;
+			OpenNearestDoor();
+		}
+	}
 
 	UpdateLaraRoom(item, 0);
 	LaraGun();

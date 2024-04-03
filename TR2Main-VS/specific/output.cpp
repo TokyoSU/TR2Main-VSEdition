@@ -48,6 +48,26 @@ DWORD HealthBarMode = 2;
 bool PsxBarPosEnabled = true;
 double GameGUI_Scale = 1.0;
 double InvGUI_Scale = 1.0;
+
+// TODO: change it to slider in the option in-game !
+static double UI_CalcScaleFromScreenHeight(int height)
+{
+	if (height <= 240)
+		return 0.50;
+	else if (height <= 480) // 480p
+		return 1.00;
+	else if (height <= 720) // 720p
+		return 1.50;
+	else if (height <= 1080) // 1080p
+		return 2.00;
+	else if (height <= 1440) // 1440p
+		return 2.50;
+	else if (height <= 1600) // 1600p
+		return 3.00;
+	else if (height <= 2160) // 4K
+		return 5.00;
+	return 1.00; // default...
+}
 #endif // FEATURE_HUD_IMPROVED
 
 #ifdef FEATURE_VIEW_IMPROVED
@@ -166,12 +186,13 @@ static bool SWR_StretchBlt(SWR_BUFFER* dstBuf, RECT* dstRect, SWR_BUFFER* srcBuf
 
 int GetRenderScale(int unit, bool enableGUIScaling) {
 #if defined(FEATURE_HUD_IMPROVED)
+	double uiScale = UI_CalcScaleFromScreenHeight(PhdWinMaxY);
 	int baseWidth = 0;
 	int baseHeight = 0;
 	if (enableGUIScaling)
 	{
-		baseWidth = int(double(PhdWinMaxX) / (IsVidSizeLock ? InvGUI_Scale : GameGUI_Scale));
-		baseHeight = int(double(PhdWinMaxY) / (IsVidSizeLock ? InvGUI_Scale : GameGUI_Scale));
+		baseWidth = int(double(PhdWinMaxX) / uiScale);
+		baseHeight = int(double(PhdWinMaxY) / uiScale);
 	}
 	else
 	{
@@ -189,12 +210,13 @@ int GetRenderScale(int unit, bool enableGUIScaling) {
 
 int GetRenderScaleCustSize(int unit, int width, int height, bool enableGUIScaling) {
 #if defined(FEATURE_HUD_IMPROVED)
+	double uiScale = UI_CalcScaleFromScreenHeight(PhdWinHeight);
 	int baseWidth = 0;
 	int baseHeight = 0;
 	if (enableGUIScaling)
 	{
-		baseWidth = int(double(width) / (IsVidSizeLock ? InvGUI_Scale : GameGUI_Scale));
-		baseHeight = int(double(height) / (IsVidSizeLock ? InvGUI_Scale : GameGUI_Scale));
+		baseWidth = int(double(width) / (IsVidSizeLock ? InvGUI_Scale : uiScale));
+		baseHeight = int(double(height) / (IsVidSizeLock ? InvGUI_Scale : uiScale));
 	}
 	else
 	{
@@ -707,6 +729,7 @@ void S_CalculateStaticMeshLight(int x, int y, int z, int shade1, int shade2, ROO
 			}
 		}
 	}
+
 	S_CalculateStaticLight(adder);
 }
 
@@ -885,8 +908,8 @@ void S_DrawEnemyHealthBar(int percent, int originalHP) {
 #if defined(FEATURE_HUD_IMPROVED)
 	BAR_CONFIG& barconfig = Mod.enemyBar;
 	int pixel = GetRenderScale(1);
-	int barWidth = barconfig.basedOnEnemyHealth ? GetRenderScale(originalHP) : GetRenderScale(100);
-	CLAMP(barWidth, PhdWinMinX + (pixel * 4), PhdWinMaxX - (pixel * 4));
+	int barWidth = GetRenderScale(barconfig.basedOnEnemyHealth ? originalHP : 100);
+	CLAMP(barWidth, PhdWinMinX + (pixel * 2), PhdWinMaxX - (pixel * 2));
 	int barHeight = GetRenderScale(5);
 	int barXOffset;
 	int barYOffset;

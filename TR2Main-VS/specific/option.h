@@ -27,6 +27,7 @@
  /*
   * Function list
   */
+
 void do_inventory_options(INVENTORY_ITEM* item); // 0x0044EE80
 void do_passport_option(INVENTORY_ITEM* item); // 0x0044EF90
 void do_gamma_option(INVENTORY_ITEM* item); // ----------
