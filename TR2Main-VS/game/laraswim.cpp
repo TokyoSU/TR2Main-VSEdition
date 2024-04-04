@@ -94,13 +94,12 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 			LaraCollisionFunctions[item->currentAnimState](item, coll);
 	}
 
-	// TODO: finish door cheat code.
 	if (Lara.water_status == LWS_Cheat) {
 		if (OpenDoorsCheatCooldown) {
 			OpenDoorsCheatCooldown--;
 		}
 		else if (InputStatus & IN_DRAW) {
-			OpenDoorsCheatCooldown = FRAMES_PER_SECOND;
+			OpenDoorsCheatCooldown = TICKS_PER_SECOND;
 			OpenNearestDoor();
 		}
 	}
