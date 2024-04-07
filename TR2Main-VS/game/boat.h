@@ -27,21 +27,26 @@
  /*
   * Function list
   */
-  //0x0040CB10:		InitialiseBoat
-  //0x0040CB50:		BoatCheckGeton
-  //0x0040CCC0:		BoatCollision
-  //0x0040CE20:		TestWaterHeight
-  //0x0040CF20:		DoBoatShift
 
+typedef enum {
+	BGF_NOTON,
+	BGF_GETRIGHT,
+	BGF_GETLEFT,
+	BGF_JUMPON,
+	BGF_SAMESPOT
+} BOAT_GETON_FLAGS; // used for BoatCheckGeton return value.
+
+void InitialiseBoat(short itemNum); // 0x0040CB10
+int BoatCheckGeton(short itemNum, COLL_INFO* coll); // 0x0040CB50
+void BoatCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll); // 0x0040CCC0
+int TestWaterHeight(ITEM_INFO* item, int zoff, int xoff, PHD_VECTOR* pos); // 0x0040CE20
 void DoBoatShift(int itemID); // 0x0040CF20
 void DoWakeEffect(ITEM_INFO* item); // 0x0040D0F0
-
-//0x0040D270:		DoBoatDynamics
-//0x0040D2C0:		BoatDynamics
-//0x0040D7A0:		BoatUserControl
-//0x0040D930:		BoatAnimation
-//0x0040DAA0:		BoatControl
-
+int DoBoatDynamics(int height, int fallspeed, int* y); // 0x0040D270
+int BoatDynamics(short itemNum); // 0x0040D2C0
+int BoatUserControl(ITEM_INFO* item); // 0x0040D7A0
+void BoatAnimation(ITEM_INFO* item, int collide); // 0x0040D930
+void BoatControl(short itemNum); // 0x0040DAA0
 void GondolaControl(short itemID); // 0x0040E0D0
 
 #endif // BOAT_H_INCLUDED

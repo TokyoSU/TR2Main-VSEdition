@@ -32,9 +32,9 @@
 //0x0043D010:		SkidooCollision
 //0x0043D110:		SkidooBaddieCollision
 //0x0043D310:		TestHeight
-//0x0043D3D0:		DoShift
+#define DoShift ((int(__cdecl*)(ITEM_INFO*,PHD_VECTOR*,PHD_VECTOR*)) 0x0043D3D0)
 //0x0043D650:		DoDynamics
-//0x0043D6B0:		GetCollisionAnim
+#define GetCollisionAnim ((int(__cdecl*)(ITEM_INFO*,PHD_VECTOR*)) 0x0043D6B0)
 void DoSnowEffect(ITEM_INFO* item); // 0x0043D740
 //0x0043D880:		SkidooDynamics
 //0x0043DD20:		SkidooUserControl

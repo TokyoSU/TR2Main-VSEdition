@@ -49,4 +49,7 @@ int GlobalItemReplace(int oldItemID, int newItemID); // 0x00427250
 #define EffectNewRoom ((void(__cdecl*)(short, short)) 0x00427460)
 #define ClearBodyBag ((void(__cdecl*)(void)) 0x00427500)
 
+void SetAnimForItem(ITEM_INFO* item, int animID, int frameID, int stateID = -1);
+void SetAnimForItemFromAnotherObject(ITEM_INFO* item, int otherObjectID, int animID, int frameID, int stateID = -1);
+
 #endif // ITEMS_H_INCLUDED
