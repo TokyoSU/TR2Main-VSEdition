@@ -34,6 +34,7 @@
 #include "specific/output.h"
 #include "global/vars.h"
 #include "lara.h"
+#include "box.h"
 
 typedef enum {
 	BOAT_GETON,
@@ -125,8 +126,8 @@ void BoatCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 	if (laraitem->hitPoints <= 0 || Lara.skidoo != -1)
 		return;
 
-	int ison = BoatCheckGeton(itemNum, coll);
-	if (ison == 0)
+	int onflag = BoatCheckGeton(itemNum, coll);
+	if (onflag == BGF_NOTON)
 	{
 		coll->enableBaddiePush = TRUE;
 		ObjectCollision(itemNum, laraitem, coll);
@@ -134,7 +135,7 @@ void BoatCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 	}
 
 	int animIndex = Objects[ID_LARA_BOAT].animIndex;
-	switch (ison)
+	switch (onflag)
 	{
 	case BGF_GETRIGHT:
 		laraitem->animNumber = animIndex + 8;
@@ -494,17 +495,17 @@ void BoatAnimation(ITEM_INFO* item, int collide)
 	if (LaraItem->hitPoints <= 0)
 	{
 		if (LaraItem->currentAnimState != BOAT_DEATH)
-			SetAnimForItemFromAnotherObject(LaraItem, ID_LARA_BOAT, 18, 0, BOAT_DEATH);
+			SetAnimationWithObject(LaraItem, ID_LARA_BOAT, 18, BOAT_DEATH);
 	}
 	else if (item->pos.y < (boat->water - 128) && item->fallSpeed > 0)
 	{
 		if (LaraItem->currentAnimState != BOAT_FALL)
-			SetAnimForItemFromAnotherObject(LaraItem, ID_LARA_BOAT, 15, 0, BOAT_FALL);
+			SetAnimationWithObject(LaraItem, ID_LARA_BOAT, 15, BOAT_FALL);
 	}
 	else if (collide != 0)
 	{
 		if (LaraItem->currentAnimState != BOAT_HIT)
-			SetAnimForItemFromAnotherObject(LaraItem, ID_LARA_BOAT, collide, 0, BOAT_HIT);
+			SetAnimationWithObject(LaraItem, ID_LARA_BOAT, collide, BOAT_HIT);
 	}
 	else
 	{

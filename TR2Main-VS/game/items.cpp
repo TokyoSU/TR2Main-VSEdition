@@ -128,40 +128,6 @@ int GlobalItemReplace(int oldItemID, int newItemID) {
 	return result;
 }
 
-void SetAnimForItem(ITEM_INFO* item, int animID, int frameID, int stateID)
-{
-	item->animNumber = Objects[item->objectID].animIndex + animID;
-	ANIM_STRUCT* anim = &Anims[item->animNumber];
-	item->frameNumber = anim->frameBase + frameID;
-	if (stateID != -1)
-	{
-		item->currentAnimState = stateID;
-		item->goalAnimState = stateID;
-	}
-	else
-	{
-		item->currentAnimState = anim->currentAnimState;
-		item->goalAnimState = anim->currentAnimState;
-	}
-}
-
-void SetAnimForItemFromAnotherObject(ITEM_INFO* item, int otherObjectID, int animID, int frameID, int stateID)
-{
-	item->animNumber = Objects[otherObjectID].animIndex + animID;
-	ANIM_STRUCT* anim = &Anims[item->animNumber];
-	item->frameNumber = anim->frameBase + frameID;
-	if (stateID != -1)
-	{
-		item->currentAnimState = stateID;
-		item->goalAnimState = stateID;
-	}
-	else
-	{
-		item->currentAnimState = anim->currentAnimState;
-		item->goalAnimState = anim->currentAnimState;
-	}
-}
-
 /*
  * Inject function
  */

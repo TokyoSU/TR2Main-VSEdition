@@ -27,19 +27,19 @@
  /*
   * Function list
   */
-void InitialiseCreature(short itemNumber); // 0x0040E190
-#define CreatureActive ((BOOL(__cdecl*)(short)) 0x0040E1C0)
+void InitialiseCreature(short itemNum); // 0x0040E190
+int CreatureActive(short itemNum); // 0x0040E1C0
 void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI); // 0x0040E210
 //0x0040E470:		SearchLOT
 //0x0040E670:		UpdateLOT
 //0x0040E6E0:		TargetBox
 //0x0040E780:		StalkBox
 //0x0040E880:		EscapeBox
-//0x0040E930:		ValidBox
+int ValidBox(ITEM_INFO* item, short zoneNum, short boxNum); // 0x0040E930
 #define CreatureMood ((void(__cdecl*)(ITEM_INFO*, AI_INFO*, BOOL)) 0x0040E9E0)
 #define CalculateTarget ((int(__cdecl*)(PHD_VECTOR*, ITEM_INFO*, LOT_INFO*)) 0x0040EE50)
 //0x0040F2B0:		CreatureCreature
-//0x0040F3B0:		BadFloor
+int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNum, LOT_INFO* LOT); // 0x0040F3B0
 void CreatureDie(short itemID, BOOL explode); // 0x0040F440
 #define CreatureAnimation ((int(__cdecl*)(short, short, short)) 0x0040F500)
 #define CreatureTurn ((short(__cdecl*)(ITEM_INFO *, short)) 0x0040FDD0)
@@ -52,12 +52,11 @@ void CreatureDie(short itemID, BOOL explode); // 0x0040F440
 #define CreatureVault ((int(__cdecl*)(short,short,int,int)) 0x004100F0)
 void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillState); // 0x00410230
 void GetBaddieTarget(short creatureIdx, BOOL isMonk); // 0x004103A0
+
 bool IsCreatureNearTarget(ITEM_INFO* item, ITEM_INFO* enemy, int distance = CLICK(2));
-// NOTE: Only for hand to hand. (Not exist in the original game)
-bool DamageTarget(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damage);
-// NOTE: Only for hand to hand. (Not exist in the original game)
-bool DamageLaraOrEnemy(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damageLara, int damageEnemy, bool touchBitsLara);
-// NOTE: Force animation. (Not exist in the original game)
-void SetAnimation(ITEM_INFO* item, int animID, int stateID, int frameID = 0);
+bool DamageTarget(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damage); // NOTE: Only for hand to hand. (Not exist in the original game)
+bool DamageLaraOrEnemy(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damageLara, int damageEnemy, bool touchBitsLara); // NOTE: Only for hand to hand. (Not exist in the original game)
+void SetAnimation(ITEM_INFO* item, int animID, int stateID, int frameID = 0); // NOTE: Force animation. (Not exist in the original game)
+void SetAnimationWithObject(ITEM_INFO* item, GAME_OBJECT_ID fromObjectIndex, int animID, int stateID, int frameID = 0); // NOTE: Force animation using another object animation. (Not exist in the original game)
 
 #endif // BOX_H_INCLUDED

@@ -1164,9 +1164,9 @@ typedef enum {
 } MOOD_TYPE;
 
 typedef enum {
-	ITEM_INACTIVE,
+	ITEM_INACTIVE, // Status 1
 	ITEM_ACTIVE,
-	ITEM_DISABLED,
+	ITEM_DISABLED, // Status 2
 	ITEM_INVISIBLE,
 } ITEM_STATUS;
 
@@ -1903,6 +1903,17 @@ typedef struct Phd3dPos_t {
 	short rotZ;
 } PHD_3DPOS;
 
+typedef enum {
+	IFF_Active = 1 << 0,
+	IFF_Status = 1 << 1,
+	IFF_Gravity = 1 << 3,
+	IFF_HitStatus = 1 << 4,
+	IFF_Collidable = 1 << 5,
+	IFF_LookedAt = 1 << 6,
+	IFF_DynamicLight = 1 << 7,
+	IFF_ClearBody = 1 << 8
+} ItemInfoFlags2;
+
 typedef struct ItemInfo_t {
 	int floor;
 	DWORD touchBits;
@@ -2214,7 +2225,7 @@ typedef struct BoxInfo_t {
 	BYTE right;
 	BYTE top;
 	BYTE bottom;
-	UINT16 height;
+	short height;
 	UINT16 overlapIndex;
 } BOX_INFO;
 

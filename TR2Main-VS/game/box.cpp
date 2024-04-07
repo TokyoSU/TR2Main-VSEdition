@@ -43,6 +43,18 @@ void InitialiseCreature(short itemNumber)
 	item->pos.rotY += (GetRandomControl() - 0x4000) >> 1;
 }
 
+int CreatureActive(short itemNum)
+{
+	ITEM_INFO* item = &Items[itemNum];
+	if (item->status == ITEM_DISABLED)
+	{
+		if (!EnableBaddieAI(itemNum, FALSE))
+			return FALSE;
+		item->status = ITEM_ACTIVE;
+	}
+	return TRUE;
+}
+
 void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 {
 	CREATURE_INFO* creature = GetCreatureInfo(item);
@@ -93,6 +105,40 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 	AI->enemy_facing = angle - enemy->pos.rotY + 0x8000;
 	AI->ahead = AI->angle > -0x4000 && AI->angle < 0x4000;
 	AI->bite = AI->ahead && enemy->hitPoints > 0 && ABS(item->pos.y - enemy->pos.y) <= 384;
+}
+
+int ValidBox(ITEM_INFO* item, short zoneNum, short boxNum)
+{
+	CREATURE_INFO* creature = GetCreatureInfo(item);
+	short* zone = creature->LOT.fly != 0 ? FlyZones[FlipStatus] : GroundZones[2 * (creature->LOT.step >> 8) + FlipStatus];
+	if (zone[boxNum] != zoneNum)
+		return FALSE;
+
+	BOX_INFO* box = &Boxes[boxNum];
+	if (creature->LOT.block_mask & box->overlapIndex)
+		return FALSE;
+	if (item->pos.z > ((int)box->left << WALL_SHIFT) && item->pos.z < ((int)box->right << WALL_SHIFT)
+    &&  item->pos.x > ((int)box->top << WALL_SHIFT)  && item->pos.x < ((int)box->bottom << WALL_SHIFT))
+		return FALSE;
+	return TRUE;
+}
+
+int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNum, LOT_INFO* LOT)
+{
+	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNum);
+	if (floor->box == 2047)
+		return TRUE;
+	BOX_INFO* box = &Boxes[floor->box];
+	int height = box->height;
+	if (box->overlapIndex & LOT->block_mask)
+		return TRUE;
+	if (boxHeight - height > LOT->step || boxHeight - height < LOT->drop)
+		return TRUE;
+	if (boxHeight - height < -LOT->step && height > nextHeight)
+		return TRUE;
+	if (LOT->fly != 0 && y > height + LOT->fly)
+		return TRUE;
+	return FALSE;
 }
 
 void CreatureDie(short itemID, BOOL explode) {
@@ -283,23 +329,31 @@ void SetAnimation(ITEM_INFO* item, int animID, int stateID, int frameID)
 	item->currentAnimState = stateID;
 }
 
+void SetAnimationWithObject(ITEM_INFO* item, GAME_OBJECT_ID fromObjectIndex, int animID, int stateID, int frameID)
+{
+	item->animNumber = Objects[fromObjectIndex].animIndex + animID;
+	item->frameNumber = Anims[item->animNumber].frameBase + frameID;
+	item->goalAnimState = stateID;
+	item->currentAnimState = stateID;
+}
+
 /*
  * Inject function
  */
 void Inject_Box() {
 	INJECT(0x0040E190, InitialiseCreature);
-	//INJECT(0x0040E1C0, CreatureActive);
+	INJECT(0x0040E1C0, CreatureActive);
 	INJECT(0x0040E210, CreatureAIInfo);
 	//INJECT(0x0040E470, SearchLOT);
 	//INJECT(0x0040E670, UpdateLOT);
 	//INJECT(0x0040E6E0, TargetBox);
 	//INJECT(0x0040E780, StalkBox);
 	//INJECT(0x0040E880, EscapeBox);
-	//INJECT(0x0040E930, ValidBox);
+	INJECT(0x0040E930, ValidBox);
 	//INJECT(0x0040E9E0, CreatureMood);
 	//INJECT(0x0040EE50, CalculateTarget);
 	//INJECT(0x0040F2B0, CreatureCreature);
-	//INJECT(0x0040F3B0, BadFloor);
+	INJECT(0x0040F3B0, BadFloor);
 	INJECT(0x0040F440, CreatureDie);
 	//INJECT(0x0040F500, CreatureAnimation);
 	//INJECT(0x0040FDD0, CreatureTurn);
