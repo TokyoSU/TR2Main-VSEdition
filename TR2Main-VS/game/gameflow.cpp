@@ -124,10 +124,7 @@ BOOL GF_LoadScriptFile(LPCTSTR fileName) {
 
 	GF_GameFlow.levelCompleteTrack = 41; // "level complete" track is hardcoded for some reason
 #if defined(_DEBUG) // Only for debugging !
-	if (!CHK_ANY(GF_GameFlow.flags, GFF_SelectAnyLevel))
-		GF_GameFlow.flags |= GFF_SelectAnyLevel;
-	if (!CHK_ANY(GF_GameFlow.flags, GFF_DozyCheatEnabled))
-		GF_GameFlow.flags |= GFF_DozyCheatEnabled;
+	GF_GameFlow.flags |= GFF_SelectAnyLevel | GFF_DozyCheatEnabled;
 #endif
 
 	InvCompassOption.lpString = GF_GameStringTable[GSI_InvItem_Statistics];
