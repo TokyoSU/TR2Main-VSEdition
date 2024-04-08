@@ -140,11 +140,11 @@ x function is unused / included in another function
 0x0040E210:	+	CreatureAIInfo
 0x0040E470:		SearchLOT
 0x0040E670:		UpdateLOT
-0x0040E6E0:		TargetBox
-0x0040E780:		StalkBox
-0x0040E880:		EscapeBox
+0x0040E6E0:	 *	TargetBox
+0x0040E780:	 *	StalkBox
+0x0040E880:	 *	EscapeBox
 0x0040E930:	+	ValidBox
-0x0040E9E0:	 *	CreatureMood
+0x0040E9E0:	+	CreatureMood
 0x0040EE50:	 *	CalculateTarget
 0x0040F2B0:		CreatureCreature
 0x0040F3B0:	+	BadFloor
@@ -154,8 +154,8 @@ x function is unused / included in another function
 0x0040FEB0:	 *	CreatureTilt
 0x0040FEF0:	 *	CreatureHead
 0x0040FF40:	 *	CreatureNeck
-0x0040FF90:		CreatureFloat
-0x00410040:		CreatureUnderwater
+0x0040FF90:	 *	CreatureFloat
+0x00410040:	 *	CreatureUnderwater
 0x00410090:	 *	CreatureEffect
 0x004100F0:	 *	CreatureVault
 0x00410230:	+	CreatureKill
@@ -241,9 +241,9 @@ x function is unused / included in another function
 0x00416BC0:	+	GetDemoInput
 
 	game/diver.cpp
-0x00416BF0:		Harpoon
-0x00416C70:		GetWaterSurface
-0x00416D80:	 *	DiverControl
+0x00416BF0:	+	Harpoon
+0x00416C70:	+	GetWaterSurface
+0x00416D80:	+	DiverControl
 
 	game/dog.cpp
 0x00417130:	 *	DogControl
@@ -746,7 +746,7 @@ x function is unused / included in another function
 
 	game/missile.cpp
 0x00433090:	+	ControlMissile
-0x00433360:		ShootAtLara
+0x00433360:	+	ShootAtLara
 0x00433410:	 *	ExplodingDeath
 0x004337A0:		ControlBodyPart
 
