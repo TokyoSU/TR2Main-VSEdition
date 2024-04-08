@@ -75,8 +75,8 @@ short DoBloodSplat(int x, int y, int z, short speed, short direction, short room
 		fx->pos.z = z;
 		fx->pos.rotY = direction;
 		fx->speed = speed;
-		fx->frame_number = 0;
-		fx->object_number = ID_BLOOD;
+		fx->frameNumber = 0;
+		fx->objectID = ID_BLOOD;
 		fx->counter = 0;
 	}
 	return fxID;
@@ -102,9 +102,9 @@ void ControlBlood1(short fxID) {
 	fx->pos.z += fx->speed * phd_cos(fx->pos.rotY) >> W2V_SHIFT;
 	++fx->counter;
 	if (fx->counter == 4) {
-		--fx->frame_number;
+		--fx->frameNumber;
 		fx->counter = 0;
-		if (fx->frame_number <= Objects[fx->object_number].nMeshes)
+		if (fx->frameNumber <= Objects[fx->objectID].nMeshes)
 			KillEffect(fxID);
 	}
 }
@@ -115,9 +115,9 @@ void ControlExplosion1(short fxID) {
 	fx = &Effects[fxID];
 	++fx->counter;
 	if (fx->counter == 2) {
-		--fx->frame_number;
+		--fx->frameNumber;
 		fx->counter = 0;
-		if (fx->frame_number <= Objects[fx->object_number].nMeshes) {
+		if (fx->frameNumber <= Objects[fx->objectID].nMeshes) {
 			KillEffect(fxID);
 		}
 		else {
@@ -139,8 +139,8 @@ void Richochet(GAME_VECTOR* pos) {
 	fx->pos.y = pos->y;
 	fx->pos.z = pos->z;
 	fx->counter = 4;
-	fx->object_number = ID_RICOCHET;
-	fx->frame_number = -3 * GetRandomDraw() / 0x8000;
+	fx->objectID = ID_RICOCHET;
+	fx->frameNumber = -3 * GetRandomDraw() / 0x8000;
 	PlaySoundEffect(10, &fx->pos, 0);
 }
 
@@ -162,8 +162,8 @@ void CreateBubbleVec(PHD_VECTOR* pos, short roomNumber)
 	fx->pos.y = pos->y;
 	fx->pos.z = pos->z;
 	fx->speed = ((GetRandomDraw() * 6) >> 15) + 10;
-	fx->frame_number = -((GetRandomDraw() * 3) >> 15);
-	fx->object_number = ID_BUBBLES;
+	fx->frameNumber = -((GetRandomDraw() * 3) >> 15);
+	fx->objectID = ID_BUBBLES;
 }
 
 void CreateBubble(PHD_3DPOS* pos, short roomNumber) {
@@ -172,8 +172,8 @@ void CreateBubble(PHD_3DPOS* pos, short roomNumber) {
 	FX_INFO* fx = &Effects[fxID];
 	fx->pos = *pos;
 	fx->speed = ((GetRandomDraw() * 6) >> 15) + 10;
-	fx->frame_number = -((GetRandomDraw() * 3) >> 15);
-	fx->object_number = ID_BUBBLES;
+	fx->frameNumber = -((GetRandomDraw() * 3) >> 15);
+	fx->objectID = ID_BUBBLES;
 }
 
 void LaraBubbles(ITEM_INFO* item) {
@@ -205,12 +205,12 @@ void ControlBubble1(short fxID) {
 	x = fx->pos.x + (11 * phd_sin(fx->pos.rotY) >> W2V_SHIFT);
 	y = fx->pos.y - fx->speed;
 	z = fx->pos.z + (8 * phd_cos(fx->pos.rotX) >> W2V_SHIFT);
-	roomID = fx->room_number;
+	roomID = fx->roomNumber;
 	floor = GetFloor(x, y, z, &roomID);
 	if (floor && CHK_ANY(RoomInfo[roomID].flags, ROOM_UNDERWATER)) {
 		ceiling = GetCeiling(floor, x, y, z);
 		if (ceiling != -32512 && y > ceiling) {
-			if (fx->room_number != roomID)
+			if (fx->roomNumber != roomID)
 				EffectNewRoom(fxID, roomID);
 			fx->pos.x = x;
 			fx->pos.y = y;
@@ -221,27 +221,29 @@ void ControlBubble1(short fxID) {
 	KillEffect(fxID);
 }
 
-void Splash(ITEM_INFO* item) {
-	int y, i;
-	short roomID, fxID;
-	FX_INFO* fx;
-
-	y = GetWaterHeight(item->pos.x, item->pos.y, item->pos.z, item->roomNumber);
-	roomID = item->roomNumber;
+void Splash2(ITEM_INFO* item, int waterHeight)
+{
+	short roomID = item->roomNumber;
 	GetFloor(item->pos.x, item->pos.y, item->pos.z, &roomID);
-	for (i = 0; i < 10; ++i) {
-		fxID = CreateEffect(roomID);
+	for (int i = 0; i < 10; ++i) {
+		short fxID = CreateEffect(roomID);
 		if (fxID != -1) {
-			fx = &Effects[fxID];
+			FX_INFO* fx = &Effects[fxID];
 			fx->pos.x = item->pos.x;
-			fx->pos.y = y;
+			fx->pos.y = waterHeight;
 			fx->pos.z = item->pos.z;
 			fx->pos.rotY = 2 * GetRandomDraw() - 0x8000;
-			fx->frame_number = 0;
-			fx->object_number = ID_SPLASH;
+			fx->frameNumber = 0;
+			fx->objectID = ID_SPLASH;
 			fx->speed = GetRandomDraw() / 256;
 		}
 	}
+	PlaySoundEffect(247, &item->pos, SFX_ALWAYS);
+}
+
+void Splash(ITEM_INFO* item) {
+	int y = GetWaterHeight(item->pos.x, item->pos.y, item->pos.z, item->roomNumber);
+	Splash2(item, y);
 }
 
 void CreateSplash(int x, int y, int z, short roomNumber)
@@ -257,8 +259,8 @@ void CreateSplash(int x, int y, int z, short roomNumber)
 		fx->pos.y = waterHeight;
 		fx->pos.z = z;
 		fx->pos.rotY = 0;
-		fx->frame_number = 0;
-		fx->object_number = ID_SPLASH;
+		fx->frameNumber = 0;
+		fx->objectID = ID_SPLASH;
 		fx->speed = 0;
 	}
 }
@@ -271,8 +273,8 @@ void ControlSplash1(short fxID) {
 	FX_INFO* fx;
 
 	fx = &Effects[fxID];
-	--fx->frame_number;
-	if (fx->frame_number <= Objects[fx->object_number].nMeshes) {
+	--fx->frameNumber;
+	if (fx->frameNumber <= Objects[fx->objectID].nMeshes) {
 		KillEffect(fxID);
 	}
 	else {
@@ -287,9 +289,9 @@ void ControlWaterSprite(short fxID) {
 	fx = &Effects[fxID];
 	--fx->counter;
 	if (!CHK_ANY(fx->counter, 3)) {
-		--fx->frame_number;
-		if (fx->frame_number <= Objects[fx->object_number].nMeshes)
-			fx->frame_number = 0;
+		--fx->frameNumber;
+		if (fx->frameNumber <= Objects[fx->objectID].nMeshes)
+			fx->frameNumber = 0;
 	}
 	if (fx->counter && fx->fallspeed <= 0) {
 		fx->pos.z += fx->speed * phd_cos(fx->pos.rotY) >> W2V_SHIFT;
@@ -308,8 +310,8 @@ void ControlSnowSprite(short fxID) {
 	FX_INFO* fx;
 
 	fx = &Effects[fxID];
-	--fx->frame_number;
-	if (fx->frame_number <= Objects[fx->object_number].nMeshes) {
+	--fx->frameNumber;
+	if (fx->frameNumber <= Objects[fx->objectID].nMeshes) {
 		KillEffect(fxID);
 	}
 	else {
@@ -328,23 +330,23 @@ void ControlHotLiquid(short fxID) {
 	int height;
 
 	fx = &Effects[fxID];
-	--fx->frame_number;
-	if (fx->frame_number <= Objects[ID_HOT_LIQUID].nMeshes)
-		fx->frame_number = 0;
+	--fx->frameNumber;
+	if (fx->frameNumber <= Objects[ID_HOT_LIQUID].nMeshes)
+		fx->frameNumber = 0;
 	fx->pos.y += fx->fallspeed;
 	fx->fallspeed += 6;
-	roomID = fx->room_number;
+	roomID = fx->roomNumber;
 	height = GetHeight(GetFloor(fx->pos.x, fx->pos.y, fx->pos.z, &roomID), fx->pos.x, fx->pos.y, fx->pos.z);
 	if (fx->pos.y >= height) {
 		PlaySoundEffect(285, &fx->pos, 0);
-		fx->object_number = ID_SPLASH;
+		fx->objectID = ID_SPLASH;
 		fx->pos.y = height;
 		fx->pos.rotY = 2 * GetRandomDraw();
 		fx->fallspeed = 0;
 		fx->speed = 50;
 	}
 	else {
-		if (fx->room_number != roomID)
+		if (fx->roomNumber != roomID)
 			EffectNewRoom(fxID, roomID);
 		PlaySoundEffect(284, &fx->pos, 0);
 	}
@@ -368,9 +370,9 @@ void WaterFall(short itemID) {
 			fx->pos.z = item->pos.z + 1024 * (GetRandomDraw() - 16384) / 32767;
 			fx->pos.y = item->pos.y;
 			fx->speed = 0;
-			fx->frame_number = 0;
+			fx->frameNumber = 0;
 			fx->shade = LsAdder;
-			fx->object_number = ID_SPLASH;
+			fx->objectID = ID_SPLASH;
 		}
 		PlaySoundEffect(79, &item->pos, 0);
 	}

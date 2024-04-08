@@ -220,17 +220,17 @@ void draw_poly_line(short* bufPtr) {
 
 void draw_poly_flat(short* bufPtr) {
 	if (xgen_x(bufPtr + 1))
-		flatA(XGen_y0, XGen_y1, *bufPtr);
+		flatA(XGen_y0, XGen_y1, (BYTE)*bufPtr);
 }
 
 void draw_poly_trans(short* bufPtr) {
 	if (xgen_x(bufPtr + 1))
-		transA(XGen_y0, XGen_y1, *bufPtr);
+		transA(XGen_y0, XGen_y1, (BYTE)*bufPtr);
 }
 
 void draw_poly_gouraud(short* bufPtr) {
 	if (xgen_xg(bufPtr + 1))
-		gourA(XGen_y0, XGen_y1, *bufPtr);
+		gourA(XGen_y0, XGen_y1, (BYTE)*bufPtr);
 }
 
 void draw_poly_gtmap(short* bufPtr) {

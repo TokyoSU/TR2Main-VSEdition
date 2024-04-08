@@ -524,7 +524,7 @@ void FlaggedStringCreate(STRING_FLAGGED* item, DWORD dwSize) {
 	}
 }
 
-JOYSTICK_NODE* __cdecl GetJoystick(GUID* lpGuid) {
+JOYSTICK_NODE* GetJoystick(GUID* lpGuid) {
 	JOYSTICK_NODE* joystick;
 
 	if (JoystickList.dwCount == 0)

@@ -399,9 +399,9 @@ void ControlRocket(short itemID) {
 			fx->pos.y = oldY;
 			fx->pos.z = oldZ;
 			fx->speed = 0;
-			fx->frame_number = 0;
+			fx->frameNumber = 0;
 			fx->counter = 0;
-			fx->object_number = ID_EXPLOSION;
+			fx->objectID = ID_EXPLOSION;
 		}
 		PlaySoundEffect(105, NULL, 0);
 		KillItem(itemID);

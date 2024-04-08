@@ -48,7 +48,7 @@ bool WinInputInit(); // 0x00447460
 bool DInputEnumDevices(JOYSTICK_LIST* joystickList); // 0x004474E0
 BOOL CALLBACK DInputEnumDevicesCallback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef); // 0x00447510
 void FlaggedStringCreate(STRING_FLAGGED* item, DWORD dwSize); // 0x00447600
-JOYSTICK_NODE* __cdecl GetJoystick(GUID* lpGuid); // 0x00447620
+JOYSTICK_NODE* GetJoystick(GUID* lpGuid); // 0x00447620
 void DInputKeyboardCreate(); // 0x00447670
 void DInputKeyboardRelease(); // 0x00447740
 bool DInputJoystickCreate(); // 0x00447770

@@ -32,7 +32,7 @@ DWORD SampleFreqs[370];
 LPDIRECTSOUNDBUFFER SampleBuffers[370];
 #endif // FEATURE_EXTENDED_LIMITS
 
-SOUND_ADAPTER_NODE* __cdecl GetSoundAdapter(GUID* lpGuid) {
+SOUND_ADAPTER_NODE* GetSoundAdapter(GUID* lpGuid) {
 	SOUND_ADAPTER_NODE* adapter;
 
 	if (lpGuid != NULL) {

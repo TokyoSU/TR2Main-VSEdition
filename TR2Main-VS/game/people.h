@@ -28,6 +28,7 @@
   * Function list
   */
 BOOL Targetable(ITEM_INFO* item, AI_INFO* info); // 0x00435EB0
+BOOL Targetable2(ITEM_INFO* item, AI_INFO* info, int srcHeight, int targetHeight, int range = BLOCK(8));
 // 0x00435F40: ControlGlow
 // 0x00435F80: ControlGunShot
 short GunShot(int x, int y, int z, short speed, short rotY, short roomNumber); // 0x00435FD0

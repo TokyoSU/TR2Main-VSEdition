@@ -28,7 +28,7 @@
   * Function list
   */
 void T_InitPrint(); // 0x00440500
-TEXT_STR_INFO* __cdecl T_Print(int x, int y, short z, const char* str); // 0x00440530
+TEXT_STR_INFO* T_Print(int x, int y, short z, const char* str); // 0x00440530
 void T_ChangeText(TEXT_STR_INFO* textInfo, const char* newString); // 0x00440640
 void T_SetScale(TEXT_STR_INFO* textInfo, int scaleH, int scaleV); // 0x00440680
 void T_FlashText(TEXT_STR_INFO* textInfo, short state, short rate); // 0x004406A0

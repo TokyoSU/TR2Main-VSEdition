@@ -1460,7 +1460,7 @@ void WinVidExitMessage() {
 	}
 }
 
-DISPLAY_ADAPTER_NODE* __cdecl WinVidGetDisplayAdapter(GUID* lpGuid) {
+DISPLAY_ADAPTER_NODE* WinVidGetDisplayAdapter(GUID* lpGuid) {
 	DISPLAY_ADAPTER_NODE* adapter;
 
 	if (lpGuid != NULL) {

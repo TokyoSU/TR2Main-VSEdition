@@ -168,10 +168,10 @@ int ControlPhase(int nTicks, BOOL demoMode) {
 
 		for (id = NextEffectActive; id >= 0; id = next) {
 			fx = &Effects[id];
-			if (Objects[fx->object_number].control) {
-				Objects[fx->object_number].control(id);
+			if (Objects[fx->objectID].control) {
+				Objects[fx->objectID].control(id);
 			}
-			next = fx->next_active;
+			next = fx->nextActive;
 		}
 
 		LaraControl(0);
@@ -332,11 +332,6 @@ void AnimateItem(ITEM_INFO* item)
 	item->pos.x += item->speed * phd_sin(item->pos.rotY) >> W2V_SHIFT;
 	item->pos.z += item->speed * phd_cos(item->pos.rotY) >> W2V_SHIFT;
 }
-
-#define END_BIT     0x8000
-#define VALUE_BITS  0x03FF
-#define DATA_TYPE   0x01F
-#define TRIG_BITS(T) ((T >> WALL_SHIFT) & 0xF)
 
 void TestTriggers(short* data, BOOL isHeavy)
 {

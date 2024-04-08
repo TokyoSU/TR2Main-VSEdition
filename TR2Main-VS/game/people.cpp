@@ -92,7 +92,7 @@ BOOL Targetable(ITEM_INFO* item, AI_INFO* info) {
 	CREATURE_INFO* creature = NULL;
 	ITEM_INFO* enemy = NULL;
 
-	creature = (CREATURE_INFO*)item->data;
+	creature = GetCreatureInfo(item);
 	enemy = creature->enemy;
 	if (enemy->hitPoints > 0 && info->ahead && info->distance < SQR(8192)) {
 		source.x = item->pos.x;
@@ -101,6 +101,26 @@ BOOL Targetable(ITEM_INFO* item, AI_INFO* info) {
 		source.roomNumber = item->roomNumber;
 		destination.x = enemy->pos.x;
 		destination.y = enemy->pos.y - 768;
+		destination.z = enemy->pos.z;
+		return LOS(&source, &destination);
+	}
+	return FALSE;
+}
+
+BOOL Targetable2(ITEM_INFO* item, AI_INFO* info, int srcHeight, int targetHeight, int range) {
+	GAME_VECTOR source = {}, destination = {};
+	CREATURE_INFO* creature = NULL;
+	ITEM_INFO* enemy = NULL;
+
+	creature = GetCreatureInfo(item);
+	enemy = creature->enemy;
+	if (enemy->hitPoints > 0 && info->ahead && info->distance < SQR(range)) {
+		source.x = item->pos.x;
+		source.y = item->pos.y - srcHeight;
+		source.z = item->pos.z;
+		source.roomNumber = item->roomNumber;
+		destination.x = enemy->pos.x;
+		destination.y = enemy->pos.y - targetHeight;
 		destination.z = enemy->pos.z;
 		return LOS(&source, &destination);
 	}
@@ -116,12 +136,12 @@ short GunShot(int x, int y, int z, short speed, short rotY, short roomNumber) {
 			fx->pos.x = x;
 			fx->pos.y = y;
 			fx->pos.z = z;
-			fx->room_number = roomNumber;
+			fx->roomNumber = roomNumber;
 			fx->counter = 4;
 			fx->speed = 0x400;
-			fx->frame_number = 0x200; // this is sprite scale
+			fx->frameNumber = 0x200; // this is sprite scale
 			fx->fallspeed = 0;
-			fx->object_number = ID_GLOW;
+			fx->objectID = ID_GLOW;
 			fx->shade = 0x800;
 			// NOTE: Core's hacky way to store the sprite flags in the rotation fields
 			DWORD flags = GLOW_GUNSHOT_COLOR | SPR_BLEND_ADD | SPR_TINT | SPR_SHADE | SPR_SCALE | SPR_SEMITRANS | SPR_ABS;
@@ -136,13 +156,13 @@ short GunShot(int x, int y, int z, short speed, short rotY, short roomNumber) {
 		fx->pos.x = x;
 		fx->pos.y = y;
 		fx->pos.z = z;
-		fx->room_number = roomNumber;
+		fx->roomNumber = roomNumber;
 		fx->pos.rotX = 0;
 		fx->pos.rotY = rotY;
 		fx->pos.rotZ = 0;
 		fx->counter = 3;
-		fx->frame_number = 0;
-		fx->object_number = ID_GUN_FLASH;
+		fx->frameNumber = 0;
+		fx->objectID = ID_GUN_FLASH;
 		fx->shade = 0x1000;
 	}
 	return fx_id;
@@ -160,10 +180,10 @@ short GunHit(int x, int y, int z, short speed, short rotY, short roomNumber) {
 			fx->pos.y = pos.y;
 			fx->pos.z = pos.z;
 			fx->counter = 4;
-			fx->object_number = ID_RICOCHET;
+			fx->objectID = ID_RICOCHET;
 			fx->pos.rotY = LaraItem->pos.rotY;
 			fx->speed = LaraItem->speed;
-			fx->frame_number = -3 * GetRandomDraw() / 0x8000;
+			fx->frameNumber = -3 * GetRandomDraw() / 0x8000;
 		}
 		PlaySoundEffect(10, &LaraItem->pos, 0);
 	}

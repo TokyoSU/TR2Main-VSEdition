@@ -29,11 +29,9 @@
   */
 
 void ControlMissile(short fxID); // 0x00433090
-
-// 0x00433360:		ShootAtLara
-
+void ShootAtLara(FX_INFO* fx); // 0x00433360
+void ShootAtLara2(FX_INFO* fx, int laraHeight); // NOTE: Not exist in the original code.
 #define ExplodingDeath ((BOOL(__cdecl*)(short, DWORD, short)) 0x00433410)
-
 // 0x004337A0:		ControlBodyPart
 
 #endif // MISSILE_H_INCLUDED

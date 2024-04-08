@@ -106,7 +106,7 @@ void init_game_malloc() {
 	GameAllocMemUsed = 0;
 }
 
-void* __cdecl game_malloc(DWORD allocSize, DWORD bufIndex) {
+void* game_malloc(DWORD allocSize, DWORD bufIndex) {
 	DWORD alignedSize = (allocSize + 3) & ~3;
 	if (alignedSize > GameAllocMemFree) {
 		wsprintf(StringToShow, "game_malloc(): OUT OF MEMORY %s %d", BufferNames[bufIndex], alignedSize);

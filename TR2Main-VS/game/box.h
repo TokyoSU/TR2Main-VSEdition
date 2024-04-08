@@ -32,11 +32,12 @@ int CreatureActive(short itemNum); // 0x0040E1C0
 void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI); // 0x0040E210
 //0x0040E470:		SearchLOT
 //0x0040E670:		UpdateLOT
-//0x0040E6E0:		TargetBox
-//0x0040E780:		StalkBox
-//0x0040E880:		EscapeBox
+#define TargetBox ((void(__cdecl*)(LOT_INFO*,short)) 0x0040E6E0)
+#define StalkBox ((int(__cdecl*)(ITEM_INFO*,ITEM_INFO*,short)) 0x0040E780)
+#define EscapeBox ((int(__cdecl*)(ITEM_INFO*,ITEM_INFO*,short)) 0x0040E880)
 int ValidBox(ITEM_INFO* item, short zoneNum, short boxNum); // 0x0040E930
-#define CreatureMood ((void(__cdecl*)(ITEM_INFO*, AI_INFO*, BOOL)) 0x0040E9E0)
+void CreatureMood(ITEM_INFO* item, AI_INFO* ai, BOOL isViolent); // 0x0040E9E0
+//#define CreatureMood ((void(__cdecl*)(ITEM_INFO*, AI_INFO*, BOOL)) 0x0040E9E0)
 #define CalculateTarget ((int(__cdecl*)(PHD_VECTOR*, ITEM_INFO*, LOT_INFO*)) 0x0040EE50)
 //0x0040F2B0:		CreatureCreature
 int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNum, LOT_INFO* LOT); // 0x0040F3B0
@@ -46,8 +47,8 @@ void CreatureDie(short itemID, BOOL explode); // 0x0040F440
 #define CreatureTilt ((void(__cdecl*)(ITEM_INFO *, short)) 0x0040FEB0)
 #define CreatureHead ((void(__cdecl*)(ITEM_INFO *, short)) 0x0040FEF0)
 #define CreatureNeck ((void(__cdecl*)(ITEM_INFO *, short)) 0x0040FF40)
-//0x0040FF90:		CreatureFloat
-//0x00410040:		CreatureUnderwater
+#define CreatureFloat ((void(__cdecl*)(short)) 0x0040FF90)
+#define CreatureUnderwater ((void(__cdecl*)(ITEM_INFO*, int)) 0x00410040)
 #define CreatureEffect ((short(__cdecl*)(ITEM_INFO *, const BITE_INFO *, short(__cdecl*)(int, int, int, short, short, short))) 0x00410090)
 #define CreatureVault ((int(__cdecl*)(short,short,int,int)) 0x004100F0)
 void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillState); // 0x00410230

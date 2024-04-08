@@ -29,7 +29,7 @@
   */
 void S_DrawSprite(DWORD flags, int x, int y, int z, short spriteIdx, short shade, short scale); // 0x0040C030
 void S_DrawPickup(int sx, int sy, int scale, short spriteIdx, short shade); // 0x0040C300
-short* __cdecl ins_room_sprite(short* ptrObj, int vtxCount); // 0x0040C390
+short* ins_room_sprite(short* ptrObj, int vtxCount); // 0x0040C390
 void S_DrawScreenSprite2d(int sx, int sy, int sz, int scaleH, int scaleV, short spriteIdx, short shade, UINT16 flags); // 0x0040C4F0
 void S_DrawScreenSprite(int sx, int sy, int sz, int scaleH, int scaleV, short spriteIdx, short shade, UINT16 flags); // 0x0040C590
 void draw_scaled_spriteC(short* ptrObj); // 0x0040C630

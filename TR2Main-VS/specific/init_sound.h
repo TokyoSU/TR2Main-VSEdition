@@ -29,7 +29,7 @@
  /*
   * Function list
   */
-SOUND_ADAPTER_NODE* __cdecl GetSoundAdapter(GUID* lpGuid); // 0x00447C70
+SOUND_ADAPTER_NODE* GetSoundAdapter(GUID* lpGuid); // 0x00447C70
 void WinSndFreeAllSamples(); // 0x00447CC0
 bool WinSndMakeSample(DWORD sampleIdx, LPWAVEFORMATEX format, const LPVOID data, DWORD dataSize); // 0x00447CF0
 bool WinSndIsChannelPlaying(DWORD channel); // 0x00447E00

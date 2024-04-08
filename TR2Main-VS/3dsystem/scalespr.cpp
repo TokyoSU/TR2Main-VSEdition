@@ -171,7 +171,7 @@ void S_DrawPickup(int sx, int sy, int scale, short spriteIdx, short shade) {
 	}
 }
 
-short* __cdecl ins_room_sprite(short* ptrObj, int vtxCount) {
+short* ins_room_sprite(short* ptrObj, int vtxCount) {
 	PHD_VBUF* vbuf;
 	PHD_SPRITE* sprite;
 	double zp;

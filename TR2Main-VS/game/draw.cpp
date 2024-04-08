@@ -477,7 +477,7 @@ void PrintObjects(short roomNumber) {
 		}
 	}
 
-	for (short id = room->fxNumber; id >= 0; id = Effects[id].next_fx) {
+	for (short id = room->fxNumber; id >= 0; id = Effects[id].nextFx) {
 		DrawEffect(id);
 	}
 
@@ -490,19 +490,19 @@ void PrintObjects(short roomNumber) {
 
 void DrawEffect(short fx_id) {
 	FX_INFO* fx = &Effects[fx_id];
-	OBJECT_INFO* obj = &Objects[fx->object_number];
+	OBJECT_INFO* obj = &Objects[fx->objectID];
 	if (!obj->loaded) return;
-	if (fx->object_number == ID_GLOW) {
+	if (fx->objectID == ID_GLOW) {
 		// NOTE: Core's hacky way to store the sprite flags in the rotation fields
 		S_DrawSprite((fx->pos.rotY << 16) | (fx->pos.rotX), // flags
 			fx->pos.x, fx->pos.y, fx->pos.z, // coordinates
 			Objects[ID_GLOW].meshIndex, // sprite id
-			fx->shade, fx->frame_number); // shade, scale
+			fx->shade, fx->frameNumber); // shade, scale
 	}
 	else if (obj->nMeshes < 0) {
 		S_DrawSprite(SPR_ABS | SPR_SHADE | (obj->semi_transparent ? SPR_SEMITRANS : 0), // flags
 			fx->pos.x, fx->pos.y, fx->pos.z, // coordinates
-			obj->meshIndex - fx->frame_number, // sprite id
+			obj->meshIndex - fx->frameNumber, // sprite id
 			fx->shade, 0);  // shade, scale
 	}
 	else {
@@ -516,7 +516,7 @@ void DrawEffect(short fx_id) {
 				meshPtr = MeshPtr[obj->meshIndex];
 			}
 			else {
-				meshPtr = MeshPtr[fx->frame_number];
+				meshPtr = MeshPtr[fx->frameNumber];
 			}
 			phd_PutPolygons(meshPtr, -1);
 		}

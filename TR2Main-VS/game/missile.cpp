@@ -34,7 +34,7 @@
 void ControlMissile(short fxID) {
 	FX_INFO* fx = &Effects[fxID];
 
-	if (Effects[fxID].object_number == ID_MISSILE_HARPOON && !CHK_ANY(RoomInfo[fx->room_number].flags, ROOM_UNDERWATER) && fx->pos.rotX > -(ANGLE(270) / 4))
+	if (Effects[fxID].objectID == ID_MISSILE_HARPOON && !CHK_ANY(RoomInfo[fx->roomNumber].flags, ROOM_UNDERWATER) && fx->pos.rotX > -12288)
 		fx->pos.rotX -= ANGLE(1);
 
 	int speed = fx->speed * phd_cos(fx->pos.rotX) >> W2V_SHIFT;
@@ -42,29 +42,29 @@ void ControlMissile(short fxID) {
 	fx->pos.z += speed * phd_cos(fx->pos.rotY) >> W2V_SHIFT;
 	fx->pos.x += speed * phd_sin(fx->pos.rotY) >> W2V_SHIFT;
 
-	short roomNumber = fx->room_number;
+	short roomNumber = fx->roomNumber;
 	FLOOR_INFO* floor = GetFloor(fx->pos.x, fx->pos.y, fx->pos.z, &roomNumber);
 	if (fx->pos.y >= GetHeight(floor, fx->pos.x, fx->pos.y, fx->pos.z)
 	|| (fx->pos.y <= GetCeiling(floor, fx->pos.x, fx->pos.y, fx->pos.z)))
 	{
-		if (fx->object_number == ID_MISSILE_KNIFE || fx->object_number == ID_MISSILE_HARPOON) {
+		if (fx->objectID == ID_MISSILE_KNIFE || fx->objectID == ID_MISSILE_HARPOON) {
 			fx->speed = 0;
-			fx->frame_number = -GetRandomControl() / 11000;
+			fx->frameNumber = -GetRandomControl() / 11000;
 			fx->counter = 6;
-			fx->object_number = ID_RICOCHET;
+			fx->objectID = ID_RICOCHET;
 			PlaySoundEffect(258, &fx->pos, 0);
 		}
-		else if (fx->object_number == ID_MISSILE_FLAME) {
+		else if (fx->objectID == ID_MISSILE_FLAME) {
 			AddDynamicLight(fx->pos.x, fx->pos.y, fx->pos.z, 14, 11);
 			KillEffect(fxID);
 		}
 		return;
 	}
 
-	if (roomNumber != fx->room_number) {
+	if (roomNumber != fx->roomNumber) {
 		EffectNewRoom(fxID, roomNumber);
 	}
-	if (fx->object_number == ID_MISSILE_FLAME) {
+	if (fx->objectID == ID_MISSILE_FLAME) {
 		if (ItemNearLara(&fx->pos, 350)) {
 			LaraItem->hitPoints -= 3;
 			LaraItem->hitStatus = 1;
@@ -77,18 +77,18 @@ void ControlMissile(short fxID) {
 		fx->pos.rotY = LaraItem->pos.rotY;
 		fx->counter = 0;
 		fx->speed = LaraItem->speed;
-		fx->frame_number = 0;
-		if (fx->object_number == ID_MISSILE_KNIFE || fx->object_number == ID_MISSILE_HARPOON) {
+		fx->frameNumber = 0;
+		if (fx->objectID == ID_MISSILE_KNIFE || fx->objectID == ID_MISSILE_HARPOON) {
 			LaraItem->hitPoints -= 50;
 #ifdef FEATURE_CHEAT
 			if (Lara.water_status == LWS_Cheat) {
-				fx->frame_number = -GetRandomControl() / 11000;
+				fx->frameNumber = -GetRandomControl() / 11000;
 				fx->counter = 6;
-				fx->object_number = ID_RICOCHET;
+				fx->objectID = ID_RICOCHET;
 				PlaySoundEffect(258, &fx->pos, 0);
 			}
 			else {
-				fx->object_number = ID_BLOOD;
+				fx->objectID = ID_BLOOD;
 				PlaySoundEffect(317, &fx->pos, 0);
 			}
 #else // FEATURE_CHEAT
@@ -98,17 +98,36 @@ void ControlMissile(short fxID) {
 		}
 	}
 
-	if (fx->object_number == ID_MISSILE_HARPOON && CHK_ANY(RoomInfo[fx->room_number].flags, ROOM_UNDERWATER)) {
-		CreateBubble(&fx->pos, fx->room_number);
+	if (fx->objectID == ID_MISSILE_HARPOON && CHK_ANY(RoomInfo[fx->roomNumber].flags, ROOM_UNDERWATER)) {
+		CreateBubble(&fx->pos, fx->roomNumber);
 	}
-	else if (fx->object_number == ID_MISSILE_FLAME && !fx->counter--) {
+	else if (fx->objectID == ID_MISSILE_FLAME && !fx->counter--) {
 		AddDynamicLight(fx->pos.x, fx->pos.y, fx->pos.z, 14, 11);
 		PlaySoundEffect(305, &fx->pos, 0);
 		KillEffect(fxID);
 	}
-	else if (fx->object_number == ID_MISSILE_KNIFE) {
+	else if (fx->objectID == ID_MISSILE_KNIFE) {
 		fx->pos.rotZ += ANGLE(30);
 	}
+}
+
+void ShootAtLara(FX_INFO* fx)
+{
+	ShootAtLara2(fx, 0);
+}
+
+void ShootAtLara2(FX_INFO* fx, int laraHeight)
+{
+	int x = LaraItem->pos.x - fx->pos.x;
+	int y = (LaraItem->pos.y - laraHeight) - fx->pos.y;
+	int z = LaraItem->pos.z - fx->pos.z;
+	short* bounds = GetBoundsAccurate(LaraItem);
+	y += bounds[3] + (bounds[2] - bounds[3]) * 3 / 4;
+	int dist = (int)phd_sqrt(SQR(z) + SQR(x));
+	fx->pos.rotX = -phd_atan(dist, y);
+	fx->pos.rotY = phd_atan(z, x);
+	fx->pos.rotX += (GetRandomControl() - 0x4000) / 0x40;
+	fx->pos.rotY += (GetRandomControl() - 0x4000) / 0x40;
 }
 
 /*
@@ -116,7 +135,7 @@ void ControlMissile(short fxID) {
  */
 void Inject_Missile() {
 	INJECT(0x00433090, ControlMissile);
-	//INJECT(0x00433360, ShootAtLara);
+	INJECT(0x00433360, ShootAtLara);
 	//INJECT(0x00433410, ExplodingDeath);
 	//INJECT(0x004337A0, ControlBodyPart);
 }

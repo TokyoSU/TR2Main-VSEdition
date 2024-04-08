@@ -23,6 +23,8 @@
 #include "game/box.h"
 #include "3dsystem/phd_math.h"
 #include "game/control.h"
+#include "game/draw.h"
+#include "game/diver.h"
 #include "game/items.h"
 #include "game/larafire.h"
 #include "game/effects.h"
@@ -40,7 +42,7 @@ void InitialiseCreature(short itemNumber)
 	ITEM_INFO* item = &Items[itemNumber];
 	item->collidable = TRUE;
 	item->data = NULL;
-	item->pos.rotY += (GetRandomControl() - 0x4000) >> 1;
+	item->pos.rotY += (GetRandomControl() - PHD_90) >> 1;
 }
 
 int CreatureActive(short itemNum)
@@ -102,8 +104,8 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 	else
 		AI->distance = 0x7FFFFFFF;
 	AI->angle = angle - item->pos.rotY;
-	AI->enemy_facing = angle - enemy->pos.rotY + 0x8000;
-	AI->ahead = AI->angle > -0x4000 && AI->angle < 0x4000;
+	AI->enemy_facing = angle - enemy->pos.rotY + PHD_180;
+	AI->ahead = AI->angle > -PHD_90 && AI->angle < PHD_90;
 	AI->bite = AI->ahead && enemy->hitPoints > 0 && ABS(item->pos.y - enemy->pos.y) <= 384;
 }
 
@@ -121,6 +123,167 @@ int ValidBox(ITEM_INFO* item, short zoneNum, short boxNum)
     &&  item->pos.x > ((int)box->top << WALL_SHIFT)  && item->pos.x < ((int)box->bottom << WALL_SHIFT))
 		return FALSE;
 	return TRUE;
+}
+
+void CreatureMood(ITEM_INFO* item, AI_INFO* ai, BOOL isViolent)
+{
+	CREATURE_INFO* creature = GetCreatureInfo(item);
+	if (creature == NULL) return;
+	LOT_INFO* LOT = &creature->LOT;
+	ITEM_INFO* enemy = creature->enemy;
+
+	if (LOT->node[item->boxNumber].search_number == (LOT->search_number | 0x8000))
+		LOT->required_box = 2047;
+
+	if (creature->mood == MOOD_ATTACK && LOT->required_box != 2047 && !ValidBox(item, ai->zone_number, LOT->target_box))
+	{
+		if (ai->zone_number == ai->enemy_zone)
+			creature->mood = MOOD_BORED;
+		LOT->required_box = 2047;
+	}
+
+	int oldmood = creature->mood;
+	if (enemy != NULL)
+	{
+		if (enemy->hitPoints > 0)
+		{
+			if (isViolent)
+			{
+				switch (creature->mood)
+				{
+				case MOOD_ATTACK:
+					if (ai->zone_number != ai->enemy_zone)
+						creature->mood = MOOD_BORED;
+					break;
+				case MOOD_BORED:
+				case MOOD_STALK:
+					if (ai->zone_number == ai->enemy_zone)
+						creature->mood = MOOD_ATTACK;
+					else if (item->hitStatus)
+						creature->mood = MOOD_ESCAPE;
+					break;
+				case MOOD_ESCAPE:
+					if (ai->zone_number == ai->enemy_zone)
+						creature->mood = MOOD_ATTACK;
+					break;
+				}
+			}
+			else
+			{
+				switch (creature->mood)
+				{
+				case MOOD_ATTACK:
+					if (ai->zone_number != ai->enemy_zone)
+					{
+						if (!item->hitStatus)
+							creature->mood = MOOD_BORED;
+						else if (GetRandomControl() < 2048)
+							creature->mood = MOOD_ESCAPE;
+					}
+					break;
+				case MOOD_BORED:
+				case MOOD_STALK:
+					if (item->hitStatus && (GetRandomControl() < 2048 || ai->zone_number != ai->enemy_zone))
+					{
+						creature->mood = MOOD_ESCAPE;
+					}
+					else if (ai->zone_number == ai->enemy_zone)
+					{
+						if (ai->distance < 0x900000 || creature->mood == MOOD_STALK && LOT->required_box == 2047)
+							creature->mood = MOOD_ATTACK;
+						else
+							creature->mood = MOOD_STALK;
+					}
+					break;
+				case MOOD_ESCAPE:
+					if (ai->zone_number == ai->enemy_zone && GetRandomControl() < 256)
+						creature->mood = MOOD_STALK;
+					break;
+				}
+			}
+		}
+		else
+		{
+			creature->mood = MOOD_BORED;
+		}
+	}
+	else
+	{
+		creature->mood = MOOD_BORED;
+		creature->enemy = LaraItem;
+	}
+
+	if (oldmood != creature->mood)
+	{
+		if (oldmood == MOOD_ATTACK)
+			TargetBox(LOT, LOT->target_box);
+		LOT->required_box = 2047;
+	}
+
+	int boxNum = 2047;
+	switch (creature->mood)
+	{
+	case MOOD_ATTACK:
+		LOT->target.x = enemy->pos.x;
+		LOT->target.y = enemy->pos.y;
+		LOT->target.z = enemy->pos.z;
+		LOT->required_box = enemy->boxNumber;
+		if (LOT->fly != 0 && Lara.water_status != LWS_AboveWater)
+			LOT->target.y += GetBestFrame(enemy)[2]; // ymin (above)
+		break;
+	case MOOD_BORED:
+		boxNum = LOT->node[creature->LOT.zone_count * GetRandomControl() >> 15].box_number;
+		if (ValidBox(item, ai->zone_number, boxNum))
+		{
+			if (StalkBox(item, enemy, boxNum) && enemy != NULL && enemy->hitPoints > 0)
+			{
+				TargetBox(LOT, boxNum);
+				creature->mood = MOOD_STALK;
+			}
+			else if (LOT->required_box == 2047)
+				TargetBox(LOT, boxNum);
+		}
+		break;
+	case MOOD_STALK:
+		boxNum = LOT->required_box;
+		if (boxNum == 2047 || !StalkBox(item, enemy, boxNum))
+		{
+			boxNum = LOT->node[creature->LOT.zone_count * GetRandomControl() >> 15].box_number;
+			if (ValidBox(item, ai->zone_number, boxNum))
+			{
+				if (EscapeBox(item, enemy, boxNum))
+				{
+					TargetBox(LOT, boxNum);
+				}
+				else if (LOT->required_box == 2047)
+				{
+					TargetBox(LOT, boxNum);
+					if (ai->zone_number != ai->enemy_zone)
+						creature->mood = MOOD_BORED;
+				}
+			}
+		}
+		break;
+	case MOOD_ESCAPE:
+		boxNum = LOT->node[creature->LOT.zone_count * GetRandomControl() >> 15].box_number;
+		if (ValidBox(item, ai->zone_number, boxNum) && LOT->required_box == 2047)
+		{
+			if (EscapeBox(item, enemy, boxNum))
+			{
+				TargetBox(LOT, boxNum);
+			}
+			else if (ai->zone_number == ai->enemy_zone && StalkBox(item, enemy, boxNum))
+			{
+				TargetBox(LOT, boxNum);
+				creature->mood = MOOD_STALK;
+			}
+		}
+		break;
+	}
+
+	if (creature->LOT.target_box == 2047)
+		TargetBox(LOT, item->boxNumber);
+	CalculateTarget(&creature->target, item, LOT);
 }
 
 int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNum, LOT_INFO* LOT)
@@ -350,7 +513,7 @@ void Inject_Box() {
 	//INJECT(0x0040E780, StalkBox);
 	//INJECT(0x0040E880, EscapeBox);
 	INJECT(0x0040E930, ValidBox);
-	//INJECT(0x0040E9E0, CreatureMood);
+	INJECT(0x0040E9E0, CreatureMood);
 	//INJECT(0x0040EE50, CalculateTarget);
 	//INJECT(0x0040F2B0, CreatureCreature);
 	INJECT(0x0040F3B0, BadFloor);

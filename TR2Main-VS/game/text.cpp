@@ -104,7 +104,7 @@ void T_InitPrint() {
 	TextStringCount = 0;
 }
 
-TEXT_STR_INFO* __cdecl T_Print(int x, int y, short z, const char* str) {
+TEXT_STR_INFO* T_Print(int x, int y, short z, const char* str) {
 	if (str == NULL || TextStringCount >= 64)
 		return NULL;
 

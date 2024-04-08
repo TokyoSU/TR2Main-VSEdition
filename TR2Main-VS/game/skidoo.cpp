@@ -53,9 +53,9 @@ void DoSnowEffect(ITEM_INFO* item) {
 		fx->pos.x = item->pos.x - ((500 * phd_sin(item->pos.rotY) + displacement * phd_cos(item->pos.rotY)) >> W2V_SHIFT);
 		fx->pos.y = item->pos.y + (500 * phd_sin(item->pos.rotX) >> W2V_SHIFT);
 		fx->pos.z = item->pos.z - ((500 * phd_cos(item->pos.rotY) - displacement * phd_sin(item->pos.rotY)) >> W2V_SHIFT);
-		fx->room_number = item->roomNumber;
-		fx->frame_number = 0;
-		fx->object_number = ID_SNOW_SPRITE;
+		fx->roomNumber = item->roomNumber;
+		fx->frameNumber = 0;
+		fx->objectID = ID_SNOW_SPRITE;
 		fx->speed = 0;
 		if (item->speed < 64) {
 			fx->fallspeed = (ABS(item->speed) - 64) * GetRandomDraw() >> 15;
@@ -64,7 +64,7 @@ void DoSnowEffect(ITEM_INFO* item) {
 			fx->fallspeed = 0;
 		}
 		PhdMatrixPtr->_23 = 0;
-		S_CalculateLight(fx->pos.x, fx->pos.y, fx->pos.z, fx->room_number);
+		S_CalculateLight(fx->pos.x, fx->pos.y, fx->pos.z, fx->roomNumber);
 		fx->shade = LsAdder - 512;
 		CLAMPL(fx->shade, 0);
 	}
@@ -81,9 +81,9 @@ void SkidooExplode(ITEM_INFO* item) {
 		fx->pos.y = item->pos.y;
 		fx->pos.z = item->pos.z;
 		fx->speed = 0;
-		fx->frame_number = 0;
+		fx->frameNumber = 0;
 		fx->counter = 0;
-		fx->object_number = ID_EXPLOSION;
+		fx->objectID = ID_EXPLOSION;
 	}
 	ExplodingDeath(Lara.skidoo, ~3, 0);
 	PlaySoundEffect(105, NULL, 0);

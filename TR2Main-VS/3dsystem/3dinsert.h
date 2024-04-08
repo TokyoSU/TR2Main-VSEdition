@@ -37,11 +37,11 @@ void InsertGourQuad(int x0, int y0, int x1, int y1, int z, D3DCOLOR color0, D3DC
 BOOL visible_zclip(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2); // 0x00405840
 int ZedClipper(int vtxCount, POINT_INFO* pts, VERTEX_INFO* vtx); // 0x004058B0
 int XYGUVClipper(int vtxCount, VERTEX_INFO* vtx); // 0x004059F0
-short* __cdecl InsertObjectGT4(short* ptrObj, int number, SORTTYPE sortType); // 0x00405F10
-short* __cdecl InsertObjectGT3(short* ptrObj, int number, SORTTYPE sortType); // 0x00406970
+short* InsertObjectGT4(short* ptrObj, int number, SORTTYPE sortType); // 0x00405F10
+short* InsertObjectGT3(short* ptrObj, int number, SORTTYPE sortType); // 0x00406970
 int XYGClipper(int vtxCount, VERTEX_INFO* vtx); // 0x004071F0
-short* __cdecl InsertObjectG4(short* ptrObj, int number, SORTTYPE sortType); // 0x00407620
-short* __cdecl InsertObjectG3(short* ptrObj, int number, SORTTYPE sortType); // 0x00407A00
+short* InsertObjectG4(short* ptrObj, int number, SORTTYPE sortType); // 0x00407620
+short* InsertObjectG3(short* ptrObj, int number, SORTTYPE sortType); // 0x00407A00
 int XYClipper(int vtxCount, VERTEX_INFO* vtx); // 0x00407D20
 void InsertTrans8(PHD_VBUF* vbuf, short shade); // 0x00407FF0
 void InsertTransQuad(int x, int y, int width, int height, int z); // 0x004084A0
@@ -50,21 +50,21 @@ void InsertLine(int x0, int y0, int x1, int y1, int z, BYTE colorIdx); // 0x0040
 void InsertGT3_ZBuffered(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_TEXTURE* texture, PHD_UV* uv0, PHD_UV* uv1, PHD_UV* uv2); // 0x00408710
 void DrawClippedPoly_Textured(int vtxCount); // 0x00408D60
 void InsertGT4_ZBuffered(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_VBUF* vtx3, PHD_TEXTURE* texture); // 0x00408EA0
-short* __cdecl InsertObjectGT4_ZBuffered(short* ptrObj, int number, SORTTYPE sortType); // 0x004092E0
-short* __cdecl InsertObjectGT3_ZBuffered(short* ptrObj, int number, SORTTYPE sortType); // 0x00409380
-short* __cdecl InsertObjectG4_ZBuffered(short* ptrObj, int number, SORTTYPE sortType); // 0x00409430
+short* InsertObjectGT4_ZBuffered(short* ptrObj, int number, SORTTYPE sortType); // 0x004092E0
+short* InsertObjectGT3_ZBuffered(short* ptrObj, int number, SORTTYPE sortType); // 0x00409380
+short* InsertObjectG4_ZBuffered(short* ptrObj, int number, SORTTYPE sortType); // 0x00409430
 void DrawPoly_Gouraud(int vtxCount, int red, int green, int blue); // 0x004097D0
-short* __cdecl InsertObjectG3_ZBuffered(short* ptrObj, int number, SORTTYPE sortType); // 0x004098D0
+short* InsertObjectG3_ZBuffered(short* ptrObj, int number, SORTTYPE sortType); // 0x004098D0
 void InsertFlatRect_ZBuffered(int x0, int y0, int x1, int y1, int z, BYTE colorIdx); // 0x00409BB0
 void InsertLine_ZBuffered(int x0, int y0, int x1, int y1, int z, BYTE colorIdx); // 0x00409D80
 void InsertGT3_Sorted(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_TEXTURE* texture, PHD_UV* uv0, PHD_UV* uv1, PHD_UV* uv2, SORTTYPE sortType); // 0x00409EC0
 void InsertClippedPoly_Textured(int vtxCount, float z, short polyType, short texPage); // 0x0040A5D0
 void InsertGT4_Sorted(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_VBUF* vtx3, PHD_TEXTURE* texture, SORTTYPE sortType); // 0x0040A780
-short* __cdecl InsertObjectGT4_Sorted(short* ptrObj, int number, SORTTYPE sortType); // 0x0040AC60
-short* __cdecl InsertObjectGT3_Sorted(short* ptrObj, int number, SORTTYPE sortType); // 0x0040ACF0
-short* __cdecl InsertObjectG4_Sorted(short* ptrObj, int number, SORTTYPE sortType); // 0x0040AD90
+short* InsertObjectGT4_Sorted(short* ptrObj, int number, SORTTYPE sortType); // 0x0040AC60
+short* InsertObjectGT3_Sorted(short* ptrObj, int number, SORTTYPE sortType); // 0x0040ACF0
+short* InsertObjectG4_Sorted(short* ptrObj, int number, SORTTYPE sortType); // 0x0040AD90
 void InsertPoly_Gouraud(int vtxCount, float z, int red, int green, int blue, short polyType); // 0x0040B1D0
-short* __cdecl InsertObjectG3_Sorted(short* ptrObj, int number, SORTTYPE sortType); // 0x0040B350
+short* InsertObjectG3_Sorted(short* ptrObj, int number, SORTTYPE sortType); // 0x0040B350
 #ifdef FEATURE_VIDEOFX_IMPROVED
 void InsertSprite_Sorted(int z, int x0, int y0, int x1, int y1, int spriteIdx, short shade, DWORD flags); // 0x0040B6A0
 #else // FEATURE_VIDEOFX_IMPROVED

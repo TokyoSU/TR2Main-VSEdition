@@ -586,7 +586,7 @@ void S_InsertRoom(short* ptrObj, BOOL isOutside) {
 	ptrObj = ins_room_sprite(ptrObj + 1, *ptrObj);
 }
 
-short* __cdecl calc_background_light(short* ptrObj) {
+short* calc_background_light(short* ptrObj) {
 	int vtxCount = *ptrObj++;
 
 	if (vtxCount > 0) {
@@ -649,8 +649,8 @@ void S_InsertInvBgnd(short* ptrObj) {
 	// Main S_InsertInvBgnd() logic is similar to S_InsertBackground();
 }
 
-short* __cdecl calc_object_vertices(short* ptrObj) {
-	double xv, yv, zv, persp, baseZ;
+short* calc_object_vertices(short* ptrObj) {
+	float xv, yv, zv, persp, baseZ;
 	int vtxCount;
 	BYTE totalClip, clipFlags;
 
@@ -671,17 +671,17 @@ short* __cdecl calc_object_vertices(short* ptrObj) {
 	}
 
 	for (int i = 0; i < vtxCount; ++i) {
-		xv = (double)(PhdMatrixPtr->_00 * ptrObj[0] +
+		xv = (float)(PhdMatrixPtr->_00 * ptrObj[0] +
 			PhdMatrixPtr->_01 * ptrObj[1] +
 			PhdMatrixPtr->_02 * ptrObj[2] +
 			PhdMatrixPtr->_03);
 
-		yv = (double)(PhdMatrixPtr->_10 * ptrObj[0] +
+		yv = (float)(PhdMatrixPtr->_10 * ptrObj[0] +
 			PhdMatrixPtr->_11 * ptrObj[1] +
 			PhdMatrixPtr->_12 * ptrObj[2] +
 			PhdMatrixPtr->_13);
 
-		zv = (double)(PhdMatrixPtr->_20 * ptrObj[0] +
+		zv = (float)(PhdMatrixPtr->_20 * ptrObj[0] +
 			PhdMatrixPtr->_21 * ptrObj[1] +
 			PhdMatrixPtr->_22 * ptrObj[2] +
 			PhdMatrixPtr->_23);
@@ -728,7 +728,7 @@ short* __cdecl calc_object_vertices(short* ptrObj) {
 	return (totalClip == 0) ? ptrObj : NULL;
 }
 
-short* __cdecl calc_vertice_light(short* ptrObj) {
+short* calc_vertice_light(short* ptrObj) {
 	int i, xv, yv, zv;
 	short shade;
 	int vtxCount = *ptrObj++;
@@ -736,14 +736,14 @@ short* __cdecl calc_vertice_light(short* ptrObj) {
 	if (vtxCount > 0) {
 		if (LsDivider != 0) {
 			xv = (PhdMatrixPtr->_00 * LsVectorView.x +
-				PhdMatrixPtr->_10 * LsVectorView.y +
-				PhdMatrixPtr->_20 * LsVectorView.z) / LsDivider;
+				  PhdMatrixPtr->_10 * LsVectorView.y +
+				  PhdMatrixPtr->_20 * LsVectorView.z) / LsDivider;
 			yv = (PhdMatrixPtr->_01 * LsVectorView.x +
-				PhdMatrixPtr->_11 * LsVectorView.y +
-				PhdMatrixPtr->_21 * LsVectorView.z) / LsDivider;
+				  PhdMatrixPtr->_11 * LsVectorView.y +
+				  PhdMatrixPtr->_21 * LsVectorView.z) / LsDivider;
 			zv = (PhdMatrixPtr->_02 * LsVectorView.x +
-				PhdMatrixPtr->_12 * LsVectorView.y +
-				PhdMatrixPtr->_22 * LsVectorView.z) / LsDivider;
+				  PhdMatrixPtr->_12 * LsVectorView.y +
+				  PhdMatrixPtr->_22 * LsVectorView.z) / LsDivider;
 
 			for (i = 0; i < vtxCount; ++i) {
 				shade = LsAdder + ((ptrObj[0] * xv + ptrObj[1] * yv + ptrObj[2] * zv) >> 16);
@@ -772,8 +772,8 @@ short* __cdecl calc_vertice_light(short* ptrObj) {
 	return ptrObj;
 }
 
-short* __cdecl calc_roomvert(short* ptrObj, BYTE farClip) {
-	double xv, yv, zv, persp, baseZ, depth;
+short* calc_roomvert(short* ptrObj, BYTE farClip) {
+	float xv, yv, zv, persp, baseZ, depth;
 	int vtxCount, zv_int;
 
 	baseZ = 0.0;
@@ -786,12 +786,12 @@ short* __cdecl calc_roomvert(short* ptrObj, BYTE farClip) {
 	vtxCount = *(ptrObj++);
 
 	for (int i = 0; i < vtxCount; ++i) {
-		xv = (double)(PhdMatrixPtr->_00 * ptrObj[0] +
+		xv = (float)(PhdMatrixPtr->_00 * ptrObj[0] +
 			PhdMatrixPtr->_01 * ptrObj[1] +
 			PhdMatrixPtr->_02 * ptrObj[2] +
 			PhdMatrixPtr->_03);
 
-		yv = (double)(PhdMatrixPtr->_10 * ptrObj[0] +
+		yv = (float)(PhdMatrixPtr->_10 * ptrObj[0] +
 			PhdMatrixPtr->_11 * ptrObj[1] +
 			PhdMatrixPtr->_12 * ptrObj[2] +
 			PhdMatrixPtr->_13);
@@ -801,7 +801,7 @@ short* __cdecl calc_roomvert(short* ptrObj, BYTE farClip) {
 			PhdMatrixPtr->_22 * ptrObj[2] +
 			PhdMatrixPtr->_23);
 
-		zv = (double)zv_int;
+		zv = (float)zv_int;
 		PhdVBuf[i].xv = xv;
 		PhdVBuf[i].yv = yv;
 
@@ -815,7 +815,7 @@ short* __cdecl calc_roomvert(short* ptrObj, BYTE farClip) {
 		}
 		else {
 			persp = FltPersp / zv;
-			depth = zv_int >> W2V_SHIFT;
+			depth = (float)(zv_int >> W2V_SHIFT);
 
 #ifdef FEATURE_VIEW_IMPROVED
 			if (depth >= PhdViewDistance) {
@@ -831,7 +831,7 @@ short* __cdecl calc_roomvert(short* ptrObj, BYTE farClip) {
 			}
 			else {
 #ifdef FEATURE_VIEW_IMPROVED
-				PhdVBuf[i].g += CalculateFogShade(depth);
+				PhdVBuf[i].g += (short)CalculateFogShade((int)depth);
 #else // !FEATURE_VIEW_IMPROVED
 				if (depth > DEPTHQ_START) { // fog begin
 					PhdVBuf[i].g += depth - DEPTHQ_START;
@@ -976,23 +976,19 @@ void phd_SetNearZ(int nearZ) {
 	FltNearZ = (float)nearZ;
 	FltRhwONearZ = RhwFactor / FltNearZ;
 	FltPerspONearZ = FltPersp / FltNearZ;
-
-	double resZ = 0.99 * FltFarZ * FltNearZ / (FltFarZ - FltNearZ);
-
+	float resZ = 0.99f * FltFarZ * FltNearZ / (FltFarZ - FltNearZ);
 	FltResZ = resZ;
 	FltResZORhw = resZ / RhwFactor;
-	FltResZBuf = 0.005 + resZ / FltNearZ;
+	FltResZBuf = 0.005f + resZ / FltNearZ;
 }
 
 void phd_SetFarZ(int farZ) {
 	PhdFarZ = farZ;
 	FltFarZ = (float)farZ;
-
-	double resZ = 0.99 * FltFarZ * FltNearZ / (FltFarZ - FltNearZ);
-
+	float resZ = 0.99f * FltFarZ * FltNearZ / (FltFarZ - FltNearZ);
 	FltResZ = resZ;
 	FltResZORhw = resZ / RhwFactor;
-	FltResZBuf = 0.005 + resZ / FltNearZ;
+	FltResZBuf = 0.005f + resZ / FltNearZ;
 }
 
 void phd_InitWindow(short x, short y, int width, int height, int nearZ, int farZ, short viewAngle, int screenWidth, int screenHeight) {

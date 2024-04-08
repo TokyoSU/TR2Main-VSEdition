@@ -30,7 +30,7 @@
 BOOL S_InitialiseSystem(); // 0x0044D6E0
 void ShutdownGame(); // 0x0044D730
 void init_game_malloc(); // 0x0044D750
-void* __cdecl game_malloc(DWORD allocSize, DWORD bufIndex); // 0x0044D780
+void* game_malloc(DWORD allocSize, DWORD bufIndex); // 0x0044D780
 void game_free(DWORD freeSize); // 0x0044D800
 void CalculateWibbleTable(); // 0x0044D840
 void S_SeedRandom(); // 0x0044D930

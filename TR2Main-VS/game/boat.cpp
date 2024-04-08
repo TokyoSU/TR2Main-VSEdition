@@ -24,7 +24,10 @@
 #include "3dsystem/phd_math.h"
 #include "game/control.h"
 #include "game/collide.h"
+#include "game/box.h"
 #include "game/items.h"
+#include "game/lara.h"
+#include "game/effects.h"
 #include "game/missile.h"
 #include "game/sound.h"
 #include "game/sphere.h"
@@ -33,8 +36,6 @@
 #include "specific/init.h"
 #include "specific/output.h"
 #include "global/vars.h"
-#include "lara.h"
-#include "box.h"
 
 typedef enum {
 	BOAT_GETON,
@@ -256,10 +257,10 @@ void DoWakeEffect(ITEM_INFO* item) {
 			fx->pos.y = item->pos.y;
 			fx->pos.z = item->pos.z + ((-700 * phd_cos(item->pos.rotY) - 300 * (i - 1) * phd_sin(item->pos.rotY)) >> W2V_SHIFT);
 			fx->pos.rotY = PHD_90 * (i - 1) + item->pos.rotY;
-			fx->room_number = item->roomNumber;
-			fx->frame_number = frame_number;
+			fx->roomNumber = item->roomNumber;
+			fx->frameNumber = frame_number;
 			fx->counter = 20;
-			fx->object_number = ID_WATER_SPRITE;
+			fx->objectID = ID_WATER_SPRITE;
 			fx->speed = item->speed >> 2;
 			if (item->speed < 64) {
 				fx->fallspeed = (ABS(item->speed) - 64) * GetRandomDraw() >> 15;
@@ -565,10 +566,9 @@ void BoatControl(short itemNum)
 	ITEM_INFO* item;
 	BOAT_INFO* boat;
 	FLOOR_INFO* floor;
-	PHD_3DPOS bubble;
-	PHD_VECTOR flPos, frPos, pos;
-	long hitWall, driving, no_turn, front_left, front_right, h, wh, x, y, z, leaving;
-	short room_number, fallspeed, x_rot, z_rot, ang;
+	PHD_VECTOR flPos, frPos;
+	long hitWall, driving, no_turn, front_left, front_right, h, wh, x, y, z;
+	short room_number, oldFallSpeed, x_rot, z_rot;
 
 	item = &Items[itemNum];
 	boat = GetBoatData(item);
@@ -624,10 +624,10 @@ void BoatControl(short itemNum)
 	boat->leftFallspeed = DoBoatDynamics(front_left, boat->leftFallspeed, &flPos.y);
 	boat->rightFallspeed = DoBoatDynamics(front_right, boat->rightFallspeed, &frPos.y);
 
-	fallspeed = item->fallSpeed;
+	oldFallSpeed = item->fallSpeed;
 	item->fallSpeed = (short)DoBoatDynamics(boat->water, item->fallSpeed, &item->pos.y);
-	//if (fallspeed - item->fallSpeed > 32 && !item->fallSpeed && wh != NO_HEIGHT)
-	//	BoatSplash(item, fallspeed - item->fallSpeed, wh);
+	if ((oldFallSpeed - item->fallSpeed) > 32 && !item->fallSpeed && wh != NO_HEIGHT)
+		Splash2(item, wh);
 
 	h = frPos.y + flPos.y;
 	if (h >= 0)

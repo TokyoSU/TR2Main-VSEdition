@@ -92,9 +92,9 @@ void MineControl(short mineID) {
 		fx->pos.y = mine->pos.y - 0x400;
 		fx->pos.z = mine->pos.z;
 		fx->speed = 0;
-		fx->frame_number = 0;
+		fx->frameNumber = 0;
 		fx->counter = 0;
-		fx->object_number = ID_EXPLOSION;
+		fx->objectID = ID_EXPLOSION;
 	}
 
 	Splash(mine);
@@ -672,8 +672,8 @@ void DartsControl(short itemID) {
 			fx->pos = item->pos;
 			fx->speed = 0;
 			fx->counter = 6;
-			fx->object_number = ID_RICOCHET;
-			fx->frame_number = -3 * GetRandomControl() / 32768;
+			fx->objectID = ID_RICOCHET;
+			fx->frameNumber = -3 * GetRandomControl() / 32768;
 		}
 		PlaySoundEffect(258, &item->pos, 0);
 	}
@@ -685,9 +685,9 @@ void DartEffectControl(short fxID) {
 	fx = &Effects[fxID];
 	++fx->counter;
 	if (fx->counter >= 3) {
-		--fx->frame_number;
+		--fx->frameNumber;
 		fx->counter = 0;
-		if (fx->frame_number <= Objects[fx->object_number].nMeshes)
+		if (fx->frameNumber <= Objects[fx->objectID].nMeshes)
 			KillEffect(fxID);
 	}
 }
@@ -706,8 +706,8 @@ void FlameEmitterControl(short item_id) {
 				fx->pos.x = item->pos.x;
 				fx->pos.y = item->pos.y;
 				fx->pos.z = item->pos.z;
-				fx->frame_number = 0;
-				fx->object_number = ID_FLAME;
+				fx->frameNumber = 0;
+				fx->objectID = ID_FLAME;
 				fx->counter = 0;
 			}
 			item->data = (LPVOID)(fxID + 1);
@@ -723,8 +723,8 @@ void FlameEmitterControl(short item_id) {
 
 void FlameControl(short fx_id) {
 	FX_INFO* fx = &Effects[fx_id];
-	if (--fx->frame_number <= Objects[ID_FLAME].nMeshes) {
-		fx->frame_number = 0;
+	if (--fx->frameNumber <= Objects[ID_FLAME].nMeshes) {
+		fx->frameNumber = 0;
 	}
 	if (fx->counter < 0) {
 #ifdef FEATURE_CHEAT
@@ -739,10 +739,10 @@ void FlameControl(short fx_id) {
 		fx->pos.y = 0;
 		fx->pos.z = (fx->counter == -1) ? -100 : 0;
 		GetJointAbsPosition(LaraItem, (PHD_VECTOR*)&fx->pos, -1 - fx->counter);
-		if (LaraItem->roomNumber != fx->room_number) {
+		if (LaraItem->roomNumber != fx->roomNumber) {
 			EffectNewRoom(fx_id, LaraItem->roomNumber);
 		}
-		int height = GetWaterHeight(fx->pos.x, fx->pos.y, fx->pos.z, fx->room_number);
+		int height = GetWaterHeight(fx->pos.x, fx->pos.y, fx->pos.z, fx->roomNumber);
 		if (height != NO_HEIGHT && fx->pos.y > height) {
 			fx->counter = 0;
 			KillEffect(fx_id);
@@ -787,8 +787,8 @@ void LaraBurn() {
 		return;
 	}
 	FX_INFO* fx = &Effects[fx_id];
-	fx->object_number = ID_FLAME;
-	fx->frame_number = 0;
+	fx->objectID = ID_FLAME;
+	fx->frameNumber = 0;
 	fx->counter = -1;
 	Lara.burn = 1;
 }
@@ -815,8 +815,8 @@ void LavaBurn(ITEM_INFO* item) {
 		short fx_id = CreateEffect(item->roomNumber);
 		if (fx_id < 0) continue;
 		FX_INFO* fx = &Effects[fx_id];
-		fx->object_number = ID_FLAME;
-		fx->frame_number = Objects[ID_FLAME].nMeshes * GetRandomControl() / 0x7FFF;
+		fx->objectID = ID_FLAME;
+		fx->frameNumber = Objects[ID_FLAME].nMeshes * GetRandomControl() / 0x7FFF;
 		fx->counter = -1 - 24 * GetRandomControl() / 0x7FFF;
 	}
 }

@@ -143,9 +143,9 @@ int DoCinematic(int nTicks) {
 		}
 
 		for (id = NextEffectActive; id >= 0; id = next) {
-			next = Effects[id].next_active;
-			if (Objects[Effects[id].object_number].control) {
-				Objects[Effects[id].object_number].control(id);
+			next = Effects[id].nextActive;
+			if (Objects[Effects[id].objectID].control) {
+				Objects[Effects[id].objectID].control(id);
 			}
 		}
 

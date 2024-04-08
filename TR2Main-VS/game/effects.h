@@ -40,6 +40,9 @@ void CreateBubble(PHD_3DPOS* pos, short roomNumber); // 0x0041C880
 void LaraBubbles(ITEM_INFO* item); // 0x0041C8F0
 void ControlBubble1(short fxID); // 0x0041C970
 void Splash(ITEM_INFO* item); // 0x0041CA70
+// TODO: Change to 'Splash' when decompiled !
+// NOTE: Not exist in the original code, new argument.
+void Splash2(ITEM_INFO* item, int waterHeight);
 void CreateSplash(int x, int y, int z, short roomNumber);
 void WadeSplash(ITEM_INFO* item, int height);
 void ControlSplash1(short fxID); // 0x0041CB40

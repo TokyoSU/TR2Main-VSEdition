@@ -237,6 +237,7 @@ enum InputStatusFlags : int
 #define GF_ERROR			(-1)
 
 // Room flags
+#define NO_ROOM             (255)
 #define ROOM_UNDERWATER		(0x01)
 #define ROOM_OUTSIDE		(0x08)
 #define ROOM_INSIDE			(0x40)
@@ -288,6 +289,7 @@ enum InputStatusFlags : int
 #define END_BIT		(0x8000)
 #define VALUE_BITS	(0x03FF)
 #define DATA_TYPE	(0x00FF)
+#define TRIG_BITS(T) ((T >> WALL_SHIFT) & 0xF)
 
 // Target types for CalculateTarget()
 #define NO_TARGET			(0x0000)
@@ -2059,11 +2061,11 @@ typedef struct DoorInfos_t {
 } DOOR_INFOS;
 
 typedef struct FloorInfo_t {
-	unsigned short index;
-	unsigned short box;
-	char pitRoom;
+	USHORT index;
+	USHORT box;
+	BYTE pitRoom;
 	char floor;
-	char skyRoom;
+	BYTE skyRoom;
 	char ceiling;
 } FLOOR_INFO;
 
@@ -2337,13 +2339,13 @@ typedef struct LotInfo_t {
 
 typedef struct FxInfo_t {
 	PHD_3DPOS pos;
-	short room_number;
-	short object_number;
-	short next_fx;
-	short next_active;
+	short roomNumber;
+	short objectID;
+	short nextFx;
+	short nextActive;
 	short speed;
 	short fallspeed;
-	short frame_number;
+	short frameNumber;
 	short counter;
 	short shade;
 } FX_INFO;
@@ -2490,8 +2492,18 @@ typedef struct WeaponInfo_t {
 	short sampleNum;
 } WEAPON_INFO;
 
+static inline FLOOR_INFO* GetFloorSector(int x, int z, ROOM_INFO* room) {
+	return &room->floor[((z - room->z) >> WALL_SHIFT) + ((x - room->x) >> WALL_SHIFT) * room->xSize];
+}
+static inline FLOOR_INFO* GetFloorSector(ITEM_INFO* item, ROOM_INFO* room) {
+	return &room->floor[((item->pos.z - room->z) >> WALL_SHIFT) + ((item->pos.x - room->x) >> WALL_SHIFT) * room->xSize];
+}
+
 static inline short GetSectorBoxXZ(ITEM_INFO* item, ROOM_INFO* room) {
-	return room->floor[((item->pos.z - room->z) >> WALL_SHIFT) + ((item->pos.x - room->x) >> WALL_SHIFT) * room->xSize].box;
+	FLOOR_INFO* floor = GetFloorSector(item, room);
+	if (floor == NULL)
+		return 2047;
+	return floor->box;
 }
 
 #pragma pack(pop)

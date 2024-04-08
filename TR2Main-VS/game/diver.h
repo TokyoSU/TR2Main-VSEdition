@@ -27,9 +27,9 @@
  /*
   * Function list
   */
-  //0x00416BF0:		Harpoon
-  //0x00416C70:		GetWaterSurface
 
-#define DiverControl ((void(__cdecl*)(short)) 0x00416D80)
+short Harpoon(int x, int y, int z, short speed, short rotY, short roomNum); // 0x00416BF0
+int GetWaterSurface(int x, int y, int z, short roomNum); // 0x00416C70
+void DiverControl(short itemNum); // 0x00416D80
 
 #endif // DIVER_H_INCLUDED

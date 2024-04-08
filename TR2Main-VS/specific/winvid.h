@@ -83,7 +83,7 @@ bool WinVidCheckGameWindowPalette(HWND hWnd); // 0x00446A50
 bool WinVidCreateGameWindow(); // 0x00446B10
 void WinVidFreeWindow(); // 0x00446BE0
 void WinVidExitMessage(); // 0x00446C10
-DISPLAY_ADAPTER_NODE* __cdecl WinVidGetDisplayAdapter(GUID* lpGuid); // 0x00446C60
+DISPLAY_ADAPTER_NODE* WinVidGetDisplayAdapter(GUID* lpGuid); // 0x00446C60
 void WinVidStart(); // 0x00446CB0
 void WinVidFinish(); // 0x00447030
 void DisplayModeListInit(DISPLAY_MODE_LIST* pList); // 0x00447050
