@@ -251,6 +251,18 @@ void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int he
 	}
 }
 
+int FindGridShift(int src, int dest)
+{
+	int srcw = src >> WALL_SHIFT;
+	int destw = dest >> WALL_SHIFT;
+	if (srcw == destw)
+		return 0;
+	src &= (WALL_SIZE - 1);
+	if (destw <= srcw)
+		return -1 - src;
+	return (WALL_SIZE + 1) - src;
+}
+
 int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomID, int hite) {
 	int rxMin = x - coll->radius;
 	int rxMax = x + coll->radius;
@@ -259,7 +271,7 @@ int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomID, int
 	int rzMin = z - coll->radius;
 	int rzMax = z + coll->radius;
 
-	coll->hitStatic = 0;
+	coll->hitStatic = FALSE;
 	GetNearByRooms(x, y, z, coll->radius + 50, hite + 50, roomID);
 
 	// outer loop
@@ -431,7 +443,7 @@ void GetNewRoom(int x, int y, int z, short roomID) {
  */
 void Inject_Collide() {
 	INJECT(0x004128D0, GetCollisionInfo);
-	//INJECT(0x00412F90, FindGridShift);
+	INJECT(0x00412F90, FindGridShift);
 	INJECT(0x00412FC0, CollideStaticObjects);
 	INJECT(0x004133B0, GetNearByRooms);
 	INJECT(0x00413480, GetNewRoom);

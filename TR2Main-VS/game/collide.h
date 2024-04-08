@@ -28,7 +28,7 @@
   * Function list
   */
 void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int height); // 0x004128D0
-#define FindGridShift ((int(__cdecl*)(int, int)) 0x00412F90)
+int FindGridShift(int src, int dest); // 0x00412F90
 int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomID, int hite); // 0x00412FC0
 void GetNearByRooms(int x, int y, int z, int r, int h, short roomID); // 0x004133B0
 void GetNewRoom(int x, int y, int z, short roomID); // 0x00413480
