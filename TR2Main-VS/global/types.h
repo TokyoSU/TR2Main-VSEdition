@@ -2502,7 +2502,7 @@ static inline FLOOR_INFO* GetFloorSector(ITEM_INFO* item, ROOM_INFO* room) {
 static inline short GetSectorBoxXZ(ITEM_INFO* item, ROOM_INFO* room) {
 	FLOOR_INFO* floor = GetFloorSector(item, room);
 	if (floor == NULL)
-		return 2047;
+		return -1;
 	return floor->box;
 }
 

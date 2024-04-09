@@ -1028,6 +1028,20 @@ void CalculateObjectLighting(ITEM_INFO* item, short* frame) {
 	}
 }
 
+short* GetBoundsAccurate(ITEM_INFO* item)
+{
+	int rate = 0;
+	short* frame[2];
+	int frac = GetFrames(item, frame, &rate);
+	if (frac)
+	{
+		for (int i = 0; i < _countof(InterpolateBounds); i++, frame[0]++, frame[1]++)
+			InterpolateBounds[i] = *frame[0] + ((*frame[1] - *frame[0]) * frac) / rate;
+		return InterpolateBounds;
+	}
+	return frame[0];
+}
+
 void AddDynamicLight(int x, int y, int z, int intensity, int falloff) {
 	LIGHT_INFO* light = &DynamicLights[(DynamicLightCount < ARRAY_SIZE(DynamicLights)) ? DynamicLightCount++ : 0];
 	light->x = x;
@@ -1072,7 +1086,7 @@ void Inject_Draw() {
 	INJECT(0x0041BD10, DrawGunFlash);
 	INJECT(0x0041BE80, CalculateObjectLighting);
 	//INJECT(0x0041BF70, GetFrames);
-	//INJECT(0x0041C010, GetBoundsAccurate);
+	INJECT(0x0041C010, GetBoundsAccurate);
 	//INJECT(0x0041C090, GetBestFrame);
 	INJECT(0x0041C0D0, AddDynamicLight);
 }

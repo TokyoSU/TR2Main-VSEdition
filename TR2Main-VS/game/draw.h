@@ -58,7 +58,7 @@ void phd_PutPolygons_I(short* ptrObj, int clip); // 0x0041BA30
 void DrawGunFlash(int weapon, int clip);
 void CalculateObjectLighting(ITEM_INFO* item, short* frame); // 0x0041BE80
 #define GetFrames ((int(__cdecl*)(ITEM_INFO*, short**, int*)) 0x0041BF70)
-#define GetBoundsAccurate ((short*(__cdecl*)(ITEM_INFO*)) 0x0041C010)
+short* GetBoundsAccurate(ITEM_INFO* item); // 0x0041C010
 #define GetBestFrame ((short*(__cdecl*)(ITEM_INFO*)) 0x0041C090)
 void AddDynamicLight(int x, int y, int z, int intensity, int falloff); // 0x0041C0D0
 

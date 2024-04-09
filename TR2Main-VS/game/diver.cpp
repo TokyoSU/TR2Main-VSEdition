@@ -44,6 +44,7 @@ typedef enum {
 } DIVER_STATE;
 
 const BITE_INFO HarpoonBite = { 17, 164, 44, 18 };
+constexpr auto DIVER_DEATH_ANIM = 16;
 
 short Harpoon(int x, int y, int z, short speed, short rotY, short roomNum)
 {
@@ -130,8 +131,8 @@ void DiverControl(short itemNum)
 
     if (item->hitPoints <= 0)
     {
-        if (item->currentAnimState != 9)
-            SetAnimation(item, 16, 9);
+        if (item->currentAnimState != DIVER_DEATH)
+            SetAnimation(item, DIVER_DEATH_ANIM, DIVER_DEATH);
         CreatureFloat(itemNum);
         return;
     }
