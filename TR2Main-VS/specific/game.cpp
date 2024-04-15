@@ -153,7 +153,7 @@ short StartGame(int levelID, GF_LEVEL_TYPE levelType) {
 			return GF_START_GAME | CurrentLevel;
 		}
 #endif // FEATURE_HUD_IMPROVED
-		if ((GF_GameFlow.flags & GFF_SelectAnyLevel) != 0)
+		if (CHK_ANY(GF_GameFlow.flags, GFF_SelectAnyLevel))
 			return GF_START_GAME | (InventoryExtraData[1] + 1); // selected level
 		else
 			return GF_START_GAME | 1; // first level

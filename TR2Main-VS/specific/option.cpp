@@ -643,14 +643,13 @@ void do_passport_option(INVENTORY_ITEM* item) {
 #ifdef FEATURE_HUD_IMPROVED
 	bool left = page > 0;
 	bool right = page < 2;
-
 	if (InventoryMode == INV_DeathMode) {
 		InputDB &= ~IN_DESELECT;
 	}
 #endif // FEATURE_HUD_IMPROVED
 
-	if (InventoryMode == INV_LoadMode ||
-		InventoryMode == INV_SaveMode ||
+	if ((InventoryMode == INV_LoadMode ||
+		InventoryMode == INV_SaveMode) ||
 		CHK_ANY(GF_GameFlow.flags, GFF_LoadSaveDisabled))
 	{
 		InputDB &= ~(IN_LEFT | IN_RIGHT);
@@ -714,12 +713,12 @@ void do_passport_option(INVENTORY_ITEM* item) {
 		break;
 
 	case 1: // new game | save game | restart level
-		if (CHK_ANY(GF_GameFlow.flags, GFF_LoadSaveDisabled)) {
-			InputDB = IN_RIGHT;
-		}
-		else if (passportMode == 1 || passportMode == 2) {
+		if (passportMode == 1 || passportMode == 2) {
+			if (passportMode == 1 && CHK_ANY(GF_GameFlow.flags, GFF_LoadSaveDisabled)) {
+				InputDB = IN_RIGHT;
+				break;
+			}
 			requester = (passportMode == 1) ? &LoadGameRequester : &SaveGameRequester;
-
 			SetPassportRequesterSize(requester);
 			select = Display_Requester(requester, TRUE, TRUE);
 			if (select == 0) {
@@ -772,7 +771,11 @@ void do_passport_option(INVENTORY_ITEM* item) {
 					T_CentreH(PassportTextInfo, 1);
 				}
 
-				if (InventoryMode != INV_TitleMode && CurrentLevel != 0) {
+				if (InventoryMode != INV_TitleMode && CurrentLevel != 0) { // not title.
+					if (CHK_ANY(GF_GameFlow.flags, GFF_LoadSaveDisabled)) {
+						InputDB = IN_RIGHT;
+						break;
+					}
 					T_RemovePrint(InvRingText);
 					InvRingText = NULL;
 					T_RemovePrint(InvItemText[0]);

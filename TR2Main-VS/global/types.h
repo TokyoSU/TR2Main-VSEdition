@@ -195,33 +195,30 @@ typedef struct {
 #define GFF_EnableCheatCode			(0x0800)
 
 // Input Status Flags
-enum InputStatusFlags : int
-{
-	IN_FORWARD = 1 << 0,
-	IN_BACK = 1 << 1,
-	IN_LEFT = 1 << 2,
-	IN_RIGHT = 1 << 3,
-	IN_JUMP = 1 << 4,
-	IN_DRAW = 1 << 5,
-	IN_ACTION = 1 << 6,
-	IN_SLOW = 1 << 7,
-	IN_OPTION = 1 << 8,
-	IN_LOOK = 1 << 9,
-	IN_STEPL = 1 << 10,
-	IN_STEPR = 1 << 11,
-	IN_ROLL = 1 << 12,
-	IN_PAUSE = 1 << 13,
-	IN_RESERVED1 = 1 << 14,
-	IN_RESERVED2 = 1 << 15,
-	IN_DOZYCHEAT = 1 << 16,
-	IN_STUFFCHEAT = 1 << 17,
-	IN_DEBUGINFO = 1 << 18,
-	IN_FLARE = 1 << 19,
-	IN_SELECT = 1 << 20,
-	IN_DESELECT = 1 << 21,
-	IN_SAVE = 1 << 22,
-	IN_LOAD = 1 << 23
-};
+#define IN_FORWARD			(0x00000001)
+#define IN_BACK				(0x00000002)
+#define IN_LEFT				(0x00000004)
+#define IN_RIGHT			(0x00000008)
+#define IN_JUMP				(0x00000010)
+#define IN_DRAW				(0x00000020)
+#define IN_ACTION			(0x00000040)
+#define IN_SLOW				(0x00000080)
+#define IN_OPTION			(0x00000100)
+#define IN_LOOK				(0x00000200)
+#define IN_STEPL			(0x00000400)
+#define IN_STEPR			(0x00000800)
+#define IN_ROLL				(0x00001000)
+#define IN_PAUSE			(0x00002000)
+#define IN_RESERVED1		(0x00004000)
+#define IN_RESERVED2		(0x00008000)
+#define IN_DOZYCHEAT		(0x00010000)
+#define IN_STUFFCHEAT		(0x00020000)
+#define IN_DEBUGINFO		(0x00040000)
+#define IN_FLARE			(0x00080000)
+#define IN_SELECT			(0x00100000)
+#define IN_DESELECT			(0x00200000)
+#define IN_SAVE				(0x00400000)
+#define IN_LOAD				(0x00800000)
 
 // Gameflow directions
 #define GF_START_GAME		(0x0000)

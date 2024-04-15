@@ -1008,27 +1008,27 @@ void S_DrawEnemyHealthBar(int percent, int originalHP) {
 
 void S_DrawAirBar(int percent) {
 #ifdef FEATURE_HUD_IMPROVED
+	BAR_CONFIG& barconfig = Mod.laraBar.air;
 	int pixel = GetRenderScale(1);
 	int barWidth = GetRenderScale(100);
 	CLAMP(barWidth, PhdWinMinX + (pixel * 4), PhdWinMaxX - (pixel * 4));
 	int barHeight = GetRenderScale(5);
-	BAR_CONFIG& barconfig = Mod.laraBar.air;
 	int barXOffset;
 	int barYOffset;
 	if (barconfig.isCentered)
 	{
-		int posX = GetRenderScale(barconfig.CENTER_xpos, false);
-		int posY = GetRenderScale(barconfig.CENTER_ypos, false);
+		int posX = GetRenderScale(barconfig.CENTER_xpos);
+		int posY = GetRenderScale(barconfig.CENTER_ypos);
 		barXOffset = GetRenderDownscaled(PhdWinCenterX, false) - posX;
 		barYOffset = GetRenderDownscaled(PhdWinCenterY, false) - posY;
-}
+	}
 	else
 	{
-		barXOffset = GetRenderScale(PsxBarPosEnabled ? barconfig.PSX_xpos : barconfig.PC_xpos, false);
-		barYOffset = GetRenderScale(PsxBarPosEnabled ? barconfig.PSX_ypos : barconfig.PC_ypos, false);
+		barXOffset = GetRenderScale(PsxBarPosEnabled ? barconfig.PSX_xpos : barconfig.PC_xpos);
+		barYOffset = GetRenderScale(PsxBarPosEnabled ? barconfig.PSX_ypos : barconfig.PC_ypos);
 	}
-	CLAMP(barXOffset, PhdWinMinX + (pixel * 2), PhdWinMaxX + (pixel * 2));
-	CLAMP(barYOffset, PhdWinMinY + (pixel * 2), PhdWinMaxY - barHeight - (pixel * 2));
+	CLAMP(barXOffset, PhdWinMinX + (pixel * 2), PhdWinMaxX - (pixel * 2));
+	CLAMP(barYOffset, PhdWinMinY + barHeight + (pixel * 2), PhdWinMaxY - barHeight - (pixel * 2));
 
 	int x0, x1;
 	if (PsxBarPosEnabled) {
@@ -1039,6 +1039,7 @@ void S_DrawAirBar(int percent) {
 		x0 = PhdWinMinX + barXOffset;
 		x1 = x0 + barWidth;
 	}
+
 	int y0 = PhdWinMinY + barYOffset;
 	int y1 = y0 + barHeight;
 	int bar = barWidth * percent / PHD_ONE;

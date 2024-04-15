@@ -34,7 +34,6 @@
 
 #ifdef FEATURE_BACKGROUND_IMPROVED
 #include "modding/background_new.h"
-
 bool LoadingScreensEnabled = true;
 #endif // FEATURE_BACKGROUND_IMPROVED
 
@@ -124,7 +123,7 @@ BOOL GF_LoadScriptFile(LPCTSTR fileName) {
 
 	GF_GameFlow.levelCompleteTrack = 41; // "level complete" track is hardcoded for some reason
 #if defined(_DEBUG) // Only for debugging !
-	GF_GameFlow.flags |= GFF_SelectAnyLevel | GFF_DozyCheatEnabled;
+	GF_GameFlow.flags |= GFF_DozyCheatEnabled;
 #endif
 
 	InvCompassOption.lpString = GF_GameStringTable[GSI_InvItem_Statistics];

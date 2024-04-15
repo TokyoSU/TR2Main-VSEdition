@@ -348,7 +348,7 @@ short TitleSequence() {
 			short levelID = 1;
 
 			InitialiseStartInfo();
-			if ((GF_GameFlow.flags & GFF_SelectAnyLevel) != 0)
+			if (CHK_ANY(GF_GameFlow.flags, GFF_SelectAnyLevel))
 				levelID = InventoryExtraData[1] + 1;
 
 			return GF_START_GAME | levelID;
@@ -658,6 +658,12 @@ void S_LoadSettings() {
 		DWORD rjf = 0;
 		GetRegistryDwordValue("RJF", &rjf, 0);
 		if (rjf == 150868) {
+			LogWarn("RJF Select any level command was enabled by default because you found every secrets of the game, that exist only in gold mode !");
+			std::string path = REG_TR2_PATH;
+			path.append("\\");
+			path.append(REG_GAME_KEY);
+			LogWarn("- RJF path in registry: %s", path.c_str());
+			LogWarn("- You can also remove it using the .reg file 'RemoveRJF.reg'");
 			GF_GameFlow.flags |= GFF_SelectAnyLevel;
 		}
 		else {
@@ -665,7 +671,6 @@ void S_LoadSettings() {
 		}
 	}
 #endif // FEATURE_GOLD
-
 	CloseGameRegistryKey();
 
 	// NOTE: There was no such call in the original code, which produces control configuration bugs
