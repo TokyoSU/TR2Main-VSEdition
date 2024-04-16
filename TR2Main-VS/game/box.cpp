@@ -48,7 +48,7 @@ void InitialiseCreature(short itemNumber)
 int CreatureActive(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
-	if (item->status == ITEM_DISABLED)
+	if (item->status == ITEM_INVISIBLE)
 	{
 		if (!EnableBaddieAI(itemNum, FALSE))
 			return FALSE;
