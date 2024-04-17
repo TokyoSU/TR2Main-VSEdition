@@ -146,7 +146,7 @@ void ModConfig::LoadAirBarConfig(Value& data, BAR_CONFIG* result) {
     result->PSX_framecolor[5] = GetColorByName(data, "PSX_framecolor5", RGB_MAKE(0x50, 0x50, 0x50));
 }
 
-void ModConfig::LoadEnemyHealthConfig(Value& data) {
+void ModConfig::LoadLevelConfig(Value& data) {
     SizeType pictureStrSize = 0;
     const char* pictureName = GetValueByNameString(data, "picture", &pictureStrSize, NULL);
     if (pictureStrSize > 0)
@@ -203,6 +203,7 @@ void ModConfig::LoadEnemyHealthConfig(Value& data) {
     makeMercenaryAttackLaraFirst = GetValueByNameBool(data, "mercenaryattacklaradirectly", false);
     makeMonkAttackLaraFirst = GetValueByNameBool(data, "monksattacklaradirectly", false);
     enemyBarEnabled = GetValueByNameBool(data, "enableenemybar", true);
+    makeYetiExplodeOnDeath = GetValueByNameBool(data, "makeyetiexplodeondeath", false);
 }
 
 void ModConfig::LoadSemitransConfig(Value& data, SEMITRANS_CONFIG* semitrans) {
@@ -349,8 +350,7 @@ void ModConfig::ParseLevelConfiguration(Value& data, LPCSTR currentLevel) {
         if (level.HasMember("filename")) {
             // If the filename is equal then load it !
             if (strcasecmp(level["filename"].GetString(), currentLevel) == 0) {
-                LogDebug("Found level: %s", level["filename"].GetString());
-                LoadEnemyHealthConfig(level);
+                LoadLevelConfig(level);
                 if (level.HasMember("semitransparent")) LoadSemitransConfig(level["semitransparent"], &semitrans);
                 if (level.HasMember("reflective")) LoadReflectConfig(level["reflective"], &reflect);
                 break;

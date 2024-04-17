@@ -23,6 +23,7 @@ public:
 	bool makeMonkAttackLaraFirst = false;
 	bool makeMercenaryAttackLaraFirst = false;
 	bool enemyBarEnabled = true;
+	bool makeYetiExplodeOnDeath = false;
 
 	bool pistolAtStart = true;
 	bool shotgunAtStart = true;
@@ -55,7 +56,7 @@ public:
 private: // Loader for data inside json:
 	void LoadHealthBarConfig(Value& data, BAR_CONFIG* result);
 	void LoadAirBarConfig(Value& data, BAR_CONFIG* result);
-	void LoadEnemyHealthConfig(Value& data);
+	void LoadLevelConfig(Value& data);
 	void LoadSemitransConfig(Value& data, SEMITRANS_CONFIG* semitrans);
 	void LoadPolyfilterConfig(Value& data, LPCSTR name, POLYFILTER_NODE** filterNodes);
 	void LoadReflectConfig(Value& data, REFLECT_CONFIG* reflect);

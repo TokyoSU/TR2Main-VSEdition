@@ -23,6 +23,9 @@
 #include "game/yeti.h"
 #include "game/box.h"
 #include "game/effects.h"
+#include "game/missile.h"
+#include "game/lot.h"
+#include "game/items.h"
 #include "specific/game.h"
 #include "modding/mod_utils.h"
 #include "global/vars.h"
@@ -209,8 +212,22 @@ void YetiControl(short itemID)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != YETI_DEATH)
+		if (Mod.makeYetiExplodeOnDeath)
+		{
+			if (ExplodingDeath(itemID, 0xFFFFFFFF, 0))
+			{
+				DisableBaddieAI(itemID);
+				KillItem(itemID);
+				item->currentAnimState = YETI_DEATH;
+				item->status = ITEM_DISABLED;
+				item->flags |= IFL_ONESHOT;
+				return;
+			}
+		}
+		else if (item->currentAnimState != YETI_DEATH)
+		{
 			SetAnimation(item, YETI_DEATH_ANIM, YETI_DEATH);
+		}
 	}
 	else
 	{

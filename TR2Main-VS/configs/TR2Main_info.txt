@@ -194,4 +194,6 @@
         " - 'monksattacklaradirectly' same as 'mercenaryattacklaradirectly'   ",
         "  but for monks instead.                                             ",
         "                                                                     ",
+        " - 'makeyetiexplodeondeath' make the yeti explode on death.          ",
+        "                                                                     ",
         "=====================================================================",
