@@ -227,7 +227,7 @@ BOOL ShotTargetNew(ITEM_INFO* item, AI_INFO* AI, const BITE_INFO* bite, short an
 	}
 	else
 	{
-		distance = (phd_sin(AI->enemy_facing) * target->speed >> W2V_SHIFT) * PEOPLE_TARGET_DISTANCE / PEOPLE_TARGETING_SPEED;
+		distance = (phd_sin(AI->enemyFacing) * target->speed >> W2V_SHIFT) * PEOPLE_TARGET_DISTANCE / PEOPLE_TARGETING_SPEED;
 		distance = AI->distance + SQR(distance);
 		if (distance > PEOPLE_TARGET_DISTANCE)
 		{
@@ -367,7 +367,7 @@ void BanditControl(short itemID)
 			}
 			else if (Targetable(item, &AI))
 			{
-				if ((AI.distance <= 0x400000) || (AI.zone_number != AI.enemy_zone))
+				if ((AI.distance <= 0x400000) || (AI.zoneNumber != AI.enemyZone))
 					item->goalAnimState = BANDIT_STOP;
 				else
 					item->goalAnimState = BANDIT_AIM4;

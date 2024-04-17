@@ -2459,13 +2459,13 @@ typedef struct BiteInfo_t {
 } BITE_INFO;
 
 typedef struct AIInfo_t {
-	short zone_number;
-	short enemy_zone;
+	short zoneNumber;
+	short enemyZone;
 	int distance;
 	int ahead;
 	int bite;
 	short angle;
-	short enemy_facing;
+	short enemyFacing;
 } AI_INFO;
 
 typedef struct Sphere_t {

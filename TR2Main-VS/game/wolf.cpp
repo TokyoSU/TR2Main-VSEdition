@@ -91,7 +91,7 @@ void WolfControl(short itemID) {
 		switch (item->currentAnimState) {
 		case WOLF_SLEEP:
 			head = 0;
-			if (wolf->mood == MOOD_ESCAPE || info.zone_number == info.enemy_zone) {
+			if (wolf->mood == MOOD_ESCAPE || info.zoneNumber == info.enemyZone) {
 				item->requiredAnimState = WOLF_CROUCH;
 				item->goalAnimState = WOLF_STOP;
 			}
@@ -156,7 +156,7 @@ void WolfControl(short itemID) {
 			}
 			else if (wolf->mood == MOOD_ATTACK) {
 				if (!info.ahead || info.distance > 0x240000 ||
-					(info.enemy_facing < 0x4000 && info.enemy_facing > -0x4000))
+					(info.enemyFacing < 0x4000 && info.enemyFacing > -0x4000))
 				{
 					item->goalAnimState = WOLF_RUN;
 				}
@@ -175,7 +175,7 @@ void WolfControl(short itemID) {
 			tilt = angle;
 			if (info.ahead && info.distance < 0x240000) {
 				if (info.distance > 0x120000 &&
-					(info.enemy_facing > 0x4000 || info.enemy_facing < -0x4000))
+					(info.enemyFacing > 0x4000 || info.enemyFacing < -0x4000))
 				{
 					item->requiredAnimState = WOLF_STALK;
 					item->goalAnimState = WOLF_CROUCH;
