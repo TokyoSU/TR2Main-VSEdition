@@ -32,7 +32,7 @@ int CreatureActive(short itemNum); // 0x0040E1C0
 void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI); // 0x0040E210
 //0x0040E470:		SearchLOT
 //0x0040E670:		UpdateLOT
-#define TargetBox ((void(__cdecl*)(LOT_INFO*,short)) 0x0040E6E0)
+void TargetBox(LOT_INFO* LOT, short boxNum); // 0x0040E6E0
 #define StalkBox ((int(__cdecl*)(ITEM_INFO*,ITEM_INFO*,short)) 0x0040E780)
 #define EscapeBox ((int(__cdecl*)(ITEM_INFO*,ITEM_INFO*,short)) 0x0040E880)
 int ValidBox(ITEM_INFO* item, short zoneNum, short boxNum); // 0x0040E930

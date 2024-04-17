@@ -61,6 +61,7 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 {
 	CREATURE_INFO* creature = GetCreatureInfo(item);
 	if (creature == NULL) return;
+
 #if defined(FEATURE_MOD_CONFIG)
 	if ((item->objectID == ID_BANDIT1 || item->objectID == ID_BANDIT2 || item->objectID == ID_BANDIT2B) && !Mod.makeMercenaryAttackLaraFirst)
 		GetBaddieTarget(creature->itemID, FALSE);
@@ -102,11 +103,20 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 	if (creature->enemy)
 		AI->distance = SQR(x) + SQR(z);
 	else
-		AI->distance = 0x7FFFFFFF;
+		AI->distance = INT_MAX;
 	AI->angle = angle - item->pos.rotY;
-	AI->enemyFacing = angle - enemy->pos.rotY + PHD_180;
+	AI->enemyFacing = (angle - enemy->pos.rotY) + PHD_180;
 	AI->ahead = AI->angle > -PHD_90 && AI->angle < PHD_90;
 	AI->bite = AI->ahead && enemy->hitPoints > 0 && ABS(item->pos.y - enemy->pos.y) <= 384;
+}
+
+void TargetBox(LOT_INFO* LOT, short boxNum)
+{
+	BOX_INFO* box = &Boxes[boxNum];
+	LOT->target.x = GetRandomControl() * (((int)box->bottom - (int)box->top - 1) >> 5) + 512 + ((int)box->top * 1024);
+	LOT->target.y = LOT->fly != 0 ? box->height - 384 : box->height;
+	LOT->target.z = GetRandomControl() * (((int)box->right - (int)box->left - 1) >> 5) + 512 + ((int)box->left * 1024);
+	LOT->requiredBox = boxNum;
 }
 
 int ValidBox(ITEM_INFO* item, short zoneNum, short boxNum)
@@ -115,7 +125,6 @@ int ValidBox(ITEM_INFO* item, short zoneNum, short boxNum)
 	short* zone = creature->LOT.fly != 0 ? FlyZones[FlipStatus] : GroundZones[2 * (creature->LOT.step >> 8) + FlipStatus];
 	if (zone[boxNum] != zoneNum)
 		return FALSE;
-
 	BOX_INFO* box = &Boxes[boxNum];
 	if (creature->LOT.blockMask & box->overlapIndex)
 		return FALSE;
@@ -510,7 +519,7 @@ void Inject_Box() {
 	INJECT(0x0040E210, CreatureAIInfo);
 	//INJECT(0x0040E470, SearchLOT);
 	//INJECT(0x0040E670, UpdateLOT);
-	//INJECT(0x0040E6E0, TargetBox);
+	INJECT(0x0040E6E0, TargetBox);
 	//INJECT(0x0040E780, StalkBox);
 	//INJECT(0x0040E880, EscapeBox);
 	INJECT(0x0040E930, ValidBox);

@@ -2462,8 +2462,8 @@ typedef struct AIInfo_t {
 	short zoneNumber;
 	short enemyZone;
 	int distance;
-	int ahead;
-	int bite;
+	BOOL ahead;
+	BOOL bite;
 	short angle;
 	short enemyFacing;
 } AI_INFO;
