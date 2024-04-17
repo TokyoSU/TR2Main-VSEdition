@@ -265,9 +265,9 @@ void LaraGetNewTarget(WEAPON_INFO* weapon)
 	for (int i = 0; i < MAX_CREATURES; i++)
 	{
 		creature = &BaddiesSlots[i];
-		if (creature->item_num == -1 || Lara.item_number == creature->item_num)
+		if (creature->itemID == -1 || Lara.item_number == creature->itemID)
 			continue;
-		targetItem = &Items[creature->item_num];
+		targetItem = &Items[creature->itemID];
 		if (targetItem->hitPoints <= 0)
 			continue;
 #if defined(FEATURE_MOD_CONFIG)

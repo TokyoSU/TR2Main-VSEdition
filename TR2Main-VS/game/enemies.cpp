@@ -80,7 +80,7 @@ void MonkControl(short itemID)
 	{
 		CreatureAIInfo(item, &ai);
 		CreatureMood(item, &ai, TRUE);
-		angle = CreatureTurn(item, monk->maximum_turn);
+		angle = CreatureTurn(item, monk->maximumTurn);
 
 		if (ai.ahead)
 			head = ai.angle;
@@ -149,7 +149,7 @@ void MonkControl(short itemID)
 			}
 			break;
 		case MONK_WALK:
-			monk->maximum_turn = 546;
+			monk->maximumTurn = 546;
 
 			if (monk->mood != MOOD_BORED)
 			{
@@ -181,9 +181,9 @@ void MonkControl(short itemID)
 			monk->flags &= ~0x1000;
 			monk->flags &= 0xFFF;
 			if (IsMonkAngry)
-				monk->maximum_turn = 910;
+				monk->maximumTurn = 910;
 			else
-				monk->maximum_turn = 728;
+				monk->maximumTurn = 728;
 			tilt = angle >> 2;
 
 			if (monk->mood != MOOD_BORED && monk->mood != MOOD_ESCAPE)

@@ -94,7 +94,7 @@ void BearControl(short itemID) {
 		}
 
 		CreatureMood(item, &info, TRUE);
-		angle = CreatureTurn(item, bear->maximum_turn);
+		angle = CreatureTurn(item, bear->maximumTurn);
 		isLaraDead = (LaraItem->hitPoints <= 0);
 
 		if (item->hitStatus) {
@@ -123,7 +123,7 @@ void BearControl(short itemID) {
 			break;
 
 		case BEAR_STROLL:
-			bear->maximum_turn = 364;
+			bear->maximumTurn = 364;
 			if (isLaraDead && CHK_ANY(item->touchBits, BEAR_TOUCH) && info.ahead) {
 				item->goalAnimState = BEAR_STOP;
 			}
@@ -140,7 +140,7 @@ void BearControl(short itemID) {
 			break;
 
 		case BEAR_RUN:
-			bear->maximum_turn = 910;
+			bear->maximumTurn = 910;
 			if (CHK_ANY(item->touchBits, BEAR_TOUCH)) {
 				bear->enemy->hitPoints -= BEAR_DAMAGE_TOUCH;
 				bear->enemy->hitStatus = 1;

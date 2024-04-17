@@ -535,7 +535,7 @@ void TestTriggers(short* data, BOOL isHeavy)
 					LOT->target.x = fixed_cam->x;
 					LOT->target.y = fixed_cam->y;
 					LOT->target.z = fixed_cam->z;
-					LOT->required_box = fixed_cam->flags;
+					LOT->requiredBox = fixed_cam->flags;
 				}
 				Lara.current_active = fixed_cam->data * 6;
 			}

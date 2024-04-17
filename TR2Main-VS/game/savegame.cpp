@@ -316,9 +316,9 @@ void CreateSaveGameInfo() {
 			WriteSG(&item->timer, sizeof(item->timer));
 			if (CHK_ANY(flags, SGF_CREATURE)) {
 				CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-				WriteSG(&creature->head_rotation, sizeof(creature->head_rotation));
-				WriteSG(&creature->neck_rotation, sizeof(creature->neck_rotation));
-				WriteSG(&creature->maximum_turn, sizeof(creature->maximum_turn));
+				WriteSG(&creature->headRotation, sizeof(creature->headRotation));
+				WriteSG(&creature->neckRotation, sizeof(creature->neckRotation));
+				WriteSG(&creature->maximumTurn, sizeof(creature->maximumTurn));
 				WriteSG(&creature->flags, sizeof(creature->flags));
 				WriteSG(&creature->mood, sizeof(creature->mood));
 			}
@@ -487,9 +487,9 @@ void ExtractSaveGameInfo() {
 				EnableBaddieAI(i, 1);
 				CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 				if (creature != NULL) {
-					ReadSG(&creature->head_rotation, sizeof(creature->head_rotation));
-					ReadSG(&creature->neck_rotation, sizeof(creature->neck_rotation));
-					ReadSG(&creature->maximum_turn, sizeof(creature->maximum_turn));
+					ReadSG(&creature->headRotation, sizeof(creature->headRotation));
+					ReadSG(&creature->neckRotation, sizeof(creature->neckRotation));
+					ReadSG(&creature->maximumTurn, sizeof(creature->maximumTurn));
 					ReadSG(&creature->flags, sizeof(creature->flags));
 					ReadSG(&creature->mood, sizeof(creature->mood));
 				}

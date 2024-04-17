@@ -63,9 +63,9 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 	if (creature == NULL) return;
 #if defined(FEATURE_MOD_CONFIG)
 	if ((item->objectID == ID_BANDIT1 || item->objectID == ID_BANDIT2 || item->objectID == ID_BANDIT2B) && !Mod.makeMercenaryAttackLaraFirst)
-		GetBaddieTarget(creature->item_num, FALSE);
+		GetBaddieTarget(creature->itemID, FALSE);
 	else if ((item->objectID == ID_MONK1 || item->objectID == ID_MONK2) && !Mod.makeMonkAttackLaraFirst)
-		GetBaddieTarget(creature->item_num, TRUE);
+		GetBaddieTarget(creature->itemID, TRUE);
 #else
 	if (item->objectID == ID_BANDIT1 || item->objectID == ID_BANDIT2 || item->objectID == ID_BANDIT2B)
 		GetBaddieTarget(creature->item_num, FALSE);
@@ -92,7 +92,7 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 	enemy->boxNumber = GetSectorBoxXZ(enemy, room);
 	AI->enemy_zone = zone[enemy->boxNumber];
 
-	if ((Boxes[enemy->boxNumber].overlapIndex & creature->LOT.block_mask) || creature->LOT.node[item->boxNumber].search_number == (creature->LOT.search_number | 0x8000))
+	if ((Boxes[enemy->boxNumber].overlapIndex & creature->LOT.blockMask) || creature->LOT.node[item->boxNumber].searchNumber == (creature->LOT.searchNumber | 0x8000))
 		AI->enemy_zone |= 0x4000;
 
 	obj = &Objects[item->objectID];
@@ -117,7 +117,7 @@ int ValidBox(ITEM_INFO* item, short zoneNum, short boxNum)
 		return FALSE;
 
 	BOX_INFO* box = &Boxes[boxNum];
-	if (creature->LOT.block_mask & box->overlapIndex)
+	if (creature->LOT.blockMask & box->overlapIndex)
 		return FALSE;
 	if (item->pos.z > ((int)box->left << WALL_SHIFT) && item->pos.z < ((int)box->right << WALL_SHIFT)
     &&  item->pos.x > ((int)box->top << WALL_SHIFT)  && item->pos.x < ((int)box->bottom << WALL_SHIFT))
@@ -132,92 +132,83 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* ai, BOOL isViolent)
 	LOT_INFO* LOT = &creature->LOT;
 	ITEM_INFO* enemy = creature->enemy;
 
-	if (LOT->node[item->boxNumber].search_number == (LOT->search_number | 0x8000))
-		LOT->required_box = -1;
+	if (LOT->node[item->boxNumber].searchNumber == (LOT->searchNumber | 0x8000))
+		LOT->requiredBox = -1;
 
-	if (creature->mood != MOOD_ATTACK && LOT->required_box != -1 && !ValidBox(item, ai->zone_number, LOT->target_box))
+	if (creature->mood != MOOD_ATTACK && LOT->requiredBox != -1 && !ValidBox(item, ai->zone_number, LOT->targetBox))
 	{
 		if (ai->zone_number == ai->enemy_zone)
 			creature->mood = MOOD_BORED;
-		LOT->required_box = -1;
+		LOT->requiredBox = -1;
 	}
 
 	MOOD_TYPE oldmood = creature->mood;
-	if (enemy != NULL)
+	if (enemy == NULL)
 	{
-		if (enemy->hitPoints > 0)
+		creature->mood = MOOD_BORED;
+		creature->enemy = LaraItem;
+	}
+	else if (enemy->hitPoints <= 0)
+	{
+		creature->mood = MOOD_BORED;
+	}
+	else if (!isViolent)
+	{
+		switch (oldmood)
 		{
-			if (isViolent)
+		case MOOD_ATTACK:
+			if (item->hitStatus && (GetRandomControl() < 2048 || ai->zone_number != ai->enemy_zone))
+				creature->mood = MOOD_ESCAPE;
+			else if (ai->zone_number != ai->enemy_zone)
+				creature->mood = MOOD_BORED;
+			break;
+		case MOOD_BORED:
+		case MOOD_STALK:
+			if (item->hitStatus && (GetRandomControl() < 2048 || ai->zone_number != ai->enemy_zone))
 			{
-				switch (creature->mood)
-				{
-				case MOOD_ATTACK:
-					if (ai->zone_number != ai->enemy_zone)
-						creature->mood = MOOD_BORED;
-					break;
-				case MOOD_BORED:
-				case MOOD_STALK:
-					if (ai->zone_number == ai->enemy_zone)
-						creature->mood = MOOD_ATTACK;
-					else if (item->hitStatus)
-						creature->mood = MOOD_ESCAPE;
-					break;
-				case MOOD_ESCAPE:
-					if (ai->zone_number == ai->enemy_zone)
-						creature->mood = MOOD_ATTACK;
-					break;
-				}
+				creature->mood = MOOD_ESCAPE;
 			}
-			else
+			else if (ai->zone_number == ai->enemy_zone)
 			{
-				switch (creature->mood)
-				{
-				case MOOD_ATTACK:
-					if (ai->zone_number != ai->enemy_zone)
-					{
-						if (item->hitStatus && (GetRandomControl() < 2048 || ai->zone_number != ai->enemy_zone))
-							creature->mood = MOOD_ESCAPE;
-						else if (ai->zone_number != ai->enemy_zone)
-							creature->mood = MOOD_BORED;
-					}
-					break;
-				case MOOD_BORED:
-				case MOOD_STALK:
-					if (item->hitStatus && (GetRandomControl() < 2048 || ai->zone_number != ai->enemy_zone))
-					{
-						creature->mood = MOOD_ESCAPE;
-					}
-					else if (ai->zone_number == ai->enemy_zone)
-					{
-						if (ai->distance < 0x900000 || (creature->mood == MOOD_STALK && LOT->required_box == -1))
-							creature->mood = MOOD_ATTACK;
-						else
-							creature->mood = MOOD_STALK;
-					}
-					break;
-				case MOOD_ESCAPE:
-					if (ai->zone_number == ai->enemy_zone && GetRandomControl() < 256)
-						creature->mood = MOOD_STALK;
-					break;
-				}
+				if (ai->distance < 0x900000 || (creature->mood == MOOD_STALK && LOT->requiredBox == -1))
+					creature->mood = MOOD_ATTACK;
+				else
+					creature->mood = MOOD_STALK;
 			}
-		}
-		else
-		{
-			creature->mood = MOOD_BORED;
+			break;
+		case MOOD_ESCAPE:
+			if (ai->zone_number == ai->enemy_zone && GetRandomControl() < 256)
+				creature->mood = MOOD_STALK;
+			break;
 		}
 	}
 	else
 	{
-		creature->mood = MOOD_BORED;
-		creature->enemy = LaraItem;
+		switch (oldmood)
+		{
+		case MOOD_ATTACK:
+			if (ai->zone_number != ai->enemy_zone)
+				creature->mood = MOOD_BORED;
+			break;
+		case MOOD_BORED:
+		case MOOD_STALK:
+			if (ai->zone_number == ai->enemy_zone)
+				creature->mood = MOOD_ATTACK;
+			else if (item->hitStatus)
+				creature->mood = MOOD_ESCAPE;
+			break;
+		case MOOD_ESCAPE:
+			if (ai->zone_number == ai->enemy_zone)
+				creature->mood = MOOD_ATTACK;
+			break;
+		}
 	}
 
 	if (oldmood != creature->mood)
 	{
 		if (oldmood == MOOD_ATTACK)
-			TargetBox(LOT, LOT->target_box);
-		LOT->required_box = -1;
+			TargetBox(LOT, LOT->targetBox);
+		LOT->requiredBox = -1;
 	}
 
 	short boxNum = 0;
@@ -227,12 +218,12 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* ai, BOOL isViolent)
 		LOT->target.x = enemy->pos.x;
 		LOT->target.y = enemy->pos.y;
 		LOT->target.z = enemy->pos.z;
-		LOT->required_box = enemy->boxNumber;
+		LOT->requiredBox = enemy->boxNumber;
 		if (LOT->fly != 0 && Lara.water_status == LWS_AboveWater)
 			LOT->target.y += GetBestFrame(enemy)[2]; // ymin (above)
 		break;
 	case MOOD_BORED:
-		boxNum = LOT->node[LOT->zone_count * GetRandomControl() >> 15].box_number;
+		boxNum = LOT->node[LOT->zoneCount * GetRandomControl() >> 15].boxNumber;
 		if (ValidBox(item, ai->zone_number, boxNum))
 		{
 			if (StalkBox(item, enemy, boxNum) && enemy != NULL && enemy->hitPoints > 0)
@@ -240,22 +231,22 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* ai, BOOL isViolent)
 				TargetBox(LOT, boxNum);
 				creature->mood = MOOD_STALK;
 			}
-			else if (LOT->required_box == -1)
+			else if (LOT->requiredBox == -1)
 				TargetBox(LOT, boxNum);
 		}
 		break;
 	case MOOD_STALK:
-		boxNum = LOT->required_box;
+		boxNum = LOT->requiredBox;
 		if (boxNum == -1 || !StalkBox(item, enemy, boxNum))
 		{
-			boxNum = LOT->node[LOT->zone_count * GetRandomControl() >> 15].box_number;
+			boxNum = LOT->node[LOT->zoneCount * GetRandomControl() >> 15].boxNumber;
 			if (ValidBox(item, ai->zone_number, boxNum))
 			{
 				if (StalkBox(item, enemy, boxNum))
 				{
 					TargetBox(LOT, boxNum);
 				}
-				else if (LOT->required_box == -1)
+				else if (LOT->requiredBox == -1)
 				{
 					TargetBox(LOT, boxNum);
 					if (ai->zone_number != ai->enemy_zone)
@@ -265,8 +256,8 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* ai, BOOL isViolent)
 		}
 		break;
 	case MOOD_ESCAPE:
-		boxNum = LOT->node[LOT->zone_count * GetRandomControl() >> 15].box_number;
-		if (ValidBox(item, ai->zone_number, boxNum) && LOT->required_box == -1)
+		boxNum = LOT->node[LOT->zoneCount * GetRandomControl() >> 15].boxNumber;
+		if (ValidBox(item, ai->zone_number, boxNum) && LOT->requiredBox == -1)
 		{
 			if (EscapeBox(item, enemy, boxNum))
 			{
@@ -281,7 +272,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* ai, BOOL isViolent)
 		break;
 	}
 
-	if (LOT->target_box == -1)
+	if (LOT->targetBox == -1)
 		TargetBox(LOT, item->boxNumber);
 	CalculateTarget(&creature->target, item, LOT);
 }
@@ -293,7 +284,7 @@ int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNum, 
 		return TRUE;
 	BOX_INFO* box = &Boxes[floor->box];
 	int height = box->height;
-	if (box->overlapIndex & LOT->block_mask)
+	if (box->overlapIndex & LOT->blockMask)
 		return TRUE;
 	if (boxHeight - height > LOT->step || boxHeight - height < LOT->drop)
 		return TRUE;
@@ -312,6 +303,7 @@ void CreatureDie(short itemID, BOOL explode) {
 	if (explode) {
 		ExplodingDeath(itemID, ~0, 0);
 		KillItem(itemID);
+		item->status = ITEM_DISABLED;
 	}
 	else {
 		RemoveActiveItem(itemID);
@@ -324,14 +316,7 @@ void CreatureDie(short itemID, BOOL explode) {
 		PrevItemActive = itemID;
 	}
 
-	ITEM_INFO* pickup = NULL;
-	for (int i = item->carriedItem; i != -1; i = pickup->carriedItem) {
-		pickup = &Items[i];
-		pickup->pos.x = item->pos.x;
-		pickup->pos.y = item->pos.y;
-		pickup->pos.z = item->pos.z;
-		ItemNewRoom(i, item->roomNumber);
-	}
+	CreatureDropItem(item);
 }
 
 void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillState) {
@@ -387,9 +372,9 @@ void GetBaddieTarget(short creatureIdx, BOOL isMonk)
 	for (int i = 0; i < MAX_CREATURES; i++)
 	{
 		baddy = &BaddiesSlots[i];
-		if (baddy->item_num == -1 || creatureIdx == baddy->item_num)
+		if (baddy->itemID == -1 || creatureIdx == baddy->itemID)
 			continue;
-		targetItem = &Items[baddy->item_num];
+		targetItem = &Items[baddy->itemID];
 		if (isMonk)
 		{
 			if (targetItem->objectID != ID_BANDIT1 && targetItem->objectID != ID_BANDIT2 && targetItem->objectID != ID_BANDIT2B)
@@ -444,6 +429,18 @@ void GetBaddieTarget(short creatureIdx, BOOL isMonk)
 	else
 	{
 		creature->enemy = NULL;
+	}
+}
+
+void CreatureDropItem(ITEM_INFO* item)
+{
+	ITEM_INFO* pickup = NULL;
+	for (int i = item->carriedItem; i != -1; i = pickup->carriedItem) {
+		pickup = &Items[i];
+		pickup->pos.x = item->pos.x;
+		pickup->pos.y = item->pos.y;
+		pickup->pos.z = item->pos.z;
+		ItemNewRoom(i, item->roomNumber);
 	}
 }
 

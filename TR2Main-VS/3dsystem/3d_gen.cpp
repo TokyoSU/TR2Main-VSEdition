@@ -308,7 +308,7 @@ void phd_GenerateW2V(PHD_3DPOS* viewPos) {
 	MatrixW2V._21 = PhdMatrixPtr->_21 = -(sx);
 	MatrixW2V._22 = PhdMatrixPtr->_22 = TRIGMULT2(cx, cy);
 
-	MatrixW2V._03 = PhdMatrixPtr->_03 = viewPos->x;;
+	MatrixW2V._03 = PhdMatrixPtr->_03 = viewPos->x;
 	MatrixW2V._13 = PhdMatrixPtr->_13 = viewPos->y;
 	MatrixW2V._23 = PhdMatrixPtr->_23 = viewPos->z;
 }

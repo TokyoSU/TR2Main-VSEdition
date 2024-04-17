@@ -314,13 +314,13 @@ void BanditControl(short itemID)
 	{
 		CreatureAIInfo(item, &AI);
 		CreatureMood(item, &AI, FALSE);
-		angle = CreatureTurn(item, bandit->maximum_turn);
+		angle = CreatureTurn(item, bandit->maximumTurn);
 
 		switch (item->currentAnimState)
 		{
 		case BANDIT_STOP:
 			bandit->flags = 0;
-			bandit->maximum_turn = 0;
+			bandit->maximumTurn = 0;
 			if (AI.ahead)
 				neck = AI.angle;
 			if (bandit->mood == MOOD_ESCAPE)
@@ -357,7 +357,7 @@ void BanditControl(short itemID)
 			break;
 		case BANDIT_WALK:
 			bandit->flags = 0;
-			bandit->maximum_turn = 728;
+			bandit->maximumTurn = 728;
 			if (AI.ahead)
 				neck = AI.angle;
 
@@ -386,7 +386,7 @@ void BanditControl(short itemID)
 			}
 			break;
 		case BANDIT_RUN:
-			bandit->maximum_turn = 1092;
+			bandit->maximumTurn = 1092;
 			if (AI.ahead)
 				neck = AI.angle;
 			tilt = angle >> 2;
@@ -467,12 +467,12 @@ void Bandit2Control(short itemID)
 	{
 		CreatureAIInfo(item, &AI);
 		CreatureMood(item, &AI, TRUE);
-		angle = CreatureTurn(item, bandit->maximum_turn);
+		angle = CreatureTurn(item, bandit->maximumTurn);
 
 		switch (item->currentAnimState)
 		{
 		case BANDIT2_WAIT:
-			bandit->maximum_turn = 0;
+			bandit->maximumTurn = 0;
 			if (AI.ahead)
 				neck = AI.angle;
 
@@ -507,7 +507,7 @@ void Bandit2Control(short itemID)
 				item->goalAnimState = BANDIT2_WALK;
 			break;
 		case BANDIT2_WALK:
-			bandit->maximum_turn = 728;
+			bandit->maximumTurn = 728;
 			if (AI.ahead)
 				neck = AI.angle;
 
@@ -532,7 +532,7 @@ void Bandit2Control(short itemID)
 			}
 			break;
 		case BANDIT2_RUN:
-			bandit->maximum_turn = 1092;
+			bandit->maximumTurn = 1092;
 			if (AI.ahead)
 				neck = AI.angle;
 			tilt = angle >> 2;
@@ -629,7 +629,7 @@ void WinstonControl(short itemID) {
 	AI_INFO info;
 	CreatureAIInfo(item, &info);
 	CreatureMood(item, &info, TRUE);
-	short angle = CreatureTurn(item, winston->maximum_turn);
+	short angle = CreatureTurn(item, winston->maximumTurn);
 	if (item->currentAnimState == 1) {
 		if ((info.distance > SQR(1536) || !info.ahead) && item->goalAnimState != 2) {
 			item->goalAnimState = 2;

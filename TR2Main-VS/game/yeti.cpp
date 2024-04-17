@@ -24,8 +24,9 @@
 #include "game/box.h"
 #include "game/effects.h"
 #include "game/missile.h"
-#include "game/lot.h"
 #include "game/items.h"
+#include "game/lot.h"
+#include "game/sound.h"
 #include "specific/game.h"
 #include "modding/mod_utils.h"
 #include "global/vars.h"
@@ -114,12 +115,12 @@ void GiantYetiControl(short itemID)
 		if (AI.ahead)
 			head = AI.angle;
 		CreatureMood(item, &AI, TRUE);
-		angle = CreatureTurn(item, birdy->maximum_turn);
+		angle = CreatureTurn(item, birdy->maximumTurn);
 
 		switch (item->currentAnimState)
 		{
 		case BIRDY_WAIT1:
-			birdy->maximum_turn = 0;
+			birdy->maximumTurn = 0;
 			if (AI.ahead && AI.distance < BIRDY_ATTACK1_RANGE)
 			{
 				if (GetRandomControl() >= 0x4000)
@@ -140,7 +141,7 @@ void GiantYetiControl(short itemID)
 				item->goalAnimState = BIRDY_WAIT1;
 			break;
 		case BIRDY_WALK:
-			birdy->maximum_turn = 728;
+			birdy->maximumTurn = 728;
 			if (AI.ahead && AI.distance < BIRDY_ATTACK2_RANGE)
 				item->goalAnimState = BIRDY_AIM2;
 			else if ((birdy->mood == MOOD_BORED || birdy->mood == MOOD_STALK) && AI.ahead)
@@ -214,15 +215,10 @@ void YetiControl(short itemID)
 	{
 		if (Mod.makeYetiExplodeOnDeath)
 		{
-			if (ExplodingDeath(itemID, 0xFFFFFFFF, 0))
-			{
-				DisableBaddieAI(itemID);
-				KillItem(itemID);
-				item->currentAnimState = YETI_DEATH;
-				item->status = ITEM_DISABLED;
-				item->flags |= IFL_ONESHOT;
-				return;
-			}
+			CreateExplosion(&item->pos, item->roomNumber, 384);
+			CreatureDie(itemID, TRUE);
+			item->currentAnimState = YETI_DEATH;
+			return;
 		}
 		else if (item->currentAnimState != YETI_DEATH)
 		{
@@ -235,13 +231,13 @@ void YetiControl(short itemID)
 		if (AI.ahead)
 			neck = AI.angle;
 		CreatureMood(item, &AI, TRUE);
-		angle = CreatureTurn(item, yeti->maximum_turn);
+		angle = CreatureTurn(item, yeti->maximumTurn);
 
 		switch (item->currentAnimState)
 		{
 		case YETI_STOP:
 			yeti->flags = 0;
-			yeti->maximum_turn = 0;
+			yeti->maximumTurn = 0;
 
 			if (yeti->mood == MOOD_ESCAPE)
 			{
@@ -325,7 +321,7 @@ void YetiControl(short itemID)
 			}
 			break;
 		case YETI_WALK:
-			yeti->maximum_turn = 728;
+			yeti->maximumTurn = 728;
 
 			random = GetRandomControl();
 			if (yeti->mood == MOOD_ESCAPE)
@@ -359,7 +355,7 @@ void YetiControl(short itemID)
 			break;
 		case YETI_RUN:
 			yeti->flags = 0;
-			yeti->maximum_turn = 1092;
+			yeti->maximumTurn = 1092;
 
 			if (yeti->mood == MOOD_ESCAPE)
 				break;

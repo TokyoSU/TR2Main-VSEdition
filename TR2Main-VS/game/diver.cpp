@@ -149,11 +149,11 @@ void DiverControl(short itemNum)
         else
             target_on_sight = FALSE;
 
-        angle = CreatureTurn(item, creature->maximum_turn);
+        angle = CreatureTurn(item, creature->maximumTurn);
         switch (item->currentAnimState)
         {
         case DIVER_UNDERWATER_SWIM:
-            creature->maximum_turn = 546;
+            creature->maximumTurn = 546;
             if (target_on_sight)
                 neckAngle = -ai.angle;
 
@@ -165,7 +165,7 @@ void DiverControl(short itemNum)
                 item->goalAnimState = DIVER_AIM1;
             break;
         case DIVER_WADE_SWIM:
-            creature->maximum_turn = 546;
+            creature->maximumTurn = 546;
             if (target_on_sight)
                 headAngle = ai.angle;
 

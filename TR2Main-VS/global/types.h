@@ -2313,24 +2313,24 @@ typedef struct RingInfo_t {
 } RING_INFO;
 
 typedef struct BoxNode_t {
-	short exit_box;
-	UINT16 search_number;
-	short next_expansion;
-	short box_number;
+	short exitBox;
+	UINT16 searchNumber;
+	short nextExpansion;
+	short boxNumber;
 } BOX_NODE;
 
 typedef struct LotInfo_t {
 	BOX_NODE* node;
 	short head;
 	short tail;
-	UINT16 search_number;
-	UINT16 block_mask;
+	UINT16 searchNumber;
+	UINT16 blockMask;
 	short step;
 	short drop;
 	short fly;
-	short zone_count;
-	short target_box;
-	short required_box;
+	short zoneCount;
+	short targetBox;
+	short requiredBox;
 	PHD_VECTOR target;
 } LOT_INFO;
 
@@ -2348,11 +2348,11 @@ typedef struct FxInfo_t {
 } FX_INFO;
 
 typedef struct CreatureInfo_t {
-	short head_rotation;
-	short neck_rotation;
-	short maximum_turn;
+	short headRotation;
+	short neckRotation;
+	short maximumTurn;
 	UINT16 flags;
-	short item_num;
+	short itemID;
 	MOOD_TYPE mood;
 	LOT_INFO LOT;
 	PHD_VECTOR target;

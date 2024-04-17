@@ -176,6 +176,22 @@ void CreateBubble(PHD_3DPOS* pos, short roomNumber) {
 	fx->objectID = ID_BUBBLES;
 }
 
+void CreateExplosion(PHD_3DPOS* pos, short roomNumber, int yOffset)
+{
+	short fxID = CreateEffect(roomNumber);
+	if (fxID != -1) {
+		FX_INFO* fx = &Effects[fxID];
+		fx->pos.x = pos->x;
+		fx->pos.y = pos->y - yOffset;
+		fx->pos.z = pos->z;
+		fx->speed = 0;
+		fx->frameNumber = 0;
+		fx->counter = 0;
+		fx->objectID = ID_EXPLOSION;
+	}
+	PlaySoundEffect(105, pos, SFX_ALWAYS);
+}
+
 void LaraBubbles(ITEM_INFO* item) {
 #ifdef FEATURE_CHEAT
 	if (Lara.water_status == LWS_Cheat) {

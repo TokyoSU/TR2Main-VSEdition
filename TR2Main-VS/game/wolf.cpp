@@ -86,7 +86,7 @@ void WolfControl(short itemID) {
 			head = info.angle;
 		}
 		CreatureMood(item, &info, FALSE);
-		angle = CreatureTurn(item, wolf->maximum_turn);
+		angle = CreatureTurn(item, wolf->maximumTurn);
 
 		switch (item->currentAnimState) {
 		case WOLF_SLEEP:
@@ -111,7 +111,7 @@ void WolfControl(short itemID) {
 			break;
 
 		case WOLF_WALK:
-			wolf->maximum_turn = 364;
+			wolf->maximumTurn = 364;
 			if (wolf->mood != MOOD_BORED) {
 				item->goalAnimState = WOLF_STALK;
 				item->requiredAnimState = WOLF_EMPTY;
@@ -144,7 +144,7 @@ void WolfControl(short itemID) {
 			break;
 
 		case WOLF_STALK:
-			wolf->maximum_turn = 364;
+			wolf->maximumTurn = 364;
 			if (wolf->mood == MOOD_ESCAPE) {
 				item->goalAnimState = WOLF_RUN;
 			}
@@ -171,7 +171,7 @@ void WolfControl(short itemID) {
 			break;
 
 		case WOLF_RUN:
-			wolf->maximum_turn = 910;
+			wolf->maximumTurn = 910;
 			tilt = angle;
 			if (info.ahead && info.distance < 0x240000) {
 				if (info.distance > 0x120000 &&
