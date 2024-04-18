@@ -189,19 +189,17 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* ai, BOOL isViolent)
 		{
 		case MOOD_BORED:
 		case MOOD_STALK:
-			if (!item->hitStatus || (2048 < GetRandomControl() && ai->zoneNumber == ai->enemyZone))
-			{
-				if (ai->zoneNumber == ai->enemyZone)
-				{
-					if (ai->distance < 0x900000 || (creature->mood == MOOD_STALK && creature->LOT.requiredBox == -1))
-						creature->mood = MOOD_ATTACK;
-					else
-						creature->mood = MOOD_STALK;
-				}
-			}
-			else
+			if (item->hitStatus && (GetRandomControl() < 2048 || ai->zoneNumber != ai->enemyZone))
 			{
 				creature->mood = MOOD_ESCAPE;
+				
+			}
+			else if (ai->zoneNumber == ai->enemyZone)
+			{
+				if (ai->distance < 0x900000 || (creature->mood == MOOD_STALK && creature->LOT.requiredBox == -1))
+					creature->mood = MOOD_ATTACK;
+				else
+					creature->mood = MOOD_STALK;
 			}
 			break;
 		case MOOD_ATTACK:
@@ -480,7 +478,7 @@ bool DamageLaraOrEnemy(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite,
 {
 	if (enemy != NULL)
 	{
-		if (enemy == LaraItem && touchBitsLara)
+		if (enemy->objectID == ID_LARA && touchBitsLara)
 		{
 			DamageTarget(item, enemy, bite, damageLara);
 			return true;

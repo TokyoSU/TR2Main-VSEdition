@@ -140,7 +140,7 @@ x function is unused / included in another function
 0x0040E210:	+	CreatureAIInfo
 0x0040E470:		SearchLOT
 0x0040E670:		UpdateLOT
-0x0040E6E0:	 *	TargetBox
+0x0040E6E0:	+	TargetBox
 0x0040E780:	 *	StalkBox
 0x0040E880:	 *	EscapeBox
 0x0040E930:	+	ValidBox
