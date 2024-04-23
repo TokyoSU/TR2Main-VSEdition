@@ -362,9 +362,6 @@ void phd_RotX(short angle) {
 		m1 = PhdMatrixPtr->_22 * cx - PhdMatrixPtr->_21 * sx;
 		PhdMatrixPtr->_21 = m0 >> W2V_SHIFT;
 		PhdMatrixPtr->_22 = m1 >> W2V_SHIFT;
-
-		D3DXVECTOR3 dir(1.0f, 0.0f, 0.0f);
-		D3DMatrixStack->RotateAxis(&dir, D3DXToRadian(angle));
 	}
 }
 
@@ -386,9 +383,6 @@ void phd_RotY(short angle) {
 		m1 = PhdMatrixPtr->_22 * cy + PhdMatrixPtr->_20 * sy;
 		PhdMatrixPtr->_20 = m0 >> W2V_SHIFT;
 		PhdMatrixPtr->_22 = m1 >> W2V_SHIFT;
-
-		D3DXVECTOR3 dir(0.0f, 1.0f, 0.0f);
-		D3DMatrixStack->RotateAxis(&dir, D3DXToRadian(angle));
 	}
 }
 
@@ -410,9 +404,6 @@ void phd_RotZ(short angle) {
 		m1 = PhdMatrixPtr->_21 * cz - PhdMatrixPtr->_20 * sz;
 		PhdMatrixPtr->_20 = m0 >> W2V_SHIFT;
 		PhdMatrixPtr->_21 = m1 >> W2V_SHIFT;
-
-		D3DXVECTOR3 dir(0.0f, 0.0f, 1.0f);
-		D3DMatrixStack->RotateAxis(&dir, D3DXToRadian(angle));
 	}
 }
 
