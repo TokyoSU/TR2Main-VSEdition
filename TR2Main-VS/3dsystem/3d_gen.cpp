@@ -268,12 +268,12 @@ static void phd_PutEnvmapPolygons(short* ptrEnv) {
 
 		// rotate normal vectors for X/Y, no translation
 		int x = (PhdMatrixPtr->_00 * ptrObj[0] +
-			PhdMatrixPtr->_01 * ptrObj[1] +
-			PhdMatrixPtr->_02 * ptrObj[2]) >> W2V_SHIFT;
+			     PhdMatrixPtr->_01 * ptrObj[1] +
+			     PhdMatrixPtr->_02 * ptrObj[2]) >> W2V_SHIFT;
 
 		int y = (PhdMatrixPtr->_10 * ptrObj[0] +
-			PhdMatrixPtr->_11 * ptrObj[1] +
-			PhdMatrixPtr->_12 * ptrObj[2]) >> W2V_SHIFT;
+			     PhdMatrixPtr->_11 * ptrObj[1] +
+			     PhdMatrixPtr->_12 * ptrObj[2]) >> W2V_SHIFT;
 
 		CLAMP(x, -PHD_IONE, PHD_IONE);
 		CLAMP(y, -PHD_IONE, PHD_IONE);
@@ -314,9 +314,8 @@ void phd_GenerateW2V(PHD_3DPOS* viewPos) {
 }
 
 void phd_LookAt(int xsrc, int ysrc, int zsrc, int xtar, int ytar, int ztar, short roll) {
-	PHD_3DPOS viewPos;
+	PHD_3DPOS viewPos = {};
 	VECTOR_ANGLES angles;
-
 	phd_GetVectorAngles(xtar - xsrc, ytar - ysrc, ztar - zsrc, &angles);
 	viewPos.x = xsrc;
 	viewPos.y = ysrc;
@@ -363,6 +362,9 @@ void phd_RotX(short angle) {
 		m1 = PhdMatrixPtr->_22 * cx - PhdMatrixPtr->_21 * sx;
 		PhdMatrixPtr->_21 = m0 >> W2V_SHIFT;
 		PhdMatrixPtr->_22 = m1 >> W2V_SHIFT;
+
+		D3DXVECTOR3 dir(1.0f, 0.0f, 0.0f);
+		D3DMatrixStack->RotateAxis(&dir, D3DXToRadian(angle));
 	}
 }
 
@@ -384,6 +386,9 @@ void phd_RotY(short angle) {
 		m1 = PhdMatrixPtr->_22 * cy + PhdMatrixPtr->_20 * sy;
 		PhdMatrixPtr->_20 = m0 >> W2V_SHIFT;
 		PhdMatrixPtr->_22 = m1 >> W2V_SHIFT;
+
+		D3DXVECTOR3 dir(0.0f, 1.0f, 0.0f);
+		D3DMatrixStack->RotateAxis(&dir, D3DXToRadian(angle));
 	}
 }
 
@@ -405,122 +410,23 @@ void phd_RotZ(short angle) {
 		m1 = PhdMatrixPtr->_21 * cz - PhdMatrixPtr->_20 * sz;
 		PhdMatrixPtr->_20 = m0 >> W2V_SHIFT;
 		PhdMatrixPtr->_21 = m1 >> W2V_SHIFT;
+
+		D3DXVECTOR3 dir(0.0f, 0.0f, 1.0f);
+		D3DMatrixStack->RotateAxis(&dir, D3DXToRadian(angle));
 	}
 }
 
 void phd_RotYXZ(short ry, short rx, short rz) {
-	int sx, cx;
-	int sy, cy;
-	int sz, cz;
-	int m0, m1;
-
-	if (ry != 0) {
-		sy = phd_sin(ry);
-		cy = phd_cos(ry);
-		m0 = PhdMatrixPtr->_00 * cy - PhdMatrixPtr->_02 * sy;
-		m1 = PhdMatrixPtr->_02 * cy + PhdMatrixPtr->_00 * sy;
-		PhdMatrixPtr->_00 = m0 >> W2V_SHIFT;
-		PhdMatrixPtr->_02 = m1 >> W2V_SHIFT;
-		m0 = PhdMatrixPtr->_10 * cy - PhdMatrixPtr->_12 * sy;
-		m1 = PhdMatrixPtr->_12 * cy + PhdMatrixPtr->_10 * sy;
-		PhdMatrixPtr->_10 = m0 >> W2V_SHIFT;
-		PhdMatrixPtr->_12 = m1 >> W2V_SHIFT;
-		m0 = PhdMatrixPtr->_20 * cy - PhdMatrixPtr->_22 * sy;
-		m1 = PhdMatrixPtr->_22 * cy + PhdMatrixPtr->_20 * sy;
-		PhdMatrixPtr->_20 = m0 >> W2V_SHIFT;
-		PhdMatrixPtr->_22 = m1 >> W2V_SHIFT;
-	}
-	if (rx != 0) {
-		sx = phd_sin(rx);
-		cx = phd_cos(rx);
-		m0 = PhdMatrixPtr->_01 * cx + PhdMatrixPtr->_02 * sx;
-		m1 = PhdMatrixPtr->_02 * cx - PhdMatrixPtr->_01 * sx;
-		PhdMatrixPtr->_01 = m0 >> W2V_SHIFT;
-		PhdMatrixPtr->_02 = m1 >> W2V_SHIFT;
-		m0 = PhdMatrixPtr->_11 * cx + PhdMatrixPtr->_12 * sx;
-		m1 = PhdMatrixPtr->_12 * cx - PhdMatrixPtr->_11 * sx;
-		PhdMatrixPtr->_11 = m0 >> W2V_SHIFT;
-		PhdMatrixPtr->_12 = m1 >> W2V_SHIFT;
-		m0 = PhdMatrixPtr->_21 * cx + PhdMatrixPtr->_22 * sx;
-		m1 = PhdMatrixPtr->_22 * cx - PhdMatrixPtr->_21 * sx;
-		PhdMatrixPtr->_21 = m0 >> W2V_SHIFT;
-		PhdMatrixPtr->_22 = m1 >> W2V_SHIFT;
-	}
-	if (rz != 0) {
-		sz = phd_sin(rz);
-		cz = phd_cos(rz);
-		m0 = PhdMatrixPtr->_00 * cz + PhdMatrixPtr->_01 * sz;
-		m1 = PhdMatrixPtr->_01 * cz - PhdMatrixPtr->_00 * sz;
-		PhdMatrixPtr->_00 = m0 >> W2V_SHIFT;
-		PhdMatrixPtr->_01 = m1 >> W2V_SHIFT;
-		m0 = PhdMatrixPtr->_10 * cz + PhdMatrixPtr->_11 * sz;
-		m1 = PhdMatrixPtr->_11 * cz - PhdMatrixPtr->_10 * sz;
-		PhdMatrixPtr->_10 = m0 >> W2V_SHIFT;
-		PhdMatrixPtr->_11 = m1 >> W2V_SHIFT;
-		m0 = PhdMatrixPtr->_20 * cz + PhdMatrixPtr->_21 * sz;
-		m1 = PhdMatrixPtr->_21 * cz - PhdMatrixPtr->_20 * sz;
-		PhdMatrixPtr->_20 = m0 >> W2V_SHIFT;
-		PhdMatrixPtr->_21 = m1 >> W2V_SHIFT;
-	}
+	if (ry != 0) phd_RotY(ry);
+	if (rx != 0) phd_RotX(rx);
+	if (rz != 0) phd_RotZ(rz);
 }
 
 void phd_RotYXZpack(DWORD rpack) {
-	int sx, cx;
-	int sy, cy;
-	int sz, cz;
-	int m0, m1;
 	short rx = ((rpack >> 20) & 0x3FF) << 6;
 	short ry = ((rpack >> 10) & 0x3FF) << 6;
 	short rz = ((rpack >> 00) & 0x3FF) << 6;
-
-	if (ry != 0) {
-		sy = phd_sin(ry);
-		cy = phd_cos(ry);
-		m0 = PhdMatrixPtr->_00 * cy - PhdMatrixPtr->_02 * sy;
-		m1 = PhdMatrixPtr->_02 * cy + PhdMatrixPtr->_00 * sy;
-		PhdMatrixPtr->_00 = m0 >> W2V_SHIFT;
-		PhdMatrixPtr->_02 = m1 >> W2V_SHIFT;
-		m0 = PhdMatrixPtr->_10 * cy - PhdMatrixPtr->_12 * sy;
-		m1 = PhdMatrixPtr->_12 * cy + PhdMatrixPtr->_10 * sy;
-		PhdMatrixPtr->_10 = m0 >> W2V_SHIFT;
-		PhdMatrixPtr->_12 = m1 >> W2V_SHIFT;
-		m0 = PhdMatrixPtr->_20 * cy - PhdMatrixPtr->_22 * sy;
-		m1 = PhdMatrixPtr->_22 * cy + PhdMatrixPtr->_20 * sy;
-		PhdMatrixPtr->_20 = m0 >> W2V_SHIFT;
-		PhdMatrixPtr->_22 = m1 >> W2V_SHIFT;
-	}
-	if (rx != 0) {
-		sx = phd_sin(rx);
-		cx = phd_cos(rx);
-		m0 = PhdMatrixPtr->_01 * cx + PhdMatrixPtr->_02 * sx;
-		m1 = PhdMatrixPtr->_02 * cx - PhdMatrixPtr->_01 * sx;
-		PhdMatrixPtr->_01 = m0 >> W2V_SHIFT;
-		PhdMatrixPtr->_02 = m1 >> W2V_SHIFT;
-		m0 = PhdMatrixPtr->_11 * cx + PhdMatrixPtr->_12 * sx;
-		m1 = PhdMatrixPtr->_12 * cx - PhdMatrixPtr->_11 * sx;
-		PhdMatrixPtr->_11 = m0 >> W2V_SHIFT;
-		PhdMatrixPtr->_12 = m1 >> W2V_SHIFT;
-		m0 = PhdMatrixPtr->_21 * cx + PhdMatrixPtr->_22 * sx;
-		m1 = PhdMatrixPtr->_22 * cx - PhdMatrixPtr->_21 * sx;
-		PhdMatrixPtr->_21 = m0 >> W2V_SHIFT;
-		PhdMatrixPtr->_22 = m1 >> W2V_SHIFT;
-	}
-	if (rz != 0) {
-		sz = phd_sin(rz);
-		cz = phd_cos(rz);
-		m0 = PhdMatrixPtr->_00 * cz + PhdMatrixPtr->_01 * sz;
-		m1 = PhdMatrixPtr->_01 * cz - PhdMatrixPtr->_00 * sz;
-		PhdMatrixPtr->_00 = m0 >> W2V_SHIFT;
-		PhdMatrixPtr->_01 = m1 >> W2V_SHIFT;
-		m0 = PhdMatrixPtr->_10 * cz + PhdMatrixPtr->_11 * sz;
-		m1 = PhdMatrixPtr->_11 * cz - PhdMatrixPtr->_10 * sz;
-		PhdMatrixPtr->_10 = m0 >> W2V_SHIFT;
-		PhdMatrixPtr->_11 = m1 >> W2V_SHIFT;
-		m0 = PhdMatrixPtr->_20 * cz + PhdMatrixPtr->_21 * sz;
-		m1 = PhdMatrixPtr->_21 * cz - PhdMatrixPtr->_20 * sz;
-		PhdMatrixPtr->_20 = m0 >> W2V_SHIFT;
-		PhdMatrixPtr->_21 = m1 >> W2V_SHIFT;
-	}
+	phd_RotYXZ(ry, rx, rz);
 }
 
 BOOL phd_TranslateRel(int x, int y, int z) {
@@ -665,10 +571,6 @@ short* calc_object_vertices(short* ptrObj) {
 
 	ptrObj++; // skip poly counter
 	vtxCount = *(ptrObj++); // get vertex counter
-
-	if (vtxCount < 0) {
-		printf("vtxCount=%d", vtxCount);
-	}
 
 	for (int i = 0; i < vtxCount; ++i) {
 		xv = (float)(PhdMatrixPtr->_00 * ptrObj[0] +
@@ -861,12 +763,12 @@ short* calc_roomvert(short* ptrObj, BYTE farClip) {
 				PhdVBuf[i].clip |= 0x08;
 
 			PhdVBuf[i].clip |= ~(BYTE)(PhdVBuf[i].zv / 0x155555.p0) << 8;
-			}
+		}
 		CLAMP(PhdVBuf[i].g, 0, 0x1FFF);
 		ptrObj += 6;
-		}
-	return ptrObj;
 	}
+	return ptrObj;
+}
 
 void phd_RotateLight(short pitch, short yaw) {
 	int xcos, ysin, wcos, wsin;
@@ -936,7 +838,7 @@ void do_quickysorty(int left, int right) {
 		do_quickysorty(i, right);
 }
 
-void phd_PrintPolyList(BYTE * surfacePtr) {
+void phd_PrintPolyList(BYTE* surfacePtr) {
 	short polyType, * bufPtr;
 	PrintSurfacePtr = surfacePtr;
 
@@ -962,7 +864,7 @@ void AlterFOV(short fov) {
 	FltRhwOPersp = RhwFactor / FltPersp;
 	FltPerspONearZ = FltPersp / FltNearZ;
 
-#ifndef FEATURE_VIEW_IMPROVED // if feature is not defined!!!
+#ifndef FEATURE_VIEW_IMPROVED
 	double windowAspect = 4.0 / 3.0;
 	if (!SavedAppSettings.FullScreen && SavedAppSettings.AspectMode == AM_16_9) {
 		windowAspect = 16.0 / 9.0;

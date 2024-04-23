@@ -123,8 +123,7 @@ void MoveCamera(GAME_VECTOR* destination, int speed) {
 	}
 
 	GetFloor(Camera.pos.x, Camera.shift + Camera.pos.y, Camera.pos.z, &Camera.pos.roomNumber);
-	phd_LookAt(Camera.pos.x, Camera.pos.y + Camera.shift, Camera.pos.z,
-		Camera.target.x, Camera.target.y, Camera.target.z, 0);
+	phd_LookAt(Camera.pos.x, Camera.pos.y + Camera.shift, Camera.pos.z, Camera.target.x, Camera.target.y, Camera.target.z, 0);
 
 	if (Camera.isLaraMic) {
 		Camera.actualAngle = Lara.torso_y_rot + Lara.head_y_rot + LaraItem->pos.rotY;

@@ -82,7 +82,6 @@ static void DrawAlphaBlended(D3DTLVERTEX* vtxPtr, DWORD vtxCount, DWORD mode) {
 // NOTE: this function is absent in the original code
 HRESULT HWR_DrawPrimitive(D3DPRIMITIVETYPE primitiveType, LPVOID vertices, DWORD vertexCount, bool isNoClip) {
 #if (DIRECT3D_VERSION >= 0x900)
-	extern LPDIRECT3DVERTEXBUFFER9 D3DVtx;
 	int primitiveCount = 0;
 	switch (primitiveType) {
 	case D3DPT_POINTLIST:		primitiveCount = vertexCount;   break;
@@ -120,7 +119,7 @@ void HWR_InitState() {
 	D3DDev->SetRenderState(D3DRS_CLIPPING, FALSE);
 	D3DDev->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 	D3DDev->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD);
-	D3DDev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	D3DDev->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	D3DDev->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	D3DDev->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
