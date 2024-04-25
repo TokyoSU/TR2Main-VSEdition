@@ -20,8 +20,7 @@ Learn about [the latest improvements](CHANGELOG.md).
 * [Visual studio 2022](https://visualstudio.microsoft.com/)
 * [vcpkg](https://github.com/microsoft/vcpkg) (Required to use this project)
 1) `vcpkg integrate install` (required for using vcpkg with visual studio)
-2) `vcpkg install dxsdk-d3dx:x86-windows`
-3) `vcpkg install spdlog:x86-windows`
+2) use packages_installer.bat to install all packages !
 
 * Next you need to download [DX7_SDK](https://archive.org/details/dx7sdk-7001) (if your planning to use the DirectX5)
 1) then extract it to somewhere you want. (you can rename the folder to DX7_SDK after extraction)
