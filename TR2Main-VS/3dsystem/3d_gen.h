@@ -43,13 +43,13 @@ void phd_RotYXZpack(DWORD rpack); // 0x004016C0
 BOOL phd_TranslateRel(int x, int y, int z); // 0x004018B0
 void phd_TranslateAbs(int x, int y, int z); // 0x00401960
 void phd_PutPolygons(short* ptrObj, int clip); // 0x004019E0
-void S_InsertRoom(short* ptrObj, BOOL isOutside); // 0x00401AE0
+void S_InsertRoom(ROOM_DATA* ptrObj, BOOL isOutside); // 0x00401AE0
 short* calc_background_light(short* ptrObj); // 0x00401BD0
 void S_InsertBackground(short* ptrObj); // 0x00401C10
 void S_InsertInvBgnd(short* ptrObj); // ----------
 short* calc_object_vertices(short* ptrObj); // 0x00401D50
 short* calc_vertice_light(short* ptrObj); // 0x00401F30
-short* calc_roomvert(short* ptrObj, BYTE farClip); // 0x004020A0
+void calc_room_vertices(ROOM_DATA* ptrObj, BYTE farClip); // 0x004020A0
 void phd_RotateLight(short pitch, short yaw); // 0x00402320
 void phd_InitPolyList(); // 0x004023F0
 void phd_SortPolyList(); // 0x00402420

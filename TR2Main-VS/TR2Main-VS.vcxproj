@@ -102,7 +102,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)json-parser;$(ProjectDir)global</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)json-parser;$(ProjectDir)global;$(ProjectDir)3dsystem;$(ProjectDir)game;$(ProjectDir)specific</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -129,7 +129,7 @@ xcopy /y "$(TargetDir)fmtd.dll" "$(LocalDebuggerWorkingDirectory)"</Command>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)json-parser;$(ProjectDir)global</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)json-parser;$(ProjectDir)global;$(ProjectDir)3dsystem;$(ProjectDir)game;$(ProjectDir)specific</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -158,7 +158,7 @@ xcopy /y "$(TargetDir)d3dx9d_43.dll" "$(LocalDebuggerWorkingDirectory)"</Command
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)json-parser;$(ProjectDir)global</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)json-parser;$(ProjectDir)global;$(ProjectDir)3dsystem;$(ProjectDir)game;$(ProjectDir)specific</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -189,7 +189,7 @@ xcopy /y "$(TargetDir)fmt.dll" "$(LocalDebuggerWorkingDirectory)"</Command>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)json-parser;$(ProjectDir)global</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)json-parser;$(ProjectDir)global;$(ProjectDir)3dsystem;$(ProjectDir)game;$(ProjectDir)specific</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -321,6 +321,7 @@ xcopy /y "$(TargetDir)d3dx9_43.dll" "$(LocalDebuggerWorkingDirectory)"</Command>
     <ClCompile Include="specific\option.cpp" />
     <ClCompile Include="specific\output.cpp" />
     <ClCompile Include="specific\registry.cpp" />
+    <ClCompile Include="specific\room.cpp" />
     <ClCompile Include="specific\screenshot.cpp" />
     <ClCompile Include="specific\setupdlg.cpp" />
     <ClCompile Include="specific\setupwnd.cpp" />
@@ -460,6 +461,7 @@ xcopy /y "$(TargetDir)d3dx9_43.dll" "$(LocalDebuggerWorkingDirectory)"</Command>
     <ClInclude Include="specific\option.h" />
     <ClInclude Include="specific\output.h" />
     <ClInclude Include="specific\registry.h" />
+    <ClInclude Include="specific\room.h" />
     <ClInclude Include="specific\screenshot.h" />
     <ClInclude Include="specific\setupdlg.h" />
     <ClInclude Include="specific\setupwnd.h" />

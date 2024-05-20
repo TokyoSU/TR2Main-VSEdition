@@ -734,26 +734,24 @@ void S_CalculateStaticMeshLight(int x, int y, int z, int shade1, int shade2, ROO
 }
 
 void S_LightRoom(ROOM_INFO* room) {
+	LIGHT_INFO* light;
+	ROOM_VERTEX* roomVtx = room->data->vertices, *currVtx;
+	int roomVtxCount = room->data->vtxSize;
 	int shade, falloff, intensity;
 	int xPos, yPos, zPos;
 	int xDist, yDist, zDist, distance, radius;
-	int roomVtxCount;
-	ROOM_VERTEX_INFO* roomVtx;
 
 	if (room->lightMode != 0) {
 		int* roomLightTable = RoomLightTables[RoomLightShades[room->lightMode]].table;
-		roomVtxCount = *room->data;
-		roomVtx = (ROOM_VERTEX_INFO*)(room->data + 1);
 		for (int i = 0; i < roomVtxCount; ++i) {
-			short wibble = roomLightTable[roomVtx[i].lightTableValue % WIBBLE_SIZE];
-			roomVtx[i].lightAdder = roomVtx[i].lightBase + wibble;
+			currVtx = &roomVtx[i];
+			currVtx->lightAdder = currVtx->lightBase + ((short)roomLightTable[currVtx->lightTableValue % WIBBLE_SIZE]);
 		}
 	}
 	else if ((room->flags & 0x10) != 0) {
-		roomVtxCount = *room->data;
-		roomVtx = (ROOM_VERTEX_INFO*)(room->data + 1);
 		for (int i = 0; i < roomVtxCount; ++i) {
-			roomVtx[i].lightAdder = roomVtx[i].lightBase;
+			currVtx = &roomVtx[i];
+			currVtx->lightAdder = currVtx->lightBase;
 		}
 		room->flags &= ~0x10;
 	}
@@ -762,25 +760,26 @@ void S_LightRoom(ROOM_INFO* room) {
 	int zMin = 0x400;
 	int xMax = 0x400 * (room->ySize - 1);
 	int zMax = 0x400 * (room->xSize - 1);
-
-	for (DWORD i = 0; i < DynamicLightCount; ++i) {
-		xPos = DynamicLights[i].x - room->x;
-		yPos = DynamicLights[i].y;
-		zPos = DynamicLights[i].z - room->z;
-		falloff = DynamicLights[i].fallOff1;
-		intensity = DynamicLights[i].intensity1;
-
+	for (DWORD i = 0; i < DynamicLightCount; ++i)
+	{
+		light = &DynamicLights[i];
+		xPos = light->x - room->x;
+		yPos = light->y;
+		zPos = light->z - room->z;
+		falloff = light->fallOff1;
+		intensity = light->intensity1;
 		radius = 1 << falloff;
-
-		if (xPos + radius >= xMin && zPos + radius >= zMin && xPos - radius <= xMax && zPos - radius <= zMax) {
+		if (xPos + radius >= xMin && zPos + radius >= zMin && xPos - radius <= xMax && zPos - radius <= zMax)
+		{
 			room->flags |= 0x10;
-			roomVtxCount = *room->data;
-			roomVtx = (ROOM_VERTEX_INFO*)(room->data + 1);
-			for (int j = 0; j < roomVtxCount; ++j) {
-				if (roomVtx[j].lightAdder != 0) {
-					xDist = roomVtx[j].x - xPos;
-					yDist = roomVtx[j].y - yPos;
-					zDist = roomVtx[j].z - zPos;
+			for (int j = 0; j < roomVtxCount; ++j)
+			{
+				currVtx = &roomVtx[j];
+				if (currVtx->lightAdder != 0)
+				{
+					xDist = currVtx->x - xPos;
+					yDist = currVtx->y - yPos;
+					zDist = currVtx->z - zPos;
 					if ((xDist >= -radius && xDist <= radius) &&
 						(yDist >= -radius && yDist <= radius) &&
 						(zDist >= -radius && zDist <= radius))
@@ -788,9 +787,9 @@ void S_LightRoom(ROOM_INFO* room) {
 						distance = SQR(xDist) + SQR(yDist) + SQR(zDist);
 						if (distance <= SQR(radius)) {
 							shade = (1 << intensity) - (distance >> (2 * falloff - intensity));
-							roomVtx[j].lightAdder -= shade;
-							if (roomVtx[j].lightAdder < 0)
-								roomVtx[j].lightAdder = 0;
+							currVtx->lightAdder -= shade;
+							if (currVtx->lightAdder < 0)
+								currVtx->lightAdder = 0;
 						}
 					}
 				}

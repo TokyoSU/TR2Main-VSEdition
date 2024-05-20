@@ -26,6 +26,7 @@
 #include "3dsystem/phd_math.h"
 #include "3dsystem/scalespr.h"
 #include "specific/hwr.h"
+#include "specific/room.h"
 #include "global/vars.h"
 
  // related to POLYTYPE enum
@@ -238,8 +239,7 @@ void SetMeshReflectState(int objID, int meshIdx) {
 }
 
 static bool InsertEnvmap(short* ptrObj, int vtxCount, bool colored, LPVOID param) {
-	InsertObjectEM(ptrObj, vtxCount, ReflectTint, (PHD_UV*)param);
-	return true;
+	return InsertObjectEM(ptrObj, vtxCount, ReflectTint, (PHD_UV*)param);
 }
 
 static void phd_PutEnvmapPolygons(short* ptrEnv) {
@@ -283,7 +283,7 @@ static void phd_PutEnvmapPolygons(short* ptrEnv) {
 		uv[i].v = PHD_ONE / PHD_IONE * (y + PHD_IONE) / 2;
 		ptrObj += 3;
 	}
-	Mod.EnumeratePolys(ptrEnv, false, InsertEnvmap, &ReflectFilter, (LPVOID)uv);
+	Mod.EnumeratePolysObjects(ptrEnv, InsertEnvmap, &ReflectFilter, (LPVOID)uv);
 	delete[] uv;
 }
 #endif // FEATURE_VIDEOFX_IMPROVED
@@ -456,7 +456,6 @@ void phd_PutPolygons(short* ptrObj, int clip) {
 #ifdef FEATURE_VIDEOFX_IMPROVED
 	short* ptrEnv = ptrObj;
 #endif // FEATURE_VIDEOFX_IMPROVED
-
 	ptrObj += 4; // skip x, y, z, radius
 	ptrObj = calc_object_vertices(ptrObj);
 	if (ptrObj != NULL) {
@@ -471,18 +470,17 @@ void phd_PutPolygons(short* ptrObj, int clip) {
 	}
 }
 
-void S_InsertRoom(short* ptrObj, BOOL isOutside) {
+void S_InsertRoom(ROOM_DATA* ptrObj, BOOL isOutside) {
 	FltWinLeft = (float)(PhdWinMinX + PhdWinLeft);
 	FltWinTop = (float)(PhdWinMinY + PhdWinTop);
 	FltWinRight = (float)(PhdWinMinX + PhdWinRight + 1);
 	FltWinBottom = (float)(PhdWinMinY + PhdWinBottom + 1);
 	FltWinCenterX = (float)(PhdWinMinX + PhdWinCenterX);
 	FltWinCenterY = (float)(PhdWinMinY + PhdWinCenterY);
-
-	ptrObj = calc_roomvert(ptrObj, isOutside ? 0x00 : 0x10);
-	ptrObj = ins_objectGT4(ptrObj + 1, *ptrObj, ST_MaxZ);
-	ptrObj = ins_objectGT3(ptrObj + 1, *ptrObj, ST_MaxZ);
-	ptrObj = ins_room_sprite(ptrObj + 1, *ptrObj);
+	calc_room_vertices(ptrObj, isOutside ? 0 : 16);
+	ins_roomGT4(ptrObj->gt4, ptrObj->gt4Size, ST_MaxZ);
+	ins_roomGT3(ptrObj->gt3, ptrObj->gt3Size, ST_MaxZ);
+	ins_room_sprite(ptrObj->sprites, ptrObj->spriteSize);
 }
 
 short* calc_background_light(short* ptrObj) {
@@ -667,100 +665,90 @@ short* calc_vertice_light(short* ptrObj) {
 	return ptrObj;
 }
 
-short* calc_roomvert(short* ptrObj, BYTE farClip) {
-	float xv, yv, zv, persp, baseZ, depth;
-	int vtxCount, zv_int;
+void calc_room_vertices(ROOM_DATA* ptrObj, BYTE farClip) {
+	PHD_VBUF* vbuf;
+	ROOM_VERTEX* vtx;
+	float xv, yv, zv, persp, depth;
+	float baseZ = 0.0;
+	int zv_int;
 
-	baseZ = 0.0;
-#ifndef FEATURE_VIEW_IMPROVED
+#if !defined(FEATURE_VIEW_IMPROVED)
 	if (SavedAppSettings.RenderMode == RM_Software || !SavedAppSettings.ZBuffer) {
 		baseZ = (double)(MidSort << (W2V_SHIFT + 8));
 	}
 #endif // !FEATURE_VIEW_IMPROVED
 
-	vtxCount = *(ptrObj++);
-
-	for (int i = 0; i < vtxCount; ++i) {
-		xv = (float)(PhdMatrixPtr->_00 * ptrObj[0] +
-			PhdMatrixPtr->_01 * ptrObj[1] +
-			PhdMatrixPtr->_02 * ptrObj[2] +
-			PhdMatrixPtr->_03);
-
-		yv = (float)(PhdMatrixPtr->_10 * ptrObj[0] +
-			PhdMatrixPtr->_11 * ptrObj[1] +
-			PhdMatrixPtr->_12 * ptrObj[2] +
-			PhdMatrixPtr->_13);
-
-		zv_int = (PhdMatrixPtr->_20 * ptrObj[0] +
-			PhdMatrixPtr->_21 * ptrObj[1] +
-			PhdMatrixPtr->_22 * ptrObj[2] +
-			PhdMatrixPtr->_23);
-
+	for (int i = 0; i < ptrObj->vtxSize; ++i)
+	{
+		vtx = &ptrObj->vertices[i];
+		xv = (float)(PhdMatrixPtr->_00 * vtx->x + PhdMatrixPtr->_01 * vtx->y + PhdMatrixPtr->_02 * vtx->z + PhdMatrixPtr->_03);
+		yv = (float)(PhdMatrixPtr->_10 * vtx->x + PhdMatrixPtr->_11 * vtx->y + PhdMatrixPtr->_12 * vtx->z + PhdMatrixPtr->_13);
+		zv_int =    (PhdMatrixPtr->_20 * vtx->x + PhdMatrixPtr->_21 * vtx->y + PhdMatrixPtr->_22 * vtx->z + PhdMatrixPtr->_23);
 		zv = (float)zv_int;
-		PhdVBuf[i].xv = xv;
-		PhdVBuf[i].yv = yv;
 
-		PhdVBuf[i].g = ptrObj[5];
+		vbuf = &PhdVBuf[i];
+		vbuf->xv = xv;
+		vbuf->yv = yv;
+		vbuf->g = vtx->lightAdder;
+
 		if (IsWaterEffect != 0)
-			PhdVBuf[i].g += ShadesTable[(WibbleOffset + (BYTE)RandomTable[(vtxCount - i) % WIBBLE_SIZE]) % WIBBLE_SIZE];
+			vbuf->g += ShadesTable[(WibbleOffset + (BYTE)RandomTable[(ptrObj->vtxSize - i) % WIBBLE_SIZE]) % WIBBLE_SIZE];
 
 		if (zv < FltNearZ) {
-			PhdVBuf[i].clip = 0xFF80;
-			PhdVBuf[i].zv = zv;
+			vbuf->clip = 0xFF80;
+			vbuf->zv = zv;
 		}
 		else {
 			persp = FltPersp / zv;
 			depth = (float)(zv_int >> W2V_SHIFT);
 
-#ifdef FEATURE_VIEW_IMPROVED
+#if defined(FEATURE_VIEW_IMPROVED)
 			if (depth >= PhdViewDistance) {
-				PhdVBuf[i].rhw = persp * FltRhwOPersp;
-				PhdVBuf[i].zv = zv + baseZ;
+				vbuf->rhw = persp * FltRhwOPersp;
+				vbuf->zv = zv + baseZ;
 #else // !FEATURE_VIEW_IMPROVED
 			if (depth >= DEPTHQ_END) { // fog end
-				PhdVBuf[i].rhw = 0.0; // NOTE: zero RHW is an invalid value, but the original game sets it.
-				PhdVBuf[i].zv = FltFarZ;
+				vbuf->rhw = 0.0; // NOTE: zero RHW is an invalid value, but the original game sets it.
+				vbuf->zv = FltFarZ;
 #endif // FEATURE_VIEW_IMPROVED
-				PhdVBuf[i].g = 0x1FFF;
-				PhdVBuf[i].clip = farClip;
+				vbuf->g = 0x1FFF;
+				vbuf->clip = farClip;
 			}
 			else {
-#ifdef FEATURE_VIEW_IMPROVED
-				PhdVBuf[i].g += (short)CalculateFogShade((int)depth);
+#if defined(FEATURE_VIEW_IMPROVED)
+				vbuf->g += (short)CalculateFogShade((int)depth);
 #else // !FEATURE_VIEW_IMPROVED
 				if (depth > DEPTHQ_START) { // fog begin
-					PhdVBuf[i].g += depth - DEPTHQ_START;
+					vbuf->g += depth - DEPTHQ_START;
 				}
 #endif // FEATURE_VIEW_IMPROVED
-				PhdVBuf[i].rhw = persp * FltRhwOPersp;
-				PhdVBuf[i].clip = 0;
-				PhdVBuf[i].zv = zv + baseZ;
+				vbuf->rhw = persp * FltRhwOPersp;
+				vbuf->clip = 0;
+				vbuf->zv = zv + baseZ;
 			}
 
-			PhdVBuf[i].xs = persp * xv + FltWinCenterX;
-			PhdVBuf[i].ys = persp * yv + FltWinCenterY;
+			vbuf->xs = persp * xv + FltWinCenterX;
+			vbuf->ys = persp * yv + FltWinCenterY;
 
-			if (IsWibbleEffect && ptrObj[4] >= 0) {
-				PhdVBuf[i].xs += WibbleTable[(WibbleOffset + (BYTE)PhdVBuf[i].ys) % WIBBLE_SIZE];
-				PhdVBuf[i].ys += WibbleTable[(WibbleOffset + (BYTE)PhdVBuf[i].xs) % WIBBLE_SIZE];
+			if (IsWibbleEffect && vtx->flags >= 0) {
+				vbuf->xs += WibbleTable[(WibbleOffset + (BYTE)vbuf->ys) % WIBBLE_SIZE];
+				vbuf->ys += WibbleTable[(WibbleOffset + (BYTE)vbuf->xs) % WIBBLE_SIZE];
 			}
 
-			if (PhdVBuf[i].xs < FltWinLeft)
-				PhdVBuf[i].clip |= 0x01;
-			else if (PhdVBuf[i].xs > FltWinRight)
-				PhdVBuf[i].clip |= 0x02;
+			if (vbuf->xs < FltWinLeft)
+				vbuf->clip |= 0x01;
+			else if (vbuf->xs > FltWinRight)
+				vbuf->clip |= 0x02;
+			if (vbuf->ys < FltWinTop)
+				vbuf->clip |= 0x04;
+			else if (vbuf->ys > FltWinBottom)
+				vbuf->clip |= 0x08;
 
-			if (PhdVBuf[i].ys < FltWinTop)
-				PhdVBuf[i].clip |= 0x04;
-			else if (PhdVBuf[i].ys > FltWinBottom)
-				PhdVBuf[i].clip |= 0x08;
-
-			PhdVBuf[i].clip |= ~(BYTE)(PhdVBuf[i].zv / 0x155555.p0) << 8;
+			vbuf->clip |= ~(BYTE)(vbuf->zv / 0x155555.p0) << 8;
 		}
-		CLAMP(PhdVBuf[i].g, 0, 0x1FFF);
-		ptrObj += 6;
+
+		CLAMP(vbuf->g, 0, 8191);
 	}
-	return ptrObj;
 }
 
 void phd_RotateLight(short pitch, short yaw) {
@@ -932,26 +920,30 @@ void phd_InitWindow(short x, short y, int width, int height, int nearZ, int farZ
 
 	PhdMatrixPtr = MatrixStack; // reset matrix stack pointer
 
-	if (SavedAppSettings.RenderMode == RM_Software) {
+	switch (SavedAppSettings.RenderMode)
+	{
+	case RM_Software:
 		PerspectiveDistance = SavedAppSettings.PerspectiveCorrect ? SW_DETAIL_HIGH : SW_DETAIL_MEDIUM;
-
 		ins_objectGT3 = InsertObjectGT3;
 		ins_objectGT4 = InsertObjectGT4;
 		ins_objectG3 = InsertObjectG3;
 		ins_objectG4 = InsertObjectG4;
+		ins_roomGT3 = InsertRoomGT3;
+		ins_roomGT4 = InsertRoomGT4;
 		ins_flat_rect = InsertFlatRect;
 		ins_line = InsertLine;
-
 		ins_sprite = InsertSprite;
 		ins_poly_trans8 = InsertTrans8;
 		ins_trans_quad = InsertTransQuad;
-	}
-	else if (SavedAppSettings.RenderMode == RM_Hardware) {
+		break;
+	case RM_Hardware:
 		if (SavedAppSettings.ZBuffer) {
 			ins_objectGT3 = InsertObjectGT3_ZBuffered;
 			ins_objectGT4 = InsertObjectGT4_ZBuffered;
 			ins_objectG3 = InsertObjectG3_ZBuffered;
 			ins_objectG4 = InsertObjectG4_ZBuffered;
+			ins_roomGT3 = InsertRoomGT3_ZBuffered;
+			ins_roomGT4 = InsertRoomGT4_ZBuffered;
 			ins_flat_rect = InsertFlatRect_ZBuffered;
 			ins_line = InsertLine_ZBuffered;
 		}
@@ -960,12 +952,18 @@ void phd_InitWindow(short x, short y, int width, int height, int nearZ, int farZ
 			ins_objectGT4 = InsertObjectGT4_Sorted;
 			ins_objectG3 = InsertObjectG3_Sorted;
 			ins_objectG4 = InsertObjectG4_Sorted;
+			ins_roomGT3 = InsertRoomGT3_Sorted;
+			ins_roomGT4 = InsertRoomGT4_Sorted;
 			ins_flat_rect = InsertFlatRect_Sorted;
 			ins_line = InsertLine_Sorted;
 		}
 		ins_sprite = InsertSprite_Sorted;
 		ins_poly_trans8 = InsertTrans8_Sorted;
 		ins_trans_quad = InsertTransQuad_Sorted;
+		break;
+	case RM_Unknown:
+		LogWarn("Failed to setup the renderer, render mode is unknown !");
+		break;
 	}
 }
 
@@ -1007,7 +1005,7 @@ void Inject_3Dgen() {
 	//INJECT(----------, S_InsertInvBgnd); // NOTE: this is null in the original code
 	INJECT(0x00401D50, calc_object_vertices);
 	INJECT(0x00401F30, calc_vertice_light);
-	INJECT(0x004020A0, calc_roomvert);
+	INJECT(0x004020A0, calc_room_vertices);
 	INJECT(0x00402320, phd_RotateLight);
 	INJECT(0x004023F0, phd_InitPolyList);
 	INJECT(0x00402420, phd_SortPolyList);

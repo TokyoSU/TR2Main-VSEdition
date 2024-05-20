@@ -308,6 +308,9 @@
     <ClCompile Include="modding\json_utils.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="specific\room.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="specific\background.h">
@@ -716,6 +719,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="modding\json_utils.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\room.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

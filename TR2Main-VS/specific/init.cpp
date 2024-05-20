@@ -28,7 +28,7 @@
 #include <time.h>
 
  // related to GAMEALLOC_BUFFER enum
-static LPCTSTR BufferNames[] = {
+static LPCTSTR BufferNames[GBUF_Max] = {
 	"Temp Alloc",
 	"Texture Pages",
 	"Mesh Pointers",
@@ -42,6 +42,7 @@ static LPCTSTR BufferNames[] = {
 	"Room Textures",
 	"Room Infos",
 	"Room Mesh",
+	"Room Mesh Data",
 	"Room Door",
 	"Room Floor",
 	"Room Lights",
@@ -113,7 +114,6 @@ void* game_malloc(DWORD allocSize, DWORD bufIndex) {
 		S_ExitSystem(StringToShow);
 		return NULL; // the app is terminated here
 	}
-
 	void* result = GameAllocMemPointer;
 	GameAllocMemFree -= alignedSize;
 	GameAllocMemUsed += alignedSize;

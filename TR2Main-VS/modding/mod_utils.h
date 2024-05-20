@@ -67,9 +67,13 @@ private:
 public: // Utilities.
 	POLYFILTER* CreatePolyfilterNode(POLYFILTER_NODE** root, int id);
 	void FreePolyfilterNodes(POLYFILTER_NODE** root);
-	bool IsCompatibleFilter(short* ptrObj, bool isRoomMesh, POLYFILTER* filter);
-	short* EnumeratePolysSpecific(short* ptrObj, int vtxCount, bool colored, ENUM_POLYS_CB callback, POLYINDEX* filter, LPVOID param);
-	bool EnumeratePolys(short* ptrObj, bool isRoomMesh, ENUM_POLYS_CB callback, POLYFILTER* filter, LPVOID param);
+	bool IsCompatibleFilterObjects(short* ptrObj, POLYFILTER* filter);
+	short* EnumeratePolysSpecificObjects(short* ptrObj, int vtxCount, bool colored, ENUM_POLYS_OBJECTS_CB callback, POLYINDEX* filter, LPVOID param);
+	void EnumeratePolysSpecificRoomFace4(FACE4* ptrObj, int faceCount, bool colored, ENUM_POLYS_FACE4_CB callback, POLYINDEX* filter, LPVOID param);
+	void EnumeratePolysSpecificRoomFace3(FACE3* ptrObj, int faceCount, bool colored, ENUM_POLYS_FACE3_CB callback, POLYINDEX* filter, LPVOID param);
+	bool EnumeratePolysObjects(short* ptrObj, ENUM_POLYS_OBJECTS_CB callback, POLYFILTER* filter, LPVOID param);
+	bool EnumeratePolysRoomFace3(FACE3* ptrObj, int faceCount, ENUM_POLYS_FACE3_CB callback, POLYFILTER* filter, LPVOID param);
+	bool EnumeratePolysRoomFace4(FACE4* ptrObj, int faceCount, ENUM_POLYS_FACE4_CB callback, POLYFILTER* filter, LPVOID param);
 	int ParsePolyString(LPCSTR str, POLYINDEX* lst, DWORD lstLen);
 	int ParsePolyValue(LPCSTR value, POLYINDEX* lst, DWORD lstLen);
 };

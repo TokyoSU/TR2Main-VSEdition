@@ -326,7 +326,6 @@ void DrawTextureTile(int sx, int sy, int width, int height, HWR_TEXHANDLE texSou
 	tv0 = (double)tv / 256.0;
 	tu1 = (double)(tu + t_width) / 256.0;
 	tv1 = (double)(tv + t_height) / 256.0;
-
 	if (PatternTexPage < 0) {
 		uvAdjust = (double)UvAdd / (double)(256 * GetTextureSideByHandle(texSource));
 		CLAMPL(uvAdjust, 1.0 / double(PHD_ONE));

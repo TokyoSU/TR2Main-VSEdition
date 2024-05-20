@@ -24,6 +24,17 @@
 
 #include "global/types.h"
 
+#ifdef FEATURE_VIEW_IMPROVED
+extern bool RoomSortEnabled;
+#define MAKE_ZSORT(z) (RoomSortEnabled && (SavedAppSettings.RenderMode == RM_Software || !SavedAppSettings.ZBuffer) ? (((UINT64)MidSort)<<32)+(DWORD)(z) : (DWORD)(z))
+#else // FEATURE_VIEW_IMPROVED
+#define MAKE_ZSORT(z) ((DWORD)(z))
+#endif // FEATURE_VIEW_IMPROVED
+
+extern VERTEX_INFO VBuffer[40];
+extern D3DTLVERTEX VBufferD3D[32];
+extern D3DCOLOR GlobalTint;
+
  /*
   * Function list
   */
@@ -34,6 +45,7 @@ bool InsertObjectEM(short* ptrObj, int vtxCount, D3DCOLOR tint, PHD_UV* em_uv);
 // NOTE: this function is not presented in the original game
 void InsertGourQuad(int x0, int y0, int x1, int y1, int z, D3DCOLOR color0, D3DCOLOR color1, D3DCOLOR color2, D3DCOLOR color3);
 
+float CalculatePolyZ(SORTTYPE sortType, float z0, float z1, float z2, float z3 = -1.0f);
 BOOL visible_zclip(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2); // 0x00405840
 int ZedClipper(int vtxCount, POINT_INFO* pts, VERTEX_INFO* vtx); // 0x004058B0
 int XYGUVClipper(int vtxCount, VERTEX_INFO* vtx); // 0x004059F0

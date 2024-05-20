@@ -25,6 +25,20 @@
 #include "specific/texture.h"
 #include "global/vars.h"
 
+void(*ins_trans_quad)(int x, int y, int width, int height, int z); // 0x00470318
+void(*ins_poly_trans8)(PHD_VBUF* vbuf, short shade); // 0x0047032C
+void(*ins_flat_rect)(int, int, int, int, int, BYTE); // 0x0047805C
+#ifdef FEATURE_VIDEOFX_IMPROVED
+void(*ins_sprite)(int, int, int, int, int, int, short, DWORD); // 0x004B2A10
+#else
+void(*ins_sprite)(int, int, int, int, int, int, short); // 0x004B2A10
+#endif
+short*(*ins_objectGT3)(short*, int, SORTTYPE); // 0x004B2A1C
+short*(*ins_objectGT4)(short*, int, SORTTYPE); // 0x004B2A20
+void(*ins_line)(int, int, int, int, int, BYTE); // 0x004B2AE8
+short*(*ins_objectG4)(short*, int, SORTTYPE); // 0x004BCAF8
+short*(*ins_objectG3)(short*, int, SORTTYPE); // 0x004BCB40
+
 #if defined(FEATURE_HUD_IMPROVED) || (DIRECT3D_VERSION >= 0x900)
 #include "modding/texture_utils.h"
 #endif // defined(FEATURE_HUD_IMPROVED) || (DIRECT3D_VERSION >= 0x900)
@@ -41,18 +55,15 @@ extern DWORD AlphaBlendMode;
 bool CustomWaterColorEnabled = true;
 #endif // FEATURE_VIDEOFX_IMPROVED
 
-static VERTEX_INFO VBuffer[40]; // NOTE: original size was 20
-static D3DTLVERTEX VBufferD3D[32];
-static D3DCOLOR GlobalTint = 0; // NOTE: not presented in the original code
+VERTEX_INFO VBuffer[40]; // NOTE: original size was 20
+D3DTLVERTEX VBufferD3D[32];
+D3DCOLOR GlobalTint = 0; // NOTE: not presented in the original code
 
 #ifdef FEATURE_VIEW_IMPROVED
 bool RoomSortEnabled = false;
-#define MAKE_ZSORT(z) (RoomSortEnabled && (SavedAppSettings.RenderMode == RM_Software || !SavedAppSettings.ZBuffer) ? (((UINT64)MidSort)<<32)+(DWORD)(z) : (DWORD)(z))
-#else // FEATURE_VIEW_IMPROVED
-#define MAKE_ZSORT(z) ((DWORD)(z))
-#endif // FEATURE_VIEW_IMPROVED
+#endif
 
-static D3DCOLOR shadeColor(DWORD red, DWORD green, DWORD blue, DWORD alpha, DWORD shade, bool isTextured) {
+static D3DCOLOR GetShadeColor(DWORD red, DWORD green, DWORD blue, DWORD alpha, DWORD shade, bool isTextured) {
 	CLAMPG(shade, 0x1FFF);
 
 	if (GlobalTint) {
@@ -101,10 +112,11 @@ static D3DCOLOR shadeColor(DWORD red, DWORD green, DWORD blue, DWORD alpha, DWOR
 		green = green * 224 / 256;
 #endif // defined(FEATURE_VIDEOFX_IMPROVED) && defined(FEATURE_MOD_CONFIG)
 	}
+
 	return RGBA_MAKE(red, green, blue, alpha);
 }
 
-static float CalculatePolyZ(SORTTYPE sortType, float z0, float z1, float z2, float z3 = -1.0f) {
+float CalculatePolyZ(SORTTYPE sortType, float z0, float z1, float z2, float z3) {
 	float zv = 0.0f;
 
 	switch (sortType) {
@@ -1373,7 +1385,7 @@ void InsertGT3_ZBuffered(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_TEX
 			VBufferD3D[0].sy = vtx0->ys;
 			VBufferD3D[0].sz = FltResZBuf - FltResZORhw * vtx0->rhw;
 			VBufferD3D[0].rhw = vtx0->rhw;
-			VBufferD3D[0].color = shadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx0->g, true);
+			VBufferD3D[0].color = GetShadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx0->g, true);
 			VBufferD3D[0].tu = (double)uv0->u / (double)PHD_ONE;
 			VBufferD3D[0].tv = (double)uv0->v / (double)PHD_ONE;
 
@@ -1381,7 +1393,7 @@ void InsertGT3_ZBuffered(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_TEX
 			VBufferD3D[1].sy = vtx1->ys;
 			VBufferD3D[1].sz = FltResZBuf - FltResZORhw * vtx1->rhw;
 			VBufferD3D[1].rhw = vtx1->rhw;
-			VBufferD3D[1].color = shadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx1->g, true);
+			VBufferD3D[1].color = GetShadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx1->g, true);
 			VBufferD3D[1].tu = (double)uv1->u / (double)PHD_ONE;
 			VBufferD3D[1].tv = (double)uv1->v / (double)PHD_ONE;
 
@@ -1389,7 +1401,7 @@ void InsertGT3_ZBuffered(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_TEX
 			VBufferD3D[2].sy = vtx2->ys;
 			VBufferD3D[2].sz = FltResZBuf - FltResZORhw * vtx2->rhw;
 			VBufferD3D[2].rhw = vtx2->rhw;
-			VBufferD3D[2].color = shadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx2->g, true);
+			VBufferD3D[2].color = GetShadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx2->g, true);
 			VBufferD3D[2].tu = (double)uv2->u / (double)PHD_ONE;
 			VBufferD3D[2].tv = (double)uv2->v / (double)PHD_ONE;
 
@@ -1483,7 +1495,7 @@ void DrawClippedPoly_Textured(int vtxCount) {
 		return;
 
 	for (int i = 0; i < vtxCount; ++i) {
-		color = shadeColor(0xFF, 0xFF, 0xFF, 0xFF, (DWORD)VBuffer[i].g, true);
+		color = GetShadeColor(0xFF, 0xFF, 0xFF, 0xFF, (DWORD)VBuffer[i].g, true);
 
 		tu = VBuffer[i].u / VBuffer[i].rhw / (double)PHD_ONE;
 		tv = VBuffer[i].v / VBuffer[i].rhw / (double)PHD_ONE;
@@ -1516,7 +1528,7 @@ void InsertGT4_ZBuffered(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_VBU
 		VBufferD3D[0].sy = vtx0->ys;
 		VBufferD3D[0].sz = FltResZBuf - FltResZORhw * vtx0->rhw;
 		VBufferD3D[0].rhw = vtx0->rhw;
-		VBufferD3D[0].color = shadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx0->g, true);
+		VBufferD3D[0].color = GetShadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx0->g, true);
 		VBufferD3D[0].tu = (double)texture->uv[0].u / (double)PHD_ONE;
 		VBufferD3D[0].tv = (double)texture->uv[0].v / (double)PHD_ONE;
 
@@ -1524,7 +1536,7 @@ void InsertGT4_ZBuffered(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_VBU
 		VBufferD3D[1].sy = vtx1->ys;
 		VBufferD3D[1].sz = FltResZBuf - FltResZORhw * vtx1->rhw;
 		VBufferD3D[1].rhw = vtx1->rhw;
-		VBufferD3D[1].color = shadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx1->g, true);
+		VBufferD3D[1].color = GetShadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx1->g, true);
 		VBufferD3D[1].tu = (double)texture->uv[1].u / (double)PHD_ONE;
 		VBufferD3D[1].tv = (double)texture->uv[1].v / (double)PHD_ONE;
 
@@ -1532,7 +1544,7 @@ void InsertGT4_ZBuffered(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_VBU
 		VBufferD3D[2].sy = vtx2->ys;
 		VBufferD3D[2].sz = FltResZBuf - FltResZORhw * vtx2->rhw;
 		VBufferD3D[2].rhw = vtx2->rhw;
-		VBufferD3D[2].color = shadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx2->g, true);
+		VBufferD3D[2].color = GetShadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx2->g, true);
 		VBufferD3D[2].tu = (double)texture->uv[2].u / (double)PHD_ONE;
 		VBufferD3D[2].tv = (double)texture->uv[2].v / (double)PHD_ONE;
 
@@ -1540,7 +1552,7 @@ void InsertGT4_ZBuffered(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_VBU
 		VBufferD3D[3].sy = vtx3->ys;
 		VBufferD3D[3].sz = FltResZBuf - FltResZORhw * vtx3->rhw;
 		VBufferD3D[3].rhw = vtx3->rhw;
-		VBufferD3D[3].color = shadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx3->g, true);
+		VBufferD3D[3].color = GetShadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx3->g, true);
 		VBufferD3D[3].tu = (double)texture->uv[3].u / (double)PHD_ONE;
 		VBufferD3D[3].tv = (double)texture->uv[3].v / (double)PHD_ONE;
 
@@ -1562,7 +1574,7 @@ void InsertGT4_ZBuffered(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_VBU
 }
 
 short* InsertObjectGT4_ZBuffered(short* ptrObj, int number, SORTTYPE sortType) {
-	PHD_VBUF* vtx0, * vtx1, * vtx2, * vtx3;
+	PHD_VBUF* vtx0, *vtx1, *vtx2, *vtx3;
 	PHD_TEXTURE* texture;
 
 	for (int i = 0; i < number; ++i) {
@@ -1571,14 +1583,13 @@ short* InsertObjectGT4_ZBuffered(short* ptrObj, int number, SORTTYPE sortType) {
 		vtx2 = &PhdVBuf[ptrObj[2]];
 		vtx3 = &PhdVBuf[ptrObj[3]];
 		texture = &PhdTextureInfo[ptrObj[4]];
-
 		if (texture->drawtype != DRAW_Opaque)
 			InsertGT4_Sorted(vtx0, vtx1, vtx2, vtx3, texture, sortType);
 		else
 			InsertGT4_ZBuffered(vtx0, vtx1, vtx2, vtx3, texture);
-
 		ptrObj += 5;
 	}
+
 	return ptrObj;
 }
 
@@ -1725,7 +1736,7 @@ void DrawPoly_Gouraud(int vtxCount, int red, int green, int blue) {
 		return;
 
 	for (int i = 0; i < vtxCount; ++i) {
-		color = shadeColor(red, green, blue, 0xFF, (DWORD)VBuffer[i].g, false);
+		color = GetShadeColor(red, green, blue, 0xFF, (DWORD)VBuffer[i].g, false);
 
 		VBufferD3D[i].sx = VBuffer[i].x;
 		VBufferD3D[i].sy = VBuffer[i].y;
@@ -1855,7 +1866,7 @@ void InsertFlatRect_ZBuffered(int x0, int y0, int x1, int y1, int z, BYTE colorI
 
 	CLAMP(z, PhdNearZ, PhdFarZ);
 
-	color = shadeColor(GamePalette8[colorIdx].red, GamePalette8[colorIdx].green, GamePalette8[colorIdx].blue, 0xFF, 0, false);
+	color = GetShadeColor(GamePalette8[colorIdx].red, GamePalette8[colorIdx].green, GamePalette8[colorIdx].blue, 0xFF, 0, false);
 	rhw = RhwFactor / (double)z;
 	sz = FltResZBuf - rhw * FltResZORhw;
 
@@ -1890,7 +1901,7 @@ void InsertLine_ZBuffered(int x0, int y0, int x1, int y1, int z, BYTE colorIdx) 
 		z = PhdNearZ;
 	}
 
-	color = shadeColor(GamePalette8[colorIdx].red, GamePalette8[colorIdx].green, GamePalette8[colorIdx].blue, 0xFF, 0, false);
+	color = GetShadeColor(GamePalette8[colorIdx].red, GamePalette8[colorIdx].green, GamePalette8[colorIdx].blue, 0xFF, 0, false);
 	rhw = RhwFactor / (double)z;
 	sz = FltResZBuf - rhw * FltResZORhw;
 
@@ -1918,7 +1929,6 @@ void InsertGT3_Sorted(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_TEXTUR
 
 	clipOR = LOBYTE(vtx0->clip | vtx1->clip | vtx2->clip);
 	clipAND = LOBYTE(vtx0->clip & vtx1->clip & vtx2->clip);
-
 	if (clipAND != 0)
 		return;
 
@@ -1946,7 +1956,7 @@ void InsertGT3_Sorted(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_TEXTUR
 			HWR_VertexPtr[0].sy = vtx0->ys;
 			HWR_VertexPtr[0].sz = FltResZBuf - FltResZORhw * vtx0->rhw; // NOTE: there was bug because of uninitialized sz and rhw
 			HWR_VertexPtr[0].rhw = vtx0->rhw;
-			HWR_VertexPtr[0].color = shadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx0->g, true);
+			HWR_VertexPtr[0].color = GetShadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx0->g, true);
 			HWR_VertexPtr[0].tu = (double)uv0->u / (double)PHD_ONE;
 			HWR_VertexPtr[0].tv = (double)uv0->v / (double)PHD_ONE;
 
@@ -1954,7 +1964,7 @@ void InsertGT3_Sorted(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_TEXTUR
 			HWR_VertexPtr[1].sy = vtx1->ys;
 			HWR_VertexPtr[1].sz = FltResZBuf - FltResZORhw * vtx1->rhw; // NOTE: there was bug because of uninitialized sz and rhw
 			HWR_VertexPtr[1].rhw = vtx1->rhw;
-			HWR_VertexPtr[1].color = shadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx1->g, true);
+			HWR_VertexPtr[1].color = GetShadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx1->g, true);
 			HWR_VertexPtr[1].tu = (double)uv1->u / (double)PHD_ONE;
 			HWR_VertexPtr[1].tv = (double)uv1->v / (double)PHD_ONE;
 
@@ -1962,7 +1972,7 @@ void InsertGT3_Sorted(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_TEXTUR
 			HWR_VertexPtr[2].sy = vtx2->ys;
 			HWR_VertexPtr[2].sz = FltResZBuf - FltResZORhw * vtx2->rhw; // NOTE: there was bug because of uninitialized sz and rhw
 			HWR_VertexPtr[2].rhw = vtx2->rhw;
-			HWR_VertexPtr[2].color = shadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx2->g, true);
+			HWR_VertexPtr[2].color = GetShadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx2->g, true);
 			HWR_VertexPtr[2].tu = (double)uv2->u / (double)PHD_ONE;
 			HWR_VertexPtr[2].tv = (double)uv2->v / (double)PHD_ONE;
 
@@ -2064,7 +2074,7 @@ void InsertClippedPoly_Textured(int vtxCount, float z, short polyType, short tex
 		HWR_VertexPtr[i].sy = VBuffer[i].y;
 		HWR_VertexPtr[i].sz = FltResZBuf - FltResZORhw * VBuffer[i].rhw; // NOTE: there was bug because of uninitialized sz and rhw
 		HWR_VertexPtr[i].rhw = VBuffer[i].rhw;
-		HWR_VertexPtr[i].color = shadeColor(0xFF, 0xFF, 0xFF, 0xFF, VBuffer[i].g, true);
+		HWR_VertexPtr[i].color = GetShadeColor(0xFF, 0xFF, 0xFF, 0xFF, VBuffer[i].g, true);
 		HWR_VertexPtr[i].tu = tu;
 		HWR_VertexPtr[i].tv = tv;
 	}
@@ -2102,7 +2112,7 @@ void InsertGT4_Sorted(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_VBUF* 
 		HWR_VertexPtr[0].sy = vtx0->ys;
 		HWR_VertexPtr[0].sz = FltResZBuf - FltResZORhw * vtx0->rhw; // NOTE: there was bug because of uninitialized sz and rhw
 		HWR_VertexPtr[0].rhw = vtx0->rhw;
-		HWR_VertexPtr[0].color = shadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx0->g, true);
+		HWR_VertexPtr[0].color = GetShadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx0->g, true);
 		HWR_VertexPtr[0].tu = (double)texture->uv[0].u / (double)PHD_ONE;
 		HWR_VertexPtr[0].tv = (double)texture->uv[0].v / (double)PHD_ONE;
 
@@ -2110,7 +2120,7 @@ void InsertGT4_Sorted(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_VBUF* 
 		HWR_VertexPtr[1].sy = vtx1->ys;
 		HWR_VertexPtr[1].sz = FltResZBuf - FltResZORhw * vtx1->rhw; // NOTE: there was bug because of uninitialized sz and rhw
 		HWR_VertexPtr[1].rhw = vtx1->rhw;
-		HWR_VertexPtr[1].color = shadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx1->g, true);
+		HWR_VertexPtr[1].color = GetShadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx1->g, true);
 		HWR_VertexPtr[1].tu = (double)texture->uv[1].u / (double)PHD_ONE;
 		HWR_VertexPtr[1].tv = (double)texture->uv[1].v / (double)PHD_ONE;
 
@@ -2118,7 +2128,7 @@ void InsertGT4_Sorted(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_VBUF* 
 		HWR_VertexPtr[2].sy = vtx2->ys;
 		HWR_VertexPtr[2].sz = FltResZBuf - FltResZORhw * vtx2->rhw; // NOTE: there was bug because of uninitialized sz and rhw
 		HWR_VertexPtr[2].rhw = vtx2->rhw;
-		HWR_VertexPtr[2].color = shadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx2->g, true);
+		HWR_VertexPtr[2].color = GetShadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx2->g, true);
 		HWR_VertexPtr[2].tu = (double)texture->uv[2].u / (double)PHD_ONE;
 		HWR_VertexPtr[2].tv = (double)texture->uv[2].v / (double)PHD_ONE;
 
@@ -2126,7 +2136,7 @@ void InsertGT4_Sorted(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_VBUF* 
 		HWR_VertexPtr[3].sy = vtx3->ys;
 		HWR_VertexPtr[3].sz = FltResZBuf - FltResZORhw * vtx3->rhw; // NOTE: there was bug because of uninitialized sz and rhw
 		HWR_VertexPtr[3].rhw = vtx3->rhw;
-		HWR_VertexPtr[3].color = shadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx3->g, true);
+		HWR_VertexPtr[3].color = GetShadeColor(0xFF, 0xFF, 0xFF, 0xFF, vtx3->g, true);
 		HWR_VertexPtr[3].tu = (double)texture->uv[3].u / (double)PHD_ONE;
 		HWR_VertexPtr[3].tv = (double)texture->uv[3].v / (double)PHD_ONE;
 
@@ -2322,7 +2332,7 @@ void InsertPoly_Gouraud(int vtxCount, float z, int red, int green, int blue, sho
 		HWR_VertexPtr[i].sy = VBuffer[i].y;
 		HWR_VertexPtr[i].sz = FltResZBuf - FltResZORhw * VBuffer[i].rhw; // NOTE: there was bug because of uninitialized sz and rhw
 		HWR_VertexPtr[i].rhw = VBuffer[i].rhw;
-		HWR_VertexPtr[i].color = shadeColor(red, green, blue, alpha, VBuffer[i].g, false);
+		HWR_VertexPtr[i].color = GetShadeColor(red, green, blue, alpha, VBuffer[i].g, false);
 	}
 
 	HWR_VertexPtr += vtxCount;
@@ -2450,10 +2460,8 @@ void InsertSprite_Sorted(int z, int x0, int y0, int x1, int y1, int spriteIdx, s
 	y0 += PhdWinMinY;
 	x1 += PhdWinMinX;
 	y1 += PhdWinMinY;
-
 	if (z < PhdNearZ)
 		z = PhdNearZ;
-
 	rhw = RhwFactor / (double)z;
 
 	uOffset = LOBYTE(PhdSpriteInfo[spriteIdx].offset) * 256;
@@ -2476,7 +2484,6 @@ void InsertSprite_Sorted(int z, int x0, int y0, int x1, int y1, int spriteIdx, s
 
 	u0 = rhw * (double)(uOffset - adjustment + PhdSpriteInfo[spriteIdx].width);
 	v0 = rhw * (double)(vOffset + adjustment);
-
 	u1 = rhw * (double)(uOffset + adjustment);
 	v1 = rhw * (double)(vOffset - adjustment + PhdSpriteInfo[spriteIdx].height);
 
@@ -2530,7 +2537,9 @@ void InsertSprite_Sorted(int z, int x0, int y0, int x1, int y1, int spriteIdx, s
 		polyType = blend[(flags & SPR_BLEND) >> 29];
 	}
 	InsertClippedPoly_Textured(nPoints, (float)z, polyType, PhdSpriteInfo[spriteIdx].texPage);
-	GlobalTint = 0;
+	if (CHK_ANY(flags, SPR_TINT)) {
+		GlobalTint = 0;
+	}
 #else // FEATURE_VIDEOFX_IMPROVED
 	InsertClippedPoly_Textured(nPoints, (float)z, POLY_HWR_WGTmap, PhdSpriteInfo[spriteIdx].texPage);
 #endif // FEATURE_VIDEOFX_IMPROVED
@@ -2562,7 +2571,7 @@ void InsertFlatRect_Sorted(int x0, int y0, int x1, int y1, int z, BYTE colorIdx)
 	*(D3DTLVERTEX**)Info3dPtr = HWR_VertexPtr;
 	Info3dPtr += sizeof(D3DTLVERTEX*) / sizeof(short);
 
-	color = shadeColor(GamePalette8[colorIdx].red, GamePalette8[colorIdx].green, GamePalette8[colorIdx].blue, 0xFF, 0, false);
+	color = GetShadeColor(GamePalette8[colorIdx].red, GamePalette8[colorIdx].green, GamePalette8[colorIdx].blue, 0xFF, 0, false);
 	rhw = RhwFactor / (float)z;
 	sz = FltResZBuf - rhw * FltResZORhw;
 
@@ -2585,39 +2594,42 @@ void InsertFlatRect_Sorted(int x0, int y0, int x1, int y1, int z, BYTE colorIdx)
 	++SurfaceCount;
 }
 
-void InsertLine_Sorted(int x0, int y0, int x1, int y1, int z, BYTE colorIdx) {
-	double rhw, sz;
-	D3DCOLOR color;
-
+static D3DTLVERTEX* InsertVertices(POLYTYPE type, int z, int vertexCount)
+{
+	if (HWR_VertexBufferFull())
+		return NULL;
 	Sort3dPtr->_0 = (DWORD)Info3dPtr;
 	Sort3dPtr->_1 = MAKE_ZSORT(z);
 	++Sort3dPtr;
-
-	*(Info3dPtr++) = POLY_HWR_line;
-	*(Info3dPtr++) = 2; //  vertex count
-	*(D3DTLVERTEX**)Info3dPtr = HWR_VertexPtr;
+	*(Info3dPtr++) = type;
+	*(Info3dPtr++) = vertexCount; //  vertex count
+	D3DTLVERTEX* oldPos = HWR_VertexPtr;
+	*(D3DTLVERTEX**)Info3dPtr = oldPos;
 	Info3dPtr += sizeof(D3DTLVERTEX*) / sizeof(short);
-
-	color = shadeColor(GamePalette8[colorIdx].red, GamePalette8[colorIdx].green, GamePalette8[colorIdx].blue, 0xFF, 0, false);
-	rhw = RhwFactor / (double)z;
-	sz = FltResZBuf - rhw * FltResZORhw;
-
-	HWR_VertexPtr[0].sx = (float)(PhdWinMinX + x0);
-	HWR_VertexPtr[0].sy = (float)(PhdWinMinY + y0);
-	HWR_VertexPtr[1].sx = (float)(PhdWinMinX + x1);
-	HWR_VertexPtr[1].sy = (float)(PhdWinMinY + y1);
-
-	for (int i = 0; i < 2; ++i) {
-		HWR_VertexPtr[i].color = color;
-		HWR_VertexPtr[i].sz = sz; // NOTE: there was bug because of uninitialized sz and rhw
-		HWR_VertexPtr[i].rhw = rhw;
-	}
-
-	HWR_VertexPtr += 2;
-	++SurfaceCount;
+	HWR_VertexPtr += vertexCount;
+	SurfaceCount++;
+	return oldPos;
 }
 
-void InsertTrans8_Sorted(PHD_VBUF * vbuf, short shade) {
+void InsertLine_Sorted(int x0, int y0, int x1, int y1, int z, BYTE colorIdx) {
+	D3DTLVERTEX* vtx = InsertVertices(POLY_HWR_line, z, 2);
+	if (vtx == NULL) return;
+	RGB888* color = &GamePalette8[colorIdx];
+	D3DCOLOR shade = GetShadeColor(color->red, color->green, color->blue, 0xFF, 0, false);
+	D3DVALUE rhw = RhwFactor / (D3DVALUE)z;
+	D3DVALUE sz = FltResZBuf - rhw * FltResZORhw;
+	vtx[0].sx = (D3DVALUE)(PhdWinMinX + x0);
+	vtx[0].sy = (D3DVALUE)(PhdWinMinY + y0);
+	vtx[1].sx = (D3DVALUE)(PhdWinMinX + x1);
+	vtx[1].sy = (D3DVALUE)(PhdWinMinY + y1);
+	for (int i = 0; i < 2; ++i) {
+		vtx[i].color = shade;
+		vtx[i].sz = sz; // NOTE: there was bug because of uninitialized sz and rhw
+		vtx[i].rhw = rhw;
+	}
+}
+
+void InsertTrans8_Sorted(PHD_VBUF* vbuf, short shade) {
 	int i, nPoints, polyZ;
 	char clipOR = 0x00;
 	char clipAND = 0xFF;

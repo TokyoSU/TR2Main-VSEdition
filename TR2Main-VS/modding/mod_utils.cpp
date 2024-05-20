@@ -388,36 +388,30 @@ void ModConfig::FreePolyfilterNodes(POLYFILTER_NODE** data)
     *data = NULL;
 }
 
-bool ModConfig::IsCompatibleFilter(short* ptrObj, bool isRoomMesh, POLYFILTER* filter)
+bool ModConfig::IsCompatibleFilterObjects(short* ptrObj, POLYFILTER* filter)
 {
     if (!ptrObj || !filter || !filter->n_vtx) return true;
-    if (!isRoomMesh) {
-        ptrObj += 5; // skip x, y, z, radius, flags
-    }
+    ptrObj += 5; // skip x, y, z, radius, flags
     short num = *(ptrObj++); // get vertex counter
     if (num != filter->n_vtx) return false;
-    ptrObj += num * (isRoomMesh ? 6 : 3); // skip vertices
-    if (!isRoomMesh) {
-        num = *(ptrObj++); // get normal counter
-        ptrObj += (num > 0) ? num * 3 : ABS(num); // skip normals/shades
-    }
+    ptrObj += num * 3; // skip vertices
+    num = *(ptrObj++); // get normal counter
+    ptrObj += (num > 0) ? num * 3 : ABS(num); // skip normals/shades
     num = *(ptrObj++); // get gt4 number
     if (num != filter->n_gt4) return false;
     ptrObj += num * 5; // skip gt4 polys
     num = *(ptrObj++); // get gt3 number
     if (num != filter->n_gt3) return false;
-    if (!isRoomMesh) {
-        ptrObj += num * 4; // skip gt3 polys
-        num = *(ptrObj++); // get g4 number
-        if (num != filter->n_g4) return false;
-        ptrObj += num * 5; // skip g4 polys
-        num = *(ptrObj++); // get g3 number
-        if (num != filter->n_g3) return false;
-    }
+    ptrObj += num * 4; // skip gt3 polys
+    num = *(ptrObj++); // get g4 number
+    if (num != filter->n_g4) return false;
+    ptrObj += num * 5; // skip g4 polys
+    num = *(ptrObj++); // get g3 number
+    if (num != filter->n_g3) return false;
     return true;
 }
 
-short* ModConfig::EnumeratePolysSpecific(short* ptrObj, int vtxCount, bool colored, ENUM_POLYS_CB callback, POLYINDEX* filter, LPVOID param)
+short* ModConfig::EnumeratePolysSpecificObjects(short* ptrObj, int vtxCount, bool colored, ENUM_POLYS_OBJECTS_CB callback, POLYINDEX* filter, LPVOID param)
 {
     int polyNumber = *ptrObj++;
     if (filter == NULL || (!filter[0].idx && !filter[0].num)) {
@@ -449,31 +443,76 @@ short* ModConfig::EnumeratePolysSpecific(short* ptrObj, int vtxCount, bool color
     return ptrObj;
 }
 
-bool ModConfig::EnumeratePolys(short* ptrObj, bool isRoomMesh, ENUM_POLYS_CB callback, POLYFILTER* filter, LPVOID param)
+void ModConfig::EnumeratePolysSpecificRoomFace4(FACE4* ptrObj, int faceCount, bool colored, ENUM_POLYS_FACE4_CB callback, POLYINDEX* filter, LPVOID param)
+{
+    if (filter == NULL || (!filter[0].idx && !filter[0].num)) {
+        for (int i = 0; i < faceCount; ++i) {
+            if (!callback(&ptrObj[i], 4, colored, param))
+                return;
+        }
+    }
+    else
+    {
+        for (int i = 0; i < POLYFILTER_SIZE; ++i)
+        {
+            if (!callback(&ptrObj[filter[i].idx], filter[i].num - 1, colored, param))
+                LogWarn("Failed to setup the room face4 index: %d, at number: %d", filter[i].idx, filter[i].num - 1);
+        }
+    }
+}
+
+void ModConfig::EnumeratePolysSpecificRoomFace3(FACE3* ptrObj, int faceCount, bool colored, ENUM_POLYS_FACE3_CB callback, POLYINDEX* filter, LPVOID param)
+{
+    if (filter == NULL || (!filter[0].idx && !filter[0].num)) {
+        for (int i = 0; i < faceCount; ++i) {
+            if (!callback(&ptrObj[i], 3, colored, param))
+                return;
+        }
+    }
+    else
+    {
+        for (int i = 0; i < POLYFILTER_SIZE; ++i)
+        {
+            if (!callback(&ptrObj[filter[i].idx], filter[i].num - 1, colored, param))
+                LogWarn("Failed to setup the room face3 index: %d, at number: %d", filter[i].idx, filter[i].num - 1);
+        }
+    }
+}
+
+bool ModConfig::EnumeratePolysObjects(short* ptrObj, ENUM_POLYS_OBJECTS_CB callback, POLYFILTER* filter, LPVOID param)
 {
     if (ptrObj == NULL || callback == NULL) return false; // wrong parameters
-    if (!IsCompatibleFilter(ptrObj, isRoomMesh, filter)) return false; // filter is not compatible
+    if (!IsCompatibleFilterObjects(ptrObj, filter)) return false; // filter is not compatible
 
-    short num;
-    if (!isRoomMesh) {
-        ptrObj += 5; // skip x, y, z, radius, flags
-    }
-    num = *(ptrObj++); // get vertex counter
-    ptrObj += num * (isRoomMesh ? 6 : 3); // skip vertices
-    if (!isRoomMesh) {
-        num = *(ptrObj++); // get normal counter
-        ptrObj += (num > 0) ? num * 3 : ABS(num); // skip normals/shades
-    }
-    ptrObj = EnumeratePolysSpecific(ptrObj, 4, false, callback, filter ? filter->gt4 : NULL, param); // enumerate textured quads
+    ptrObj += 5; // skip x, y, z, radius, flags
+    short num = *(ptrObj++); // get vertex counter
+    ptrObj += num * 3; // skip vertices
+    num = *(ptrObj++); // get normal counter
+    ptrObj += (num > 0) ? num * 3 : ABS(num); // skip normals/shades
+    ptrObj = EnumeratePolysSpecificObjects(ptrObj, 4, false, callback, filter ? filter->gt4 : NULL, param); // enumerate textured quads
     if (ptrObj == NULL) return true;
-    ptrObj = EnumeratePolysSpecific(ptrObj, 3, false, callback, filter ? filter->gt3 : NULL, param); // enumerate textured triangles
-    if (!isRoomMesh) {
-        if (ptrObj == NULL) return true;
-        ptrObj = EnumeratePolysSpecific(ptrObj, 4, true, callback, filter ? filter->g4 : NULL, param); // enumerate colored quads
-        if (ptrObj == NULL) return true;
-        ptrObj = EnumeratePolysSpecific(ptrObj, 3, true, callback, filter ? filter->g3 : NULL, param); // enumerate colored triangles
-    }
+    ptrObj = EnumeratePolysSpecificObjects(ptrObj, 3, false, callback, filter ? filter->gt3 : NULL, param); // enumerate textured triangles
+    if (ptrObj == NULL) return true;
+    ptrObj = EnumeratePolysSpecificObjects(ptrObj, 4, true, callback, filter ? filter->g4 : NULL, param); // enumerate colored quads
+    if (ptrObj == NULL) return true;
+    ptrObj = EnumeratePolysSpecificObjects(ptrObj, 3, true, callback, filter ? filter->g3 : NULL, param); // enumerate colored triangles
     return true;
+}
+
+bool ModConfig::EnumeratePolysRoomFace3(FACE3* ptrObj, int faceCount, ENUM_POLYS_FACE3_CB callback, POLYFILTER* filter, LPVOID param)
+{
+    if (ptrObj == NULL) return false; // wrong parameters
+    if (faceCount != filter->n_gt3) return false;
+    EnumeratePolysSpecificRoomFace3(ptrObj, faceCount, false, callback, filter ? filter->gt3 : NULL, param); // enumerate textured triangles
+    return false;
+}
+
+bool ModConfig::EnumeratePolysRoomFace4(FACE4* ptrObj, int faceCount, ENUM_POLYS_FACE4_CB callback, POLYFILTER* filter, LPVOID param)
+{
+    if (ptrObj == NULL) return false; // wrong parameters
+    if (faceCount != filter->n_gt4) return false;
+    EnumeratePolysSpecificRoomFace4(ptrObj, faceCount, false, callback, filter ? filter->gt4 : NULL, param); // enumerate textured triangles
+    return false;
 }
 
 int ModConfig::ParsePolyString(LPCSTR str, POLYINDEX* lst, DWORD lstLen) {

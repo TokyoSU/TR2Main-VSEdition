@@ -171,34 +171,30 @@ void S_DrawPickup(int sx, int sy, int scale, short spriteIdx, short shade) {
 	}
 }
 
-short* ins_room_sprite(short* ptrObj, int vtxCount) {
+void ins_room_sprite(ROOM_SPRITE* ptrObj, int spriteCount) {
 	PHD_VBUF* vbuf;
 	PHD_SPRITE* sprite;
 	double zp;
 	int x1, y1, x2, y2;
 
-	for (int i = 0; i < vtxCount; ++i) {
-		vbuf = &PhdVBuf[*ptrObj];
+	for (int i = 0; i < spriteCount; ++i, ++ptrObj) {
+		vbuf = &PhdVBuf[ptrObj->vertex];
 		if ((vbuf->clip & 0x80) == 0) {
-			sprite = &PhdSpriteInfo[ptrObj[1]];
+			sprite = &PhdSpriteInfo[ptrObj->spriteIndex];
 			zp = (double)vbuf->zv / (double)PhdPersp;
-
 			x1 = (int)((vbuf->xv + (double)((int)sprite->x1 << W2V_SHIFT)) / zp) + PhdWinCenterX;
 			y1 = (int)((vbuf->yv + (double)((int)sprite->y1 << W2V_SHIFT)) / zp) + PhdWinCenterY;
 			x2 = (int)((vbuf->xv + (double)((int)sprite->x2 << W2V_SHIFT)) / zp) + PhdWinCenterX;
 			y2 = (int)((vbuf->yv + (double)((int)sprite->y2 << W2V_SHIFT)) / zp) + PhdWinCenterY;
-
 			if (x2 >= PhdWinLeft && y2 >= PhdWinTop && x1 < PhdWinRight && y1 < PhdWinBottom) {
 #ifdef FEATURE_VIDEOFX_IMPROVED
-				ins_sprite((int)vbuf->zv, x1, y1, x2, y2, ptrObj[1], vbuf->g, 0);
+				ins_sprite((int)vbuf->zv, x1, y1, x2, y2, ptrObj->spriteIndex, vbuf->g, NULL);
 #else // FEATURE_VIDEOFX_IMPROVED
-				ins_sprite((int)vbuf->zv, x1, y1, x2, y2, ptrObj[1], vbuf->g);
+				ins_sprite((int)vbuf->zv, x1, y1, x2, y2, ptrObj->spriteIndex, vbuf->g);
 #endif // FEATURE_VIDEOFX_IMPROVED
 			}
 		}
-		ptrObj += 2;
 	}
-	return ptrObj;
 }
 
 void S_DrawScreenSprite2d(int sx, int sy, int sz, int scaleH, int scaleV, short spriteIdx, short shade, UINT16 flags) {
