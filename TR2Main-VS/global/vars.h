@@ -40,9 +40,7 @@
 #define ARRAY_(address, type, length)	(*(type(*)length)(address)) // array (can be multidimensional)
 
 // Macros values.
-
 #define WEAPON_UNLIMITED 10001
-
 #define PISTOLS_AMMO_DEFAULT 1000
 #define AUTOPISTOLS_AMMO_CLIPS 40
 #define UZIS_AMMO_CLIPS 80
@@ -51,26 +49,27 @@
 #define HARPOON_AMMO_CLIPS 3
 #define M16_AMMO_CLIPS 40
 #define GRENADE_AMMO_CLIPS 2
-
 #define FLARE_AMMO_CLIPS 6
 
 /*
  * General Variables
  */
  // 3D insert function variables
-#define ins_trans_quad		(*(void(__cdecl **)(int,int,int,int,int))				0x00470318)
-#define ins_poly_trans8		(*(void(__cdecl **)(PHD_VBUF*,short))					0x0047032C)
-#define ins_flat_rect		(*(void(__cdecl **)(int,int,int,int,int,BYTE))			0x0047805C)
-#ifdef FEATURE_VIDEOFX_IMPROVED
-#define ins_sprite			(*(void(__cdecl **)(int,int,int,int,int,int,short,DWORD))	0x004B2A10)
-#else // FEATURE_VIDEOFX_IMPROVED
-#define ins_sprite			(*(void(__cdecl **)(int,int,int,int,int,int,short))	0x004B2A10)
-#endif // FEATURE_VIDEOFX_IMPROVED
-#define ins_objectGT3		(*(short*(__cdecl **)(short*,int,SORTTYPE))			0x004B2A1C)
-#define ins_objectGT4		(*(short*(__cdecl **)(short*,int,SORTTYPE))			0x004B2A20)
-#define ins_line			(*(void(__cdecl **)(int,int,int,int,int,BYTE))			0x004B2AE8)
-#define ins_objectG4		(*(short*(__cdecl **)(short*,int,SORTTYPE))			0x004BCAF8)
-#define ins_objectG3		(*(short*(__cdecl **)(short*,int,SORTTYPE))			0x004BCB40)
+extern void(*ins_trans_quad)(int x, int y, int width, int height, int z); // 0x00470318
+extern void(*ins_poly_trans8)(PHD_VBUF* vbuf, short shade); // 0x0047032C
+extern void(*ins_flat_rect)(int, int, int, int, int, BYTE); // 0x0047805C
+#if defined(FEATURE_VIDEOFX_IMPROVED)
+extern void(*ins_sprite)(int, int, int, int, int, int, short, DWORD); // 0x004B2A10
+#else
+extern void(*ins_sprite)(int, int, int, int, int, int, short); // 0x004B2A10
+#endif
+extern short*(*ins_objectGT3)(short*, int, SORTTYPE); // 0x004B2A1C
+extern short*(*ins_objectGT4)(short*, int, SORTTYPE); // 0x004B2A20
+extern void(*ins_line)(int, int, int, int, int, BYTE); // 0x004B2AE8
+extern short*(*ins_objectG4)(short*, int, SORTTYPE); // 0x004BCAF8
+extern short*(*ins_objectG3)(short*, int, SORTTYPE); // 0x004BCB40
+extern void(*ins_roomGT3)(FACE3*, int, SORTTYPE); // ----------
+extern void(*ins_roomGT4)(FACE4*, int, SORTTYPE); // ----------
 
 #define SfxFunctions			(*(void(__cdecl *(*)[32])(ITEM_INFO*))				0x004641F8)
 #define EffectFunctions			(*(void(__cdecl *(*)[32])(ITEM_INFO*))				0x004641F8)

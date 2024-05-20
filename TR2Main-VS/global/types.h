@@ -59,7 +59,7 @@ typedef struct {
 
  // General values
 #define REQ_LEVEL_VERSION	(45)
-#define ARRAY_SIZE(a) (sizeof(a)/sizeof(*(a)))
+#define ARRAY_SIZE(a) _countof(a)
 #define NUMBER_ITEMS 1024
 #define MAX_SAVEGAME_BUFFER(bufferSize) ((bufferSize * 1024) + 128) // bufferSize in KB
 
@@ -319,7 +319,7 @@ typedef struct {
 	D3DVALUE sx, sy, sz, rhw;
 	D3DCOLOR color, specular;
 	D3DVALUE tu, tv;
-} D3DTLVERTEX, * LPD3DTLVERTEX;
+} D3DTLVERTEX, *LPD3DTLVERTEX;
 
 typedef D3DLOCKED_RECT DDSDESC, * LPDDSDESC;
 typedef LPDIRECT3DSURFACE9 LPDDS;
@@ -928,6 +928,7 @@ typedef enum {
 	GBUF_RoomTextures,
 	GBUF_RoomInfos,
 	GBUF_RoomMesh,
+	GBUF_RoomMeshData,
 	GBUF_RoomDoor,
 	GBUF_RoomFloor,
 	GBUF_RoomLights,
@@ -962,6 +963,7 @@ typedef enum {
 	GBUF_CLUTs,
 	GBUF_TextureInfos,
 	GBUF_SpriteInfos,
+	GBUF_Max
 } GAMEALLOC_BUFFER;
 
 typedef enum {
@@ -1309,8 +1311,6 @@ typedef struct {
 	DWORD PSX_rightcolor[6];
 	DWORD PSX_framecolor[6];
 } BAR_CONFIG;
-
-typedef bool (*ENUM_POLYS_CB) (short* ptrObj, int vtxCount, bool colored, LPVOID param);
 
 typedef struct {
 	bool isLoaded;
@@ -2086,8 +2086,44 @@ typedef struct MeshInfo_t {
 	short staticNumber;
 } MESH_INFO;
 
+typedef struct RoomVertex_t {
+	short x;
+	short y;
+	short z;
+	short lightBase;
+	BYTE lightTableValue;
+	BYTE flags;
+	short lightAdder;
+} ROOM_VERTEX;
+
+typedef struct Face4_t {
+	short vertices[4];
+	short texture;
+} FACE4;
+
+typedef struct Face3_t {
+	short vertices[3];
+	short texture;
+} FACE3;
+
+typedef struct RoomSprite_t {
+	short vertex;
+	short spriteIndex;
+} ROOM_SPRITE;
+
+typedef struct RoomData_t {
+	USHORT vtxSize;
+	ROOM_VERTEX* vertices;
+	USHORT gt4Size;
+	FACE4* gt4;
+	USHORT gt3Size;
+	FACE3* gt3;
+	USHORT spriteSize;
+	ROOM_SPRITE* sprites;
+} ROOM_DATA;
+
 typedef struct RoomInfo_t {
-	short* data;
+	ROOM_DATA* data;
 	DOOR_INFOS* doors;
 	FLOOR_INFO* floor;
 	LIGHT_INFO* light;
@@ -2502,6 +2538,10 @@ static inline short GetSectorBoxXZ(ITEM_INFO* item, ROOM_INFO* room) {
 		return -1;
 	return floor->box;
 }
+
+typedef bool (*ENUM_POLYS_OBJECTS_CB) (short* ptrObj, int vtxCount, bool colored, LPVOID param);
+typedef bool (*ENUM_POLYS_FACE4_CB) (FACE4* ptrObj, int faceCount, bool colored, LPVOID param);
+typedef bool (*ENUM_POLYS_FACE3_CB) (FACE3* ptrObj, int faceCount, bool colored, LPVOID param);
 
 #pragma pack(pop)
 

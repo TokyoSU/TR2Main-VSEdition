@@ -63,13 +63,33 @@ extern bool LoadingScreensEnabled;
 #endif // FEATURE_HUD_IMPROVED
 
 #ifdef FEATURE_VIDEOFX_IMPROVED
-static bool MarkSemitransPoly(short* ptrObj, int vtxCount, bool colored, LPVOID param) {
+static bool MarkSemitransPolyObjects(short* ptrObj, int vtxCount, bool colored, LPVOID param) {
 	UINT16 index = ptrObj[vtxCount];
 	if (colored) {
 		GamePalette16[index >> 8].peFlags = 1; // semitransparent blending mode 1
 	}
 	else {
 		PhdTextureInfo[index].drawtype = DRAW_Semitrans;
+	}
+	return true;
+}
+static bool MarkSemitransPolyFace3(FACE3* ptrObj, int vtxCount, bool colored, LPVOID param) {
+	FACE3* face = &ptrObj[vtxCount];
+	if (colored) {
+		GamePalette16[face->texture >> 8].peFlags = 1; // semitransparent blending mode 1
+	}
+	else {
+		PhdTextureInfo[face->texture].drawtype = DRAW_Semitrans;
+	}
+	return true;
+}
+static bool MarkSemitransPolyFace4(FACE4* ptrObj, int vtxCount, bool colored, LPVOID param) {
+	FACE4* face = &ptrObj[vtxCount];
+	if (colored) {
+		GamePalette16[face->texture >> 8].peFlags = 1; // semitransparent blending mode 1
+	}
+	else {
+		PhdTextureInfo[face->texture].drawtype = DRAW_Semitrans;
 	}
 	return true;
 }
@@ -90,7 +110,7 @@ static bool MarkSemitransMesh(int objID, int meshIdx, POLYFILTER* filter) {
 		if (!obj->loaded || meshIdx >= obj->nMeshes) return false; // no such object/mesh for patching
 		ptrObj = MeshPtr[obj->meshIndex + meshIdx];
 	}
-	return Mod.EnumeratePolys(ptrObj, false, MarkSemitransPoly, filter, NULL);
+	return Mod.EnumeratePolysObjects(ptrObj, MarkSemitransPolyObjects, filter, NULL);
 }
 
 static void MarkSemitransObjects() {
@@ -109,7 +129,9 @@ static void MarkSemitransObjects() {
 		}
 		for (node = Mod.semitrans.rooms; node != NULL; node = node->next) {
 			if (node->id >= 0 && node->id < RoomCount) {
-				Mod.EnumeratePolys(RoomInfo[node->id].data, true, MarkSemitransPoly, &node->filter, NULL);
+				ROOM_INFO* room = &RoomInfo[node->id];
+				Mod.EnumeratePolysRoomFace4(room->data->gt4, room->data->gt4Size, MarkSemitransPolyFace4, &node->filter, NULL);
+				Mod.EnumeratePolysRoomFace3(room->data->gt3, room->data->gt3Size, MarkSemitransPolyFace3, &node->filter, NULL);
 			}
 		}
 		return;
@@ -465,7 +487,7 @@ BOOL LoadTexturePages(HANDLE hFile) {
 
 BOOL LoadRooms(HANDLE hFile) {
 	DWORD bytesRead;
-	DWORD dwCount;
+	DWORD dwCount, dwMeshSize;
 	short wCount;
 
 	// Get number of rooms
@@ -484,75 +506,126 @@ BOOL LoadRooms(HANDLE hFile) {
 
 	// For every room read info
 	for (int i = 0; i < RoomCount; ++i) {
+		ROOM_INFO* room = &RoomInfo[i];
+
 		// Room position
-		ReadFileSync(hFile, &RoomInfo[i].x, sizeof(int), &bytesRead, NULL);
-		ReadFileSync(hFile, &RoomInfo[i].z, sizeof(int), &bytesRead, NULL);
-		RoomInfo[i].y = 0;
+		ReadFileSync(hFile, &room->x, sizeof(int), &bytesRead, NULL);
+		ReadFileSync(hFile, &room->z, sizeof(int), &bytesRead, NULL);
+		room->y = 0;
 
 		// Room floor/ceiling
-		ReadFileSync(hFile, &RoomInfo[i].minFloor, sizeof(int), &bytesRead, NULL);
-		ReadFileSync(hFile, &RoomInfo[i].maxCeiling, sizeof(int), &bytesRead, NULL);
+		ReadFileSync(hFile, &room->minFloor, sizeof(int), &bytesRead, NULL);
+		ReadFileSync(hFile, &room->maxCeiling, sizeof(int), &bytesRead, NULL);
 
 		// Room mesh
-		ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
-		RoomInfo[i].data = (short*)game_malloc(sizeof(short) * dwCount, GBUF_RoomMesh);
-		ReadFileSync(hFile, RoomInfo[i].data, sizeof(short) * dwCount, &bytesRead, NULL);
+		ReadFileSync(hFile, &dwMeshSize, sizeof(DWORD), &bytesRead, NULL); // Dummy size, only used for load it fully on short* data, but that's the old way !
+		room->data = (ROOM_DATA*)game_malloc(sizeof(ROOM_DATA), GBUF_RoomMeshData);
+		
+		// Room vertices
+		ReadFileSync(hFile, &room->data->vtxSize, sizeof(USHORT), &bytesRead, NULL);
+		room->data->vertices = (ROOM_VERTEX*)game_malloc(sizeof(ROOM_VERTEX) * room->data->vtxSize, GBUF_RoomMeshData);
+		for (int j = 0; j < room->data->vtxSize; j++)
+		{
+			ROOM_VERTEX* vertice = &room->data->vertices[j];
+			ReadFileSync(hFile, &vertice->x, sizeof(short), &bytesRead, NULL); // posX
+			ReadFileSync(hFile, &vertice->y, sizeof(short), &bytesRead, NULL); // posY
+			ReadFileSync(hFile, &vertice->z, sizeof(short), &bytesRead, NULL); // posZ
+			ReadFileSync(hFile, &vertice->lightBase, sizeof(short), &bytesRead, NULL); // lightning1
+			ReadFileSync(hFile, &vertice->lightTableValue, sizeof(BYTE), &bytesRead, NULL); // attributes
+			ReadFileSync(hFile, &vertice->flags, sizeof(BYTE), &bytesRead, NULL); // attributes
+			ReadFileSync(hFile, &vertice->lightAdder, sizeof(short), &bytesRead, NULL); // lighting2
+		}
 
-		// Doors
+		// Room quads
+		ReadFileSync(hFile, &room->data->gt4Size, sizeof(USHORT), &bytesRead, NULL);
+		room->data->gt4 = (FACE4*)game_malloc(sizeof(FACE4) * room->data->gt4Size, GBUF_RoomMeshData);
+		for (int j = 0; j < room->data->gt4Size; j++)
+		{
+			FACE4* face = &room->data->gt4[j];
+			ReadFileSync(hFile, &face->vertices[0], sizeof(short), &bytesRead, NULL);
+			ReadFileSync(hFile, &face->vertices[1], sizeof(short), &bytesRead, NULL);
+			ReadFileSync(hFile, &face->vertices[2], sizeof(short), &bytesRead, NULL);
+			ReadFileSync(hFile, &face->vertices[3], sizeof(short), &bytesRead, NULL);
+			ReadFileSync(hFile, &face->texture, sizeof(short), &bytesRead, NULL);
+		}
+
+		// Room triangles
+		ReadFileSync(hFile, &room->data->gt3Size, sizeof(USHORT), &bytesRead, NULL);
+		room->data->gt3 = (FACE3*)game_malloc(sizeof(FACE3) * room->data->gt3Size, GBUF_RoomMeshData);
+		for (int j = 0; j < room->data->gt3Size; j++)
+		{
+			FACE3* face = &room->data->gt3[j];
+			ReadFileSync(hFile, &face->vertices[0], sizeof(USHORT), &bytesRead, NULL);
+			ReadFileSync(hFile, &face->vertices[1], sizeof(USHORT), &bytesRead, NULL);
+			ReadFileSync(hFile, &face->vertices[2], sizeof(USHORT), &bytesRead, NULL);
+			ReadFileSync(hFile, &face->texture, sizeof(USHORT), &bytesRead, NULL);
+		}
+
+		// Room sprites
+		ReadFileSync(hFile, &room->data->spriteSize, sizeof(USHORT), &bytesRead, NULL);
+		room->data->sprites = (ROOM_SPRITE*)game_malloc(sizeof(ROOM_SPRITE) * room->data->spriteSize, GBUF_RoomMeshData);
+		for (int j = 0; j < room->data->spriteSize; j++)
+		{
+			ROOM_SPRITE* sprite = &room->data->sprites[j];
+			ReadFileSync(hFile, &sprite->vertex, sizeof(short), &bytesRead, NULL);
+			ReadFileSync(hFile, &sprite->spriteIndex, sizeof(short), &bytesRead, NULL);
+		}
+
+		// Doors (Portals)
 		ReadFileSync(hFile, &wCount, sizeof(short), &bytesRead, NULL);
 		if (wCount == 0) {
-			RoomInfo[i].doors = NULL;
+			room->doors = NULL;
 		}
 		else {
-			RoomInfo[i].doors = (DOOR_INFOS*)game_malloc(sizeof(short) + sizeof(DOOR_INFO) * wCount, GBUF_RoomDoor);
-			RoomInfo[i].doors->wCount = wCount;
-			ReadFileSync(hFile, &RoomInfo[i].doors->door, sizeof(DOOR_INFO) * wCount, &bytesRead, NULL);
+			room->doors = (DOOR_INFOS*)game_malloc(sizeof(short) + sizeof(DOOR_INFO) * wCount, GBUF_RoomDoor);
+			room->doors->wCount = wCount;
+			ReadFileSync(hFile, &room->doors->door, sizeof(DOOR_INFO) * wCount, &bytesRead, NULL);
 		}
 
 		// Room floor
-		ReadFileSync(hFile, &RoomInfo[i].xSize, sizeof(short), &bytesRead, NULL);
-		ReadFileSync(hFile, &RoomInfo[i].ySize, sizeof(short), &bytesRead, NULL);
-		dwCount = RoomInfo[i].xSize * RoomInfo[i].ySize;
-		RoomInfo[i].floor = (FLOOR_INFO*)game_malloc(sizeof(FLOOR_INFO) * dwCount, GBUF_RoomFloor);
-		ReadFileSync(hFile, RoomInfo[i].floor, sizeof(FLOOR_INFO) * dwCount, &bytesRead, NULL);
+		ReadFileSync(hFile, &room->xSize, sizeof(short), &bytesRead, NULL);
+		ReadFileSync(hFile, &room->ySize, sizeof(short), &bytesRead, NULL);
+		dwCount = room->xSize * room->ySize;
+		room->floor = (FLOOR_INFO*)game_malloc(sizeof(FLOOR_INFO) * dwCount, GBUF_RoomFloor);
+		ReadFileSync(hFile, room->floor, sizeof(FLOOR_INFO) * dwCount, &bytesRead, NULL);
 
 		// Room lights
-		ReadFileSync(hFile, &RoomInfo[i].ambient1, sizeof(short), &bytesRead, NULL);
-		ReadFileSync(hFile, &RoomInfo[i].ambient2, sizeof(short), &bytesRead, NULL);
-		ReadFileSync(hFile, &RoomInfo[i].lightMode, sizeof(short), &bytesRead, NULL);
-		ReadFileSync(hFile, &RoomInfo[i].numLights, sizeof(short), &bytesRead, NULL);
-		if (RoomInfo[i].numLights == 0) {
-			RoomInfo[i].light = NULL;
+		ReadFileSync(hFile, &room->ambient1, sizeof(short), &bytesRead, NULL);
+		ReadFileSync(hFile, &room->ambient2, sizeof(short), &bytesRead, NULL);
+		ReadFileSync(hFile, &room->lightMode, sizeof(short), &bytesRead, NULL);
+		ReadFileSync(hFile, &room->numLights, sizeof(short), &bytesRead, NULL);
+		if (room->numLights == 0) {
+			room->light = NULL;
 		}
 		else {
-			RoomInfo[i].light = (LIGHT_INFO*)game_malloc(sizeof(LIGHT_INFO) * RoomInfo[i].numLights, GBUF_RoomLights);
-			ReadFileSync(hFile, RoomInfo[i].light, sizeof(LIGHT_INFO) * RoomInfo[i].numLights, &bytesRead, NULL);
+			room->light = (LIGHT_INFO*)game_malloc(sizeof(LIGHT_INFO) * room->numLights, GBUF_RoomLights);
+			ReadFileSync(hFile, room->light, sizeof(LIGHT_INFO) * room->numLights, &bytesRead, NULL);
 		}
 
 		// Static mesh infos
-		ReadFileSync(hFile, &RoomInfo[i].numMeshes, sizeof(short), &bytesRead, NULL);
-		if (RoomInfo[i].numMeshes == 0) {
-			RoomInfo[i].mesh = NULL;
+		ReadFileSync(hFile, &room->numMeshes, sizeof(short), &bytesRead, NULL);
+		if (room->numMeshes == 0) {
+			room->mesh = NULL;
 		}
 		else {
-			RoomInfo[i].mesh = (MESH_INFO*)game_malloc(sizeof(MESH_INFO) * RoomInfo[i].numMeshes, GBUF_RoomStaticMeshInfos);
-			ReadFileSync(hFile, RoomInfo[i].mesh, sizeof(MESH_INFO) * RoomInfo[i].numMeshes, &bytesRead, NULL);
+			room->mesh = (MESH_INFO*)game_malloc(sizeof(MESH_INFO) * room->numMeshes, GBUF_RoomStaticMeshInfos);
+			ReadFileSync(hFile, room->mesh, sizeof(MESH_INFO) * room->numMeshes, &bytesRead, NULL);
 		}
 
 		// Flipped (alternative) room
-		ReadFileSync(hFile, &RoomInfo[i].flippedRoom, sizeof(short), &bytesRead, NULL);
+		ReadFileSync(hFile, &room->flippedRoom, sizeof(short), &bytesRead, NULL);
 
 		// Room flags
-		ReadFileSync(hFile, &RoomInfo[i].flags, sizeof(short), &bytesRead, NULL);
+		ReadFileSync(hFile, &room->flags, sizeof(short), &bytesRead, NULL);
 
 		// Initialise some variables
-		RoomInfo[i].boundActive = 0;
-		RoomInfo[i].boundLeft = PhdWinMaxX;
-		RoomInfo[i].boundTop = PhdWinMaxY;
-		RoomInfo[i].boundRight = 0;
-		RoomInfo[i].boundBottom = 0;
-		RoomInfo[i].itemNumber = -1;
-		RoomInfo[i].fxNumber = -1;
+		room->boundActive = 0;
+		room->boundLeft = PhdWinMaxX;
+		room->boundTop = PhdWinMaxY;
+		room->boundRight = 0;
+		room->boundBottom = 0;
+		room->itemNumber = -1;
+		room->fxNumber = -1;
 	}
 
 	// Read floor data

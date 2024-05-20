@@ -391,7 +391,7 @@ void ClipRoom(ROOM_INFO* room) {
 
 void PrintRooms(short roomNumber) {
 	ROOM_INFO* room = &RoomInfo[roomNumber];
-#ifdef FEATURE_VIEW_IMPROVED
+#if defined(FEATURE_VIEW_IMPROVED)
 	if (CHK_ANY(room->boundActive, 4)) {
 		return;
 	}
@@ -410,15 +410,15 @@ void PrintRooms(short roomNumber) {
 	PhdWinBottom = room->boundBottom;
 	S_LightRoom(room);
 	if (OutsideCamera > 0 && !CHK_ANY(room->flags, ROOM_INSIDE)) {
-		S_InsertRoom(room->data, 1);
+		S_InsertRoom(room->data, TRUE);
 	}
 	else {
 		if (OutsideCamera >= 0) {
 			ClipRoom(room);
 		}
-		S_InsertRoom(room->data, 0);
+		S_InsertRoom(room->data, FALSE);
 	}
-#ifdef FEATURE_VIEW_IMPROVED
+#if defined(FEATURE_VIEW_IMPROVED)
 	room->boundActive |= 4;
 #endif // FEATURE_VIEW_IMPROVED
 }
