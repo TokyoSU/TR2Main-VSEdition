@@ -120,6 +120,7 @@ extern short InvOptionObjectsCount;
 #define XGen_y1						VAR_I_(0x0046C2FC, int,				0)
 
 // Uninitialized variables
+extern int PhdFov;
 #define PhdWinTop					VAR_U_(0x0046E300, int)
 #define LsAdder						VAR_U_(0x00470308, int)
 #define FltWinBottom				VAR_U_(0x0047030C, float)

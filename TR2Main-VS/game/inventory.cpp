@@ -763,6 +763,10 @@ int Display_Inventory(INVENTORY_MODE invMode) {
 		S_CDVolume(MusicVolume * 25 + 5);
 #endif // FEATURE_AUDIO_IMPROVED
 	}
+
+	// NOTE: Not exist in the original code,
+	// The inventory change the fov to 90 instead of 80 but not reset it back !
+	AlterFOV(PhdFov);
 	return 0;
 }
 

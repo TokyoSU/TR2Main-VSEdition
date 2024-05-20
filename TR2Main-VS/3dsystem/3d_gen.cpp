@@ -51,6 +51,8 @@ PHD_SPRITE PhdSpriteInfo[2048];
 D3DTLVERTEX HWR_VertexBuffer[0x8000];
 #endif // FEATURE_EXTENDED_LIMITS
 
+int PhdFov;
+
 #ifdef FEATURE_VIEW_IMPROVED
 bool PsxFovEnabled;
 
@@ -818,7 +820,6 @@ void do_quickysorty(int left, int right) {
 		while ((i < right) && (SortBuffer[i]._1 > compare)) ++i;
 		while ((left < j) && (compare > SortBuffer[j]._1)) --j;
 		if (i > j) break;
-
 		SWAP(SortBuffer[i]._0, SortBuffer[j]._0, swapBuf);
 		SWAP(SortBuffer[i]._1, SortBuffer[j]._1, swapBuf);
 	} while (++i <= --j);
@@ -920,11 +921,12 @@ void phd_InitWindow(short x, short y, int width, int height, int nearZ, int farZ
 	WaterFogEndDepth = (int)(baseDistance * WaterFogEndFactor);
 #endif // FEATURE_VIEW_IMPROVED
 
+	PhdFov = ANGLE(viewAngle);
 	PhdNearZ = nearZ << W2V_SHIFT;
 	PhdFarZ = farZ << W2V_SHIFT;
 	PhdViewDistance = farZ;
 
-	AlterFOV(PHD_DEGREE * viewAngle); // convert degrees to PHD angle
+	AlterFOV(PhdFov); // convert degrees to PHD angle
 	phd_SetNearZ(PhdNearZ);
 	phd_SetFarZ(PhdFarZ);
 

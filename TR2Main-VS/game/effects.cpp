@@ -419,7 +419,7 @@ void lara_normal_effect(ITEM_INFO* item) {
 	item->animNumber = 11;
 	item->frameNumber = Anims[item->animNumber].frameBase;
 	Camera.type = CAM_Chase;
-	AlterFOV(ANGLE(80));
+	AlterFOV(PhdFov); // Reset the fov back to original.
 }
 
 void BoilerFX(ITEM_INFO* item) {

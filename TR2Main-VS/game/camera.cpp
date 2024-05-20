@@ -43,12 +43,10 @@ void InitialiseCamera() {
 	Camera.target.y = Camera.shift;
 	Camera.target.z = LaraItem->pos.z;
 	Camera.target.roomNumber = LaraItem->roomNumber;
-
 	Camera.pos.x = Camera.target.x;
 	Camera.pos.y = Camera.target.y;
 	Camera.pos.z = Camera.target.z - 100;
 	Camera.pos.roomNumber = Camera.target.roomNumber;
-
 	Camera.targetDistance = CAM_DISTANCE;
 	Camera.item = NULL;
 	Camera.numberFrames = 1;
@@ -60,7 +58,7 @@ void InitialiseCamera() {
 	Camera.bounce = 0;
 	Camera.number = -1;
 	Camera.fixedCamera = 0;
-	AlterFOV(80 * PHD_DEGREE);
+	AlterFOV(PhdFov);
 	CalculateCamera();
 }
 
