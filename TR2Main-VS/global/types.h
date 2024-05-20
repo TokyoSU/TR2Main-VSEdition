@@ -2189,16 +2189,6 @@ typedef struct VertexInfo_t {
 	float g;
 } VERTEX_INFO;
 
-typedef struct RoomVertexInfo_t {
-	short x;
-	short y;
-	short z;
-	short lightBase;
-	BYTE lightTableValue;
-	BYTE flags;
-	short lightAdder;
-} ROOM_VERTEX_INFO;
-
 typedef struct AnimStruct_t {
 	short* framePtr;
 	short interpolation;
