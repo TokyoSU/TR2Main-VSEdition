@@ -72,7 +72,7 @@ bool ModConfig::LoadJson(LPCSTR filePath) {
     if (ext != NULL) *ext = 0;
 
     LogDebug("Level configuration loaded !");
-    LogDebug("LevelFilename: %s", levelName);
+    //LogDebug("LevelFilename: %s", levelName);
 
     for (size_t i = 0; i < strlen(levelName); i++)
         levelName[i] = std::toupper(levelName[i]);
@@ -354,6 +354,10 @@ void ModConfig::ParseLevelConfiguration(Value& data, LPCSTR currentLevel) {
                 if (level.HasMember("semitransparent")) LoadSemitransConfig(level["semitransparent"], &semitrans);
                 if (level.HasMember("reflective")) LoadReflectConfig(level["reflective"], &reflect);
                 break;
+            }
+            else
+            {
+                LogWarn("Failed to load level configuration, filename entry: %s not found, instead found: %s", currentLevel, level["filename"].GetString());
             }
         }
         else

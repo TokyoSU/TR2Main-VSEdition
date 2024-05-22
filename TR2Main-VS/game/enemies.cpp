@@ -22,8 +22,10 @@
 #include "precompiled.h"
 #include "game/enemies.h"
 #include "game/box.h"
+#include "game/items.h"
 #include "game/larafire.h"
 #include "game/effects.h"
+#include "game/missile.h"
 #include "game/sound.h"
 #include "specific/game.h"
 #include "global/vars.h"
@@ -54,6 +56,28 @@ enum MonkState
 };
 
 static const BITE_INFO MonkBite = { -23, 16, 265, 14 };
+
+short Knife(int x, int y, int z, short speed, short rotY, short roomNum)
+{
+	short fxNum = CreateEffect(roomNum);
+	if (fxNum != -1)
+	{
+		FX_INFO* fx = &Effects[fxNum];
+		fx->pos.x = x;
+		fx->pos.y = y;
+		fx->pos.z = z;
+		fx->roomNumber = roomNum;
+		fx->pos.rotZ = 0;
+		fx->pos.rotX = 0;
+		fx->pos.rotY = rotY;
+		fx->speed = 150;
+		fx->frameNumber = 0;
+		fx->objectID = ID_MISSILE_KNIFE;
+		fx->shade = 0xE00;
+		ShootAtLara(fx);
+	}
+	return fxNum;
+}
 
 void MonkControl(short itemID)
 {
@@ -258,11 +282,28 @@ void MonkControl(short itemID)
 	CreatureAnimation(itemID, angle, 0);
 }
 
+void WarriorSparkleTrail(ITEM_INFO* item)
+{
+	short fxNum = CreateEffect(item->roomNumber);
+	if (fxNum != -1)
+	{
+		FX_INFO* fx = &Effects[fxNum];
+		fx->objectID = ID_TWINKLE;
+		fx->pos.x = (GetRandomDraw() << 8 >> 15) + item->pos.x - 128;
+		fx->pos.y = (GetRandomDraw() << 8 >> 15) + item->pos.y - 256;
+		fx->pos.z = (GetRandomDraw() << 8 >> 15) + item->pos.z - 128;
+		fx->roomNumber = item->roomNumber;
+		fx->counter = -30;
+		fx->frameNumber = 0;
+	}
+	PlaySoundEffect(312, &item->pos, 0);
+}
+
  /*
   * Inject function
   */
 void Inject_Enemies() {
-	//INJECT(0x0041DB30, Knife);
+	INJECT(0x0041DB30, Knife);
 	//INJECT(0x0041DBB0, Cult2Control);
 	INJECT(0x0041DFE0, MonkControl);
 	//INJECT(0x0041E4B0, Worker3Control);
@@ -270,6 +311,6 @@ void Inject_Enemies() {
 	//INJECT(0x0041EEC0, XianDamage);
 	//INJECT(0x0041EF70, InitialiseXianLord);
 	//INJECT(0x0041EFD0, XianLordControl);
-	//INJECT(0x0041F5B0, WarriorSparkleTrail);
+	INJECT(0x0041F5B0, WarriorSparkleTrail);
 	//INJECT(0x0041F650, WarriorControl);
 }

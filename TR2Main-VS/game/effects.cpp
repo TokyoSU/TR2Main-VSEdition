@@ -36,6 +36,8 @@
 #include "specific/sndpc.h"
 #include "global/vars.h"
 
+FX_INFO Effects[MAX_EFFECTS];
+
 int ItemNearLara(PHD_3DPOS* pos, int distance) {
 	int dx, dy, dz;
 	short* frame;
@@ -145,11 +147,9 @@ void Richochet(GAME_VECTOR* pos) {
 }
 
 void ControlRichochet1(short fxID) {
-	FX_INFO* fx;
-
-	fx = &Effects[fxID];
-	--fx->counter;
-	if (!fx->counter)
+	FX_INFO* fx = &Effects[fxID];
+	fx->counter--;
+	if (fx->counter <= 0)
 		KillEffect(fxID);
 }
 

@@ -24,6 +24,7 @@
 #include "3dsystem/phd_math.h"
 #include "game/box.h"
 #include "game/control.h"
+#include "game/draw.h"
 #include "game/effects.h"
 #include "game/items.h"
 #include "game/larafire.h"
@@ -127,6 +128,36 @@ BOOL Targetable2(ITEM_INFO* item, AI_INFO* info, int srcHeight, int targetHeight
 	return FALSE;
 }
 
+void ControlGlow(short fxNum)
+{
+	FX_INFO* fx = &Effects[fxNum];
+	fx->counter--;
+	if (fx->counter)
+	{
+		fx->shade += fx->speed;
+		fx->frameNumber += fx->fallspeed;
+	}
+	else
+	{
+		KillEffect(fxNum);
+	}
+}
+
+void ControlGunShot(short fxNum)
+{
+	FX_INFO* fx = &Effects[fxNum];
+	fx->counter--;
+	if (fx->counter)
+	{
+		fx->pos.rotZ = GetRandomControl();
+		AddDynamicLight(fx->pos.x, fx->pos.y, fx->pos.z, 12, 11);
+	}
+	else
+	{
+		KillEffect(fxNum);
+	}
+}
+
 short GunShot(int x, int y, int z, short speed, short rotY, short roomNumber) {
 #ifdef FEATURE_VIDEOFX_IMPROVED
 	if (AlphaBlendMode) {
@@ -218,7 +249,6 @@ BOOL ShotTargetNew(ITEM_INFO* item, AI_INFO* AI, const BITE_INFO* bite, short an
 	BOOL isHit = FALSE, isTargetable = FALSE;
 	int distance = 0, random = 0;
 	short fxIdx = -1, smashIdx = -1;
-
 
 	if (AI->distance > PEOPLE_TARGET_DISTANCE || !Targetable(item, AI))
 	{
@@ -671,8 +701,8 @@ void WinstonControl(short itemID) {
  */
 void Inject_People() {
 	INJECT(0x00435EB0, Targetable);
-	//INJECT(0x00435F40, ControlGlow);
-	//INJECT(0x00435F80, ControlGunShot);
+	INJECT(0x00435F40, ControlGlow);
+	INJECT(0x00435F80, ControlGunShot);
 	INJECT(0x00435FD0, GunShot);
 	INJECT(0x00436040, GunHit);
 	INJECT(0x00436100, GunMiss);

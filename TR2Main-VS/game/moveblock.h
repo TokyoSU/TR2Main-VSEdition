@@ -27,19 +27,14 @@
  /*
   * Function list
   */
-  //0x004339A0:		InitialiseMovingBlock
-
+#define InitialiseMovingBlock ((void(__cdecl*)(short)) 0x004339A0)
 #define MovableBlock ((void(__cdecl*)(short)) 0x004339D0)
-
-//0x00433B20:		MovableBlockCollision
+#define MovableBlockCollision ((void(__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x00433B20)
 //0x00433D80:		TestBlockMovable
 //0x00433DD0:		TestBlockPush
 //0x00433F20:		TestBlockPull
-
-#define AlterFloorHeight ((void(__cdecl*)(ITEM_INFO *, int)) 0x00434160)
-
-//0x00434220:		DrawMovableBlock
-
-#define DrawUnclippedItem ((void(__cdecl*)(ITEM_INFO *)) 0x00434250)
+#define AlterFloorHeight ((void(__cdecl*)(ITEM_INFO*, int)) 0x00434160)
+#define DrawMovableBlock ((void(__cdecl*)(ITEM_INFO*)) 0x00434220)
+#define DrawUnclippedItem ((void(__cdecl*)(ITEM_INFO*)) 0x00434250)
 
 #endif // MOVE_BLOCK_H_INCLUDED

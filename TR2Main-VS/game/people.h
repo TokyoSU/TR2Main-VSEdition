@@ -29,8 +29,8 @@
   */
 BOOL Targetable(ITEM_INFO* item, AI_INFO* info); // 0x00435EB0
 BOOL Targetable2(ITEM_INFO* item, AI_INFO* info, int srcHeight, int targetHeight, int range = BLOCK(8));
-// 0x00435F40: ControlGlow
-// 0x00435F80: ControlGunShot
+void ControlGlow(short fxNum); // 0x00435F40
+void ControlGunShot(short fxNum); // 0x00435F80
 short GunShot(int x, int y, int z, short speed, short rotY, short roomNumber); // 0x00435FD0
 short GunHit(int x, int y, int z, short speed, short rotY, short roomNumber); // 0x00436040
 short GunMiss(int x, int y, int z, short speed, short rotY, short roomNumber); // 0x00436100

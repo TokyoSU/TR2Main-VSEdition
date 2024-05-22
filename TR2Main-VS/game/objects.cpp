@@ -27,8 +27,40 @@
 #include "game/items.h"
 #include "game/missile.h"
 #include "game/sound.h"
+#include "specific/game.h"
 #include "specific/init.h"
 #include "global/vars.h"
+
+void BigBowlControl(short itemID)
+{
+	ITEM_INFO* item = &Items[itemID];
+	if (item->currentAnimState == 1)
+	{
+		short fxNum = CreateEffect(item->roomNumber);
+		if (fxNum != -1)
+		{
+			FX_INFO* fx = &Effects[fxNum];
+			fx->objectID = ID_HOT_LIQUID;
+			fx->pos.x = item->pos.x + CLICK(2);
+			fx->pos.y = item->pos.y + 612;
+			fx->pos.z = item->pos.z + CLICK(2);
+			fx->roomNumber = item->roomNumber;
+			fx->frameNumber = Objects[fx->objectID].nMeshes * GetRandomDraw() >> 15;
+			fx->fallspeed = 0;
+			fx->shade = 0x800;
+		}
+		item->timer++;
+		if (item->timer == 150)
+		{
+			FlipMaps[4] = IFL_CODEBITS|IFL_ONESHOT;                     // CODEBITS|ONESHOT
+			if (!FlipStatus)
+				FlipMap();
+		}
+	}
+	AnimateItem(item);
+	if (item->status == ITEM_DISABLED && item->timer >= (FRAMES_PER_SECOND * 7)) // 7 seconds
+		RemoveActiveItem(itemID);
+}
 
 void BellControl(short itemID) {
 	ITEM_INFO* item = &Items[itemID];
@@ -182,7 +214,7 @@ void LiftControl(short itemID) {
 		ItemNewRoom(itemID, roomID);
 }
 
-void LiftFloorCeiling(ITEM_INFO* item, int x, int y, int z, int* floor, int* ceiling) {
+void LiftFloorCeiling(ITEM_INFO* item, int x, int y, int z, short* floor, short* ceiling) {
 	int liftX, liftZ, laraX, laraZ;
 	BOOL inside;
 
@@ -245,15 +277,15 @@ void LiftFloorCeiling(ITEM_INFO* item, int x, int y, int z, int* floor, int* cei
 	}
 }
 
-void LiftFloor(ITEM_INFO* item, int x, int y, int z, int* height) {
-	int floor, ceiling;
+void LiftFloor(ITEM_INFO* item, int x, int y, int z, short* height) {
+	short floor, ceiling;
 	LiftFloorCeiling(item, x, y, z, &floor, &ceiling);
 	if (floor < *height)
 		*height = floor;
 }
 
-void LiftCeiling(ITEM_INFO* item, int x, int y, int z, int* height) {
-	int floor, ceiling;
+void LiftCeiling(ITEM_INFO* item, int x, int y, int z, short* height) {
+	short floor, ceiling;
 	LiftFloorCeiling(item, x, y, z, &floor, &ceiling);
 	if (ceiling > *height)
 		*height = ceiling;
@@ -273,7 +305,7 @@ void Inject_Objects() {
 	//INJECT(0x004348B0, ControlGongBonger);
 	//INJECT(0x00434970, DeathSlideCollision);
 	//INJECT(0x00434A30, ControlDeathSlide);
-	//INJECT(0x00434CC0, BigBowlControl);
+	INJECT(0x00434CC0, BigBowlControl);
 	INJECT(0x00434DB0, BellControl);
 	INJECT(0x00434E30, InitialiseWindow);
 	INJECT(0x00434EB0, SmashWindow);

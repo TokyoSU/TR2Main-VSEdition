@@ -61,7 +61,7 @@ void FlameEmitterControl(short item_id); // 0x00442BE0
 void FlameControl(short fx_id); // 0x00442C70
 void LaraBurn(); // 0x00442DE0
 void LavaBurn(ITEM_INFO* item); // 0x00442E30
-#define LavaSpray ((void(__cdecl*)(short)) 0x00442F20)
-#define ControlLavaBlob ((void(__cdecl*)(short)) 0x00442FF0)
+void LavaSpray(short itemNum); // 0x00442F20
+void ControlLavaBlob(short fxNum); // 0x00442FF0
 
 #endif // TRAPS_H_INCLUDED

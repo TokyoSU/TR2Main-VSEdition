@@ -27,7 +27,7 @@
  /*
   * Function list
   */
-  //0x0041DB30:		Knife
+short Knife(int x, int y, int z, short speed, short rotY, short roomNum); // 0x0041DB30
 #define Cult2Control ((void(__cdecl*)(short)) 0x0041DBB0)
 void MonkControl(short itemID); // 0x0041DFE0
 #define Worker3Control ((void(__cdecl*)(short)) 0x0041E4B0)
@@ -35,7 +35,7 @@ void MonkControl(short itemID); // 0x0041DFE0
 //0x0041EEC0:		XianDamage
 #define InitialiseXianLord ((void(__cdecl*)(short)) 0x0041EF70)
 #define XianLordControl ((void(__cdecl*)(short)) 0x0041EFD0)
-//0x0041F5B0:		WarriorSparkleTrail
+void WarriorSparkleTrail(ITEM_INFO* item); // 0x0041F5B0
 #define WarriorControl ((void(__cdecl*)(short)) 0x0041F650)
 
 #endif // ENEMIES_H_INCLUDED

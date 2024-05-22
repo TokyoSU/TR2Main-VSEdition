@@ -39,8 +39,8 @@ void GetNewRoom(int x, int y, int z, short roomID); // 0x00413480
 //0x004137C0:		EffectSpaz
 #define CreatureCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x00413840)
 #define ObjectCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x004138C0)
-//0x00413920:		DoorCollision
-//0x004139A0:		TrapCollision
+#define DoorCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x00413920)
+#define TrapCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x004139A0)
 #define ItemPushLara ((void(__cdecl*)(ITEM_INFO*, ITEM_INFO*, COLL_INFO*, BOOL, BOOL)) 0x00413A10)
 #define TestBoundsCollide ((int(__cdecl*)(ITEM_INFO*, ITEM_INFO*, int)) 0x00413D20)
 #define TestLaraPosition ((int(__cdecl*)(short*,ITEM_INFO*,ITEM_INFO*)) 0x00413DF0)

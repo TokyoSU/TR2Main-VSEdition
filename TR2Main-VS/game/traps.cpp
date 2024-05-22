@@ -173,6 +173,7 @@ void HookControl(short itemID) {
 	if (item->touchBits && !IsHookHit) {
 		LaraItem->hitPoints -= 50;
 		LaraItem->hitStatus = 1;
+		IsHookHit = TRUE;
 		DoLotsOfBlood(LaraItem->pos.x, LaraItem->pos.y - 512, LaraItem->pos.z, LaraItem->speed, LaraItem->pos.rotY, LaraItem->roomNumber, 3);
 	}
 	else {
@@ -821,6 +822,58 @@ void LavaBurn(ITEM_INFO* item) {
 	}
 }
 
+void LavaSpray(short itemNum)
+{
+	ITEM_INFO* item = &Items[itemNum];
+	short fxNum = CreateEffect(item->roomNumber);
+	if (fxNum != -1)
+	{
+		FX_INFO* fx = &Effects[fxNum];
+		fx->pos.x = item->pos.x;
+		fx->pos.y = item->pos.y;
+		fx->pos.z = item->pos.z;
+		fx->pos.rotY = (GetRandomControl() - 0x4000) * 2;
+		fx->speed = GetRandomControl() >> 10;
+		fx->fallspeed = -GetRandomControl() / 200;
+		fx->frameNumber = -GetRandomControl() * 4 / 0x7FFF;
+		fx->objectID = ID_LAVA;
+		PlaySoundEffect(149, &item->pos, 0);
+	}
+}
+
+void ControlLavaBlob(short fxNum)
+{
+	FX_INFO* fx = &Effects[fxNum];
+
+	fx->fallspeed += 6;
+	fx->pos.x += fx->speed * phd_sin(fx->pos.rotY) >> W2V_SHIFT;
+	fx->pos.y += fx->fallspeed;
+	fx->pos.z += fx->speed * phd_cos(fx->pos.rotY) >> W2V_SHIFT;
+
+	short newRoom = fx->roomNumber;
+	FLOOR_INFO* floor = GetFloor(fx->pos.x, fx->pos.y, fx->pos.z, &newRoom);
+	int height = GetHeight(floor, fx->pos.x, fx->pos.y, fx->pos.z);
+	int ceiling = GetCeiling(floor, fx->pos.x, fx->pos.y, fx->pos.z);
+
+	if (fx->pos.y >= height || fx->pos.y < ceiling)
+	{
+		KillEffect(fxNum);
+		return;
+	}
+
+	if (ItemNearLara(&fx->pos, 200))
+	{
+		LaraItem->hitPoints -= 10;
+		LaraItem->hitStatus = TRUE;
+		KillEffect(fxNum);
+		return;
+	}
+
+	if (newRoom != fx->roomNumber)
+		EffectNewRoom(fxNum, newRoom);
+
+}
+
 /*
  * Inject function
  */
@@ -858,6 +911,6 @@ void Inject_Traps() {
 	INJECT(0x00442C70, FlameControl);
 	INJECT(0x00442DE0, LaraBurn);
 	INJECT(0x00442E30, LavaBurn);
-	//INJECT(0x00442F20, LavaSpray);
-	//INJECT(0x00442FF0, ControlLavaBlob);
+	INJECT(0x00442F20, LavaSpray);
+	INJECT(0x00442FF0, ControlLavaBlob);
 }

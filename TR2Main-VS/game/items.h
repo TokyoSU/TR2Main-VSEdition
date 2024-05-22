@@ -28,25 +28,18 @@
   * Function list
   */
 void InitialiseItemArray(int itemCount); // 0x00426CD0
-
 #define KillItem ((void(__cdecl*)(short)) 0x00426D30)
 #define CreateItem ((short(__cdecl*)(void)) 0x00426E50)
-
 void InitialiseItem(short itemIndex); // 0x00426E90
-
 #define RemoveActiveItem ((void(__cdecl*)(short)) 0x00427050)
 #define RemoveDrawnItem ((void(__cdecl*)(short)) 0x004270E0)
-
 void AddActiveItem(short itemIndex); // 0x00427150
-
 #define ItemNewRoom ((void(__cdecl*)(short, short)) 0x004271B0)
-
 int GlobalItemReplace(int oldItemID, int newItemID); // 0x00427250
-
-#define InitialiseFXArray ((void(__cdecl*)(void)) 0x004272D0)
-#define CreateEffect ((short(__cdecl*)(short)) 0x00427300)
-#define KillEffect ((void(__cdecl*)(short)) 0x00427370)
-#define EffectNewRoom ((void(__cdecl*)(short, short)) 0x00427460)
+void InitialiseFXArray(); // 0x004272D0
+short CreateEffect(short roomNum); // 0x00427300
+void KillEffect(short fxNum); // 0x00427370
+void EffectNewRoom(short fxNum, short newRoomNum); // 0x00427460
 #define ClearBodyBag ((void(__cdecl*)(void)) 0x00427500)
 
 #endif // ITEMS_H_INCLUDED

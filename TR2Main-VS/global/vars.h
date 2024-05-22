@@ -51,6 +51,8 @@
 #define GRENADE_AMMO_CLIPS 2
 #define FLARE_AMMO_CLIPS 6
 
+#define MAX_EFFECTS 512                      // From 100
+
 /*
  * General Variables
  */
@@ -399,9 +401,10 @@ extern BYTE* SG_Point; // 0x0051E9C8: BYTE*
 extern DWORD SG_Count; // 0x005206A4: DWORD
 #define Lara						VAR_U_(0x005206E0, LARA_INFO)
 #define LaraItem					VAR_U_(0x005207BC, ITEM_INFO*)
-#define Effects						VAR_U_(0x005207C0, FX_INFO*)
+extern FX_INFO Effects[MAX_EFFECTS]; // VAR_U_(0x005207C0, FX_INFO*)
 #define NextItemFree				VAR_U_(0x005207C6, short)
 #define NextItemActive				VAR_U_(0x005207C8, short)
+#define NextEffectFree              VAR_U_(0x005207C4, short)
 #define NextEffectActive			VAR_U_(0x005207CA, short)
 #define PrevItemActive				VAR_U_(0x005207CC, short)
 #define SkipHairPhysics				VAR_U_(0x00521CD0, BOOL)

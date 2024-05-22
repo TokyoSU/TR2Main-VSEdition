@@ -22,8 +22,10 @@
 #include "precompiled.h"
 #include "game/setup.h"
 #include "game/bear.h"
+#include "game/boat.h"
 #include "game/box.h"
 #include "game/bird.h"
+#include "game/cinema.h"
 #include "game/collide.h"
 #include "game/diver.h"
 #include "game/dog.h"
@@ -31,8 +33,15 @@
 #include "game/draw.h"
 #include "game/eel.h"
 #include "game/enemies.h"
+#include "game/gameflow.h"
+#include "game/items.h"
+#include "game/invfunc.h"
+#include "game/text.h"
+#include "game/health.h"
 #include "game/hair.h"
+#include "game/lara1gun.h"
 #include "game/laramisc.h"
+#include "game/laraflare.h"
 #include "game/moveblock.h"
 #include "game/people.h"
 #include "game/rat.h"
@@ -40,7 +49,20 @@
 #include "game/skidoo.h"
 #include "game/spider.h"
 #include "game/wolf.h"
+#include "game/lot.h"
+#include "game/objects.h"
+#include "game/dragon.h"
 #include "game/yeti.h"
+#include "game/effects.h"
+#include "game/traps.h"
+#include "game/pickup.h"
+#include "game/missile.h"
+#include "game/sound.h"
+#include "game/savegame.h"
+#include "specific/sndpc.h"
+#include "specific/file.h"
+#include "specific/output.h"
+#include "specific/init.h"
 #include "specific/winmain.h"
 #include "global/vars.h"
 
@@ -52,14 +74,73 @@
 extern bool IsGold();
 #endif
 
+BOOL InitialiseLevel(int levelIndex, GF_LEVEL_TYPE type)
+{
+	if (type != GFL_TITLE && type != GFL_CUTSCENE)
+		CurrentLevel = levelIndex;
+
+	IsDemoLevelType = type == GFL_DEMO;
+	InitialiseGameFlags();
+	Lara.item_number = -1;
+	IsTitleLoaded = FALSE;
+
+	BOOL result;
+	if (type)
+	{
+		if (type == GFL_SAVED || type != GFL_CUTSCENE)
+			result = S_LoadLevelFile(GF_LevelFilesStringTable[levelIndex], levelIndex, type);
+		else
+			result = S_LoadLevelFile(GF_CutsFilesStringTable[levelIndex], levelIndex, GFL_CUTSCENE);
+	}
+	else
+	{
+		result = S_LoadLevelFile(GF_TitleFilesStringTable[0], levelIndex, GFL_TITLE);
+	}
+
+	if (result)
+	{
+		if (Lara.item_number != -1)
+			InitialiseLara(type);
+		if (type == GFL_NORMAL || type == GFL_SAVED || type == GFL_DEMO)
+			GetCarriedItems();
+		InitialiseFXArray();
+		InitialiseLOTarray();
+		InitColours();
+		T_InitPrint();
+		InitialisePickUpDisplay();
+		S_InitialiseScreen(type);
+		HealthBarTimer = 100;
+		SOUND_Stop();
+		if (type == GFL_SAVED)
+			ExtractSaveGameInfo();
+		else if (type == GFL_NORMAL)
+			GF_ModifyInventory(CurrentLevel, 0);
+
+		if (Objects[ID_FINAL_LEVEL_COUNTER].loaded)
+			InitialiseFinalLevel();
+
+		if (type == GFL_NORMAL || type == GFL_SAVED || type == GFL_DEMO)
+		{
+			if (TrackIDs[0])
+				S_CDPlay(TrackIDs[0], TRUE);
+		}
+
+		IsAssaultTimerActive = FALSE;
+		IsAssaultTimerDisplay = FALSE;
+		Camera.underwater = FALSE;
+
+		result = TRUE;
+	}
+	return result;
+}
+
 void InitialiseLevelFlags() {
 	memset(&SaveGame.statistics, 0, sizeof(STATISTICS_INFO));
 }
 
 void InitialiseObjects() {
-	OBJECT_INFO* obj = NULL;
 	for (int i = 0; i < ID_NUMBER_OBJECTS; ++i) {
-		obj = &Objects[i];
+		OBJECT_INFO* obj = &Objects[i];
 		obj->initialise = NULL;
 		obj->collision = NULL;
 		obj->control = NULL;
@@ -796,9 +877,9 @@ void BaddyObjects() {
 	}
 	obj = &Objects[ID_DRAGON_FRONT];
 	if (obj->loaded) {
-		if (!Objects[ID_BARTOLI].loaded) {
-			S_ExitSystem("FATAL: DRAGON_FRONT requires BARTOLI and DRAGON_BACK,\n- BARTOLI need to be placed and triggered instead.\n- DRAGON_BONE_FRONT and DRAGON_BONE_BACK is required, also SPHERE_OF_DOOM 1 to 3.");
-		}
+		//if (!Objects[ID_BARTOLI].loaded) {
+		//	S_ExitSystem("FATAL: DRAGON_FRONT requires BARTOLI and DRAGON_BACK,\n- BARTOLI need to be placed and triggered instead.\n- DRAGON_BONE_FRONT and DRAGON_BONE_BACK is required, also SPHERE_OF_DOOM 1 to 3.");
+		//}
 		obj->initialise = InitialiseCreature;
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
@@ -818,9 +899,9 @@ void BaddyObjects() {
 	}
 	obj = &Objects[ID_DRAGON_BACK];
 	if (obj->loaded) {
-		if (!Objects[ID_BARTOLI].loaded) {
-			S_ExitSystem("FATAL: DRAGON_BACK requires BARTOLI and DRAGON_FRONT,\n- BARTOLI need to be placed and triggered instead.\n- DRAGON_BONE_FRONT and DRAGON_BONE_BACK is required, also SPHERE_OF_DOOM 1 to 3.");
-		}
+		//if (!Objects[ID_BARTOLI].loaded) {
+		//	S_ExitSystem("FATAL: DRAGON_BACK requires BARTOLI and DRAGON_FRONT,\n- BARTOLI need to be placed and triggered instead.\n- DRAGON_BONE_FRONT and DRAGON_BONE_BACK is required, also SPHERE_OF_DOOM 1 to 3.");
+		//}
 		obj->control = DragonControl;
 		obj->collision = DragonCollision;
 		obj->radius = 341;
@@ -830,9 +911,9 @@ void BaddyObjects() {
 	}
 	obj = &Objects[ID_BARTOLI];
 	if (obj->loaded) {
-		if (!Objects[ID_DRAGON_BACK].loaded || !Objects[ID_DRAGON_FRONT].loaded) {
-			S_ExitSystem("FATAL: BARTOLI requires DRAGON_BACK and DRAGON_FRONT,\n- BARTOLI need to be placed and triggered.\n- DRAGON_BONE_FRONT and DRAGON_BONE_BACK is required, also SPHERE_OF_DOOM 1 to 3.");
-		}
+		//if (!Objects[ID_DRAGON_BACK].loaded || !Objects[ID_DRAGON_FRONT].loaded) {
+		//	S_ExitSystem("FATAL: BARTOLI requires DRAGON_BACK and DRAGON_FRONT,\n- BARTOLI need to be placed and triggered.\n- DRAGON_BONE_FRONT and DRAGON_BONE_BACK is required, also SPHERE_OF_DOOM 1 to 3.");
+		//}
 		obj->initialise = InitialiseBartoli;
 		obj->control = BartoliControl;
 		obj->save_flags = 1;
@@ -892,16 +973,530 @@ void BaddyObjects() {
 	}
 }
 
+void TrapObjects()
+{
+	OBJECT_INFO* obj = NULL;
+
+	obj = &Objects[ID_GONDOLA];
+	obj->control = GondolaControl;
+	obj->collision = ObjectCollision;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_CEILING_SPIKES];
+	obj->control = ControlCeilingSpikes;
+	obj->collision = TrapCollision;
+	obj->save_flags = TRUE;
+	obj->save_position = TRUE;
+
+	obj = &Objects[ID_COPTER];
+	obj->control = CopterControl;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_MINI_COPTER];
+	obj->control = MiniCopterControl;
+	obj->save_position = TRUE;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_HOOK];
+	obj->control = HookControl;
+	obj->collision = CreatureCollision;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_GENERAL];
+	obj->control = GeneralControl;
+	obj->collision = ObjectCollision;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+	obj->water_creature = TRUE;
+
+	obj = &Objects[ID_DYING_MONK];
+	obj->initialise = InitialiseDyingMonk;
+	obj->control = DyingMonk;
+	obj->collision = ObjectCollision;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_MINE];
+	obj->control = MineControl;
+	obj->collision = ObjectCollision;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_DEATH_SLIDE];
+	obj->initialise = InitialiseRollingBall; // TODO: change it to have this defined function...
+	obj->control = ControlDeathSlide;
+	obj->collision = DeathSlideCollision;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+	obj->save_position = TRUE;
+
+	for (int i = ID_PROPELLER1; i <= ID_PROPELLER4; i++)
+	{
+		obj = &Objects[i];
+		obj->control = PropellerControl;
+		obj->collision = ObjectCollision;
+		obj->save_anim = TRUE;
+		obj->save_flags = TRUE;
+	}
+
+	obj = &Objects[ID_SPIKE_WALL];
+	obj->control = ControlSpikeWall;
+	obj->collision = ObjectCollision;
+	obj->save_flags = TRUE;
+	obj->save_position = TRUE;
+
+	obj = &Objects[ID_SPINNING_BLADE];
+	obj->initialise = InitialiseKillerStatue; // TODO: change it to have this defined function...
+	obj->control = SpinningBlade;
+	obj->collision = ObjectCollision;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+	obj->save_position = TRUE;
+
+	obj = &Objects[ID_KILLER_STATUE];
+	obj->initialise = InitialiseKillerStatue;
+	obj->control = KillerStatueControl;
+	obj->collision = TrapCollision;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	for (int i = ID_FALLING_BLOCK1; i <= ID_FALLING_BLOCK3; i++)
+	{
+		obj = &Objects[i];
+		obj->control = FallingBlock;
+		obj->floor = FallingBlockFloor;
+		obj->ceiling = FallingBlockCeiling;
+		obj->save_anim = TRUE;
+		obj->save_flags = TRUE;
+		obj->save_position = TRUE;
+	}
+
+	obj = &Objects[ID_ICICLE];
+	obj->control = IcicleControl;
+	obj->collision = TrapCollision;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+	obj->save_position = TRUE;
+
+	obj = &Objects[ID_BLADE];
+	obj->initialise = InitialiseBlade;
+	obj->control = BladeControl;
+	obj->collision = TrapCollision;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_SPRING_BOARD];
+	obj->control = SpringBoardControl;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	for (int i = ID_PENDULUM1; i <= ID_PENDULUM2; i++)
+	{
+		obj = &Objects[i];
+		obj->control = Pendulum;
+		obj->collision = ObjectCollision;
+		obj->shadowSize = 128;
+		obj->save_anim = TRUE;
+		obj->save_flags = TRUE;
+	}
+
+	obj = &Objects[ID_TEETH_TRAP];
+	obj->collision = TrapCollision;
+	obj->control = TeethTrap;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	for (int i = ID_MOVABLE_BLOCK1; i <= ID_MOVABLE_BLOCK4; i++)
+	{
+		obj = &Objects[i];
+		obj->initialise = InitialiseMovingBlock;
+		obj->control = MovableBlock;
+		obj->collision = MovableBlockCollision;
+		obj->drawRoutine = DrawMovableBlock;
+		obj->save_anim = TRUE;
+		obj->save_flags = TRUE;
+		obj->save_position = TRUE;
+	}
+
+	obj = &Objects[ID_DART_EMITTER];
+	obj->control = DartEmitterControl;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_FLAME_EMITTER];
+	obj->control = FlameEmitterControl;
+	obj->drawRoutine = DrawDummyItem;
+	obj->save_flags = TRUE;
+	
+	obj = &Objects[ID_DART_EFFECT];
+	obj->control = DartEffectControl;
+	obj->drawRoutine = DrawSpriteItem;
+	obj->semi_transparent = TRUE;
+
+	obj = &Objects[ID_FLAME];
+	obj->control = FlameControl;
+	obj->semi_transparent = TRUE;
+
+	obj = &Objects[ID_DARTS];
+	obj->control = DartsControl;
+	obj->collision = ObjectCollision;
+	obj->shadowSize = 128;
+
+	obj = &Objects[ID_LAVA_EMITTER];
+	obj->control = LavaSpray;
+	obj->drawRoutine = DrawDummyItem;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_LAVA];
+	obj->control = ControlLavaBlob;
+	obj->semi_transparent = TRUE;
+}
+
+void ObjectObjects()
+{
+	OBJECT_INFO* obj = NULL;
+
+	obj = &Objects[ID_ROCKET];
+	obj->control = ControlRocket;
+	obj->save_position = TRUE;
+
+	obj = &Objects[ID_HARPOON_BOLT];
+	obj->control = ControlHarpoonBolt;
+	obj->save_position = TRUE;
+
+	obj = &Objects[ID_MISSILE_KNIFE];
+	obj->control = ControlMissile;
+	obj->save_position = TRUE;
+
+	obj = &Objects[ID_MISSILE_HARPOON];
+	obj->control = ControlMissile;
+	obj->save_position = TRUE;
+
+	obj = &Objects[ID_MISSILE_FLAME];
+	obj->control = ControlMissile;
+	obj->semi_transparent = TRUE;
+
+	obj = &Objects[ID_SPHERE_OF_DOOM1];
+	obj->collision = SphereOfDoomCollision;
+	obj->control = SphereOfDoom;
+	obj->drawRoutine = DrawSphereOfDoom;
+	obj->save_position = TRUE;
+	obj->save_flags = TRUE;
+	obj->semi_transparent = TRUE;
+
+	obj = &Objects[ID_SPHERE_OF_DOOM2];
+	obj->collision = SphereOfDoomCollision;
+	obj->control = SphereOfDoom;
+	obj->drawRoutine = DrawSphereOfDoom;
+	obj->save_position = TRUE;
+	obj->save_flags = TRUE;
+	obj->semi_transparent = TRUE;
+
+	obj = &Objects[ID_SPHERE_OF_DOOM3];
+	obj->collision = SphereOfDoomCollision;
+	obj->control = SphereOfDoom;
+	obj->drawRoutine = DrawSphereOfDoom;
+	obj->save_position = TRUE;
+	obj->save_flags = TRUE;
+	obj->semi_transparent = FALSE;
+
+	obj = &Objects[ID_SKIDOO_FAST];
+	obj->initialise = InitialiseSkidoo;
+	obj->collision = SkidooCollision;
+	obj->control = NULL; // Used in LaraControl() instead.
+	obj->drawRoutine = DrawSkidoo;
+	obj->save_position = TRUE;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_BOAT];
+	obj->initialise = InitialiseBoat;
+	obj->collision = BoatCollision;
+	obj->control = BoatControl;
+	obj->save_position = TRUE;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_BIG_BOWL];
+	obj->control = BigBowlControl;
+	obj->save_flags = TRUE;
+	obj->save_anim = TRUE;
+
+	obj = &Objects[ID_BELL];
+	obj->control = BellControl;
+	obj->collision = ObjectCollision;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_CAMERA_TARGET];
+	obj->drawRoutine = DrawDummyItem;
+
+	obj = &Objects[ID_FLARE_ITEM];
+	obj->control = FlareControl;
+	obj->collision = PickUpCollision;
+	obj->drawRoutine = DrawFlareInAir;
+	obj->save_flags = TRUE;
+	obj->save_position = TRUE;
+
+	obj = &Objects[ID_WINDOW1];
+	obj->initialise = InitialiseWindow;
+	obj->collision = ObjectCollision;
+	obj->control = WindowControl;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_WINDOW2];
+	obj->initialise = InitialiseWindow;
+	obj->collision = ObjectCollision;
+	obj->control = SmashIceControl;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	// NOTE: WINDOW3 and WINDOW4 was not used, now its like that: 3 is breakable (like 1), 4 with jump (like 2).
+	obj = &Objects[ID_WINDOW3];
+	obj->initialise = InitialiseWindow;
+	obj->collision = ObjectCollision;
+	obj->control = WindowControl;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_WINDOW4];
+	obj->initialise = InitialiseWindow;
+	obj->collision = ObjectCollision;
+	obj->control = SmashIceControl;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_LIFT];
+	obj->initialise = InitialiseLift;
+	obj->control = LiftControl;
+	obj->floor = LiftFloor;
+	obj->ceiling = LiftCeiling;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+	obj->save_position = TRUE;
+
+	obj = &Objects[ID_BRIDGE_FLAT];
+	obj->floor = BridgeFlatFloor;
+	obj->ceiling = BridgeFlatCeiling;
+
+	obj = &Objects[ID_BRIDGE_TILT1];
+	obj->floor = BridgeTilt1Floor;
+	obj->ceiling = BridgeTilt1Ceiling;
+
+	obj = &Objects[ID_BRIDGE_TILT2];
+	obj->floor = BridgeTilt2Floor;
+	obj->ceiling = BridgeTilt2Ceiling;
+
+	obj = &Objects[ID_DRAW_BRIDGE];
+	if (obj->loaded)
+	{
+		obj->control = GeneralControl;
+		obj->collision = DrawBridgeCollision;
+		obj->floor = DrawBridgeFloor;
+		obj->ceiling = DrawBridgeCeiling;
+		obj->save_anim = TRUE;
+		obj->save_flags = TRUE;
+	}
+
+	for (int i = ID_DOOR_TYPE1; i <= ID_DOOR_TYPE8; i++)
+	{
+		obj = &Objects[i];
+		obj->initialise = InitialiseDoor;
+		obj->control = DoorControl;
+		obj->collision = DoorCollision;
+		obj->drawRoutine = DrawUnclippedItem;
+		obj->save_anim = TRUE;
+		obj->save_flags = TRUE;
+	}
+
+	for (int i = ID_TRAPDOOR_TYPE1; i <= ID_TRAPDOOR_TYPE3; i++)
+	{
+		obj = &Objects[i];
+		obj->control = TrapDoorControl;
+		obj->floor = TrapDoorFloor;
+		obj->ceiling = TrapDoorCeiling;
+		obj->save_anim = TRUE;
+		obj->save_flags = TRUE;
+	}
+
+	for (int i = ID_PISTOL_ITEM; i <= ID_FLARES_ITEM; i++)
+	{
+		obj = &Objects[i];
+		obj->collision = PickUpCollision;
+		obj->drawRoutine = DrawSpriteItem;
+		obj->save_position = TRUE;
+		obj->save_flags = TRUE;
+	}
+
+	for (int i = ID_PUZZLE_ITEM1; i <= ID_PUZZLE_ITEM4; i++)
+	{
+		obj = &Objects[i];
+		obj->collision = PickUpCollision;
+		obj->drawRoutine = DrawSpriteItem;
+		obj->save_position = TRUE;
+		obj->save_flags = TRUE;
+	}
+
+	for (int i = ID_SECRET1; i <= ID_SECRET3; i++)
+	{
+		obj = &Objects[i];
+		obj->collision = PickUpCollision;
+		obj->drawRoutine = DrawSpriteItem;
+		obj->save_position = TRUE;
+		obj->save_flags = TRUE;
+	}
+
+	for (int i = ID_KEY_ITEM1; i <= ID_KEY_ITEM4; i++)
+	{
+		obj = &Objects[i];
+		obj->collision = PickUpCollision;
+		obj->drawRoutine = DrawSpriteItem;
+		obj->save_position = TRUE;
+		obj->save_flags = TRUE;
+	}
+
+	for (int i = ID_PICKUP_ITEM1; i <= ID_PICKUP_ITEM2; i++)
+	{
+		obj = &Objects[i];
+		obj->collision = PickUpCollision;
+		obj->drawRoutine = DrawSpriteItem;
+		obj->save_position = TRUE;
+		obj->save_flags = TRUE;
+	}
+
+	for (int i = ID_KEY_HOLE1; i <= ID_KEY_HOLE4; i++)
+	{
+		obj = &Objects[i];
+		obj->collision = KeyHoleCollision;
+		obj->save_flags = TRUE;
+	}
+
+	for (int i = ID_PUZZLE_HOLE1; i <= ID_PUZZLE_HOLE4; i++)
+	{
+		obj = &Objects[i];
+		obj->collision = PuzzleHoleCollision;
+		obj->save_flags = TRUE;
+	}
+
+	for (int i = ID_PUZZLE_DONE1; i <= ID_PUZZLE_DONE4; i++)
+	{
+		obj = &Objects[i];
+		obj->save_flags = TRUE;
+	}
+
+	for (int i = ID_DETONATOR1; i <= ID_DETONATOR2; i++)
+	{
+		obj = &Objects[i];
+		obj->control = DetonatorControl;
+		obj->collision = DetonatorCollision;
+		obj->save_anim = TRUE;
+		obj->save_flags = TRUE;
+	}
+
+	obj = &Objects[ID_BODY_PART];
+	obj->loaded = TRUE;
+	obj->nMeshes = 0;
+	obj->control = ControlBodyPart;
+
+	obj = &Objects[ID_ALARM_SOUND];
+	obj->control = ControlAlarmSound;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_LARA_ALARM];
+	obj->control = ControlLaraAlarm;
+	obj->save_flags = TRUE;
+
+	for (int i = ID_PLAYER1; i <= ID_PLAYER10; i++)
+	{
+		obj = &Objects[i];
+		obj->initialise = InitialiseGenPlayer;
+		obj->control = ControlCinematicPlayer;
+		obj->hitPoints = 1;
+	}
+
+	obj = &Objects[ID_BLOOD];
+	obj->control = ControlBlood1;
+	obj->semi_transparent = TRUE;
+
+	obj = &Objects[ID_EXPLOSION];
+	obj->control = ControlExplosion1;
+	obj->semi_transparent = TRUE;
+
+	obj = &Objects[ID_RICOCHET];
+	obj->control = ControlRichochet1;
+
+	obj = &Objects[ID_TWINKLE];
+	obj->control = ControlTwinkle;
+	obj->semi_transparent = TRUE;
+
+	obj = &Objects[ID_SPLASH];
+	obj->control = ControlSplash1;
+	obj->semi_transparent = TRUE;
+
+	obj = &Objects[ID_SNOW_SPRITE];
+	obj->control = ControlSnowSprite;
+
+	obj = &Objects[ID_WATER_SPRITE];
+	obj->control = ControlWaterSprite;
+	obj->semi_transparent = TRUE;
+
+	obj = &Objects[ID_WATERFALL];
+	obj->control = WaterFall;
+	obj->drawRoutine = DrawDummyItem;
+
+	obj = &Objects[ID_GUN_FLASH];
+	obj->control = ControlGunShot;
+
+	obj = &Objects[ID_GLOW];
+	obj->control = ControlGlow;
+
+	obj = &Objects[ID_HOT_LIQUID];
+	obj->control = ControlHotLiquid;
+	obj->semi_transparent = TRUE;
+
+	for (int i = ID_BIRD_TWEETER1; i <= ID_BIRD_TWEETER2; i++)
+	{
+		obj = &Objects[i];
+		obj->control = ControlBirdTweeter;
+		obj->drawRoutine = DrawDummyItem;
+	}
+
+	obj = &Objects[ID_DING_DONG];
+	obj->control = ControlDingDong;
+	obj->drawRoutine = DrawDummyItem;
+
+	obj = &Objects[ID_CLOCK_CHIMES];
+	obj->control = ControlClockChimes;
+	obj->drawRoutine = DrawDummyItem;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_FINAL_LEVEL_COUNTER];
+	obj->control = FinalLevelCounter;
+	obj->drawRoutine = DrawDummyItem;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_CUT_SHOTGUN];
+	obj->control = ControlCutShotgun;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_EARTHQUAKE];
+	obj->control = EarthQuake;
+	obj->drawRoutine = DrawDummyItem;
+	obj->save_flags = TRUE;
+}
+
 /*
  * Inject function
  */
 void Inject_Setup() {
-	//INJECT(0x0043A330, InitialiseLevel);
+	INJECT(0x0043A330, InitialiseLevel);
 	//INJECT(0x0043A490, InitialiseGameFlags);
 	INJECT(0x0043A500, InitialiseLevelFlags);
 	INJECT(0x0043A530, BaddyObjects);
-	//INJECT(0x0043B570, TrapObjects);
-	//INJECT(0x0043BB70, ObjectObjects);
+	INJECT(0x0043B570, TrapObjects);
+	INJECT(0x0043BB70, ObjectObjects);
 	INJECT(0x0043C7C0, InitialiseObjects);
 	//INJECT(0x0043C830, GetCarriedItems);
 }

@@ -128,29 +128,155 @@ int GlobalItemReplace(int oldItemID, int newItemID) {
 	return result;
 }
 
+void InitialiseFXArray()
+{
+	ZeroMemory(Effects, sizeof(Effects));
+	NextEffectActive = -1;
+	NextEffectFree = 0;
+	FX_INFO* fx = Effects;
+	for (int i = 1; i < MAX_EFFECTS; i++, fx++)
+		fx->nextFx = i;
+	fx->nextFx = -1;
+}
+
+short CreateEffect(short roomNum)
+{
+	short result = NextEffectFree;
+	if (NextEffectFree != -1)
+	{
+		FX_INFO* fx = &Effects[NextEffectFree];
+		NextEffectFree = fx->nextFx;
+		fx->roomNumber = roomNum;
+		ROOM_INFO* r = &RoomInfo[roomNum];
+		fx->nextFx = r->fxNumber;
+		r->fxNumber = result;
+		fx->nextActive = NextEffectActive;
+		NextEffectActive = result;
+		fx->shade = 0x1000;
+	}
+	return result;
+}
+
+void KillEffect(short fxNum)
+{
+	FX_INFO* fx = &Effects[fxNum];
+	ROOM_INFO* room = &RoomInfo[fx->roomNumber];
+	FX_INFO* fxNext;
+
+	short nextActive;
+	short oldActive = NextEffectActive;
+	bool doAssignNext = true;
+	if (NextEffectActive == fxNum)
+	{
+		NextEffectActive = fx->nextActive;
+	}
+	else if (NextEffectActive != -1)
+	{
+		while (true)
+		{
+			fxNext = &Effects[oldActive];
+			if (fxNext->nextActive == fxNum)
+				break;
+			if (fxNext->nextActive == -1)
+			{
+				doAssignNext = false;
+				break;
+			}
+			oldActive = fxNext->nextActive;
+		}
+		if (doAssignNext)
+		{
+			fxNext = &Effects[oldActive];
+			fxNext->nextActive = fx->nextActive;
+		}
+	}
+
+	short oldFx = room->fxNumber;
+	doAssignNext = true;
+	if (room->fxNumber == fxNum)
+	{
+		room->fxNumber = fx->nextFx;
+	}
+	else if (oldFx != -1)
+	{
+		while (true)
+		{
+			fxNext = &Effects[oldFx];
+			if (fxNext->nextFx == fxNum)
+				break;
+			if (fxNext->nextFx == -1)
+			{
+				doAssignNext = false;
+				break;
+			}
+			oldFx = fxNext->nextFx;
+		}
+		if (doAssignNext)
+		{
+			fxNext = &Effects[oldFx];
+			fxNext->nextFx = fx->nextFx;
+		}
+	}
+
+	fx->nextFx = NextEffectFree;
+	NextEffectFree = fxNum;
+}
+
+void EffectNewRoom(short fxNum, short newRoomNum)
+{
+	FX_INFO* fx = &Effects[fxNum];
+	ROOM_INFO* room = &RoomInfo[fx->roomNumber];
+	FX_INFO* fxNext;
+	short oldFx = room->fxNumber;
+	bool doAssignNext = true;
+
+	if (room->fxNumber == fxNum)
+	{
+		room->fxNumber = fx->nextFx;
+	}
+	else if (oldFx != -1)
+	{
+		while (true)
+		{
+			fxNext = &Effects[oldFx];
+			if (fxNext->nextFx == fxNum)
+				break;
+			if (fxNext->nextFx == -1)
+			{
+				doAssignNext = false;
+				break;
+			}
+			oldFx = fxNext->nextFx;
+		}
+		if (doAssignNext)
+		{
+			fxNext = &Effects[oldFx];
+			fxNext->nextFx = fx->nextFx;
+		}
+	}
+
+	fx->roomNumber = newRoomNum;
+	ROOM_INFO* newRoom = &RoomInfo[newRoomNum];
+	fx->nextFx = newRoom->fxNumber;
+	newRoom->fxNumber = fxNum;
+}
+
 /*
  * Inject function
  */
 void Inject_Items() {
 	INJECT(0x00426CD0, InitialiseItemArray);
-
 	//INJECT(0x00426D30, KillItem);
 	//INJECT(0x00426E50, CreateItem);
-
 	INJECT(0x00426E90, InitialiseItem);
-
 	//INJECT(0x00427050, RemoveActiveItem);
 	//INJECT(0x004270E0, RemoveDrawnItem);
-
 	INJECT(0x00427150, AddActiveItem);
-
 	//INJECT(0x004271B0, ItemNewRoom);
-
 	INJECT(0x00427250, GlobalItemReplace);
-
-	//INJECT(0x004272D0, InitialiseFXArray);
-	//INJECT(0x00427300, CreateEffect);
-	//INJECT(0x00427370, KillEffect);
-	//INJECT(0x00427460, EffectNewRoom);
+	INJECT(0x004272D0, InitialiseFXArray);
+	INJECT(0x00427300, CreateEffect);
+	INJECT(0x00427370, KillEffect);
+	INJECT(0x00427460, EffectNewRoom);
 	//INJECT(0x00427500, ClearBodyBag);
 }

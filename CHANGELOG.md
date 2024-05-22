@@ -5,14 +5,98 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased: v0.9.0.4]
+## Unreleased [v0.9.0.5]
+
+### Warnings.
+
+
+
+### TR2Main features.
+
+- Increased effects counts from 100 to 512.
+
+### Minor changes.
+
+- Possibly fixed lift since the function used integer instead of short for the floor/ceiling callback.
+
+### Internal changes.
+
+- Decompiled many functions related to effects.
+
+### TombEditor warnings:
+
+- Since the items count has been increased, you need to change it in the TrCatalog.xml:
+```
+<limit name="ItemMaxCount" value="256" />
+<limit name="ItemSafeCount" value="256" />
+```
+to
+```
+<limit name="ItemMaxCount" value="1024" />
+<limit name="ItemSafeCount" value="1024" />
+```
+
+## [v0.9.0.4] - 24-04-17
+
+### Warnings:
+
+- **_If you want the correct source code use this one_**: 67d2a0d
+- Since the TR2Main.json have some addition, check TR2Main_info.txt before sending a issue.
+
+### New fix:
+
+- Fixed bug with CreatureMood() which caused problem with the AI behaviour.
+
+### TR2Main features.
+
+- Added the door cheat when you are in cheat mode, use DRAW key to open door (you need to be at 1 block or less to open/close it).
+- Added json configuration to make yeti explode on death.
+- Now the UI is scaled based on window height size (480p,720p,1080p,1440p,1600p,4K more will result in 480p by default), should be scaled correctly now.
+- Fixed air bar position not properly scaled.
+- Fixed dragon front not being triggered correctly.
+- Fixed boat and snowmobile driving ability, else the both fused and unexpected behavior happened.
+- Improved scuba diver harpoon shooting, should be more accurate, he can get you at equal or less than 8 block.
+
+### Minor changes.
+
+- Added warning about RJF, when the game is finished with all secrets, select any level is enabled through registry, you can disable it via RemoveRJF.reg in the `ExtraOptions -> SelectAnyLevelFix`, you can found it in the `TR2Main_assets.zip` archive.
+
+### Internal changes.
+
+- Fixed BOX_INFO height variable using unsigned short instead of short, searching lara 'should' be more accurate.
+- Decompiled scuba_diver.
+- Decompiled boat.
+
+### TombEditor warnings:
+
+- Since the items count has been increased, you need to change it in the TrCatalog.xml:
+```
+<limit name="ItemMaxCount" value="256" />
+<limit name="ItemSafeCount" value="256" />
+```
+to
+```
+<limit name="ItemMaxCount" value="1024" />
+<limit name="ItemSafeCount" value="1024" />
+```
 
 ## [0.9.0.3b] - 2024-03-24
 
 ### Warnings:
 
+- **_If you want the correct source code use this one_**: 6cbe960
 - Some of the functions decompiled was removed to fix bugs, think like sinks and savegame problem should be fixed.
 - Since the TR2Main.json have some addition, check it before sending a issue.
+
+### New for fix4:
+
+- Now health/air and enemybar is clamped to the window size, they won't exceed the screen size. (NEW)
+- Added json configuration to enable/disable the talion guardian next level that trigger if he die (false = enable effect) (default= false). (NEW)
+- Changed json library to a optimized one (for c++) (it should speed up a bit the loading). (NEW)
+- Added a new library to speed up the allocating of memory, Danath reported a significant speed up at launch,
+seem like it speed up the game at high window size too (need to check more) ? (NEW)
+- Changed how the UI scale up, instead of being scaled by a base of 640x480, it now will scale at the current window size,
+that should improve the look, but at high screen size more than 3000x2000+, it look too small !, maybe a adaptive game UI scale next ?. (NEW)
 
 ### TR2Main features.
 - Added enemy bars.
