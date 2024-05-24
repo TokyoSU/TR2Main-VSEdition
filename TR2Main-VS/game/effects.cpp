@@ -258,16 +258,17 @@ void Splash2(ITEM_INFO* item, int waterHeight)
 }
 
 void Splash(ITEM_INFO* item) {
-	int y = GetWaterHeight(item->pos.x, item->pos.y, item->pos.z, item->roomNumber);
-	Splash2(item, y);
+	Splash2(item, GetWaterHeight(item->pos.x, item->pos.y, item->pos.z, item->roomNumber));
 }
 
 void CreateSplash(int x, int y, int z, short roomNumber)
 {
 	FX_INFO* fx = NULL;
-	short roomID = roomNumber;
 	int waterHeight = GetWaterHeight(x, y, z, roomNumber);
+	short roomID = roomNumber;
 	GetFloor(x, y, z, &roomID);
+	if (!(RoomInfo[roomID].flags & ROOM_UNDERWATER))
+		return;
 	short fxID = CreateEffect(roomID);
 	if (fxID != -1) {
 		fx = &Effects[fxID];

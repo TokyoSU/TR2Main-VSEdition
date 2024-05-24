@@ -1119,6 +1119,17 @@ void TrapObjects()
 		obj->save_position = TRUE;
 	}
 
+	for (int i = ID_ROLLING_BALL1; i <= ID_ROLLING_BALL3; i++)
+	{
+		obj = &Objects[i];
+		obj->initialise = InitialiseRollingBall;
+		obj->control = RollingBallControl;
+		obj->collision = RollingBallCollision;
+		obj->save_anim = TRUE;
+		obj->save_flags = TRUE;
+		obj->save_position = TRUE;
+	}
+
 	obj = &Objects[ID_DART_EMITTER];
 	obj->control = DartEmitterControl;
 	obj->save_flags = TRUE;
