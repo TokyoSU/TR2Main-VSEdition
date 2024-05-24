@@ -564,7 +564,6 @@ void S_PrintShadow(short radius, short* bPtr, ITEM_INFO* item) {
 }
 
 void S_CalculateLight(int x, int y, int z, short roomNumber) {
-	ROOM_INFO* room;
 	ROOM_INFO* room = &RoomInfo[roomNumber];
 	int xDist, yDist, zDist, distance, radius, depth;
 	int xBrightest = 0, yBrightest = 0, zBrightest = 0;
