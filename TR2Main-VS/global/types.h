@@ -1121,6 +1121,17 @@ typedef enum
 	ZT_Fly,
 } ZONE_TYPES;
 
+typedef enum : short
+{
+	LIT_Point,
+	LIT_Shadow,
+	LIT_Spot,
+	LIT_Effect,
+	LIT_Sun,
+	LIT_Fogbulb,
+	LIT_MaxLightType
+} LIGHT_TYPE;
+
 typedef enum {
 	GFL_NOLEVEL = -1,
 	GFL_TITLE,
@@ -2139,7 +2150,7 @@ typedef struct RoomInfo_t {
 	short ySize;
 	short ambient1;
 	short ambient2;
-	short lightMode;
+	LIGHT_TYPE lightMode;
 	short numLights;
 	short numMeshes;
 	short boundLeft;

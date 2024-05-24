@@ -1091,15 +1091,22 @@ void TrapObjects()
 	obj->save_anim = TRUE;
 	obj->save_flags = TRUE;
 
-	for (int i = ID_PENDULUM1; i <= ID_PENDULUM2; i++)
-	{
-		obj = &Objects[i];
-		obj->control = Pendulum;
-		obj->collision = ObjectCollision;
-		obj->shadowSize = 128;
-		obj->save_anim = TRUE;
-		obj->save_flags = TRUE;
-	}
+	obj = &Objects[ID_SPIKES];
+	obj->collision = SpikeCollision;
+
+	obj = &Objects[ID_PENDULUM1];
+	obj->control = Pendulum;
+	obj->collision = ObjectCollision;
+	obj->shadowSize = 128;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_PENDULUM2];
+	obj->control = Pendulum;
+	obj->collision = ObjectCollision;
+	obj->shadowSize = 128;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
 
 	obj = &Objects[ID_TEETH_TRAP];
 	obj->collision = TrapCollision;
@@ -1119,16 +1126,29 @@ void TrapObjects()
 		obj->save_position = TRUE;
 	}
 
-	for (int i = ID_ROLLING_BALL1; i <= ID_ROLLING_BALL3; i++)
-	{
-		obj = &Objects[i];
-		obj->initialise = InitialiseRollingBall;
-		obj->control = RollingBallControl;
-		obj->collision = RollingBallCollision;
-		obj->save_anim = TRUE;
-		obj->save_flags = TRUE;
-		obj->save_position = TRUE;
-	}
+	obj = &Objects[ID_ROLLING_BALL1];
+	obj->initialise = InitialiseRollingBall;
+	obj->control = RollingBallControl;
+	obj->collision = RollingBallCollision;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+	obj->save_position = TRUE;
+
+	obj = &Objects[ID_ROLLING_BALL2];
+	obj->initialise = InitialiseRollingBall;
+	obj->control = RollingBallControl;
+	obj->collision = RollingBallCollision;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+	obj->save_position = TRUE;
+
+	obj = &Objects[ID_ROLLING_BALL3];
+	obj->initialise = InitialiseRollingBall;
+	obj->control = RollingBallControl;
+	obj->collision = RollingBallCollision;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+	obj->save_position = TRUE;
 
 	obj = &Objects[ID_DART_EMITTER];
 	obj->control = DartEmitterControl;
