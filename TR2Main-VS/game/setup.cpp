@@ -1330,6 +1330,24 @@ void ObjectObjects()
 		obj->save_flags = TRUE;
 	}
 
+	for (int i = ID_SWITCH_TYPE1; i <= ID_SWITCH_TYPE2; i++)
+	{
+		obj = &Objects[i];
+		obj->control = SwitchControl;
+		obj->collision = SwitchCollision;
+		obj->save_anim = TRUE;
+		obj->save_flags = TRUE;
+	}
+
+	for (int i = ID_SWITCH_TYPE3; i <= ID_SWITCH_TYPE5; i++)
+	{
+		obj = &Objects[i];
+		obj->control = SwitchControl;
+		obj->collision = i == ID_SWITCH_TYPE5 ? SwitchCollision2 : SwitchCollision;
+		obj->save_anim = TRUE;
+		obj->save_flags = TRUE;
+	}
+
 	for (int i = ID_DOOR_TYPE1; i <= ID_DOOR_TYPE8; i++)
 	{
 		obj = &Objects[i];
@@ -1486,12 +1504,13 @@ void ObjectObjects()
 	obj->control = ControlHotLiquid;
 	obj->semi_transparent = TRUE;
 
-	for (int i = ID_BIRD_TWEETER1; i <= ID_BIRD_TWEETER2; i++)
-	{
-		obj = &Objects[i];
-		obj->control = ControlBirdTweeter;
-		obj->drawRoutine = DrawDummyItem;
-	}
+	obj = &Objects[ID_BIRD_TWEETER1];
+	obj->control = ControlBirdTweeter;
+	obj->drawRoutine = DrawDummyItem;
+
+	obj = &Objects[ID_BIRD_TWEETER2];
+	obj->control = ControlBirdTweeter;
+	obj->drawRoutine = DrawDummyItem;
 
 	obj = &Objects[ID_DING_DONG];
 	obj->control = ControlDingDong;

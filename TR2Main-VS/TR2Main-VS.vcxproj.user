@@ -5,26 +5,30 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerCommand>Tomb2.exe</LocalDebuggerCommand>
-    <LocalDebuggerWorkingDirectory>C:\Users\TokyoSU-PC\Desktop\Magic Kingdom Beta\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>C:\Program Files (x86)\GOG.com\Tomb Raider 1 2 3\Tomb Raider 2\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-gold</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>
+    </LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DX9|Win32'">
     <LocalDebuggerCommand>Tomb2.exe</LocalDebuggerCommand>
-    <LocalDebuggerWorkingDirectory>C:\Users\TokyoSU-PC\Desktop\Magic Kingdom Beta\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>C:\Program Files (x86)\GOG.com\Tomb Raider 1 2 3\Tomb Raider 2\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-gold</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>
+    </LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LocalDebuggerCommand>Tomb2.exe</LocalDebuggerCommand>
-    <LocalDebuggerWorkingDirectory>C:\Users\TokyoSU-PC\Desktop\Magic Kingdom Beta\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>C:\Program Files (x86)\GOG.com\Tomb Raider 1 2 3\Tomb Raider 2\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-gold</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>
+    </LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_DX9|Win32'">
     <LocalDebuggerCommand>Tomb2.exe</LocalDebuggerCommand>
-    <LocalDebuggerWorkingDirectory>C:\Users\TokyoSU-PC\Desktop\Magic Kingdom Beta\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>C:\Program Files (x86)\GOG.com\Tomb Raider 1 2 3\Tomb Raider 2\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-gold</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>
+    </LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>
