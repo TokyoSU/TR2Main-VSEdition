@@ -27,7 +27,7 @@
  /*
   * Function list
   */
-#define ControlTwinkle ((void(__cdecl*)(short)) 0x00417780)
+void ControlTwinkle(short fxNum); // 0x00417780
 void CreateBartoliLight(short itemNum); // 0x00417900
 short DragonFire(int x, int y, int z, short speed, short rotY, short roomNum); // 0x004179E0
 #define DragonCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x00417A90)

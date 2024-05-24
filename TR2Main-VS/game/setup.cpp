@@ -1162,11 +1162,19 @@ void TrapObjects()
 	obj = &Objects[ID_DART_EFFECT];
 	obj->control = DartEffectControl;
 	obj->drawRoutine = DrawSpriteItem;
+#if defined(FEATURE_MOD_CONFIG)
+	obj->semi_transparent = !Mod.isDartEffectOpaque;
+#else
 	obj->semi_transparent = TRUE;
+#endif
 
 	obj = &Objects[ID_FLAME];
 	obj->control = FlameControl;
+#if defined(FEATURE_MOD_CONFIG)
+	obj->semi_transparent = !Mod.isFlameOpaque;
+#else
 	obj->semi_transparent = TRUE;
+#endif
 
 	obj = &Objects[ID_DARTS];
 	obj->control = DartsControl;
@@ -1180,7 +1188,11 @@ void TrapObjects()
 
 	obj = &Objects[ID_LAVA];
 	obj->control = ControlLavaBlob;
+#if defined(FEATURE_MOD_CONFIG)
+	obj->semi_transparent = !Mod.isLavaFountainOpaque;
+#else
 	obj->semi_transparent = TRUE;
+#endif
 }
 
 void ObjectObjects()
@@ -1205,7 +1217,11 @@ void ObjectObjects()
 
 	obj = &Objects[ID_MISSILE_FLAME];
 	obj->control = ControlMissile;
+#if defined(FEATURE_MOD_CONFIG)
+	obj->semi_transparent = !Mod.isDragonFlameOpaque;
+#else
 	obj->semi_transparent = TRUE;
+#endif
 
 	obj = &Objects[ID_SPHERE_OF_DOOM1];
 	obj->collision = SphereOfDoomCollision;
@@ -1213,7 +1229,11 @@ void ObjectObjects()
 	obj->drawRoutine = DrawSphereOfDoom;
 	obj->save_position = TRUE;
 	obj->save_flags = TRUE;
+#if defined(FEATURE_MOD_CONFIG)
+	obj->semi_transparent = !Mod.isSphereOfDoom1Opaque;
+#else
 	obj->semi_transparent = TRUE;
+#endif
 
 	obj = &Objects[ID_SPHERE_OF_DOOM2];
 	obj->collision = SphereOfDoomCollision;
@@ -1221,7 +1241,11 @@ void ObjectObjects()
 	obj->drawRoutine = DrawSphereOfDoom;
 	obj->save_position = TRUE;
 	obj->save_flags = TRUE;
+#if defined(FEATURE_MOD_CONFIG)
+	obj->semi_transparent = !Mod.isSphereOfDoom2Opaque;
+#else
 	obj->semi_transparent = TRUE;
+#endif
 
 	obj = &Objects[ID_SPHERE_OF_DOOM3];
 	obj->collision = SphereOfDoomCollision;
@@ -1229,7 +1253,6 @@ void ObjectObjects()
 	obj->drawRoutine = DrawSphereOfDoom;
 	obj->save_position = TRUE;
 	obj->save_flags = TRUE;
-	obj->semi_transparent = FALSE;
 
 	obj = &Objects[ID_SKIDOO_FAST];
 	obj->initialise = InitialiseSkidoo;
@@ -1466,29 +1489,49 @@ void ObjectObjects()
 
 	obj = &Objects[ID_BLOOD];
 	obj->control = ControlBlood1;
+#if defined(FEATURE_MOD_CONFIG)
+	obj->semi_transparent = !Mod.isBloodOpaque;
+#else
 	obj->semi_transparent = TRUE;
+#endif
 
 	obj = &Objects[ID_EXPLOSION];
 	obj->control = ControlExplosion1;
+#if defined(FEATURE_MOD_CONFIG)
+	obj->semi_transparent = !Mod.isExplosionOpaque;
+#else
 	obj->semi_transparent = TRUE;
+#endif
 
 	obj = &Objects[ID_RICOCHET];
 	obj->control = ControlRichochet1;
 
 	obj = &Objects[ID_TWINKLE];
 	obj->control = ControlTwinkle;
+#if defined(FEATURE_MOD_CONFIG)
+	obj->semi_transparent = !Mod.isTwinkleOpaque;
+#else
 	obj->semi_transparent = TRUE;
+#endif
 
 	obj = &Objects[ID_SPLASH];
 	obj->control = ControlSplash1;
+#if defined(FEATURE_MOD_CONFIG)
+	obj->semi_transparent = !Mod.isSplashOpaque;
+#else
 	obj->semi_transparent = TRUE;
+#endif
 
 	obj = &Objects[ID_SNOW_SPRITE];
 	obj->control = ControlSnowSprite;
 
 	obj = &Objects[ID_WATER_SPRITE];
 	obj->control = ControlWaterSprite;
+#if defined(FEATURE_MOD_CONFIG)
+	obj->semi_transparent = !Mod.isWaterSpriteOpaque;
+#else
 	obj->semi_transparent = TRUE;
+#endif
 
 	obj = &Objects[ID_WATERFALL];
 	obj->control = WaterFall;
@@ -1502,7 +1545,11 @@ void ObjectObjects()
 
 	obj = &Objects[ID_HOT_LIQUID];
 	obj->control = ControlHotLiquid;
+#if defined(FEATURE_MOD_CONFIG)
+	obj->semi_transparent = !Mod.isHotLiquidOpaque;
+#else
 	obj->semi_transparent = TRUE;
+#endif
 
 	obj = &Objects[ID_BIRD_TWEETER1];
 	obj->control = ControlBirdTweeter;

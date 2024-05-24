@@ -33,6 +33,19 @@ public:
 	bool grenadeAtStart = false;
 	bool harpoonAtStart = false;
 
+	bool isDartEffectOpaque = false;
+	bool isFlameOpaque = false;
+	bool isLavaFountainOpaque = false;
+	bool isDragonFlameOpaque = false;
+	bool isSphereOfDoom1Opaque = false;
+	bool isSphereOfDoom2Opaque = false;
+	bool isBloodOpaque = false;
+	bool isExplosionOpaque = false;
+	bool isTwinkleOpaque = false;
+	bool isSplashOpaque = false;
+	bool isWaterSpriteOpaque = false;
+	bool isHotLiquidOpaque = false;
+
 	short shotgunAmmoAtStart = 2;
 	short uzisAmmoAtStart = 0;
 	short autoPistolAmmoAtStart = 0;

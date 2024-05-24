@@ -288,13 +288,13 @@ void WarriorSparkleTrail(ITEM_INFO* item)
 	if (fxNum != -1)
 	{
 		FX_INFO* fx = &Effects[fxNum];
-		fx->objectID = ID_TWINKLE;
-		fx->pos.x = (GetRandomDraw() << 8 >> 15) + item->pos.x - 128;
-		fx->pos.y = (GetRandomDraw() << 8 >> 15) + item->pos.y - 256;
-		fx->pos.z = (GetRandomDraw() << 8 >> 15) + item->pos.z - 128;
+		fx->pos.x = item->pos.x + (GetRandomDraw() * 256 >> 15) - 128;
+		fx->pos.y = item->pos.y + (GetRandomDraw() * 256 >> 15) - 256;
+		fx->pos.z = item->pos.z + (GetRandomDraw() * 256 >> 15) - 128;
 		fx->roomNumber = item->roomNumber;
 		fx->counter = -30;
 		fx->frameNumber = 0;
+		fx->objectID = ID_TWINKLE;
 	}
 	PlaySoundEffect(312, &item->pos, 0);
 }

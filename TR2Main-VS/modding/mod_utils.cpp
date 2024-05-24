@@ -204,6 +204,19 @@ void ModConfig::LoadLevelConfig(Value& data) {
     makeMonkAttackLaraFirst = GetValueByNameBool(data, "monksattacklaradirectly", false);
     enemyBarEnabled = GetValueByNameBool(data, "enableenemybar", true);
     makeYetiExplodeOnDeath = GetValueByNameBool(data, "makeyetiexplodeondeath", false);
+
+    isDartEffectOpaque = GetValueByNameBool(data, "isDartEffectOpaque", false);
+    isFlameOpaque = GetValueByNameBool(data, "isFlameOpaque", false);
+    isLavaFountainOpaque = GetValueByNameBool(data, "isLavaFountainOpaque", false);
+    isDragonFlameOpaque = GetValueByNameBool(data, "isDragonFlameOpaque", false);
+    isSphereOfDoom1Opaque = GetValueByNameBool(data, "isSphereOfDoom1Opaque", false);
+    isSphereOfDoom2Opaque = GetValueByNameBool(data, "isSphereOfDoom2Opaque", false);
+    isBloodOpaque = GetValueByNameBool(data, "isBloodOpaque", false);
+    isExplosionOpaque = GetValueByNameBool(data, "isExplosionOpaque", false);
+    isTwinkleOpaque = GetValueByNameBool(data, "isTwinkleOpaque", false);
+    isSplashOpaque = GetValueByNameBool(data, "isSplashOpaque", false);
+    isWaterSpriteOpaque = GetValueByNameBool(data, "isWaterSpriteOpaque", false);
+    isHotLiquidOpaque = GetValueByNameBool(data, "isHotLiquidOpaque", false);
 }
 
 void ModConfig::LoadSemitransConfig(Value& data, SEMITRANS_CONFIG* semitrans) {

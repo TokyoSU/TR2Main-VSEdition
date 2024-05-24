@@ -267,7 +267,7 @@ void HWR_DrawPolyList() {
 	UINT16 polyType, texPage, vtxCount;
 	D3DTLVERTEX* vtxPtr;
 
-	HWR_EnableZBuffer(false, true);
+	HWR_EnableZBuffer(true, true);
 	for (DWORD i = 0; i < SurfaceCount; ++i) {
 		bufPtr = (UINT16*)SortBuffer[i]._0;
 
@@ -293,6 +293,7 @@ void HWR_DrawPolyList() {
 			continue;
 		}
 #endif // FEATURE_HUD_IMPROVED
+
 #ifdef FEATURE_VIDEOFX_IMPROVED
 		switch (polyType) {
 		case POLY_HWR_GTmap:
@@ -379,7 +380,6 @@ void HWR_LoadTexturePages(int pagesCount, LPVOID pagesBuffer, RGB888* palette) {
 	BYTE* bufferPtr = (BYTE*)pagesBuffer;
 
 	HWR_FreeTexturePages();
-
 	if (palette != NULL)
 		PaletteIndex = CreateTexturePalette(palette);
 

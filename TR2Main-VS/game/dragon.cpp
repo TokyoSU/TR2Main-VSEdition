@@ -28,6 +28,44 @@
 #include "specific/game.h"
 #include "global/vars.h"
 
+void ControlTwinkle(short fxNum)
+{
+	FX_INFO* fx = &Effects[fxNum];
+	fx->frameNumber--;
+
+	if (fx->frameNumber <= Objects[fx->objectID].nMeshes)
+		fx->frameNumber = 0;
+
+	if (fx->counter >= 0)
+	{
+		ITEM_INFO* item = &Items[fx->counter];
+		int x = item->pos.x;
+		int y = item->pos.y;
+		int z = item->pos.z;
+		if (item->objectID == ID_DRAGON_FRONT)
+		{
+			int s = phd_sin(item->pos.rotY);
+			int c = phd_cos(item->pos.rotY);
+			x += (490 * s + 1100 * c) >> W2V_SHIFT;
+			y -= 540;
+			z += (490 * c - 1100 * s) >> W2V_SHIFT;
+		}
+		fx->pos.x += (x - fx->pos.x) >> 4;
+		fx->pos.y += (y - fx->pos.y) >> 4;
+		fx->pos.z += (z - fx->pos.z) >> 4;
+		if (ABS(x - fx->pos.x) < 256 &&
+			ABS(y - fx->pos.y) < 256 &&
+			ABS(z - fx->pos.z) < 256)
+			KillEffect(fxNum);
+	}
+	else
+	{
+		fx->counter++;
+		if (fx->counter == 0)
+			KillEffect(fxNum);
+	}
+}
+
 void CreateBartoliLight(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
@@ -79,7 +117,7 @@ short DragonFire(int x, int y, int z, short speed, short rotY, short roomNum)
   * Inject function
   */
 void Inject_Dragon() {
-	//INJECT(0x00417780, ControlTwinkle);
+	INJECT(0x00417780, ControlTwinkle);
 	INJECT(0x00417900, CreateBartoliLight);
 	INJECT(0x004179E0, DragonFire);
 	//INJECT(0x00417A90, DragonCollision);

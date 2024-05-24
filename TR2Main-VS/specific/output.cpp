@@ -675,10 +675,8 @@ void S_CalculateLight(int x, int y, int z, short roomNumber) {
 }
 
 void S_CalculateStaticLight(short adder) {
-	int depth;
-
 	LsAdder = adder - 0x1000;
-	depth = PhdMatrixPtr->_23 >> W2V_SHIFT;
+	int depth = PhdMatrixPtr->_23 >> W2V_SHIFT;
 #ifdef FEATURE_VIEW_IMPROVED
 	LsAdder += CalculateFogShade(depth);
 #else // !FEATURE_VIEW_IMPROVED
@@ -693,7 +691,7 @@ void S_CalculateStaticMeshLight(int x, int y, int z, int shade1, int shade2, ROO
 	LIGHT_INFO* light;
 	ROOM_VERTEX* roomVtx = room->data->vertices, *currVtx;
 	int roomVtxCount = room->data->vtxSize;
-	int adder = shade1, shade, falloff, intensity;
+	int colorAdder = shade1, shade, falloff, intensity;
 	int xDist, yDist, zDist, distance, radius;
 
 	// if there is no lightMode (0) then it take shade1 as backup !
@@ -701,8 +699,11 @@ void S_CalculateStaticMeshLight(int x, int y, int z, int shade1, int shade2, ROO
 		int* roomLightTable = RoomLightTables[RoomLightShades[room->lightMode]].table;
 		for (int i = 0; i < roomVtxCount; ++i) {
 			currVtx = &roomVtx[i];
-			adder = currVtx->lightBase + ((short)roomLightTable[currVtx->lightTableValue % WIBBLE_SIZE]);
+			colorAdder = (shade2 - shade1) + currVtx->lightAdder;
 		}
+	}
+	else {
+		colorAdder += (shade2 - shade1) * RoomLightShades[room->lightMode] / (WIBBLE_SIZE - 1);
 	}
 
 	for (DWORD i = 0; i < DynamicLightCount; ++i) {
@@ -721,16 +722,16 @@ void S_CalculateStaticMeshLight(int x, int y, int z, int shade1, int shade2, ROO
 			distance = SQR(xDist) + SQR(yDist) + SQR(zDist);
 			if (distance <= SQR(radius)) {
 				shade = (1 << intensity) - (distance >> (2 * falloff - intensity));
-				adder -= shade;
-				if (adder < 0) {
-					adder = 0;
+				colorAdder -= shade;
+				if (colorAdder < 0) {
+					colorAdder = 0;
 					break;
 				}
 			}
 		}
 	}
 
-	S_CalculateStaticLight(adder);
+	S_CalculateStaticLight(colorAdder);
 }
 
 void S_LightRoom(ROOM_INFO* room) {
