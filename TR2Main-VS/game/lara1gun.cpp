@@ -247,7 +247,7 @@ void ControlHarpoonBolt(short itemID)
 		if (target == LaraItem)
 			continue;
 
-		if (target->objectID == ID_WINDOW1 || (item->status != ITEM_INVISIBLE && Objects[target->objectID].collision != NULL)) {
+		if ((target->objectID == ID_WINDOW1 || target->objectID == ID_WINDOW3) || (item->status != ITEM_INVISIBLE && Objects[target->objectID].collision != NULL)) {
 			bounds = GetBestFrame(target);
 			if (item->pos.y < (target->pos.y + bounds[2]) || item->pos.y > (target->pos.y + bounds[3]))
 				continue;
@@ -269,7 +269,7 @@ void ControlHarpoonBolt(short itemID)
 			if ((rZ < bounds[4] && sZ < bounds[4]) || (rZ > bounds[5] && sZ > bounds[5]))
 				continue;
 
-			if (target->objectID == ID_WINDOW1) {
+			if (target->objectID == ID_WINDOW1 || target->objectID == ID_WINDOW3) {
 				SmashWindow(targetID);
 			}
 			else {
@@ -353,7 +353,7 @@ void ControlRocket(short itemID) {
 	}
 	for (linkID = RoomInfo[item->roomNumber].itemNumber; linkID != -1; linkID = link->nextItem) {
 		link = &Items[linkID];
-		if (link != LaraItem && link->collidable && (link->objectID == ID_WINDOW1 || (Objects[link->objectID].intelligent && link->status != ITEM_INVISIBLE && Objects[link->objectID].collision)))
+		if (link != LaraItem && link->collidable && ((link->objectID == ID_WINDOW1 || link->objectID == ID_WINDOW3) || (Objects[link->objectID].intelligent && link->status != ITEM_INVISIBLE && Objects[link->objectID].collision)))
 		{
 			frame = GetBestFrame(link);
 			if (item->pos.y + displacement >= link->pos.y + frame[2] && item->pos.y - displacement <= link->pos.y + frame[3]) {
@@ -366,12 +366,10 @@ void ControlRocket(short itemID) {
 				{
 					r = (s * (item->pos.x - link->pos.x) + c * (item->pos.z - link->pos.z)) >> W2V_SHIFT;
 					oldR = (s * (oldX - link->pos.x) + c * (oldZ - link->pos.z)) >> W2V_SHIFT;
-					if ((r + displacement >= frame[4] ||
-						oldR + displacement >= frame[4]) &&
-						(r - displacement <= frame[5] ||
-							oldR - displacement <= frame[5]))
+					if ((r + displacement >= frame[4] || oldR + displacement >= frame[4]) &&
+						(r - displacement <= frame[5] || oldR - displacement <= frame[5]))
 					{
-						if (link->objectID == ID_WINDOW1) {
+						if (link->objectID == ID_WINDOW1 || link->objectID == ID_WINDOW3) {
 							SmashWindow(linkID);
 						}
 						else {

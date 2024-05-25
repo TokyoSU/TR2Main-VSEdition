@@ -450,7 +450,7 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* dest, int damage) {
 
 void SmashItem(short itemID, int weaponType) {
 	ITEM_INFO* item = &Items[itemID];
-	if (item->objectID == ID_WINDOW1) {
+	if (item->objectID == ID_WINDOW1 || item->objectID == ID_WINDOW3) {
 		SmashWindow(itemID);
 	}
 	else {
