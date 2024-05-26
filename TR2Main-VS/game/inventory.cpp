@@ -1051,15 +1051,15 @@ void DoInventoryBackground() {
 		viewPos.x = 0;
 		viewPos.y = -0x200;
 		viewPos.z = 0;
-		viewPos.rotX = angles.pitch;
-		viewPos.rotY = angles.yaw;
+		viewPos.rotX = angles.rotX;
+		viewPos.rotY = angles.rotY;
 		viewPos.rotZ = 0;
 		phd_GenerateW2V(&viewPos);
 
 		// set lighting
 		LsDivider = 0x6000;
 		phd_GetVectorAngles(-0x600, 0x100, 0x400, &angles);
-		phd_RotateLight(angles.pitch, angles.yaw);
+		phd_RotateLight(angles.rotX, angles.rotY);
 
 		// transform and insert the mesh
 		phd_PushMatrix();

@@ -645,7 +645,7 @@ extern BYTE LabTextureUVFlags[0x2000];
 #endif // FEATURE_EXTENDED_LIMITS
 #define LevelFileName				ARRAY_(0x004D9D88, char, [256])
 #ifdef FEATURE_EXTENDED_LIMITS
-extern D3DTLVERTEX HWR_VertexBuffer[0x8000];
+extern D3DTLVERTEX HWR_VertexBuffer[32768];
 extern HWR_TEXHANDLE HWR_PageHandles[128];
 extern int HWR_TexturePageIndexes[128];
 #else // FEATURE_EXTENDED_LIMITS

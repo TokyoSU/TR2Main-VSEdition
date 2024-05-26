@@ -49,7 +49,7 @@ short Info3dBuffer[480000];
 
 #ifdef FEATURE_EXTENDED_LIMITS
 PHD_SPRITE PhdSpriteInfo[2048];
-D3DTLVERTEX HWR_VertexBuffer[0x8000];
+D3DTLVERTEX HWR_VertexBuffer[32768];
 #endif // FEATURE_EXTENDED_LIMITS
 
 int PhdFov;
@@ -322,8 +322,8 @@ void phd_LookAt(int xsrc, int ysrc, int zsrc, int xtar, int ytar, int ztar, shor
 	viewPos.x = xsrc;
 	viewPos.y = ysrc;
 	viewPos.z = zsrc;
-	viewPos.rotX = angles.pitch;
-	viewPos.rotY = angles.yaw;
+	viewPos.rotX = angles.rotX;
+	viewPos.rotY = angles.rotY;
 	viewPos.rotZ = roll;
 	phd_GenerateW2V(&viewPos);
 }
@@ -331,19 +331,16 @@ void phd_LookAt(int xsrc, int ysrc, int zsrc, int xtar, int ytar, int ztar, shor
 void phd_GetVectorAngles(int x, int y, int z, VECTOR_ANGLES* angles) {
 	short pitch;
 
-	angles->yaw = phd_atan(z, x);
-
+	angles->rotY = phd_atan(z, x);
 	while ((short)x != x || (short)y != y || (short)z != z) {
 		x >>= 2;
 		y >>= 2;
 		z >>= 2;
 	}
 	pitch = phd_atan(phd_sqrt(SQR(x) + SQR(z)), y);
-
 	if ((y > 0 && pitch > 0) || (y < 0 && pitch < 0))
 		pitch = -pitch;
-
-	angles->pitch = pitch;
+	angles->rotX = pitch;
 }
 
 void phd_RotX(short angle) {

@@ -659,7 +659,7 @@ void S_CalculateLight(int x, int y, int z, short roomNumber) {
 		LsAdder = room->ambient1 - adder;
 		LsDivider = (1 << (W2V_SHIFT + 12)) / adder;
 		phd_GetVectorAngles(xBrightest, yBrightest, zBrightest, &angles);
-		phd_RotateLight(angles.pitch, angles.yaw);
+		phd_RotateLight(angles.rotX, angles.rotY);
 	}
 
 	// Fog calculation
@@ -699,11 +699,12 @@ void S_CalculateStaticMeshLight(int x, int y, int z, int shade1, int shade2, ROO
 		int* roomLightTable = RoomLightTables[RoomLightShades[room->lightMode]].table;
 		for (int i = 0; i < roomVtxCount; ++i) {
 			currVtx = &roomVtx[i];
-			colorAdder = (shade2 - shade1) + currVtx->lightAdder;
+			colorAdder = shade1 + ((short)roomLightTable[currVtx->lightTableValue % WIBBLE_SIZE]);
+			CLAMP(colorAdder, 0, 0x1FFF);
 		}
 	}
 	else {
-		colorAdder += (shade2 - shade1) * RoomLightShades[room->lightMode] / (WIBBLE_SIZE - 1);
+		colorAdder += ((shade2 - shade1) * RoomLightShades[room->lightMode]) / (WIBBLE_SIZE - 1);
 	}
 
 	for (DWORD i = 0; i < DynamicLightCount; ++i) {

@@ -789,8 +789,8 @@ void Inv_RingGetView(RING_INFO* ring, PHD_3DPOS* view) {
 	view->x = ring->camera.x;
 	view->y = ring->camera.y;
 	view->z = ring->camera.z;
-	view->rotX = angles.pitch + ring->cameraPitch;
-	view->rotY = angles.yaw;
+	view->rotX = angles.rotX + ring->cameraPitch;
+	view->rotY = angles.rotY;
 	view->rotZ = 0;
 }
 
@@ -799,7 +799,7 @@ void Inv_RingLight(RING_INFO* ring) {
 
 	LsDivider = 0x6000;
 	phd_GetVectorAngles(ring->light.x, ring->light.y, ring->light.z, &angles);
-	phd_RotateLight(angles.pitch, angles.yaw);
+	phd_RotateLight(angles.rotX, angles.rotY);
 }
 
 void Inv_RingCalcAdders(RING_INFO* ring, short rotDuration) {

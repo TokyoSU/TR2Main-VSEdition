@@ -291,15 +291,15 @@ void LaraGetNewTarget(WEAPON_INFO* weapon)
 			if (LOS(&srcPos, &targetPos))
 			{
 				phd_GetVectorAngles(targetPos.x - srcPos.x, targetPos.y - srcPos.y, targetPos.z - srcPos.z, &angle);
-				angle.yaw -= LaraItem->pos.rotY + Lara.torso_y_rot;
-				angle.pitch -= LaraItem->pos.rotX + Lara.torso_x_rot;
+				angle.rotY -= LaraItem->pos.rotY + Lara.torso_y_rot;
+				angle.rotX -= LaraItem->pos.rotX + Lara.torso_x_rot;
 
-				if ((angle.yaw >= weapon->lockAngles[0])
-				&&  (angle.yaw <= weapon->lockAngles[1])
-				&&  (angle.pitch >= weapon->lockAngles[2])
-				&&  (angle.pitch <= weapon->lockAngles[3]))
+				if ((angle.rotY >= weapon->lockAngles[0])
+				&&  (angle.rotY <= weapon->lockAngles[1])
+				&&  (angle.rotX >= weapon->lockAngles[2])
+				&&  (angle.rotX <= weapon->lockAngles[3]))
 				{
-					angleY = ABS(angle.yaw);
+					angleY = ABS(angle.rotY);
 					if ((angleY < (bestAngle + 0xAAA))
 					&&  (distance < bestDistance))
 					{

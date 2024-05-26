@@ -1902,8 +1902,8 @@ typedef struct ObjectVector_t {
 } OBJECT_VECTOR;
 
 typedef struct VectorAngles_t {
-	short yaw;
-	short pitch;
+	short rotY;
+	short rotX;
 } VECTOR_ANGLES;
 
 typedef struct Phd3dPos_t {
