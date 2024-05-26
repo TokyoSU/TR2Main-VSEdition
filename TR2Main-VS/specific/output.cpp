@@ -565,34 +565,42 @@ void S_PrintShadow(short radius, short* bPtr, ITEM_INFO* item) {
 
 void S_CalculateLight(int x, int y, int z, short roomNumber) {
 	ROOM_INFO* room = &RoomInfo[roomNumber];
+	LIGHT_INFO* light;
 	int xDist, yDist, zDist, distance, radius, depth;
 	int xBrightest = 0, yBrightest = 0, zBrightest = 0;
 	int brightest = 0, adder;
 	int shade, shade1, shade2;
 	int falloff, falloff1, falloff2;
 	int intensity, intensity1, intensity2;
-	int lightShade;
+	short colorAdder = 0;
 	VECTOR_ANGLES angles;
 
 	// Static light calculation
 	if (room->lightMode != 0) {
-		lightShade = RoomLightShades[room->lightMode];
+		ROOM_VERTEX* roomVtx = room->data->vertices;
+		int roomVtxCount = room->data->vtxSize;
+		int* roomLightTable = RoomLightTables[RoomLightShades[room->lightMode]].table;
 		for (int i = 0; i < room->numLights; ++i) {
-			xDist = x - room->light[i].x;
-			yDist = y - room->light[i].y;
-			zDist = z - room->light[i].z;
-			falloff1 = room->light[i].fallOff1;
-			falloff2 = room->light[i].fallOff2;
-			intensity1 = room->light[i].intensity1;
-			intensity2 = room->light[i].intensity2;
+			light = &room->light[i];
+			xDist = x - light->x;
+			yDist = y - light->y;
+			zDist = z - light->z;
+			falloff1 = light->fallOff1;
+			falloff2 = light->fallOff2;
+			intensity1 = light->intensity1;
+			intensity2 = light->intensity2;
 			distance = (SQR(xDist) + SQR(yDist) + SQR(zDist)) >> 12;
 			falloff1 = SQR(falloff1) >> 12;
 			falloff2 = SQR(falloff2) >> 12;
 			shade1 = falloff1 * intensity1 / (falloff1 + distance);
 			shade2 = falloff2 * intensity2 / (falloff2 + distance);
-			shade = shade1 + (shade2 - shade1) * lightShade / (WIBBLE_SIZE - 1);
-			if (shade > brightest) {
-				brightest = shade;
+			for (int i = 0; i < roomVtxCount; ++i) {
+				ROOM_VERTEX* currVtx = &roomVtx[i];
+				colorAdder = (shade1 + (shade2 - shade1)) + ((short)roomLightTable[currVtx->lightTableValue % WIBBLE_SIZE]);
+				CLAMP(colorAdder, 0, 0x1FFF);
+			}
+			if (colorAdder > brightest) {
+				brightest = colorAdder;
 				xBrightest = xDist;
 				yBrightest = yDist;
 				zBrightest = zDist;
@@ -600,17 +608,16 @@ void S_CalculateLight(int x, int y, int z, short roomNumber) {
 		}
 	}
 	else {
-		for (int i = 0; i < room->numLights; ++i) {
-			xDist = x - room->light[i].x;
-			yDist = y - room->light[i].y;
-			zDist = z - room->light[i].z;
-			falloff = room->light[i].fallOff1;
-			intensity = room->light[i].intensity1;
-
-			falloff = SQR(falloff) >> 12;
+		for (short i = 0; i < room->numLights; ++i) {
+			light = &room->light[i];
+			xDist = x - light->x;
+			yDist = y - light->y;
+			zDist = z - light->z;
+			falloff = light->fallOff1;
+			intensity = light->intensity1;
 			distance = (SQR(xDist) + SQR(yDist) + SQR(zDist)) >> 12;
-
-			shade = falloff * intensity / (falloff + distance);
+			radius = SQR(falloff) >> 12;
+			shade = radius * intensity / (radius + distance);
 			if (shade > brightest) {
 				brightest = shade;
 				xBrightest = xDist;
@@ -628,7 +635,6 @@ void S_CalculateLight(int x, int y, int z, short roomNumber) {
 		zDist = z - DynamicLights[i].z;
 		falloff = DynamicLights[i].fallOff1;
 		intensity = DynamicLights[i].intensity1;
-
 		radius = 1 << falloff;
 
 		if ((xDist >= -radius && xDist <= radius) &&
@@ -650,14 +656,14 @@ void S_CalculateLight(int x, int y, int z, short roomNumber) {
 	}
 
 	// Light finalization
-	adder = adder / 2;
+	adder = adder >> 1;
 	if (adder == 0) {
 		LsAdder = room->ambient1;
 		LsDivider = 0;
 	}
 	else {
 		LsAdder = room->ambient1 - adder;
-		LsDivider = (1 << (W2V_SHIFT + 12)) / adder;
+		LsDivider = (1 << 26) / adder;
 		phd_GetVectorAngles(xBrightest, yBrightest, zBrightest, &angles);
 		phd_RotateLight(angles.rotX, angles.rotY);
 	}
@@ -689,22 +695,22 @@ void S_CalculateStaticLight(short adder) {
 
 void S_CalculateStaticMeshLight(int x, int y, int z, int shade1, int shade2, ROOM_INFO* room) {
 	LIGHT_INFO* light;
-	ROOM_VERTEX* roomVtx = room->data->vertices, *currVtx;
-	int roomVtxCount = room->data->vtxSize;
-	int colorAdder = shade1, shade, falloff, intensity;
+	int colorAdder, shade, falloff, intensity;
 	int xDist, yDist, zDist, distance, radius;
 
 	// if there is no lightMode (0) then it take shade1 as backup !
 	if (room->lightMode != 0) {
+		ROOM_VERTEX* roomVtx = room->data->vertices;
+		int roomVtxCount = room->data->vtxSize;
 		int* roomLightTable = RoomLightTables[RoomLightShades[room->lightMode]].table;
 		for (int i = 0; i < roomVtxCount; ++i) {
-			currVtx = &roomVtx[i];
-			colorAdder = shade1 + ((short)roomLightTable[currVtx->lightTableValue % WIBBLE_SIZE]);
+			ROOM_VERTEX* currVtx = &roomVtx[i];
+			colorAdder = shade1 + (shade2 - shade1) + ((short)roomLightTable[currVtx->lightTableValue % WIBBLE_SIZE]);
 			CLAMP(colorAdder, 0, 0x1FFF);
 		}
 	}
 	else {
-		colorAdder += ((shade2 - shade1) * RoomLightShades[room->lightMode]) / (WIBBLE_SIZE - 1);
+		colorAdder = shade1 + (shade2 - shade1) * RoomLightShades[room->lightMode] / (WIBBLE_SIZE - 1);
 	}
 
 	for (DWORD i = 0; i < DynamicLightCount; ++i) {

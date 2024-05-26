@@ -1506,6 +1506,9 @@ void ObjectObjects()
 	obj = &Objects[ID_RICOCHET];
 	obj->control = ControlRichochet1;
 
+	obj = &Objects[ID_BUBBLES];
+	obj->control = ControlBubble1;
+
 	obj = &Objects[ID_TWINKLE];
 	obj->control = ControlTwinkle;
 #if defined(FEATURE_MOD_CONFIG)
