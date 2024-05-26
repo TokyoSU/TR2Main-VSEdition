@@ -563,7 +563,7 @@ void S_PrintShadow(short radius, short* bPtr, ITEM_INFO* item) {
 	phd_PopMatrix();
 }
 
-void S_CalculateLight(int x, int y, int z, short roomNumber) {
+void S_CalculateLight(int x, int y, int z, short roomNumber, bool isLara) {
 	ROOM_INFO* room = &RoomInfo[roomNumber];
 	LIGHT_INFO* light;
 	int xDist, yDist, zDist, distance, radius, depth;
@@ -576,7 +576,7 @@ void S_CalculateLight(int x, int y, int z, short roomNumber) {
 	VECTOR_ANGLES angles;
 
 	// Static light calculation
-	if (room->lightMode != 0) {
+	if (room->lightMode != LIT_None) {
 		ROOM_VERTEX* roomVtx = room->data->vertices;
 		int roomVtxCount = room->data->vtxSize;
 		int* roomLightTable = RoomLightTables[RoomLightShades[room->lightMode]].table;
@@ -594,10 +594,17 @@ void S_CalculateLight(int x, int y, int z, short roomNumber) {
 			falloff2 = SQR(falloff2) >> 12;
 			shade1 = falloff1 * intensity1 / (falloff1 + distance);
 			shade2 = falloff2 * intensity2 / (falloff2 + distance);
-			for (int i = 0; i < roomVtxCount; ++i) {
-				ROOM_VERTEX* currVtx = &roomVtx[i];
-				colorAdder = (shade1 + (shade2 - shade1)) + ((short)roomLightTable[currVtx->lightTableValue % WIBBLE_SIZE]);
-				CLAMP(colorAdder, 0, 0x1FFF);
+			if (isLara)
+			{
+				colorAdder = (shade1 + (shade2 - shade1)) * RoomLightShades[room->lightMode] / (WIBBLE_SIZE - 1);
+			}
+			else
+			{
+				for (int i = 0; i < roomVtxCount; ++i) {
+					ROOM_VERTEX* currVtx = &roomVtx[i];
+					colorAdder = (shade1 + (shade2 - shade1)) + ((short)roomLightTable[currVtx->lightTableValue % WIBBLE_SIZE]);
+					CLAMP(colorAdder, 0, 0x1FFF);
+				}
 			}
 			if (colorAdder > brightest) {
 				brightest = colorAdder;
@@ -695,23 +702,25 @@ void S_CalculateStaticLight(short adder) {
 
 void S_CalculateStaticMeshLight(int x, int y, int z, int shade1, int shade2, ROOM_INFO* room) {
 	LIGHT_INFO* light;
-	int colorAdder, shade, falloff, intensity;
+	int colorAdder = shade1, shade, falloff, intensity;
 	int xDist, yDist, zDist, distance, radius;
 
-	// if there is no lightMode (0) then it take shade1 as backup !
-	if (room->lightMode != 0) {
+	// if there is no lightMode (LIT_None) then it take shade1 as backup !
+	if (room->lightMode != LIT_None) {
 		ROOM_VERTEX* roomVtx = room->data->vertices;
 		int roomVtxCount = room->data->vtxSize;
 		int* roomLightTable = RoomLightTables[RoomLightShades[room->lightMode]].table;
 		for (int i = 0; i < roomVtxCount; ++i) {
 			ROOM_VERTEX* currVtx = &roomVtx[i];
 			colorAdder = shade1 + (shade2 - shade1) + ((short)roomLightTable[currVtx->lightTableValue % WIBBLE_SIZE]);
-			CLAMP(colorAdder, 0, 0x1FFF);
+			if (IsWaterEffect)
+				colorAdder += ShadesTable[(WibbleOffset + (BYTE)RandomTable[(roomVtxCount - i) % WIBBLE_SIZE]) % WIBBLE_SIZE] >> 2;
 		}
 	}
 	else {
 		colorAdder = shade1 + (shade2 - shade1) * RoomLightShades[room->lightMode] / (WIBBLE_SIZE - 1);
 	}
+	CLAMP(colorAdder, 0, 8192);
 
 	for (DWORD i = 0; i < DynamicLightCount; ++i) {
 		light = &DynamicLights[i];

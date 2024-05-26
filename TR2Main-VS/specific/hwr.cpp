@@ -267,7 +267,6 @@ void HWR_DrawPolyList() {
 	UINT16 polyType, texPage, vtxCount;
 	D3DTLVERTEX* vtxPtr;
 
-	HWR_EnableZBuffer(true, true);
 	for (DWORD i = 0; i < SurfaceCount; ++i) {
 		bufPtr = (UINT16*)SortBuffer[i]._0;
 
@@ -323,6 +322,7 @@ void HWR_DrawPolyList() {
 		case POLY_HWR_WGTmapSub: // triangle fan (texture + colorkey + PSX subtractive blend)
 		case POLY_HWR_WGTmapQrt: // triangle fan (texture + colorkey + PSX quarter blend)
 			HWR_TexSource(texPage == (UINT16)~0 ? GetEnvmapTextureHandle() : HWR_PageHandles[texPage]);
+			HWR_EnableZBuffer(polyType != POLY_HWR_GTmap, true);
 			HWR_EnableColorKey(polyType != POLY_HWR_GTmap);
 			if (TextureFormat.bpp < 16 || AlphaBlendMode == 0 || polyType == POLY_HWR_GTmap || polyType == POLY_HWR_WGTmap) {
 				HWR_DrawPrimitive(D3DPT_TRIANGLEFAN, vtxPtr, vtxCount, true);
@@ -344,6 +344,7 @@ void HWR_DrawPolyList() {
 		case POLY_HWR_sub: // triangle fan (color + PSX subtractive blend)
 		case POLY_HWR_qrt: // triangle fan (color + PSX quarter blend)
 			HWR_TexSource(0);
+			HWR_EnableZBuffer(polyType != POLY_HWR_gouraud, true);
 			HWR_EnableColorKey(polyType != POLY_HWR_gouraud);
 			if (TextureFormat.bpp < 16 || AlphaBlendMode == 0 || polyType == POLY_HWR_gouraud) {
 				HWR_DrawPrimitive(D3DPT_TRIANGLEFAN, vtxPtr, vtxCount, true);
@@ -354,6 +355,7 @@ void HWR_DrawPolyList() {
 #else // !FEATURE_VIDEOFX_IMPROVED
 			HWR_TexSource(0);
 			HWR_EnableColorKey(false);
+			HWR_EnableZBuffer(false, true);
 			HWR_DrawPrimitive(D3DPT_TRIANGLEFAN, vtxPtr, vtxCount, true);
 #endif // !FEATURE_VIDEOFX_IMPROVED
 			break;
@@ -361,11 +363,13 @@ void HWR_DrawPolyList() {
 		case POLY_HWR_line: // line strip (color)
 			HWR_TexSource(0);
 			HWR_EnableColorKey(false);
+			HWR_EnableZBuffer(false, true);
 			HWR_DrawPrimitive(D3DPT_LINESTRIP, vtxPtr, vtxCount, true);
 			break;
 
 		case POLY_HWR_trans: // triangle fan (color + semitransparent)
 			HWR_TexSource(0);
+			HWR_EnableZBuffer(false, true);
 			D3DDev->GetRenderState(AlphaBlendEnabler, &alphaState);
 			D3DDev->SetRenderState(AlphaBlendEnabler, TRUE);
 			HWR_DrawPrimitive(D3DPT_TRIANGLEFAN, vtxPtr, vtxCount, true);

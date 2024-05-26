@@ -579,6 +579,9 @@ short* calc_object_vertices(short* ptrObj) {
 		PhdVBuf[i].xv = xv;
 		PhdVBuf[i].yv = yv;
 
+		if (IsWaterEffect)
+			PhdVBuf[i].g += ShadesTable[(WibbleOffset + (BYTE)RandomTable[(vtxCount - i) % WIBBLE_SIZE]) % WIBBLE_SIZE] >> 2;
+
 		if (zv < FltNearZ) {
 			clipFlags = 0x80;
 			PhdVBuf[i].zv = zv;

@@ -2612,21 +2612,34 @@ static D3DTLVERTEX* InsertVertices(POLYTYPE type, int z, int vertexCount)
 }
 
 void InsertLine_Sorted(int x0, int y0, int x1, int y1, int z, BYTE colorIdx) {
-	D3DTLVERTEX* vtx = InsertVertices(POLY_HWR_line, z, 2);
-	if (vtx == NULL) return;
-	RGB888* color = &GamePalette8[colorIdx];
-	D3DCOLOR shade = GetShadeColor(color->red, color->green, color->blue, 0xFF, 0, false);
-	D3DVALUE rhw = RhwFactor / (D3DVALUE)z;
-	D3DVALUE sz = FltResZBuf - rhw * FltResZORhw;
-	vtx[0].sx = (D3DVALUE)(PhdWinMinX + x0);
-	vtx[0].sy = (D3DVALUE)(PhdWinMinY + y0);
-	vtx[1].sx = (D3DVALUE)(PhdWinMinX + x1);
-	vtx[1].sy = (D3DVALUE)(PhdWinMinY + y1);
+	double rhw, sz;
+	D3DCOLOR color;
+
+	Sort3dPtr->_0 = (DWORD)Info3dPtr;
+	Sort3dPtr->_1 = MAKE_ZSORT(z);
+	++Sort3dPtr;
+
+	*(Info3dPtr++) = POLY_HWR_line;
+	*(Info3dPtr++) = 2; //  vertex count
+	*(D3DTLVERTEX**)Info3dPtr = HWR_VertexPtr;
+
+	color = GetShadeColor(GamePalette8[colorIdx].red, GamePalette8[colorIdx].green, GamePalette8[colorIdx].blue, 0xFF, 0, false);
+	rhw = RhwFactor / (double)z;
+	sz = FltResZBuf - rhw * FltResZORhw;
+
+	HWR_VertexPtr[0].sx = (float)(PhdWinMinX + x0);
+	HWR_VertexPtr[0].sy = (float)(PhdWinMinY + y0);
+	HWR_VertexPtr[1].sx = (float)(PhdWinMinX + x1);
+	HWR_VertexPtr[1].sy = (float)(PhdWinMinY + y1);
+
 	for (int i = 0; i < 2; ++i) {
-		vtx[i].color = shade;
-		vtx[i].sz = sz; // NOTE: there was bug because of uninitialized sz and rhw
-		vtx[i].rhw = rhw;
+		HWR_VertexPtr[i].color = color;
+		HWR_VertexPtr[i].sz = sz; // NOTE: there was bug because of uninitialized sz and rhw
+		HWR_VertexPtr[i].rhw = rhw;
 	}
+
+	HWR_VertexPtr += 2;
+	++SurfaceCount;
 }
 
 void InsertTrans8_Sorted(PHD_VBUF* vbuf, short shade) {
