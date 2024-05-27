@@ -1031,14 +1031,30 @@ void TrapObjects()
 	obj->save_flags = TRUE;
 	obj->save_position = TRUE;
 
-	for (int i = ID_PROPELLER1; i <= ID_PROPELLER4; i++)
-	{
-		obj = &Objects[i];
-		obj->control = PropellerControl;
-		obj->collision = ObjectCollision;
-		obj->save_anim = TRUE;
-		obj->save_flags = TRUE;
-	}
+	obj = &Objects[ID_PROPELLER1];
+	obj->control = PropellerControl;
+	obj->collision = TrapCollision;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_PROPELLER2];
+	obj->control = PropellerControl;
+	obj->collision = ObjectCollision;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_PROPELLER3];
+	obj->control = PropellerControl;
+	obj->collision = TrapCollision;
+	obj->water_creature = TRUE;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_PROPELLER4];
+	obj->control = PropellerControl;
+	obj->collision = TrapCollision;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
 
 	obj = &Objects[ID_SPIKE_WALL];
 	obj->control = ControlSpikeWall;
@@ -1193,6 +1209,15 @@ void TrapObjects()
 #else
 	obj->semi_transparent = TRUE;
 #endif
+}
+
+static void RegisterPickup(short objNum)
+{
+	OBJECT_INFO* obj = &Objects[objNum];
+	obj->collision = PickUpCollision;
+	obj->drawRoutine = DrawSpriteItem;
+	obj->save_position = TRUE;
+	obj->save_flags = TRUE;
 }
 
 void ObjectObjects()
@@ -1392,50 +1417,36 @@ void ObjectObjects()
 		obj->save_flags = TRUE;
 	}
 
-	for (int i = ID_PISTOL_ITEM; i <= ID_FLARES_ITEM; i++)
-	{
-		obj = &Objects[i];
-		obj->collision = PickUpCollision;
-		obj->drawRoutine = DrawSpriteItem;
-		obj->save_position = TRUE;
-		obj->save_flags = TRUE;
-	}
-
-	for (int i = ID_PUZZLE_ITEM1; i <= ID_PUZZLE_ITEM4; i++)
-	{
-		obj = &Objects[i];
-		obj->collision = PickUpCollision;
-		obj->drawRoutine = DrawSpriteItem;
-		obj->save_position = TRUE;
-		obj->save_flags = TRUE;
-	}
-
-	for (int i = ID_SECRET1; i <= ID_SECRET3; i++)
-	{
-		obj = &Objects[i];
-		obj->collision = PickUpCollision;
-		obj->drawRoutine = DrawSpriteItem;
-		obj->save_position = TRUE;
-		obj->save_flags = TRUE;
-	}
-
-	for (int i = ID_KEY_ITEM1; i <= ID_KEY_ITEM4; i++)
-	{
-		obj = &Objects[i];
-		obj->collision = PickUpCollision;
-		obj->drawRoutine = DrawSpriteItem;
-		obj->save_position = TRUE;
-		obj->save_flags = TRUE;
-	}
-
-	for (int i = ID_PICKUP_ITEM1; i <= ID_PICKUP_ITEM2; i++)
-	{
-		obj = &Objects[i];
-		obj->collision = PickUpCollision;
-		obj->drawRoutine = DrawSpriteItem;
-		obj->save_position = TRUE;
-		obj->save_flags = TRUE;
-	}
+	RegisterPickup(ID_PISTOL_ITEM);
+	RegisterPickup(ID_SHOTGUN_ITEM);
+	RegisterPickup(ID_MAGNUM_ITEM);
+	RegisterPickup(ID_UZI_ITEM);
+	RegisterPickup(ID_HARPOON_ITEM);
+	RegisterPickup(ID_M16_ITEM);
+	RegisterPickup(ID_GRENADE_ITEM);
+	RegisterPickup(ID_PISTOL_AMMO_ITEM);
+	RegisterPickup(ID_SHOTGUN_AMMO_ITEM);
+	RegisterPickup(ID_MAGNUM_AMMO_ITEM);
+	RegisterPickup(ID_UZI_AMMO_ITEM);
+	RegisterPickup(ID_HARPOON_AMMO_ITEM);
+	RegisterPickup(ID_M16_AMMO_ITEM);
+	RegisterPickup(ID_GRENADE_AMMO_ITEM);
+	RegisterPickup(ID_SMALL_MEDIPACK_ITEM);
+	RegisterPickup(ID_LARGE_MEDIPACK_ITEM);
+	RegisterPickup(ID_FLARES_ITEM);
+	RegisterPickup(ID_PUZZLE_ITEM1);
+	RegisterPickup(ID_PUZZLE_ITEM2);
+	RegisterPickup(ID_PUZZLE_ITEM3);
+	RegisterPickup(ID_PUZZLE_ITEM4);
+	RegisterPickup(ID_KEY_ITEM1);
+	RegisterPickup(ID_KEY_ITEM2);
+	RegisterPickup(ID_KEY_ITEM3);
+	RegisterPickup(ID_KEY_ITEM4);
+	RegisterPickup(ID_PICKUP_ITEM1);
+	RegisterPickup(ID_PICKUP_ITEM2);
+	RegisterPickup(ID_SECRET1);
+	RegisterPickup(ID_SECRET2);
+	RegisterPickup(ID_SECRET3);
 
 	for (int i = ID_KEY_HOLE1; i <= ID_KEY_HOLE4; i++)
 	{
@@ -1457,14 +1468,17 @@ void ObjectObjects()
 		obj->save_flags = TRUE;
 	}
 
-	for (int i = ID_DETONATOR1; i <= ID_DETONATOR2; i++)
-	{
-		obj = &Objects[i];
-		obj->control = DetonatorControl;
-		obj->collision = DetonatorCollision;
-		obj->save_anim = TRUE;
-		obj->save_flags = TRUE;
-	}
+	obj = &Objects[ID_DETONATOR1];
+	obj->control = DetonatorControl;
+	obj->collision = DetonatorCollision;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_DETONATOR2];
+	obj->control = DetonatorControl;
+	obj->collision = DetonatorCollision;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
 
 	obj = &Objects[ID_BODY_PART];
 	obj->loaded = TRUE;

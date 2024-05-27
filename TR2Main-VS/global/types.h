@@ -1123,13 +1123,9 @@ typedef enum
 
 typedef enum : short
 {
-	LIT_None,
-	LIT_Default,
-	LIT_Reflection,
-	LIT_Glow,
-	LIT_Flicker,
-	LIT_Sunset,
-	LIT_Mist,
+	LIT_None = 0,
+	LIT_Move = 1,
+	LIT_GlowOrReflect = 2,
 	LIT_MaxLightType
 } LIGHT_TYPE;
 

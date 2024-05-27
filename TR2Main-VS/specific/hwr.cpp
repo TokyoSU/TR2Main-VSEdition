@@ -332,7 +332,8 @@ void HWR_DrawPolyList() {
 			}
 #else // !FEATURE_VIDEOFX_IMPROVED
 			HWR_TexSource(HWR_PageHandles[texPage]);
-			HWR_EnableColorKey(polyType == POLY_HWR_WGTmap);
+			HWR_EnableZBuffer(polyType != POLY_HWR_GTmap, true);
+			HWR_EnableColorKey(polyType != POLY_HWR_GTmap);
 			HWR_DrawPrimitive(D3DPT_TRIANGLEFAN, vtxPtr, vtxCount, true);
 #endif // !FEATURE_VIDEOFX_IMPROVED
 			break;
@@ -369,7 +370,7 @@ void HWR_DrawPolyList() {
 
 		case POLY_HWR_trans: // triangle fan (color + semitransparent)
 			HWR_TexSource(0);
-			HWR_EnableZBuffer(false, true);
+			HWR_EnableZBuffer(true, true);
 			D3DDev->GetRenderState(AlphaBlendEnabler, &alphaState);
 			D3DDev->SetRenderState(AlphaBlendEnabler, TRUE);
 			HWR_DrawPrimitive(D3DPT_TRIANGLEFAN, vtxPtr, vtxCount, true);
