@@ -51,7 +51,7 @@
 #define GRENADE_AMMO_CLIPS 2
 #define FLARE_AMMO_CLIPS 6
 
-#define MAX_EFFECTS 2048 // From 100
+#define MAX_EFFECTS 512                      // From 100
 
 /*
  * General Variables
@@ -424,7 +424,6 @@ extern FX_INFO Effects[MAX_EFFECTS]; // VAR_U_(0x005207C0, FX_INFO*)
 #define AnimChanges					VAR_U_(0x0052617C, CHANGE_STRUCT*)
 #define RoomCount					VAR_U_(0x00526180, short)
 #define RoomInfo					VAR_U_(0x0052618C, ROOM_INFO*)
-extern short* RoomLightInfo;
 #define UnderwaterCamera			VAR_U_(0x00526190, int)
 #define SunsetTimer					VAR_U_(0x00526194, DWORD)
 #define OutsideRight				VAR_U_(0x00526198, int)
@@ -611,7 +610,7 @@ extern PHD_TEXTURE PhdTextureInfo[0x2000];
 #define MatrixStack					ARRAY_(0x004BCB48, PHD_MATRIX, [40])
 #define DepthQTable					ARRAY_(0x004BD2C8, DEPTHQ_ENTRY, [32])
 #define DepthQIndex					ARRAY_(0x004BF2C8, BYTE, [256])
-extern PHD_VBUF PhdVBuf[8192]; // 0x004BF3D0
+#define PhdVBuf						ARRAY_(0x004BF3D0, PHD_VBUF, [1500])
 #ifdef FEATURE_EXTENDED_LIMITS
 extern BYTE* TexturePageBuffer8[128];
 #else // FEATURE_EXTENDED_LIMITS
@@ -685,7 +684,7 @@ extern bool ConflictLayout[ARRAY_SIZE(Layout->key)];
 extern LIGHT_INFO DynamicLights[64];
 extern int BoundRooms[1024];
 extern short DrawRoomsArray[1024];
-extern STATIC_INFO StaticObjects[2048];
+extern STATIC_INFO StaticObjects[256];
 #else // FEATURE_EXTENDED_LIMITS
 #define DynamicLights				ARRAY_(0x005251C0, LIGHT_INFO, [10])
 #define BoundRooms					ARRAY_(0x00525900, int, [128])

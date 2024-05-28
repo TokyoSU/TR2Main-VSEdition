@@ -44,7 +44,7 @@ void S_InsertBackPolygon(int x0, int y0, int x1, int y1); // 0x00450FF0
 void S_PrintShadow(short radius, short* bPtr, ITEM_INFO* item); // 0x00451040
 void S_CalculateLight(int x, int y, int z, short roomNumber, bool isLara = false); // 0x00451240
 void S_CalculateStaticLight(short adder); // 0x00451540
-void S_CalculateStaticMeshLight(int x, int y, int z, short shade1, short shade2, ROOM_INFO* room); // 0x00451580
+void S_CalculateStaticMeshLight(int x, int y, int z, int shade1, int shade2, ROOM_INFO* room); // 0x00451580
 void S_LightRoom(ROOM_INFO* room); // 0x004516B0
 void S_DrawHealthBar(int percent); // 0x004518C0
 void S_DrawEnemyHealthBar(int percent, int originalHP); // NOTE: Not exist in original code (Copy of S_DrawHealthBar with some change).

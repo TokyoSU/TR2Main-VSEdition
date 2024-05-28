@@ -52,7 +52,6 @@ PHD_SPRITE PhdSpriteInfo[2048];
 D3DTLVERTEX HWR_VertexBuffer[32768];
 #endif // FEATURE_EXTENDED_LIMITS
 
-PHD_VBUF PhdVBuf[8192];
 int PhdFov;
 
 #ifdef FEATURE_VIEW_IMPROVED
@@ -557,6 +556,7 @@ short* calc_object_vertices(short* ptrObj) {
 #endif // !FEATURE_VIEW_IMPROVED
 
 	totalClip = 0xFF;
+
 	ptrObj++; // skip poly counter
 	vtxCount = *(ptrObj++); // get vertex counter
 

@@ -1135,7 +1135,7 @@ short* InsertObjectG3(short* ptrObj, int number, SORTTYPE sortType) {
 int XYClipper(int vtxCount, VERTEX_INFO* vtx) {
 	// NOTE: the original function ignores rhw clipping that produces bugs for Z Buffer
 	static VERTEX_INFO vtx_buf[40]; // NOTE: original size was 20
-	VERTEX_INFO* vtx1, *vtx2;
+	VERTEX_INFO* vtx1, * vtx2;
 	float clip;
 	int i, j;
 

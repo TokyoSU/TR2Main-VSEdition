@@ -602,7 +602,7 @@ void S_CalculateLight(int x, int y, int z, short roomNumber, bool isLara) {
 			{
 				for (int i = 0; i < roomVtxCount; ++i) {
 					ROOM_VERTEX* currVtx = &roomVtx[i];
-					colorAdder = (shade1 + (shade2 - shade1)) - ((short)roomLightTable[currVtx->lightTableValue % WIBBLE_SIZE]);
+					colorAdder = (shade1 + (shade2 - shade1)) + ((short)roomLightTable[currVtx->lightTableValue % WIBBLE_SIZE]);
 					CLAMP(colorAdder, 0, 0x1FFF);
 				}
 			}
@@ -700,25 +700,27 @@ void S_CalculateStaticLight(short adder) {
 		LsAdder = 0x1FFF;
 }
 
-void S_CalculateStaticMeshLight(int x, int y, int z, short shade1, short shade2, ROOM_INFO* room) {
+void S_CalculateStaticMeshLight(int x, int y, int z, int shade1, int shade2, ROOM_INFO* room) {
 	LIGHT_INFO* light;
-	int falloff;
+	int colorAdder = shade1, shade, falloff, intensity;
 	int xDist, yDist, zDist, distance, radius;
-	short colorAdder = shade1, shade = 0, intensity = 0;
 
 	// if there is no lightMode (LIT_None) then it take shade1 as backup !
 	if (room->lightMode != LIT_None) {
+		ROOM_VERTEX* roomVtx = room->data->vertices;
+		int roomVtxCount = room->data->vtxSize;
 		int* roomLightTable = RoomLightTables[RoomLightShades[room->lightMode]].table;
-		for (int i = 0; i < room->data->vtxSize; ++i) {
-			ROOM_VERTEX* currVtx = &room->data->vertices[i];
+		for (int i = 0; i < roomVtxCount; ++i) {
+			ROOM_VERTEX* currVtx = &roomVtx[i];
 			colorAdder = shade1 + (shade2 - shade1) + ((short)roomLightTable[currVtx->lightTableValue % WIBBLE_SIZE]);
 			if (IsWaterEffect)
-				colorAdder += ShadesTable[(WibbleOffset + (BYTE)RandomTable[(room->data->vtxSize - i) % WIBBLE_SIZE]) % WIBBLE_SIZE] >> 2;
+				colorAdder += ShadesTable[(WibbleOffset + (BYTE)RandomTable[(roomVtxCount - i) % WIBBLE_SIZE]) % WIBBLE_SIZE] >> 2;
 		}
 	}
 	else {
 		colorAdder = shade1 + (shade2 - shade1) * RoomLightShades[room->lightMode] / (WIBBLE_SIZE - 1);
 	}
+	CLAMP(colorAdder, 0, 8192);
 
 	for (DWORD i = 0; i < DynamicLightCount; ++i) {
 		light = &DynamicLights[i];
@@ -756,7 +758,7 @@ void S_LightRoom(ROOM_INFO* room) {
 	int xPos, yPos, zPos;
 	int xDist, yDist, zDist, distance, radius;
 
-	if (room->lightMode != LIT_None) {
+	if (room->lightMode != 0) {
 		int* roomLightTable = RoomLightTables[RoomLightShades[room->lightMode]].table;
 		for (int i = 0; i < roomVtxCount; ++i) {
 			currVtx = &roomVtx[i];
