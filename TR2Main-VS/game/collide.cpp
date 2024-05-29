@@ -284,6 +284,11 @@ int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomID, int
 			}
 
 			STATIC_BOUNDS* bounds = &StaticObjects[mesh->staticNumber].collisionBounds;
+			// If bounds is empty then skip it !
+			if (bounds->xMin == 0 && bounds->xMax == 0 &&
+				bounds->yMin == 0 && bounds->yMax == 0 &&
+				bounds->zMin == 0 && bounds->zMax == 0)
+				continue;
 			int yMin = mesh->y + bounds->yMin;
 			int yMax = mesh->y + bounds->yMax;
 			int xMin = mesh->x;

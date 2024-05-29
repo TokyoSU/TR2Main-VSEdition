@@ -563,7 +563,7 @@ void S_PrintShadow(short radius, short* bPtr, ITEM_INFO* item) {
 	phd_PopMatrix();
 }
 
-void S_CalculateLight(int x, int y, int z, short roomNumber, bool isLara) {
+void S_CalculateLight(int x, int y, int z, short roomNumber) {
 	ROOM_INFO* room = &RoomInfo[roomNumber];
 	LIGHT_INFO* light;
 	int xDist, yDist, zDist, distance, radius, depth;
@@ -594,17 +594,10 @@ void S_CalculateLight(int x, int y, int z, short roomNumber, bool isLara) {
 			falloff2 = SQR(falloff2) >> 12;
 			shade1 = falloff1 * intensity1 / (falloff1 + distance);
 			shade2 = falloff2 * intensity2 / (falloff2 + distance);
-			if (isLara)
-			{
-				colorAdder = (shade1 + (shade2 - shade1)) * RoomLightShades[room->lightMode] / (WIBBLE_SIZE - 1);
-			}
-			else
-			{
-				for (int i = 0; i < roomVtxCount; ++i) {
-					ROOM_VERTEX* currVtx = &roomVtx[i];
-					colorAdder = (shade1 + (shade2 - shade1)) + ((short)roomLightTable[currVtx->lightTableValue % WIBBLE_SIZE]);
-					CLAMP(colorAdder, 0, 0x1FFF);
-				}
+			for (int i = 0; i < roomVtxCount; ++i) {
+				ROOM_VERTEX* currVtx = &roomVtx[i];
+				colorAdder = (shade1 + (shade2 - shade1)) + ((short)roomLightTable[currVtx->lightTableValue % WIBBLE_SIZE]);
+				CLAMP(colorAdder, 0, 0x1FFF);
 			}
 			if (colorAdder > brightest) {
 				brightest = colorAdder;
