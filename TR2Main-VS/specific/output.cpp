@@ -44,6 +44,7 @@
 #ifdef FEATURE_HUD_IMPROVED
 #include "modding/psx_bar.h"
 
+int RoomLightShades[5] = {};
 DWORD HealthBarMode = 2;
 bool PsxBarPosEnabled = true;
 double GameGUI_Scale = 1.0;
@@ -594,10 +595,12 @@ void S_CalculateLight(int x, int y, int z, short roomNumber) {
 			falloff2 = SQR(falloff2) >> 12;
 			shade1 = falloff1 * intensity1 / (falloff1 + distance);
 			shade2 = falloff2 * intensity2 / (falloff2 + distance);
-			for (int i = 0; i < roomVtxCount; ++i) {
+			for (int i = 0; i < roomVtxCount; ++i)
+			{
 				ROOM_VERTEX* currVtx = &roomVtx[i];
 				colorAdder = (shade1 + (shade2 - shade1)) + ((short)roomLightTable[currVtx->lightTableValue % WIBBLE_SIZE]);
-				CLAMP(colorAdder, 0, 0x1FFF);
+				if (IsWaterEffect)
+					colorAdder += ShadesTable[(WibbleOffset + (BYTE)RandomTable[(room->data->vtxSize - i) % WIBBLE_SIZE]) % WIBBLE_SIZE] >> 2;
 			}
 			if (colorAdder > brightest) {
 				brightest = colorAdder;
@@ -698,22 +701,15 @@ void S_CalculateStaticMeshLight(int x, int y, int z, int shade1, int shade2, ROO
 	int colorAdder = shade1, shade, falloff, intensity;
 	int xDist, yDist, zDist, distance, radius;
 
-	// if there is no lightMode (LIT_None) then it take shade1 as backup !
-	if (room->lightMode != LIT_None) {
-		ROOM_VERTEX* roomVtx = room->data->vertices;
-		int roomVtxCount = room->data->vtxSize;
-		int* roomLightTable = RoomLightTables[RoomLightShades[room->lightMode]].table;
-		for (int i = 0; i < roomVtxCount; ++i) {
-			ROOM_VERTEX* currVtx = &roomVtx[i];
-			colorAdder = shade1 + (shade2 - shade1) + ((short)roomLightTable[currVtx->lightTableValue % WIBBLE_SIZE]);
-			if (IsWaterEffect)
-				colorAdder += ShadesTable[(WibbleOffset + (BYTE)RandomTable[(roomVtxCount - i) % WIBBLE_SIZE]) % WIBBLE_SIZE] >> 2;
+	if (room->lightMode != LIT_None)
+	{
+		colorAdder += (shade2 - shade1 + 0x500) * RoomLightShades[room->lightMode + 2] / (WIBBLE_SIZE - 1);
+		if (IsWaterEffect)
+		{
+			for (int i = 0; i < room->data->vtxSize; i++)
+				colorAdder += ShadesTable[(WibbleOffset + (BYTE)RandomTable[(room->data->vtxSize - i) % WIBBLE_SIZE]) % WIBBLE_SIZE] >> 2;
 		}
 	}
-	else {
-		colorAdder = shade1 + (shade2 - shade1) * RoomLightShades[room->lightMode] / (WIBBLE_SIZE - 1);
-	}
-	CLAMP(colorAdder, 0, 8192);
 
 	for (DWORD i = 0; i < DynamicLightCount; ++i) {
 		light = &DynamicLights[i];
@@ -1161,8 +1157,7 @@ void S_SetupAboveWater(BOOL underwater) {
 void S_AnimateTextures(int nTicks) {
 	WibbleOffset = (WibbleOffset + nTicks / TICKS_PER_FRAME) % WIBBLE_SIZE;
 	RoomLightShades[1] = GetRandomDraw() & (WIBBLE_SIZE - 1);
-	RoomLightShades[2] = (WIBBLE_SIZE - 1) * (phd_sin(WibbleOffset * PHD_360 / WIBBLE_SIZE) + PHD_IONE) / 2 / PHD_IONE;
-
+	RoomLightShades[2] = ((WIBBLE_SIZE - 1) * ((phd_sin(WibbleOffset * PHD_360 / (WIBBLE_SIZE - 1)) + PHD_IONE) / 2)) / PHD_IONE;
 	if (GF_SunsetEnabled) {
 		// NOTE: in the original game there was: SunsetTimer += nTicks;
 		// so the timer was reset every time when the saved game is loaded
@@ -1170,6 +1165,7 @@ void S_AnimateTextures(int nTicks) {
 		CLAMPG(SunsetTimer, SUNSET_TIMEOUT);
 		RoomLightShades[3] = (WIBBLE_SIZE - 1) * SunsetTimer / SUNSET_TIMEOUT;
 	}
+	RoomLightShades[4] = ((WIBBLE_SIZE - 1) * ((phd_sin(-WibbleOffset * PHD_360 / (WIBBLE_SIZE - 1)) + PHD_IONE) / 2)) / PHD_IONE;
 	AnimateTextures(nTicks);
 }
 
