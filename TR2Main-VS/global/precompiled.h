@@ -22,6 +22,7 @@
 #ifndef TR2MAIN_PRECOMPILED_HEADER
 #define TR2MAIN_PRECOMPILED_HEADER
 
+#define FMT_UNICODE 0
  // Optimize allocation via mimalloc for malloc() and new/delete
 #include <mimalloc.h>
 #include <mimalloc-override.h>

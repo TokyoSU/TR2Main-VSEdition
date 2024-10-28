@@ -442,7 +442,7 @@ void TestTriggers(short* data, BOOL isHeavy)
 			}
 			else if (type == TT_ANTIPAD || type == TT_ANTITRIGGER)
 			{
-				item->flags &= ~(IFL_CODEBITS | IFL_REVERSE);
+				item->flags &= ~(flags & IFL_CODEBITS);
 				if (CHK_ANY(flags, IFL_ONESHOT))
 					item->flags |= IFL_ONESHOT;
 			}
@@ -853,7 +853,7 @@ void Inject_Control() {
 	//INJECT(0x00414CE0, GetWaterHeight);
 	//INJECT(0x00414E50, GetHeight);
 	//INJECT(0x004150D0, RefreshCamera);
-	//INJECT(0x004151C0, TestTriggers); (WIP)
+	INJECT(0x004151C0, TestTriggers);
 	//INJECT(0x004158A0, TriggerActive);
 	//INJECT(0x00415900, GetCeiling);
 	//INJECT(0x00415B60, GetDoor);
