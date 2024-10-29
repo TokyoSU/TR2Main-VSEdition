@@ -1031,30 +1031,14 @@ void TrapObjects()
 	obj->save_flags = TRUE;
 	obj->save_position = TRUE;
 
-	obj = &Objects[ID_PROPELLER1];
-	obj->control = PropellerControl;
-	obj->collision = TrapCollision;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
-
-	obj = &Objects[ID_PROPELLER2];
-	obj->control = PropellerControl;
-	obj->collision = ObjectCollision;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
-
-	obj = &Objects[ID_PROPELLER3];
-	obj->control = PropellerControl;
-	obj->collision = TrapCollision;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
-	obj->water_creature = TRUE;
-
-	obj = &Objects[ID_PROPELLER4];
-	obj->control = PropellerControl;
-	obj->collision = TrapCollision;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
+	for (int i = ID_PROPELLER1; i <= ID_PROPELLER4; i++)
+	{
+		obj = &Objects[i];
+		obj->control = PropellerControl;
+		obj->collision = ObjectCollision;
+		obj->save_anim = TRUE;
+		obj->save_flags = TRUE;
+	}
 
 	obj = &Objects[ID_SPIKE_WALL];
 	obj->control = ControlSpikeWall;
@@ -1077,29 +1061,16 @@ void TrapObjects()
 	obj->save_anim = TRUE;
 	obj->save_flags = TRUE;
 
-	obj = &Objects[ID_FALLING_BLOCK1];
-	obj->control = FallingBlock;
-	obj->floor = FallingBlockFloor;
-	obj->ceiling = FallingBlockCeiling;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
-	obj->save_position = TRUE;
-
-	obj = &Objects[ID_FALLING_BLOCK2];
-	obj->control = FallingBlock;
-	obj->floor = FallingBlockFloor;
-	obj->ceiling = FallingBlockCeiling;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
-	obj->save_position = TRUE;
-
-	obj = &Objects[ID_FALLING_BLOCK3];
-	obj->control = FallingBlock;
-	obj->floor = FallingBlockFloor;
-	obj->ceiling = FallingBlockCeiling;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
-	obj->save_position = TRUE;
+	for (int i = ID_FALLING_BLOCK1; i <= ID_FALLING_BLOCK3; i++)
+	{
+		obj = &Objects[i];
+		obj->control = FallingBlock;
+		obj->floor = FallingBlockFloor;
+		obj->ceiling = FallingBlockCeiling;
+		obj->save_anim = TRUE;
+		obj->save_flags = TRUE;
+		obj->save_position = TRUE;
+	}
 
 	obj = &Objects[ID_ICICLE];
 	obj->control = IcicleControl;
@@ -1143,41 +1114,17 @@ void TrapObjects()
 	obj->save_anim = TRUE;
 	obj->save_flags = TRUE;
 
-	obj = &Objects[ID_MOVABLE_BLOCK1];
-	obj->initialise = InitialiseMovingBlock;
-	obj->control = MovableBlock;
-	obj->collision = MovableBlockCollision;
-	obj->drawRoutine = DrawMovableBlock;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
-	obj->save_position = TRUE;
-
-	obj = &Objects[ID_MOVABLE_BLOCK2];
-	obj->initialise = InitialiseMovingBlock;
-	obj->control = MovableBlock;
-	obj->collision = MovableBlockCollision;
-	obj->drawRoutine = DrawMovableBlock;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
-	obj->save_position = TRUE;
-
-	obj = &Objects[ID_MOVABLE_BLOCK3];
-	obj->initialise = InitialiseMovingBlock;
-	obj->control = MovableBlock;
-	obj->collision = MovableBlockCollision;
-	obj->drawRoutine = DrawMovableBlock;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
-	obj->save_position = TRUE;
-
-	obj = &Objects[ID_MOVABLE_BLOCK4];
-	obj->initialise = InitialiseMovingBlock;
-	obj->control = MovableBlock;
-	obj->collision = MovableBlockCollision;
-	obj->drawRoutine = DrawMovableBlock;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
-	obj->save_position = TRUE;
+	for (int i = ID_MOVABLE_BLOCK1; i <= ID_MOVABLE_BLOCK4; i++)
+	{
+		obj = &Objects[i];
+		obj->initialise = InitialiseMovingBlock;
+		obj->control = MovableBlock;
+		obj->collision = MovableBlockCollision;
+		obj->drawRoutine = DrawMovableBlock;
+		obj->save_anim = TRUE;
+		obj->save_flags = TRUE;
+		obj->save_position = TRUE;
+	}
 
 	obj = &Objects[ID_ROLLING_BALL1];
 	obj->initialise = InitialiseRollingBall;
@@ -1406,120 +1353,44 @@ void ObjectObjects()
 		obj->save_flags = TRUE;
 	}
 
-	obj = &Objects[ID_SWITCH_TYPE1];
-	obj->control = SwitchControl;
-	obj->collision = SwitchCollision;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
+	for (int i = ID_SWITCH_TYPE1; i <= ID_SWITCH_TYPE2; i++)
+	{
+		obj = &Objects[i];
+		obj->control = SwitchControl;
+		obj->collision = SwitchCollision;
+		obj->save_anim = TRUE;
+		obj->save_flags = TRUE;
+	}
 
-	obj = &Objects[ID_SWITCH_TYPE2];
-	obj->control = SwitchControl;
-	obj->collision = SwitchCollision;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
+	for (int i = ID_SWITCH_TYPE3; i <= ID_SWITCH_TYPE5; i++)
+	{
+		obj = &Objects[i];
+		obj->control = SwitchControl;
+		obj->collision = i == ID_SWITCH_TYPE5 ? SwitchCollision2 : SwitchCollision;
+		obj->save_anim = TRUE;
+		obj->save_flags = TRUE;
+	}
 
-	obj = &Objects[ID_SWITCH_TYPE3];
-	obj->control = SwitchControl;
-	obj->collision = SwitchCollision;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
+	for (int i = ID_DOOR_TYPE1; i <= ID_DOOR_TYPE8; i++)
+	{
+		obj = &Objects[i];
+		obj->initialise = InitialiseDoor;
+		obj->control = DoorControl;
+		obj->collision = DoorCollision;
+		obj->drawRoutine = DrawUnclippedItem;
+		obj->save_anim = TRUE;
+		obj->save_flags = TRUE;
+	}
 
-	obj = &Objects[ID_SWITCH_TYPE4];
-	obj->control = SwitchControl;
-	obj->collision = SwitchCollision;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
-
-	obj = &Objects[ID_SWITCH_TYPE5];
-	obj->control = SwitchControl;
-	obj->collision = SwitchCollision2;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
-
-	obj = &Objects[ID_DOOR_TYPE1];
-	obj->initialise = InitialiseDoor;
-	obj->control = DoorControl;
-	obj->collision = DoorCollision;
-	obj->drawRoutine = DrawUnclippedItem;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
-
-	obj = &Objects[ID_DOOR_TYPE2];
-	obj->initialise = InitialiseDoor;
-	obj->control = DoorControl;
-	obj->collision = DoorCollision;
-	obj->drawRoutine = DrawUnclippedItem;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
-
-	obj = &Objects[ID_DOOR_TYPE3];
-	obj->initialise = InitialiseDoor;
-	obj->control = DoorControl;
-	obj->collision = DoorCollision;
-	obj->drawRoutine = DrawUnclippedItem;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
-
-	obj = &Objects[ID_DOOR_TYPE4];
-	obj->initialise = InitialiseDoor;
-	obj->control = DoorControl;
-	obj->collision = DoorCollision;
-	obj->drawRoutine = DrawUnclippedItem;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
-
-	obj = &Objects[ID_DOOR_TYPE5];
-	obj->initialise = InitialiseDoor;
-	obj->control = DoorControl;
-	obj->collision = DoorCollision;
-	obj->drawRoutine = DrawUnclippedItem;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
-
-	obj = &Objects[ID_DOOR_TYPE6];
-	obj->initialise = InitialiseDoor;
-	obj->control = DoorControl;
-	obj->collision = DoorCollision;
-	obj->drawRoutine = DrawUnclippedItem;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
-
-	obj = &Objects[ID_DOOR_TYPE7];
-	obj->initialise = InitialiseDoor;
-	obj->control = DoorControl;
-	obj->collision = DoorCollision;
-	obj->drawRoutine = DrawUnclippedItem;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
-
-	obj = &Objects[ID_DOOR_TYPE8];
-	obj->initialise = InitialiseDoor;
-	obj->control = DoorControl;
-	obj->collision = DoorCollision;
-	obj->drawRoutine = DrawUnclippedItem;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
-
-	obj = &Objects[ID_TRAPDOOR_TYPE1];
-	obj->control = TrapDoorControl;
-	obj->floor = TrapDoorFloor;
-	obj->ceiling = TrapDoorCeiling;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
-
-	obj = &Objects[ID_TRAPDOOR_TYPE2];
-	obj->control = TrapDoorControl;
-	obj->floor = TrapDoorFloor;
-	obj->ceiling = TrapDoorCeiling;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
-
-	obj = &Objects[ID_TRAPDOOR_TYPE3];
-	obj->control = TrapDoorControl;
-	obj->floor = TrapDoorFloor;
-	obj->ceiling = TrapDoorCeiling;
-	obj->save_anim = TRUE;
-	obj->save_flags = TRUE;
+	for (int i = ID_TRAPDOOR_TYPE1; i <= ID_TRAPDOOR_TYPE3; i++)
+	{
+		obj = &Objects[i];
+		obj->control = TrapDoorControl;
+		obj->floor = TrapDoorFloor;
+		obj->ceiling = TrapDoorCeiling;
+		obj->save_anim = TRUE;
+		obj->save_flags = TRUE;
+	}
 
 	for (int i = ID_PISTOL_ITEM; i <= ID_FLARES_ITEM; i++)
 	{

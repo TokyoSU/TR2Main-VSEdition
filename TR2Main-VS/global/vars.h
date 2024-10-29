@@ -51,7 +51,7 @@
 #define GRENADE_AMMO_CLIPS 2
 #define FLARE_AMMO_CLIPS 6
 
-#define MAX_EFFECTS 2048                      // From 100
+#define MAX_EFFECTS 512                      // From 100
 
 /*
  * General Variables
