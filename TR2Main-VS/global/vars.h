@@ -663,7 +663,7 @@ extern bool ConflictLayout[ARRAY_SIZE(Layout->key)];
 #define RoomLightTables				ARRAY_(0x0051A2F8, ROOM_LIGHT_TABLE, [32])
 #define WaterPalette				ARRAY_(0x0051B2F8, RGB888, [256])
 #define PicPalette					ARRAY_(0x0051B5F8, RGB888, [256])
-extern int RoomLightShades[5]; // 0x0051B8F8
+#define RoomLightShades				ARRAY_(0x0051B8F8, int, [4])
 #define GamePalette8				ARRAY_(0x0051B920, RGB888, [256])
 #define StringToShow				ARRAY_(0x0051BD10, char, [128])
 #define TextInfoTable				ARRAY_(0x0051C820, TEXT_STR_INFO, [64])
