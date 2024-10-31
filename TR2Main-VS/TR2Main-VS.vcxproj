@@ -113,7 +113,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>comctl32.lib;shlwapi.lib;winmm.lib;gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\Admin\Documents\GitHub\DX7_SDK\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\DX7_SDK\lib</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
@@ -171,7 +171,7 @@ xcopy /y "$(TargetDir)d3dx9d_43.dll" "$(LocalDebuggerWorkingDirectory)"</Command
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>comctl32.lib;shlwapi.lib;winmm.lib;gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\Admin\Documents\GitHub\DX7_SDK\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\DX7_SDK\lib</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>

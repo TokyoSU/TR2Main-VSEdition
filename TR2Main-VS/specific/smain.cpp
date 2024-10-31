@@ -575,7 +575,7 @@ void S_LoadSettings() {
 			UINT16 remap[14] = { 0,1,2,3,4,5, 7,8,9, 11,12,13, 10,14 };
 			for (int i = 0; i < 14; ++i) {
 				if (legacy[i] < 0x100) {
-					Layout[CTRL_Custom].key[remap[i]] = legacy[i];
+					Layout[CTRL_Custom].key[remap[i]] = (BYTE)legacy[i];
 				}
 			}
 		}
@@ -677,8 +677,8 @@ void S_LoadSettings() {
 	DefaultConflict();
 
 	// NOTE: There was no such volume range check in the original game
-	SoundVolume = (soundVol > 10) ? 10 : soundVol;
-	MusicVolume = (musicVol > 10) ? 10 : musicVol;
+	SoundVolume = (soundVol > 10) ? 10 : (short)soundVol;
+	MusicVolume = (musicVol > 10) ? 10 : (short)musicVol;
 	S_SoundSetMasterVolume(6 * SoundVolume + 4);	// 4,  10,  16,  22,  28,  34,  40,  46,  52,  58,  64
 	S_CDVolume(MusicVolume ? MusicVolume * 25 + 5 : 0);	// 0,  30,  55,  80, 105, 130, 155, 180, 205, 230, 255
 

@@ -447,6 +447,7 @@ void InsertRoomGT4(FACE4* ptrObj, int number, SORTTYPE sortType)
 void InsertRoomGT4_ZBuffered(FACE4* ptrObj, int number, SORTTYPE sortType)
 {
 	for (int i = 0; i < number; ++i) {
+		if (HWR_VertexBufferFull()) break;
 		FACE4* face = &ptrObj[i];
 		PHD_VBUF* vtx0 = &PhdVBuf[face->vertices[0]];
 		PHD_VBUF* vtx1 = &PhdVBuf[face->vertices[1]];
@@ -463,6 +464,7 @@ void InsertRoomGT4_ZBuffered(FACE4* ptrObj, int number, SORTTYPE sortType)
 void InsertRoomGT3_ZBuffered(FACE3* ptrObj, int number, SORTTYPE sortType)
 {
 	for (int i = 0; i < number; ++i) {
+		if (HWR_VertexBufferFull()) break;
 		FACE3* face = &ptrObj[i];
 		PHD_VBUF* vtx0 = &PhdVBuf[face->vertices[0]];
 		PHD_VBUF* vtx1 = &PhdVBuf[face->vertices[1]];

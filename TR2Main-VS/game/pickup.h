@@ -31,7 +31,7 @@ void PickUpCollision(short itemID, ITEM_INFO* laraitem, COLL_INFO* coll); // 0x0
 #define SwitchCollision ((void(__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x004383A0)
 #define SwitchCollision2 ((void(__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x004385B0)
 #define DetonatorCollision ((void(__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x004386B0)
-#define KeyHoleCollision ((void(__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x004386B0)
+#define KeyHoleCollision ((void(__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x004388F0)
 #define PuzzleHoleCollision ((void(__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x00438B30)
 #define SwitchControl ((void(__cdecl*)(short)) 0x00438DF0)
 #define SwitchTrigger ((BOOL(__cdecl*)(int, int)) 0x00438E30)

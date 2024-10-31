@@ -854,8 +854,17 @@ void ControlLavaBlob(short fxNum)
 	FLOOR_INFO* floor = GetFloor(fx->pos.x, fx->pos.y, fx->pos.z, &newRoom);
 	int height = GetHeight(floor, fx->pos.x, fx->pos.y, fx->pos.z);
 	int ceiling = GetCeiling(floor, fx->pos.x, fx->pos.y, fx->pos.z);
+	// NOTE: Bounce if it touch the ceiling, new feature !
+	if (ceiling != NO_HEIGHT)
+		ceiling += 128;
+	if (fx->pos.y <= ceiling)
+	{
+		fx->speed /= 2;
+		fx->fallspeed /= 2;
+		fx->fallspeed = -fx->fallspeed;
+	}
 
-	if (fx->pos.y >= height || fx->pos.y < ceiling)
+	if (fx->pos.y >= height)
 	{
 		KillEffect(fxNum);
 		return;

@@ -116,24 +116,24 @@ static D3DCOLOR GetShadeColor(DWORD red, DWORD green, DWORD blue, DWORD alpha, D
 	return RGBA_MAKE(red, green, blue, alpha);
 }
 
-float CalculatePolyZ(SORTTYPE sortType, float z0, float z1, float z2, float z3) {
-	float zv = 0.0f;
+double CalculatePolyZ(SORTTYPE sortType, double z0, double z1, double z2, double z3) {
+	double zv = 0.0;
 
 	switch (sortType) {
 	case ST_AvgZ:
-		zv = (z3 > 0.0f) ? (z0 + z1 + z2 + z3) / 4.0f : (z0 + z1 + z2) / 3.0f;
+		zv = (z3 > 0.0) ? (z0 + z1 + z2 + z3) / 4.0 : (z0 + z1 + z2) / 3.0;
 		break;
 
 	case ST_MaxZ:
 		zv = z0;
 		CLAMPL(zv, z1);
 		CLAMPL(zv, z2);
-		if (z3 > 0.0f) CLAMPL(zv, z3);
+		if (z3 > 0.0) CLAMPL(zv, z3);
 		break;
 
 	case ST_FarZ:
 	default:
-		zv = 4000000000.0f; // the original game value was 1000000000.0
+		zv = 4000000000.0; // the original game value was 1000000000.0
 		break;
 	}
 	return zv;

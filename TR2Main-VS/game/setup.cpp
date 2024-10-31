@@ -1005,6 +1005,13 @@ void TrapObjects()
 	obj->save_anim = TRUE;
 	obj->save_flags = TRUE;
 
+	obj = &Objects[ID_FALLING_CEILING];
+	obj->control = FallingCeiling;
+	obj->collision = TrapCollision;
+	obj->save_position = TRUE;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
 	obj = &Objects[ID_GENERAL];
 	obj->control = GeneralControl;
 	obj->collision = ObjectCollision;
@@ -1031,14 +1038,29 @@ void TrapObjects()
 	obj->save_flags = TRUE;
 	obj->save_position = TRUE;
 
-	for (int i = ID_PROPELLER1; i <= ID_PROPELLER4; i++)
-	{
-		obj = &Objects[i];
-		obj->control = PropellerControl;
-		obj->collision = ObjectCollision;
-		obj->save_anim = TRUE;
-		obj->save_flags = TRUE;
-	}
+	obj = &Objects[ID_PROPELLER1];
+	obj->control = PropellerControl;
+	obj->collision = ObjectCollision;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_PROPELLER2];
+	obj->control = PropellerControl;
+	obj->collision = ObjectCollision;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_PROPELLER3];
+	obj->control = PropellerControl;
+	obj->collision = ObjectCollision;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
+
+	obj = &Objects[ID_PROPELLER4];
+	obj->control = PropellerControl;
+	obj->collision = ObjectCollision;
+	obj->save_anim = TRUE;
+	obj->save_flags = TRUE;
 
 	obj = &Objects[ID_SPIKE_WALL];
 	obj->control = ControlSpikeWall;
@@ -1587,6 +1609,34 @@ void ObjectObjects()
 	obj->save_flags = TRUE;
 }
 
+void GetCarriedItems()
+{
+	for (int i = 0; i < LevelItemCount; i++)
+	{
+		auto* item = &Items[i];
+		if (!Objects[item->objectID].intelligent)
+			continue;
+		item->carriedItem = -1;
+		
+		auto pickup_number = RoomInfo[item->roomNumber].itemNumber;
+		while (pickup_number != -1)
+		{
+			auto* pickup = &Items[pickup_number];
+			if (pickup->pos.x == item->pos.x &&
+				pickup->pos.y == item->pos.y &&
+				pickup->pos.z == item->pos.z &&
+				Objects[pickup->objectID].collision == PickUpCollision)
+			{
+				pickup->carriedItem = item->carriedItem;
+				item->carriedItem = pickup_number;
+				RemoveDrawnItem(pickup_number);
+				pickup->roomNumber = NO_ROOM;
+			}
+			pickup_number = pickup->nextItem;
+		}
+	}
+}
+
 /*
  * Inject function
  */
@@ -1598,5 +1648,5 @@ void Inject_Setup() {
 	INJECT(0x0043B570, TrapObjects);
 	INJECT(0x0043BB70, ObjectObjects);
 	INJECT(0x0043C7C0, InitialiseObjects);
-	//INJECT(0x0043C830, GetCarriedItems);
+	INJECT(0x0043C830, GetCarriedItems);
 }
