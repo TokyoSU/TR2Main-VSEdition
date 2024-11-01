@@ -5,28 +5,28 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerCommand>Tomb2.exe</LocalDebuggerCommand>
-    <LocalDebuggerWorkingDirectory>C:\Users\TokyoSU-PC\Desktop\Magic Kingdom Beta\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>C:\Users\vleva\Desktop\Engine\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>
     </LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DX9|Win32'">
     <LocalDebuggerCommand>Tomb2.exe</LocalDebuggerCommand>
-    <LocalDebuggerWorkingDirectory>C:\Users\TokyoSU-PC\Desktop\Magic Kingdom Beta\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>C:\Users\vleva\Desktop\Engine\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>
     </LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LocalDebuggerCommand>Tomb2.exe</LocalDebuggerCommand>
-    <LocalDebuggerWorkingDirectory>C:\Users\TokyoSU-PC\Desktop\Magic Kingdom Beta\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>C:\Users\vleva\Desktop\Engine\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>
     </LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_DX9|Win32'">
     <LocalDebuggerCommand>Tomb2.exe</LocalDebuggerCommand>
-    <LocalDebuggerWorkingDirectory>C:\Users\TokyoSU-PC\Desktop\Magic Kingdom Beta\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>C:\Users\vleva\Desktop\Engine\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>
     </LocalDebuggerCommandArguments>

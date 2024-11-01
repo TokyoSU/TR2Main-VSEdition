@@ -37,6 +37,7 @@ DWORD GetMaxTextureSize();
 int GetTextureSideByPage(int page);
 int GetTextureSideByHandle(HWR_TEXHANDLE handle);
 
+HRESULT LoadTextureFromFile(LPCTSTR fileName, UINT usage, D3DFORMAT format, D3DPOOL pool, LPDIRECT3DTEXTURE9* pResult);
 void CopyBitmapPalette(RGB888* srcPal, BYTE* srcBitmap, int bitmapSize, RGB888* destPal); // 0x00455990
 BYTE FindNearestPaletteEntry(RGB888* palette, int red, int green, int blue, bool ignoreSysPalette); // 0x00455AD0
 void SyncSurfacePalettes(void* srcData, int width, int height, int srcPitch, RGB888* srcPalette, void* dstData, int dstPitch, RGB888* dstPalette, bool preserveSysPalette); // 0x00455BA0

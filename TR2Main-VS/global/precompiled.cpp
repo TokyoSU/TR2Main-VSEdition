@@ -1,7 +1,8 @@
 #include "precompiled.h"
-#include <mimalloc-new-delete.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 static std::shared_ptr<spdlog::logger> m_log = spdlog::basic_logger_mt("file", "logs/debug.txt", true);
 static std::string m_debug_prevmsg, m_warn_prevmsg;

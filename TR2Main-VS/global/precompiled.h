@@ -23,10 +23,6 @@
 #define TR2MAIN_PRECOMPILED_HEADER
 
 #define FMT_UNICODE 0
- // Optimize allocation via mimalloc for malloc() and new/delete
-#include <mimalloc.h>
-#include <mimalloc-override.h>
-
 #define FEATURE_NOCD_DATA
 #define FEATURE_ASSAULT_SAVE
 #define FEATURE_AUDIO_IMPROVED
@@ -84,12 +80,12 @@
 #include <dinput.h>
 #include <dsound.h>
 
-#if (DIRECT3D_VERSION >= 0x900)
-#include <dxsdk-d3dx/d3dx9.h>
-#else // (DIRECT3D_VERSION >= 0x900)
+#if (DIRECT3D_VERSION < 0x900)
 #include <ddraw.h>
 #include <d3d.h>
 #endif // (DIRECT3D_VERSION >= 0x900)
+
+#include <stb_image.h>
 #endif // TR2MAIN_PRECOMPILED_HEADER
 
 #ifdef _MSC_VER

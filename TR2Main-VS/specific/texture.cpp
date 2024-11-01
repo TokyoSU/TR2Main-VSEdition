@@ -182,6 +182,42 @@ int GetTextureSideByHandle(HWR_TEXHANDLE handle) {
 	return 256;
 }
 
+HRESULT LoadTextureFromFile(LPCTSTR fileName, UINT usage, D3DFORMAT format, D3DPOOL pool, LPDIRECT3DTEXTURE9* pResult)
+{
+	stbi_uc* pixels = NULL;
+	int width = 0, height = 0, channel = 0;
+
+	if (!PathFileExists(fileName))
+	{
+		LogWarn("Failed to load texture from file: %s, file not found !", fileName);
+		return E_FAIL;
+	}
+
+	pixels = stbi_load(fileName, &width, &height, &channel, 4);
+	if (pixels == NULL)
+	{
+		LogWarn("Failed to load texture from file: %s, unknown error !", fileName);
+		return E_FAIL;
+	}
+
+	if FAILED(D3DDev->CreateTexture(width, height, 1, usage, format, pool, pResult, NULL))
+	{
+		LogWarn("Failed to load texture from file: %s, texture creation failed !", fileName);
+		return E_FAIL;
+	}
+
+	D3DLOCKED_RECT lock;
+	if SUCCEEDED((*pResult)->LockRect(0, &lock, NULL, D3DLOCK_DISCARD))
+	{
+		unsigned char* dest = static_cast<unsigned char*>(lock.pBits);
+		memcpy(dest, pixels, sizeof(unsigned char) * width * height * channel);
+		(*pResult)->UnlockRect(0);
+	}
+
+	stbi_image_free(pixels);
+	return S_OK;
+}
+
 void CopyBitmapPalette(RGB888* srcPal, BYTE* srcBitmap, int bitmapSize, RGB888* destPal) {
 	int i, j;
 #if (DIRECT3D_VERSION < 0x900)
@@ -730,9 +766,8 @@ int AddExternalTexture(LPCTSTR fileName, bool alpha) {
 		return -1;
 
 	memset(&TexturePages[pageIndex], 0, sizeof(TEXPAGE_DESC));
-	HRESULT res = D3DXCreateTextureFromFileEx(D3DDev, fileName, D3DX_DEFAULT, D3DX_DEFAULT, 0,
-		0, alpha ? D3DFMT_A8R8G8B8 : D3DFMT_X8R8G8B8, D3DPOOL_MANAGED,
-		D3DX_DEFAULT, D3DX_DEFAULT, 0, NULL, NULL, &TexturePages[pageIndex].texture);
+	
+	HRESULT res = LoadTextureFromFile(fileName, NULL, alpha ? D3DFMT_A8R8G8B8 : D3DFMT_X8R8G8B8, D3DPOOL_MANAGED, &TexturePages[pageIndex].texture);
 	if FAILED(res)
 		return -1;
 
