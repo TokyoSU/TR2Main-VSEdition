@@ -50,30 +50,20 @@ void DecreaseScreenSize() {
 void setup_screen_size() {
 	int wwidth, wheight;
 	int xoff, yoff;
-
 	wwidth = (int)((double)GameVidWidth * ScreenSizer);
 	wheight = (int)((double)GameVidHeight * ScreenSizer);
-
 	if (wwidth > GameVidWidth)
 		wwidth = GameVidWidth;
-
 	if (wheight > GameVidHeight)
 		wheight = GameVidHeight;
-
 	xoff = (GameVidWidth - wwidth) / 2;
 	yoff = (GameVidHeight - wheight) / 2;
-
-#if (DIRECT3D_VERSION >= 0x900)
 	phd_InitWindow(xoff, yoff, wwidth, wheight, VIEW_NEAR, VIEW_FAR, 80, GameVidWidth, GameVidHeight);
-#else // (DIRECT3D_VERSION >= 0x900)
-	phd_InitWindow(xoff, yoff, wwidth, wheight, VIEW_NEAR, VIEW_FAR, 80, GameVidBufWidth, GameVidBufHeight);
-#endif // (DIRECT3D_VERSION >= 0x900)
 
 	DumpX = xoff;
 	DumpY = yoff;
 	DumpWidth = wwidth;
 	DumpHeight = wheight;
-
 	WinVidNeedToResetBuffers = true;
 }
 

@@ -685,6 +685,10 @@ int Display_Inventory(INVENTORY_MODE invMode) {
 #endif // FEATURE_INPUT_IMPROVED
 	} while (motion.status != RINGSTATE_DONE);
 
+	// NOTE: Not exist in the original code,
+	// The inventory change the fov to 90 instead of 80 but not reset it back !
+	AlterFOV(PhdFov);
+
 #ifdef FEATURE_HUD_IMPROVED
 	RemoveJoystickHintText(true, false, true);
 #endif // FEATURE_HUD_IMPROVED
@@ -764,9 +768,6 @@ int Display_Inventory(INVENTORY_MODE invMode) {
 #endif // FEATURE_AUDIO_IMPROVED
 	}
 
-	// NOTE: Not exist in the original code,
-	// The inventory change the fov to 90 instead of 80 but not reset it back !
-	AlterFOV(PhdFov);
 	return 0;
 }
 

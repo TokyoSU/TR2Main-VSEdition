@@ -201,12 +201,8 @@ void BGND_DrawInGameBackground() {
 
 	HWR_EnableZBuffer(false, false);
 	if (PatternTexPage >= 0) {
-#if (DIRECT3D_VERSION >= 0x900)
 		D3DDev->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
 		D3DDev->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
-#else // (DIRECT3D_VERSION >= 0x900)
-		D3DDev->SetRenderState(D3DRENDERSTATE_TEXTUREADDRESS, D3DTADDRESS_WRAP);
-#endif // (DIRECT3D_VERSION >= 0x900)
 	}
 
 	if (bgndMode == 2) {
@@ -294,14 +290,10 @@ void BGND_DrawInGameBackground() {
 		y_current = y_next;
 	}
 #ifdef FEATURE_BACKGROUND_IMPROVED
-	CLEANUP :
+CLEANUP:
 	if (PatternTexPage >= 0) {
-#if (DIRECT3D_VERSION >= 0x900)
 		D3DDev->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
 		D3DDev->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
-#else // (DIRECT3D_VERSION >= 0x900)
-		D3DDev->SetRenderState(D3DRENDERSTATE_TEXTUREADDRESS, D3DTADDRESS_CLAMP);
-#endif // (DIRECT3D_VERSION >= 0x900)
 	}
 #endif // FEATURE_BACKGROUND_IMPROVED
 	HWR_EnableZBuffer(true, true);
@@ -387,9 +379,9 @@ D3DCOLOR BGND_CenterLighting(int x, int y, int width, int height) {
 	yDist = (double)(y - (height / 2)) / (double)height; // yDist range will be: -0.5..0.5
 	light = 256 - (sqrt(xDist * xDist + yDist * yDist) * 300.0); // light range will be: 44..256
 
-#if defined(FEATURE_VIDEOFX_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
+#if defined(FEATURE_VIDEOFX_IMPROVED)
 	if (SavedAppSettings.LightingMode) light /= 2;
-#endif // defined(FEATURE_VIDEOFX_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
+#endif // defined(FEATURE_VIDEOFX_IMPROVED)
 
 	// Do light range checks just in case
 	CLAMP(light, 0, 255);

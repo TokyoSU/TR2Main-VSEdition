@@ -563,7 +563,6 @@ static int LoadButtonSpriteTexturePage(bool* isExternal) {
 	int pageIndex = -1;
 	DWORD width, height, pcxSize = 0;
 
-#if (DIRECT3D_VERSION >= 0x900)
 	if (SavedAppSettings.RenderMode == RM_Hardware && PathFileExists("textures/buttons.png")) {
 		pageIndex = AddExternalTexture("textures/buttons.png", true);
 		if (pageIndex >= 0) {
@@ -575,7 +574,6 @@ static int LoadButtonSpriteTexturePage(bool* isExternal) {
 		}
 	}
 	if (isExternal) *isExternal = false;
-#endif // (DIRECT3D_VERSION >= 0x900)
 
 	LPCBYTE pcxData = (LPCBYTE)GetResourceData("buttons.pcx", &pcxSize);
 	if (!pcxData || !pcxSize || GetPcxResolution(pcxData, pcxSize, &width, &height) || width != height || (SavedAppSettings.RenderMode != RM_Hardware && width != 256))
@@ -769,7 +767,6 @@ int MakeCustomTexture(DWORD x, DWORD y, DWORD width, DWORD height, DWORD pitch, 
 		FillEdgePadding(width, height, side, (BYTE*)tmpBmp, bpp);
 		pageIndex = AddTexturePage16(side, side, (BYTE*)tmpBmp);
 		free(tmpBmp);
-#if (DIRECT3D_VERSION >= 0x900)
 	}
 	else if (bpp == 32) {
 		if (SavedAppSettings.RenderMode != RM_Hardware || TextureFormat.bpp < 16) { // texture cannot be indexed in this case
@@ -787,7 +784,6 @@ int MakeCustomTexture(DWORD x, DWORD y, DWORD width, DWORD height, DWORD pitch, 
 		FillEdgePadding(width, height, side, (BYTE*)tmpBmp, bpp);
 		pageIndex = AddTexturePage32(side, side, (BYTE*)tmpBmp, false);
 		free(tmpBmp);
-#endif // (DIRECT3D_VERSION >= 0x900)
 	}
 	else if (SavedAppSettings.RenderMode == RM_Hardware && TextureFormat.bpp >= 16) {
 		UINT16* tmpBmp = (UINT16*)calloc(2, SQR(side));
@@ -834,26 +830,6 @@ int MakeCustomTexture(DWORD x, DWORD y, DWORD width, DWORD height, DWORD pitch, 
 	}
 	return pageIndex;
 }
-
-#if (DIRECT3D_VERSION >= 0x900)
-#define TEXPAGE_CONFIG_NAME "textures/texpages/config.json"
-
-typedef struct {
-	bool isLoaded;
-	bool isLegacyColors;
-	double adjustment;
-#ifdef FEATURE_HUD_IMPROVED
-	struct {
-		int spacing;
-		int xOffset;
-		int yOffset;
-		double xStretch;
-		double yStretch;
-	} glyphs[110];
-#endif // FEATURE_HUD_IMPROVED
-} TEXPAGES_CONFIG;
-
-static TEXPAGES_CONFIG TexPagesConfig;
 
 bool IsTexPagesConfigLoaded() {
 	return TexPagesConfig.isLoaded;
@@ -1010,4 +986,3 @@ bool LoadTexPagesConfiguration(LPCTSTR levelFilePath) {
 	TexPagesConfig.isLoaded = ParseTexPagesConfiguration(levelName, doc);
 	return TexPagesConfig.isLoaded;
 }
-#endif // (DIRECT3D_VERSION >= 0x900)

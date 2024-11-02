@@ -22,7 +22,16 @@
 #ifndef TR2MAIN_PRECOMPILED_HEADER
 #define TR2MAIN_PRECOMPILED_HEADER
 
+#pragma comment(lib, "d3d9")
+#pragma comment(lib, "dinput8")
+#pragma comment(lib, "dsound")
+#pragma comment(lib, "dxguid")
+#pragma comment(lib, "setupapi")
+#pragma comment(lib, "hid")
+#pragma comment(lib, "xinput")
+
 #define FMT_UNICODE 0
+
 #define FEATURE_NOCD_DATA
 #define FEATURE_ASSAULT_SAVE
 #define FEATURE_AUDIO_IMPROVED
@@ -43,32 +52,11 @@
 #define FEATURE_VIEW_IMPROVED
 #define FEATURE_WINDOW_STYLE_FIX
 
-#pragma comment(lib, "dxguid")
-#if defined(D3D_9)
 #define DIRECT3D_VERSION 0x900
 #define DIRECTINPUT_VERSION 0x800
 #define DIRECTSOUND_VERSION 0x900
-#pragma comment(lib, "d3d9")
-#pragma comment(lib, "dinput8")
-#else
-#define DIRECTDRAW_VERSION 0x500
-#define DIRECT3D_VERSION 0x500
-#define DIRECTINPUT_VERSION 0x500
-#define DIRECTSOUND_VERSION 0x500
-#pragma comment(lib, "ddraw")
-#pragma comment(lib, "dinput")
-#endif
-#pragma comment(lib, "dsound")
-#pragma comment(lib, "setupapi")
-#pragma comment(lib, "hid")
-#pragma comment(lib, "xinput")
 
  // Some defines are required for DX9 and above
-#if (DIRECT3D_VERSION >= 0x900)
-#ifndef FEATURE_NOLEGACY_OPTIONS
-#define FEATURE_NOLEGACY_OPTIONS
-#endif // !FEATURE_NOLEGACY_OPTIONS
-#endif // (DIRECT3D_VERSION >= 0x900)
 
 #include <istream>
 #include <fstream>
@@ -77,16 +65,10 @@
 #include <string>
 #include <shlobj.h>
 #include <shlwapi.h>
+#include <d3d9.h>
 #include <dinput.h>
 #include <dsound.h>
-
-#if (DIRECT3D_VERSION < 0x900)
-#include <ddraw.h>
-#include <d3d.h>
-#endif // (DIRECT3D_VERSION >= 0x900)
-
 #include <stb_image.h>
-#endif // TR2MAIN_PRECOMPILED_HEADER
 
 #ifdef _MSC_VER
 //not #if defined(_WIN32) || defined(_WIN64) because we have strncasecmp in mingw
@@ -103,3 +85,5 @@ using namespace rapidjson;
 extern void LogInit();
 extern void LogDebug(const char* message, ...);
 extern void LogWarn(const char* message, ...);
+
+#endif // !TR2MAIN_PRECOMPILED_HEADER

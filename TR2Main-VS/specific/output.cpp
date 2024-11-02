@@ -41,7 +41,7 @@
 #include "modding/mod_utils.h"
 #endif
 
-#ifdef FEATURE_HUD_IMPROVED
+#if defined(FEATURE_HUD_IMPROVED)
 #include "modding/psx_bar.h"
 
 DWORD HealthBarMode = 2;
@@ -66,7 +66,7 @@ static double UI_CalcScaleFromScreenHeight(int height)
 		return 3.00;
 	else if (height <= 2160) // 4K
 		return 5.00;
-	return 1.00; // default...
+	return 7.00; // 8K and above
 }
 #endif // FEATURE_HUD_IMPROVED
 
@@ -105,7 +105,6 @@ typedef struct ShadowInfo_t {
 // NOTE: there was no such backup in the original game
 PHD_TEXTURE TextureBackupUV[ARRAY_SIZE(PhdTextureInfo)];
 
-#if (DIRECT3D_VERSION >= 0x900)
 static bool SWR_StretchBlt(SWR_BUFFER* dstBuf, RECT* dstRect, SWR_BUFFER* srcBuf, RECT* srcRect) {
 	if (!srcBuf || !srcBuf->bitmap || !srcBuf->width || !srcBuf->height ||
 		!dstBuf || !dstBuf->bitmap || !dstBuf->width || !dstBuf->height)
@@ -182,7 +181,6 @@ static bool SWR_StretchBlt(SWR_BUFFER* dstBuf, RECT* dstRect, SWR_BUFFER* srcBuf
 	free(x);
 	return true;
 }
-#endif // (DIRECT3D_VERSION >= 0x900)
 
 int GetRenderScale(int unit, bool enableGUIScaling) {
 #if defined(FEATURE_HUD_IMPROVED)
@@ -256,9 +254,6 @@ void S_InitialisePolyList(BOOL clearBackBuffer) {
 	DWORD flags = 0;
 
 	if (WinVidNeedToResetBuffers) {
-#if (DIRECT3D_VERSION < 0x900)
-		RestoreLostBuffers();
-#endif // (DIRECT3D_VERSION < 0x900)
 		WinVidSpinMessageLoop(false);
 		if (SavedAppSettings.FullScreen) {
 			flags = CLRB_BackBuffer | CLRB_PrimaryBuffer;
@@ -266,9 +261,6 @@ void S_InitialisePolyList(BOOL clearBackBuffer) {
 				flags |= CLRB_RenderBuffer;
 			if (SavedAppSettings.TripleBuffering)
 				flags |= CLRB_ThirdBuffer;
-#if (DIRECT3D_VERSION < 0x900)
-			WaitPrimaryBufferFlip();
-#endif // (DIRECT3D_VERSION < 0x900)
 		}
 		else {
 			flags = CLRB_WindowedPrimaryBuffer;
@@ -285,34 +277,21 @@ void S_InitialisePolyList(BOOL clearBackBuffer) {
 	flags = CLRB_PhdWinSize;
 	if (SavedAppSettings.RenderMode == RM_Software) {
 		// Software Renderer
-#if (DIRECT3D_VERSION >= 0x900)
 		if (clearBackBuffer)
 			flags |= CLRB_BackBuffer | CLRB_RenderBuffer;
-#else // (DIRECT3D_VERSION >= 0x900)
-		flags |= CLRB_RenderBuffer;
-#endif // (DIRECT3D_VERSION >= 0x900)
 		ClearBuffers(flags, 0);
 	}
 	else {
 		// Hardware Renderer
 		if (clearBackBuffer)
 			flags |= CLRB_BackBuffer;
-#if (DIRECT3D_VERSION >= 0x900)
 		if (SavedAppSettings.ZBuffer)
 			flags |= CLRB_ZBuffer;
-#else // (DIRECT3D_VERSION >= 0x900)
-		if (SavedAppSettings.ZBuffer && ZBufferSurface != NULL)
-			flags |= CLRB_ZBuffer;
-#endif // (DIRECT3D_VERSION >= 0x900)
-
 		ClearBuffers(flags, 0);
 		HWR_BeginScene();
 		HWR_EnableZBuffer(true, true);
 	}
 	phd_InitPolyList();
-#if defined(FEATURE_VIDEOFX_IMPROVED) && (DIRECT3D_VERSION < 0x900)
-	FreeEnvmapTexture();
-#endif // defined(FEATURE_VIDEOFX_IMPROVED) && (DIRECT3D_VERSION < 0x900)
 }
 
 DWORD S_DumpScreen() {
@@ -350,7 +329,6 @@ void S_OutputPolyList() {
 	if (SavedAppSettings.RenderMode == RM_Software) {
 		// Software renderer
 		phd_SortPolyList();
-#if (DIRECT3D_VERSION >= 0x900)
 		// prefetch surface lock
 		extern LPDDS CaptureBufferSurface;
 		HRESULT rc = CaptureBufferSurface->LockRect(&desc, NULL, D3DLOCK_DONOTWAIT);
@@ -384,16 +362,6 @@ void S_OutputPolyList() {
 		}
 		// unlock surface
 		CaptureBufferSurface->UnlockRect();
-#else // (DIRECT3D_VERSION >= 0x900)
-		if SUCCEEDED(WinVidBufferLock(RenderBufferSurface, &desc, DDLOCK_WRITEONLY | DDLOCK_WAIT)) {
-#ifdef FEATURE_NOLEGACY_OPTIONS
-			extern void PrepareSWR(int pitch, int height);
-			PrepareSWR(desc.lPitch, desc.dwHeight);
-#endif // FEATURE_NOLEGACY_OPTIONS
-			phd_PrintPolyList((BYTE*)desc.lpSurface);
-			WinVidBufferUnlock(RenderBufferSurface, &desc);
-		}
-#endif // (DIRECT3D_VERSION >= 0x900)
 	}
 	else {
 		// Hardware renderer
@@ -1216,27 +1184,9 @@ void S_DisplayPicture(LPCTSTR fileName, BOOL isTitle) {
 }
 
 void S_SyncPictureBufferPalette() {
-#if (DIRECT3D_VERSION >= 0x900)
 	if (PictureBuffer.bitmap == NULL) return;
 	SyncSurfacePalettes(PictureBuffer.bitmap, PictureBuffer.width, PictureBuffer.height, PictureBuffer.width, PicPalette, PictureBuffer.bitmap, PictureBuffer.width, GamePalette8, TRUE);
 	memcpy(PicPalette, GamePalette8, sizeof(PicPalette));
-#else // (DIRECT3D_VERSION >= 0x900)
-	DDSDESC desc;
-#ifdef FEATURE_BACKGROUND_IMPROVED
-	int width = BGND_PictureWidth;
-	int height = BGND_PictureHeight;
-#else // !FEATURE_BACKGROUND_IMPROVED
-	int width = 640;
-	int height = 480;
-#endif // FEATURE_BACKGROUND_IMPROVED
-
-	if (PictureBufferSurface == NULL || FAILED(WinVidBufferLock(PictureBufferSurface, &desc, DDLOCK_WRITEONLY | DDLOCK_WAIT)))
-		return;
-
-	SyncSurfacePalettes(desc.lpSurface, width, height, desc.lPitch, PicPalette, desc.lpSurface, desc.lPitch, GamePalette8, TRUE);
-	WinVidBufferUnlock(PictureBufferSurface, &desc);
-	memcpy(PicPalette, GamePalette8, sizeof(PicPalette));
-#endif // (DIRECT3D_VERSION >= 0x900)
 }
 
 void S_DontDisplayPicture() {
@@ -1258,24 +1208,10 @@ void FadeToPal(int fadeValue, RGB888* palette) {
 	int i, j;
 	int palStartIdx = 0;
 	int palEndIdx = 256;
-#if (DIRECT3D_VERSION < 0x900)
-	int palSize = 256;
-#endif // (DIRECT3D_VERSION < 0x900)
-	PALETTEENTRY fadePal[256];
+	PALETTEENTRY fadePal[256] = {};
 
-#if (DIRECT3D_VERSION >= 0x900)
 	if (SavedAppSettings.RenderMode != RM_Software)
 		return;
-#else // (DIRECT3D_VERSION >= 0x900)
-	if (!GameVid_IsVga)
-		return;
-
-	if (GameVid_IsWindowedVga) {
-		palStartIdx += 10;
-		palEndIdx -= 10;
-		palSize -= 20;
-	}
-#endif // (DIRECT3D_VERSION >= 0x900)
 
 	if (fadeValue <= 1) {
 		for (i = palStartIdx; i < palEndIdx; ++i) {
@@ -1283,12 +1219,8 @@ void FadeToPal(int fadeValue, RGB888* palette) {
 			WinVidPalette[i].peGreen = palette[i].green;
 			WinVidPalette[i].peBlue = palette[i].blue;
 		}
-#if (DIRECT3D_VERSION >= 0x900)
 		S_InitialisePolyList(FALSE);
 		S_OutputPolyList();
-#else // (DIRECT3D_VERSION >= 0x900)
-		DDrawPalette->SetEntries(0, palStartIdx, palSize, &WinVidPalette[palStartIdx]);
-#endif // (DIRECT3D_VERSION >= 0x900)
 		return;
 	}
 
@@ -1297,7 +1229,7 @@ void FadeToPal(int fadeValue, RGB888* palette) {
 	}
 
 	for (j = 0; j <= fadeValue; ++j) {
-#ifdef FEATURE_BACKGROUND_IMPROVED
+#if defined(FEATURE_BACKGROUND_IMPROVED)
 		if (S_UpdateInput()) return;
 #endif // FEATURE_BACKGROUND_IMPROVED
 		for (i = palStartIdx; i < palEndIdx; ++i) {
@@ -1305,30 +1237,21 @@ void FadeToPal(int fadeValue, RGB888* palette) {
 			WinVidPalette[i].peGreen = fadePal[i].peGreen + (palette[i].green - fadePal[i].peGreen) * j / fadeValue;
 			WinVidPalette[i].peBlue = fadePal[i].peBlue + (palette[i].blue - fadePal[i].peBlue) * j / fadeValue;
 		}
-#if (DIRECT3D_VERSION >= 0x900)
 		S_InitialisePolyList(FALSE);
 		S_OutputPolyList();
-#else // (DIRECT3D_VERSION >= 0x900)
-		DDrawPalette->SetEntries(0, palStartIdx, palSize, &WinVidPalette[palStartIdx]);
-#endif // (DIRECT3D_VERSION >= 0x900)
 		S_DumpScreen();
 	}
 }
 
 void ScreenClear(bool isPhdWinSize) {
 	DWORD flags = (SavedAppSettings.RenderMode == RM_Hardware) ? CLRB_BackBuffer : CLRB_RenderBuffer;
-
 	if (isPhdWinSize)
 		flags |= CLRB_PhdWinSize;
-
 	ClearBuffers(flags, 0);
 }
 
 void S_CopyScreenToBuffer() {
-#if (DIRECT3D_VERSION < 0x900)
-	DDSDESC desc;
-#endif // (DIRECT3D_VERSION < 0x900)
-#ifdef FEATURE_BACKGROUND_IMPROVED
+#if defined(FEATURE_BACKGROUND_IMPROVED)
 	DWORD bgndMode = 0;
 	if (IsFadeToBlack) {
 		bgndMode = 0;
@@ -1347,8 +1270,7 @@ void S_CopyScreenToBuffer() {
 #endif // FEATURE_BACKGROUND_IMPROVED
 
 	if (SavedAppSettings.RenderMode == RM_Software) {
-#ifdef FEATURE_BACKGROUND_IMPROVED
-#if (DIRECT3D_VERSION >= 0x900)
+#if defined(FEATURE_BACKGROUND_IMPROVED)
 		if (PictureBuffer.bitmap == NULL ||
 			PictureBuffer.width != width ||
 			PictureBuffer.height != height)
@@ -1362,33 +1284,10 @@ void S_CopyScreenToBuffer() {
 				return;
 			}
 		}
-#else // (DIRECT3D_VERSION >= 0x900)
-		if (PictureBufferSurface != NULL &&
-			(BGND_PictureWidth != width || BGND_PictureHeight != height))
-		{
-			PictureBufferSurface->Release();
-			PictureBufferSurface = NULL;
-		}
-		if (PictureBufferSurface == NULL) {
-			BGND_PictureWidth = width;
-			BGND_PictureHeight = height;
-			try {
-				CreatePictureBuffer();
-			}
-			catch (...) {
-				return;
-			}
-		}
-#endif // (DIRECT3D_VERSION >= 0x900)
 #endif // FEATURE_BACKGROUND_IMPROVED
 
-#if (DIRECT3D_VERSION >= 0x900)
 		SWR_StretchBlt(&PictureBuffer, NULL, &RenderBuffer, &GameVidRect);
-#else // (DIRECT3D_VERSION >= 0x900)
-		PictureBufferSurface->Blt(NULL, RenderBufferSurface, &GameVidRect, DDBLT_WAIT, NULL);
-#endif // (DIRECT3D_VERSION >= 0x900)
-#if (DIRECT3D_VERSION >= 0x900)
-#ifdef FEATURE_BACKGROUND_IMPROVED
+#if defined(FEATURE_BACKGROUND_IMPROVED)
 		if (InventoryMode != INV_PauseMode || PauseBackgroundMode != 0)
 #endif // FEATURE_BACKGROUND_IMPROVED
 		{
@@ -1398,27 +1297,9 @@ void S_CopyScreenToBuffer() {
 				ptr[i] = DepthQIndex[ptr[i]];
 			}
 		}
-#else // (DIRECT3D_VERSION >= 0x900)
-		if (
-#ifdef FEATURE_BACKGROUND_IMPROVED
-		(InventoryMode != INV_PauseMode || PauseBackgroundMode != 0) &&
-#endif // FEATURE_BACKGROUND_IMPROVED
-			SUCCEEDED(WinVidBufferLock(PictureBufferSurface, &desc, DDLOCK_WRITEONLY | DDLOCK_WAIT)))
-		{
-			BYTE* surface = (BYTE*)desc.lpSurface;
-
-			for (DWORD i = 0; i < height; ++i) {
-				for (DWORD j = 0; j < width; ++j) {
-					surface[j] = DepthQIndex[surface[j]];
-				}
-				surface += desc.lPitch;
-			}
-			WinVidBufferUnlock(PictureBufferSurface, &desc);
-		}
-#endif // (DIRECT3D_VERSION >= 0x900)
 		memcpy(PicPalette, GamePalette8, sizeof(PicPalette));
 	}
-#ifdef FEATURE_BACKGROUND_IMPROVED
+#if defined(FEATURE_BACKGROUND_IMPROVED)
 	else if (bgndMode == 0) {
 		BGND2_CapturePicture();
 	}
@@ -1426,12 +1307,8 @@ void S_CopyScreenToBuffer() {
 }
 
 void S_CopyBufferToScreen() {
-#if defined(FEATURE_VIDEOFX_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
 	DWORD color = SavedAppSettings.LightingMode ? 0xFF808080 : 0xFFFFFFFF;
-#else // defined(FEATURE_VIDEOFX_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
-	DWORD color = 0xFFFFFFFF; // vertex color (ARGB white)
-#endif // defined(FEATURE_VIDEOFX_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
-#ifdef FEATURE_BACKGROUND_IMPROVED
+#if defined(FEATURE_BACKGROUND_IMPROVED)
 	DWORD bgndMode = 0;
 	if (IsFadeToBlack) {
 		bgndMode = 0;
@@ -1445,27 +1322,17 @@ void S_CopyBufferToScreen() {
 #endif // FEATURE_BACKGROUND_IMPROVED
 
 	if (SavedAppSettings.RenderMode == RM_Software) {
-#if (DIRECT3D_VERSION >= 0x900)
 		if (PictureBuffer.bitmap == NULL) {
 			return;
 		}
-#else // (DIRECT3D_VERSION >= 0x900)
-		if (PictureBufferSurface == NULL) { // NOTE: additional check just in case
-			return;
-		}
-#endif // (DIRECT3D_VERSION >= 0x900)
 		if (memcmp(GamePalette8, PicPalette, sizeof(PicPalette))) {
 			S_SyncPictureBufferPalette();
 		}
-#ifdef FEATURE_BACKGROUND_IMPROVED
+#if defined(FEATURE_BACKGROUND_IMPROVED)
 		RECT rect = PhdWinRect;
 		BGND2_CalculatePictureRect(&rect);
-#if (DIRECT3D_VERSION >= 0x900)
 		ClearBuffers(CLRB_RenderBuffer, 0);
 		SWR_StretchBlt(&RenderBuffer, &rect, &PictureBuffer, NULL);
-#else // (DIRECT3D_VERSION >= 0x900)
-		RenderBufferSurface->Blt(&rect, PictureBufferSurface, NULL, DDBLT_WAIT, NULL);
-#endif // (DIRECT3D_VERSION >= 0x900)
 	}
 	else if (BGND_PictureIsReady && (!BGND_IsCaptured || bgndMode == 0)) {
 		HWR_EnableZBuffer(false, false);
@@ -1486,11 +1353,7 @@ void S_CopyBufferToScreen() {
 		}
 
 #else // !FEATURE_BACKGROUND_IMPROVED
-#if (DIRECT3D_VERSION >= 0x900)
 		SWR_StretchBlt(&RenderBuffer, &GameVidRect, &PictureBuffer, NULL);
-#else // (DIRECT3D_VERSION >= 0x900)
-		RenderBufferSurface->Blt(&GameVidRect, PictureBufferSurface, NULL, DDBLT_WAIT, NULL);
-#endif // (DIRECT3D_VERSION >= 0x900)
 	}
 	else if (BGND_PictureIsReady) {
 		BGND_GetPageHandles();

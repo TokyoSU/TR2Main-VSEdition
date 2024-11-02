@@ -24,7 +24,7 @@
 #include "specific/winvid.h"
 #include "global/vars.h"
 
-#if (DIRECT3D_VERSION >= 0x900) || defined(FEATURE_SCREENSHOT_IMPROVED)
+#if defined(FEATURE_SCREENSHOT_IMPROVED)
 extern LPDDS CaptureBufferSurface;
 #endif
 
@@ -60,7 +60,6 @@ static void ScreenShotPNG(LPDDS screen) {
 	RECT rect = { 0, 0, 0, 0 };
 	HDC dc;
 
-#if (DIRECT3D_VERSION >= 0x900)
 	screen = NULL;
 	DISPLAY_MODE mode;
 
@@ -81,11 +80,6 @@ static void ScreenShotPNG(LPDDS screen) {
 		}
 		return;
 	}
-#else // (DIRECT3D_VERSION >= 0x900)
-	if (screen == NULL || FAILED(screen->GetDC(&dc))) {
-		return;
-	}
-#endif // (DIRECT3D_VERSION >= 0x900)
 
 	if (GetClientRect(HGameWindow, &rect)) {
 		HBITMAP bitmap;
@@ -113,11 +107,9 @@ static void ScreenShotPNG(LPDDS screen) {
 		}
 	}
 	screen->ReleaseDC(dc);
-#if (DIRECT3D_VERSION >= 0x900)
 	if (screen != CaptureBufferSurface) {
 		screen->Release();
 	}
-#endif // (DIRECT3D_VERSION >= 0x900)
 }
 #endif // FEATURE_SCREENSHOT_IMPROVED
 
@@ -150,18 +142,9 @@ static void ScreenShotTGA(LPDDS screen, BYTE tgaBpp) {
 	DWORD width = 0;
 	DWORD height = 0;
 
-#if (DIRECT3D_VERSION >= 0x900)
 	if (tgaBpp != 24)
 		return;
-#else // (DIRECT3D_VERSION >= 0x900)
-	if (tgaBpp != 16 && tgaBpp != 24)
-		return;
-#endif // (DIRECT3D_VERSION >= 0x900)
-
 	memset(&desc, 0, sizeof(desc));
-#if (DIRECT3D_VERSION < 0x900)
-	desc.dwSize = sizeof(desc);
-#endif // (DIRECT3D_VERSION < 0x900)
 
 #if defined(FEATURE_SCREENSHOT_IMPROVED)
 	RECT rect = { 0,0,0,0 };
@@ -175,7 +158,6 @@ static void ScreenShotTGA(LPDDS screen, BYTE tgaBpp) {
 		height = ABS(rect.bottom - rect.top);
 	}
 
-#if (DIRECT3D_VERSION >= 0x900)
 	screen = NULL;
 	DISPLAY_MODE mode;
 
@@ -192,36 +174,12 @@ static void ScreenShotTGA(LPDDS screen, BYTE tgaBpp) {
 	if FAILED(screen->LockRect(&desc, &rect, D3DLOCK_READONLY)) {
 		goto CLEANUP;
 	}
-#else // (DIRECT3D_VERSION >= 0x900)
-	HRESULT rc;
-	do {
-		rc = screen->Lock(&rect, &desc, DDLOCK_READONLY | DDLOCK_WAIT, NULL);
-	} while (rc == DDERR_WASSTILLDRAWING);
-
-	if (rc == DDERR_SURFACELOST)
-		rc = screen->Restore();
-	if FAILED(rc)
-		return;
-
-	if (width == 0 || width > desc.dwWidth)
-		width = desc.dwWidth;
-	if (height == 0 || height > desc.dwHeight)
-		height = desc.dwHeight;
-#endif // (DIRECT3D_VERSION >= 0x900)
 
 	scrshotNumber = CreateSequenceFilename(fileName, sizeof(fileName), ScreenshotPath, ".tga", "tomb", 4, scrshotNumber);
 	if (scrshotNumber < 0) goto CLEANUP;
 	++scrshotNumber;
 	CreateDirectories(fileName, true); // create whole path just in case if it's not created yet
 #else // !FEATURE_SCREENSHOT_IMPROVED
-#if (DIRECT3D_VERSION < 0x900)
-	if FAILED(WinVidBufferLock(screen, &desc, DDLOCK_WRITEONLY | DDLOCK_WAIT))
-		return;
-
-	width = desc.dwWidth;
-	height = desc.dwHeight;
-#endif // (DIRECT3D_VERSION < 0x900)
-
 	wsprintf(fileName, "tomb%04d.tga", scrshotNumber++);
 #endif // FEATURE_SCREENSHOT_IMPROVED
 
@@ -246,20 +204,8 @@ static void ScreenShotTGA(LPDDS screen, BYTE tgaBpp) {
 		goto CLEANUP;
 
 	// We need to load bitmap lines to TGA starting from the bottom line
-#if (DIRECT3D_VERSION >= 0x900)
 	src = (BYTE*)desc.pBits + desc.Pitch * (height - 1);
-#else // (DIRECT3D_VERSION >= 0x900)
-#if defined(FEATURE_SCREENSHOT_IMPROVED)
-	// NOTE: There was bug in the original formula: src = lpSurface + lPitch * dwHeight
-	// Height must be subtracted by 1 in this formula
-	src = (BYTE*)desc.lpSurface + desc.lPitch * (height - 1);
-#else // !FEATURE_SCREENSHOT_IMPROVED
-	src = (BYTE*)desc.lpSurface + desc.lPitch * height;
-#endif // FEATURE_SCREENSHOT_IMPROVED
-#endif // (DIRECT3D_VERSION >= 0x900)
-
 	dst = tgaPic;
-#if (DIRECT3D_VERSION >= 0x900)
 	for (i = 0; i < height; ++i) {
 		for (j = 0; j < width; ++j) {
 			((RGB888*)dst)[j] = *(RGB888*)(src + j * 4);
@@ -267,40 +213,6 @@ static void ScreenShotTGA(LPDDS screen, BYTE tgaBpp) {
 		src -= desc.Pitch;
 		dst += sizeof(RGB888) * width;
 	}
-#else // (DIRECT3D_VERSION >= 0x900)
-	if (tgaBpp == 16) {
-		for (i = 0; i < height; ++i) {
-			// R5G6B5 - not TGA compatible
-			if (desc.ddpfPixelFormat.dwRBitMask == 0xF800) {
-				// right shift highest 10 bits (R+G) over lowest G bit
-				for (j = 0; j < width; ++j) {
-					UINT16 sample = ((UINT16*)src)[j];
-					((UINT16*)dst)[j] = ((sample & 0xFFC0) >> 1) | (sample & 0x001F);
-				}
-			}
-			else {
-				// X1R5G5B5 - already TGA compatible
-				memcpy(dst, src, sizeof(UINT16) * width);
-			}
-			src -= desc.lPitch;
-			dst += sizeof(UINT16) * width;
-		}
-	}
-	else {
-		for (i = 0; i < height; ++i) {
-			if (desc.ddpfPixelFormat.dwRGBBitCount == 24) {
-				memcpy(dst, src, sizeof(RGB888) * width);
-			}
-			else {
-				for (j = 0; j < width; ++j) {
-					((RGB888*)dst)[j] = *(RGB888*)(src + j * (desc.ddpfPixelFormat.dwRGBBitCount / 8));
-				}
-			}
-			src -= desc.lPitch;
-			dst += sizeof(RGB888) * width;
-		}
-	}
-#endif // (DIRECT3D_VERSION >= 0x900)
 	WriteFile(hFile, tgaPic, width * height * (tgaBpp / 8), &bytesWritten, NULL);
 
 CLEANUP:
@@ -311,30 +223,16 @@ CLEANUP:
 
 	if (hFile != INVALID_HANDLE_VALUE)
 		CloseHandle(hFile);
-
-#if (DIRECT3D_VERSION >= 0x900)
 	if (screen != NULL) {
 		screen->UnlockRect();
 		if (screen != CaptureBufferSurface) {
 			screen->Release();
 		}
 	}
-#else // (DIRECT3D_VERSION >= 0x900)
-#if defined(FEATURE_SCREENSHOT_IMPROVED)
-	screen->Unlock(desc.lpSurface);
-#else // !FEATURE_SCREENSHOT_IMPROVED
-	WinVidBufferUnlock(screen, &desc);
-#endif // FEATURE_SCREENSHOT_IMPROVED
-#endif // (DIRECT3D_VERSION >= 0x900)
 }
 
 void ScreenShotPCX() {
 	static int scrshotNumber = 0;
-#if (DIRECT3D_VERSION < 0x900)
-	HRESULT rc;
-	LPDDS screen;
-	DDSDESC desc;
-#endif // (DIRECT3D_VERSION < 0x900)
 	BYTE* pcxData = NULL;
 	DWORD pcxSize;
 	HANDLE hFile = INVALID_HANDLE_VALUE;
@@ -345,26 +243,8 @@ void ScreenShotPCX() {
 	char fileName[128];
 #endif // FEATURE_SCREENSHOT_IMPROVED
 
-#if (DIRECT3D_VERSION >= 0x900)
 	if (!RenderBuffer.bitmap || !RenderBuffer.width || !RenderBuffer.height) return;
 	pcxSize = CompPCX(RenderBuffer.bitmap, RenderBuffer.width, RenderBuffer.height, GamePalette8, &pcxData);
-#else // (DIRECT3D_VERSION >= 0x900)
-	screen = (SavedAppSettings.RenderMode == RM_Software) ? RenderBufferSurface : PrimaryBufferSurface;
-	desc.dwSize = sizeof(desc);
-
-	do {
-		rc = screen->Lock(NULL, &desc, DDLOCK_SURFACEMEMORYPTR, NULL);
-	} while (rc == DDERR_WASSTILLDRAWING);
-
-	if (rc == DDERR_SURFACELOST)
-		rc = screen->Restore();
-	if FAILED(rc)
-		return;
-
-	pcxSize = CompPCX((BYTE*)desc.lpSurface, desc.dwWidth, desc.dwHeight, GamePalette8, &pcxData);
-	screen->Unlock(&desc);
-#endif // (DIRECT3D_VERSION >= 0x900)
-
 	if (pcxSize == 0 || pcxData == NULL)
 		return;
 
@@ -485,57 +365,18 @@ DWORD EncodePutPCX(BYTE value, BYTE num, BYTE* buffer) {
 
 void ScreenShot(LPDDS screen) {
 #if defined(FEATURE_SCREENSHOT_IMPROVED)
-#if (DIRECT3D_VERSION < 0x900)
-	if (SavedAppSettings.RenderMode == RM_Software) {
-		screen = RenderBufferSurface;
-	}
-	else if (CaptureBufferSurface != NULL) {
-		screen = CaptureBufferSurface;
-	}
-#endif // (DIRECT3D_VERSION < 0x900)
-
 	if (ScreenshotFormat > 0) {
 		ScreenShotPNG(screen);
 		return;
 	}
 #endif // FEATURE_SCREENSHOT_IMPROVED
 
-#if (DIRECT3D_VERSION >= 0x900)
 	if (SavedAppSettings.RenderMode == RM_Software) {
 		ScreenShotPCX();
 	}
 	else {
 		ScreenShotTGA(screen, 24);
 	}
-#else // (DIRECT3D_VERSION >= 0x900)
-	DDSDESC desc;
-
-	memset(&desc, 0, sizeof(desc));
-	desc.dwSize = sizeof(desc);
-
-	if SUCCEEDED(screen->GetSurfaceDesc(&desc)) {
-		switch (desc.ddpfPixelFormat.dwRGBBitCount) {
-		case 8:
-			ScreenShotPCX();
-			break;
-
-		case 16:
-			ScreenShotTGA(screen, 16);
-			break;
-
-#if defined(FEATURE_SCREENSHOT_IMPROVED)
-		case 24:
-		case 32:
-			// NOTE: the original game cannot make 24/32 bit screenshots
-			ScreenShotTGA(screen, 24);
-			break;
-#endif // FEATURE_SCREENSHOT_IMPROVED
-
-		default:
-			break;
-		}
-	}
-#endif // (DIRECT3D_VERSION >= 0x900)
 }
 
 /*

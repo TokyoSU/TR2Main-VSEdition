@@ -39,9 +39,9 @@ void(*ins_line)(int, int, int, int, int, BYTE); // 0x004B2AE8
 short*(*ins_objectG4)(short*, int, SORTTYPE); // 0x004BCAF8
 short*(*ins_objectG3)(short*, int, SORTTYPE); // 0x004BCB40
 
-#if defined(FEATURE_HUD_IMPROVED) || (DIRECT3D_VERSION >= 0x900)
+#if defined(FEATURE_HUD_IMPROVED)
 #include "modding/texture_utils.h"
-#endif // defined(FEATURE_HUD_IMPROVED) || (DIRECT3D_VERSION >= 0x900)
+#endif // defined(FEATURE_HUD_IMPROVED)
 
 #if defined(FEATURE_VIDEOFX_IMPROVED)
 #include "specific/texture.h"
@@ -73,15 +73,15 @@ static D3DCOLOR GetShadeColor(DWORD red, DWORD green, DWORD blue, DWORD alpha, D
 		alpha = RGBA_GETALPHA(GlobalTint);
 	}
 
-#if defined(FEATURE_VIDEOFX_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
+#if defined(FEATURE_VIDEOFX_IMPROVED)
 	if (SavedAppSettings.LightingMode == 1) CLAMPL(shade, 0x800);
 	if (SavedAppSettings.LightingMode && isTextured) shade = 0x1000 + shade / 2;
 	if (!SavedAppSettings.LightingMode && !isTextured) CLAMPL(shade, 0x1000);
-#else // defined(FEATURE_VIDEOFX_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
+#else // defined(FEATURE_VIDEOFX_IMPROVED)
 	// NOTE: The original game bugfix. We need to limit brightness of untextured faces for DirectX 5
 	// because brightness of textured faces is limited by D3DTBLEND_MODULATEALPHA or D3DTBLEND_MODULATE
 	if (!isTextured) CLAMPL(shade, 0x1000);
-#endif // defined(FEATURE_VIDEOFX_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
+#endif // defined(FEATURE_VIDEOFX_IMPROVED)
 
 	if (shade != 0x1000) {
 		DWORD brightness = 0x2000 - shade;
@@ -2444,7 +2444,7 @@ short* InsertObjectG3_Sorted(short* ptrObj, int number, SORTTYPE sortType) {
 	return ptrObj;
 }
 
-#ifdef FEATURE_VIDEOFX_IMPROVED
+#if defined(FEATURE_VIDEOFX_IMPROVED)
 void InsertSprite_Sorted(int z, int x0, int y0, int x1, int y1, int spriteIdx, short shade, DWORD flags) {
 	if (TextureFormat.bpp < 16 && CHK_ANY(flags, SPR_TINT)) return; // tinted sprites are not supported for 8 bit textured mode
 #else // FEATURE_VIDEOFX_IMPROVED
@@ -2469,13 +2469,11 @@ void InsertSprite_Sorted(int z, int x0, int y0, int x1, int y1, int spriteIdx, s
 
 	// NOTE: page side is not counted in the original game, but we need it for HD textures
 	int adjustment = UvAdd * 256 / GetTextureSideByPage(PhdSpriteInfo[spriteIdx].texPage);
-#if (DIRECT3D_VERSION >= 0x900)
 	double forcedAdjust = GetTexPagesAdjustment();
 	if (forcedAdjust > 0.0) {
 		adjustment = (int)(forcedAdjust * 256.0);
 	}
-#endif // (DIRECT3D_VERSION >= 0x900)
-#ifdef FEATURE_HUD_IMPROVED
+#if defined(FEATURE_HUD_IMPROVED)
 	if (spriteIdx >= (int)ARRAY_SIZE(PhdSpriteInfo) - HUD_SPRITE_RESERVED) {
 		adjustment = 0;
 	}
@@ -2522,7 +2520,7 @@ void InsertSprite_Sorted(int z, int x0, int y0, int x1, int y1, int spriteIdx, s
 
 	bool isShadeEffectBackup = IsShadeEffect;
 	IsShadeEffect = false;
-#ifdef FEATURE_VIDEOFX_IMPROVED
+#if defined(FEATURE_VIDEOFX_IMPROVED)
 	short polyType = POLY_HWR_WGTmap;
 	if (CHK_ANY(flags, SPR_TINT)) {
 		GlobalTint = RGBA_SETALPHA(flags, 0xFF);

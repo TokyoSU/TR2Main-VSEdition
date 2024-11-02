@@ -36,14 +36,14 @@
 #include "modding/texture_utils.h"
 #include "global/vars.h"
 
-#if (DIRECT3D_VERSION >= 0x900) || defined(FEATURE_BACKGROUND_IMPROVED)
+#if defined(FEATURE_BACKGROUND_IMPROVED)
 DWORD BGND_PictureWidth = 640;
 DWORD BGND_PictureHeight = 480;
 #endif
 
 #ifdef FEATURE_BACKGROUND_IMPROVED
 extern LPDDS CaptureBufferSurface;
-extern TEXPAGE_DESC TexturePages[256];
+extern TEXPAGE_DESC TexturePages[MAX_TEXTURE_PAGES];
 
 #ifdef FEATURE_INPUT_IMPROVED
 #include "modding/joy_output.h"
@@ -206,9 +206,9 @@ void PSX_Background(HWR_TEXHANDLE texSource, int tu, int tv, int t_width, int t_
 			int shortWave = phd_sin(shortWaveRowPhase) * 32 / 0x4000;
 			int longWave = phd_sin(longWaveRowPhase) * 32 / 0x4000;
 			light = 128 + shortWave + longWave;
-#if defined(FEATURE_VIDEOFX_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
+#if defined(FEATURE_VIDEOFX_IMPROVED)
 			if (SavedAppSettings.LightingMode) light /= 2;
-#endif // defined(FEATURE_VIDEOFX_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
+#endif // defined(FEATURE_VIDEOFX_IMPROVED)
 			vtx->color = RGBA_MAKE(light, light, light, 0xFFu);
 			vtx->y = ((float)(baseY + tileSize * j + phd_sin(deformWaveRowPhase) * tileRadius / 0x4000)) / PIXEL_ACCURACY;
 			vtx->x = ((float)(baseX + tileSize * i + phd_cos(deformWaveRowPhase) * tileRadius / 0x4000)) / PIXEL_ACCURACY;
@@ -237,6 +237,7 @@ void PSX_Background(HWR_TEXHANDLE texSource, int tu, int tv, int t_width, int t_
 			RenderTexturedFarQuad(vtx0, vtx1, vtx2, vtx3, &subTxr);
 		}
 	}
+
 	free(vertices);
 }
 
@@ -248,7 +249,6 @@ static int CreateCaptureTexture(DWORD index, int side) {
 	}
 	if (pageIndex < 0 || !CHK_ANY(TexturePages[pageIndex].status, 1)) {
 		DDSDESC desc;
-#if (DIRECT3D_VERSION >= 0x900)
 		pageIndex = CreateTexturePage(side, side, false);
 		if (pageIndex < 0) {
 			return -1;
@@ -256,12 +256,6 @@ static int CreateCaptureTexture(DWORD index, int side) {
 		if SUCCEEDED(TexturePages[pageIndex].texture->LockRect(0, &desc, NULL, 0)) {
 			TexturePages[pageIndex].texture->UnlockRect(0);
 		}
-#else // (DIRECT3D_VERSION >= 0x900)
-		pageIndex = CreateTexturePage(side, side, NULL);
-		if SUCCEEDED(WinVidBufferLock(TexturePages[pageIndex].sysMemSurface, &desc, DDLOCK_WRITEONLY | DDLOCK_WAIT)) {
-			WinVidBufferUnlock(TexturePages[pageIndex].sysMemSurface, &desc);
-		}
-#endif // (DIRECT3D_VERSION >= 0x900)
 		if (pageIndex < 0) {
 			return -1;
 		}
@@ -402,25 +396,11 @@ static int BGND2_FadeToPal(int fadeValue, RGB888* palette, int inputCheck) {
 	int i, j;
 	int palStartIdx = 0;
 	int palEndIdx = 256;
-#if (DIRECT3D_VERSION < 0x900)
-	int palSize = 256;
-#endif // (DIRECT3D_VERSION < 0x900)
 	bool fadeFaster = false;
-	PALETTEENTRY fadePal[256];
+	PALETTEENTRY fadePal[256] = {};
 
-#if (DIRECT3D_VERSION >= 0x900)
 	if (SavedAppSettings.RenderMode != RM_Software)
 		return fadeValue;
-#else // (DIRECT3D_VERSION >= 0x900)
-	if (!GameVid_IsVga)
-		return fadeValue;
-
-	if (GameVid_IsWindowedVga) {
-		palStartIdx += 10;
-		palEndIdx -= 10;
-		palSize -= 20;
-	}
-#endif // (DIRECT3D_VERSION >= 0x900)
 
 	if (fadeValue <= 1) {
 		for (i = palStartIdx; i < palEndIdx; ++i) {
@@ -428,12 +408,8 @@ static int BGND2_FadeToPal(int fadeValue, RGB888* palette, int inputCheck) {
 			WinVidPalette[i].peGreen = palette[i].green;
 			WinVidPalette[i].peBlue = palette[i].blue;
 		}
-#if (DIRECT3D_VERSION >= 0x900)
 		S_InitialisePolyList(FALSE);
 		S_OutputPolyList();
-#else // (DIRECT3D_VERSION >= 0x900)
-		DDrawPalette->SetEntries(0, palStartIdx, palSize, &WinVidPalette[palStartIdx]);
-#endif // (DIRECT3D_VERSION >= 0x900)
 		return fadeValue;
 	}
 
@@ -457,12 +433,8 @@ static int BGND2_FadeToPal(int fadeValue, RGB888* palette, int inputCheck) {
 			WinVidPalette[i].peGreen = fadePal[i].peGreen + (palette[i].green - fadePal[i].peGreen) * j / fadeValue;
 			WinVidPalette[i].peBlue = fadePal[i].peBlue + (palette[i].blue - fadePal[i].peBlue) * j / fadeValue;
 		}
-#if (DIRECT3D_VERSION >= 0x900)
 		S_InitialisePolyList(FALSE);
 		S_OutputPolyList();
-#else // (DIRECT3D_VERSION >= 0x900)
-		DDrawPalette->SetEntries(0, palStartIdx, palSize, &WinVidPalette[palStartIdx]);
-#endif // (DIRECT3D_VERSION >= 0x900)
 		S_DumpScreen();
 	}
 	return fadeFaster ? 1 : 0;
@@ -473,71 +445,13 @@ static void BGND2_CustomBlt(LPDDSDESC dst, DWORD dstX, DWORD dstY, LPDDSDESC src
 	DWORD srcY = srcRect->top;
 	DWORD width = srcRect->right - srcRect->left;
 	DWORD height = srcRect->bottom - srcRect->top;
-
-#if (DIRECT3D_VERSION >= 0x900)
 	BYTE* srcLine = (BYTE*)src->pBits + srcY * src->Pitch + srcX * 4;
 	BYTE* dstLine = (BYTE*)dst->pBits + dstY * dst->Pitch + dstX * 4;
-
 	for (DWORD j = 0; j < height; ++j) {
 		memcpy(dstLine, srcLine, sizeof(DWORD) * width);
 		srcLine += src->Pitch;
 		dstLine += dst->Pitch;
 	}
-#else // (DIRECT3D_VERSION >= 0x900)
-	DWORD srcBpp = src->ddpfPixelFormat.dwRGBBitCount / 8;
-	DWORD dstBpp = dst->ddpfPixelFormat.dwRGBBitCount / 8;
-	COLOR_BIT_MASKS srcMask, dstMask;
-
-	WinVidGetColorBitMasks(&srcMask, &src->ddpfPixelFormat);
-	WinVidGetColorBitMasks(&dstMask, &dst->ddpfPixelFormat);
-
-	BYTE* srcLine = (BYTE*)src->lpSurface + srcY * src->lPitch + srcX * srcBpp;
-	BYTE* dstLine = (BYTE*)dst->lpSurface + dstY * dst->lPitch + dstX * dstBpp;
-	for (DWORD j = 0; j < height; ++j) {
-		BYTE* srcPtr = srcLine;
-		BYTE* dstPtr = dstLine;
-		for (DWORD i = 0; i < width; ++i) {
-			DWORD color = 0;
-			memcpy(&color, srcPtr, srcBpp);
-			DWORD red = ((color & srcMask.dwRBitMask) >> srcMask.dwRBitOffset);
-			DWORD green = ((color & srcMask.dwGBitMask) >> srcMask.dwGBitOffset);
-			DWORD blue = ((color & srcMask.dwBBitMask) >> srcMask.dwBBitOffset);
-			if (srcMask.dwRBitDepth < dstMask.dwRBitDepth) {
-				DWORD high = dstMask.dwRBitDepth - srcMask.dwRBitDepth;
-				DWORD low = (srcMask.dwRBitDepth > high) ? srcMask.dwRBitDepth - high : 0;
-				red = (red << high) | (red >> low);
-			}
-			else if (srcMask.dwRBitDepth > dstMask.dwRBitDepth) {
-				red >>= srcMask.dwRBitDepth - dstMask.dwRBitDepth;
-			}
-			if (srcMask.dwGBitDepth < dstMask.dwGBitDepth) {
-				DWORD high = dstMask.dwGBitDepth - srcMask.dwGBitDepth;
-				DWORD low = (srcMask.dwGBitDepth > high) ? srcMask.dwGBitDepth - high : 0;
-				green = (green << high) | (green >> low);
-			}
-			else if (srcMask.dwGBitDepth > dstMask.dwGBitDepth) {
-				green >>= srcMask.dwGBitDepth - dstMask.dwGBitDepth;
-			}
-			if (srcMask.dwBBitDepth < dstMask.dwBBitDepth) {
-				DWORD high = dstMask.dwBBitDepth - srcMask.dwBBitDepth;
-				DWORD low = (srcMask.dwBBitDepth > high) ? srcMask.dwBBitDepth - high : 0;
-				blue = (blue << high) | (blue >> low);
-			}
-			else if (srcMask.dwBBitDepth > dstMask.dwBBitDepth) {
-				blue >>= srcMask.dwBBitDepth - dstMask.dwBBitDepth;
-			}
-			color = dst->ddpfPixelFormat.dwRGBAlphaBitMask; // destination is opaque
-			color |= red << dstMask.dwRBitOffset;
-			color |= green << dstMask.dwGBitOffset;
-			color |= blue << dstMask.dwBBitOffset;
-			memcpy(dstPtr, &color, dstBpp);
-			srcPtr += srcBpp;
-			dstPtr += dstBpp;
-		}
-		srcLine += src->lPitch;
-		dstLine += dst->lPitch;
-	}
-#endif // (DIRECT3D_VERSION >= 0x900)
 }
 
 int BGND2_CapturePicture() {
@@ -560,9 +474,6 @@ int BGND2_CapturePicture() {
 		return -1;
 	}
 
-#if (DIRECT3D_VERSION < 0x900)
-	LPDDS surface = CaptureBufferSurface ? CaptureBufferSurface : PrimaryBufferSurface;
-#endif // (DIRECT3D_VERSION < 0x900)
 	if (CaptureBufferSurface == NULL) {
 		MapWindowPoints(HGameWindow, GetParent(HGameWindow), (LPPOINT)&rect, 2);
 	}
@@ -570,7 +481,6 @@ int BGND2_CapturePicture() {
 	height = ABS(rect.bottom - rect.top);
 
 	DWORD side = MIN(2048, GetMaxTextureSize());
-
 	DWORD nx = (width + side - 1) / side;
 	DWORD ny = (height + side - 1) / side;
 
@@ -590,7 +500,6 @@ int BGND2_CapturePicture() {
 		y[i] = i * side * y[ny] / height;
 	}
 
-#if (DIRECT3D_VERSION >= 0x900)
 	DISPLAY_MODE mode;
 	LPDDS surface = NULL;
 	if (CaptureBufferSurface != NULL) {
@@ -603,7 +512,6 @@ int BGND2_CapturePicture() {
 		ret = -1;
 		goto CLEANUP;
 	}
-#endif // (DIRECT3D_VERSION >= 0x900)
 
 	for (DWORD j = 0; j < ny; ++j) {
 		for (DWORD i = 0; i < nx; ++i) {
@@ -618,43 +526,19 @@ int BGND2_CapturePicture() {
 			if (!isSrcLock) {
 				HRESULT rc;
 				memset(&srcDesc, 0, sizeof(srcDesc));
-#if (DIRECT3D_VERSION >= 0x900)
 				rc = surface->LockRect(&srcDesc, &rect, D3DLOCK_READONLY);
-#else // (DIRECT3D_VERSION >= 0x900)
-				srcDesc.dwSize = sizeof(srcDesc);
-				do {
-					rc = surface->Lock(&rect, &srcDesc, DDLOCK_READONLY | DDLOCK_WAIT, NULL);
-				} while (rc == DDERR_WASSTILLDRAWING);
-				if (rc == DDERR_SURFACELOST) {
-					rc = surface->Restore();
-				}
-#endif // (DIRECT3D_VERSION >= 0x900)
 				if FAILED(rc) {
 					ret = -1;
 					goto CLEANUP;
 				}
 				isSrcLock = true;
 			}
-#if (DIRECT3D_VERSION >= 0x900)
 			if FAILED(TexturePages[pageIndex].texture->LockRect(0, &dstDesc, NULL, 0)) {
 				ret = -1;
 				goto CLEANUP;
 			}
 			BGND2_CustomBlt(&dstDesc, 0, 0, &srcDesc, &r);
 			TexturePages[pageIndex].texture->UnlockRect(0);
-#else // (DIRECT3D_VERSION >= 0x900)
-			if FAILED(WinVidBufferLock(TexturePages[pageIndex].sysMemSurface, &dstDesc, DDLOCK_WRITEONLY | DDLOCK_WAIT)) {
-				ret = -1;
-				goto CLEANUP;
-			}
-			BGND2_CustomBlt(&dstDesc, 0, 0, &srcDesc, &r);
-			WinVidBufferUnlock(TexturePages[pageIndex].sysMemSurface, &dstDesc);
-
-			if (!LoadTexturePage(pageIndex, false)) {
-				ret = -1;
-				goto CLEANUP;
-			}
-#endif // (DIRECT3D_VERSION >= 0x900)
 		}
 	}
 
@@ -666,7 +550,6 @@ int BGND2_CapturePicture() {
 	BGND_IsCaptured = true;
 
 CLEANUP:
-#if (DIRECT3D_VERSION >= 0x900)
 	if (surface != NULL) {
 		if (isSrcLock) {
 			surface->UnlockRect();
@@ -675,11 +558,6 @@ CLEANUP:
 			surface->Release();
 		}
 	}
-#else // (DIRECT3D_VERSION >= 0x900)
-	if (isSrcLock) {
-		surface->Unlock(srcDesc.lpSurface);
-	}
-#endif // (DIRECT3D_VERSION >= 0x900)
 	return ret;
 }
 
@@ -722,7 +600,7 @@ int BGND2_LoadPicture(LPCTSTR fileName, BOOL isTitle, BOOL isReload) {
 	lastWinWidth = PhdWinWidth;
 	lastWinHeight = PhdWinHeight;
 
-#ifdef FEATURE_GOLD
+#if defined(FEATURE_GOLD)
 	if (IsGold()) {
 		AddFilenameSuffix(fullPath, sizeof(fullPath), GetFullPath(fileName), "g");
 		pickResult = PickBestPictureFile(fullPath, "pix");
@@ -771,11 +649,7 @@ int BGND2_LoadPicture(LPCTSTR fileName, BOOL isTitle, BOOL isReload) {
 		isPCX = true;
 	}
 	else if (SavedAppSettings.RenderMode == RM_Hardware && TextureFormat.bpp >= 16) {
-#if (DIRECT3D_VERSION >= 0x900)
 		bpp = 32;
-#else // (DIRECT3D_VERSION >= 0x900)
-		bpp = 16;
-#endif // (DIRECT3D_VERSION >= 0x900)
 		if (GDI_LoadImageFile(fullPath, &bitmapData, &width, &height, bpp)) {
 			goto FAIL;
 		}
@@ -786,7 +660,6 @@ int BGND2_LoadPicture(LPCTSTR fileName, BOOL isTitle, BOOL isReload) {
 		goto FAIL;
 	}
 
-#if (DIRECT3D_VERSION >= 0x900)
 	if (PictureBuffer.bitmap == NULL ||
 		PictureBuffer.width != width ||
 		PictureBuffer.height != height)
@@ -800,43 +673,17 @@ int BGND2_LoadPicture(LPCTSTR fileName, BOOL isTitle, BOOL isReload) {
 			goto FAIL;
 		}
 	}
-#else // (DIRECT3D_VERSION >= 0x900)
-	if (PictureBufferSurface != NULL &&
-		(BGND_PictureWidth != width || BGND_PictureHeight != height))
-	{
-		BGND_PictureWidth = width;
-		BGND_PictureHeight = height;
-		PictureBufferSurface->Release();
-		PictureBufferSurface = NULL;
-	}
-	if (PictureBufferSurface == NULL) {
-		try {
-			CreatePictureBuffer();
-		}
-		catch (...) {
-			goto FAIL;
-		}
-	}
-#endif // (DIRECT3D_VERSION >= 0x900)
 
 	if (SavedAppSettings.RenderMode == RM_Software) {
-#if (DIRECT3D_VERSION >= 0x900)
 		if (PictureBuffer.bitmap != NULL)
 			memcpy(PictureBuffer.bitmap, bitmapData, PictureBuffer.width * PictureBuffer.height);
-#else // (DIRECT3D_VERSION >= 0x900)
-		WinVidCopyBitmapToBuffer(PictureBufferSurface, bitmapData);
-#endif // (DIRECT3D_VERSION >= 0x900)
 	}
 	else {
 		MakeBgndTextures(width, height, bpp, bitmapData, isPCX ? PicPalette : NULL);
 	}
 
 	if (!isTitle && isPCX) {
-#if (DIRECT3D_VERSION >= 0x900)
 		memcpy(GamePalette8, PicPalette, sizeof(GamePalette8));
-#else // (DIRECT3D_VERSION >= 0x900)
-		CopyBitmapPalette(PicPalette, bitmapData, bitmapSize, GamePalette8);
-#endif // (DIRECT3D_VERSION >= 0x900)
 	}
 	if (bitmapData != NULL) {
 		free(bitmapData);
@@ -848,17 +695,10 @@ int BGND2_LoadPicture(LPCTSTR fileName, BOOL isTitle, BOOL isReload) {
 	return 0;
 
 FAIL:
-#if (DIRECT3D_VERSION >= 0x900)
 	if (PictureBuffer.bitmap != NULL) {
 		free(PictureBuffer.bitmap);
 		PictureBuffer.bitmap = NULL;
 	}
-#else // (DIRECT3D_VERSION >= 0x900)
-	if (PictureBufferSurface != NULL) {
-		PictureBufferSurface->Release();
-		PictureBufferSurface = NULL;
-	}
-#endif // (DIRECT3D_VERSION >= 0x900)
 	if (bitmapData != NULL) {
 		free(bitmapData);
 	}
@@ -910,13 +750,8 @@ int BGND2_ShowPicture(DWORD fadeIn, DWORD waitIn, DWORD fadeOut, DWORD waitOut, 
 			return -1;
 		}
 		if (fadeOut > 0 || waitOut > 0) {
-#if (DIRECT3D_VERSION >= 0x900)
 			ScreenClear(false);
 			S_Wait(2 * TICKS_PER_FRAME, FALSE);
-#else // (DIRECT3D_VERSION >= 0x900)
-			ScreenClear(false); ScreenDump();
-			ScreenClear(false); ScreenDump();
-#endif // (DIRECT3D_VERSION >= 0x900)
 		}
 		if (waitOut > 2) {
 			S_Wait((waitOut - 2) * TICKS_PER_FRAME, inputCheck);
@@ -988,7 +823,7 @@ int BGND2_ShowPicture(DWORD fadeIn, DWORD waitIn, DWORD fadeOut, DWORD waitOut, 
 				}
 			}
 			++frame;
-#ifdef FEATURE_INPUT_IMPROVED
+#if defined(FEATURE_INPUT_IMPROVED)
 			UpdateJoyOutput(false);
 #endif // FEATURE_INPUT_IMPROVED
 		}

@@ -290,12 +290,7 @@ void draw_scaled_spriteC(short* ptrObj) {
 	srcBase = (BYTE*)TexturePageBuffer8[sprite->texPage] + sprite->offset;
 	dst = PrintSurfacePtr + (PhdWinMinY + y1) * pitch + (PhdWinMinX + x1);
 	dstAdd = pitch - width;
-
-#if (DIRECT3D_VERSION >= 0x900)
 	isDepthQ = (depthQ != &DepthQTable[15]);
-#else // (DIRECT3D_VERSION >= 0x900)
-	isDepthQ = (GameVid_IsWindowedVga || depthQ != &DepthQTable[15]); // NOTE: index was 16 in the original code, this was wrong
-#endif // (DIRECT3D_VERSION >= 0x900)
 
 	for (i = 0; i < height; ++i) {
 		u = uBase;

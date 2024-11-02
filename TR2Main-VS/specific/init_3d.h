@@ -27,16 +27,16 @@
  /*
   * Function list
   */
-#if (DIRECT3D_VERSION < 0x900)
-void Enumerate3DDevices(DISPLAY_ADAPTER* adapter); // 0x004445F0
-#endif // (DIRECT3D_VERSION < 0x900)
+
+// Enumerate3DDevices 0x004445F0
+
 bool D3DCreate(); // 0x00444620
 void D3DRelease(); // 0x00444640
-#if (DIRECT3D_VERSION < 0x900)
-HRESULT CALLBACK Enum3DDevicesCallback(GUID FAR* lpGuid, LPTSTR lpDeviceDescription, LPTSTR lpDeviceName, LPD3DDEVICEDESC lpD3DHWDeviceDesc, LPD3DDEVICEDESC lpD3DHELDeviceDesc, LPVOID lpContext); // 0x00444660
-bool D3DIsSupported(LPD3DDEVICEDESC desc); // 0x00444720
-bool D3DSetViewport(); // 0x00444760
-#endif // (DIRECT3D_VERSION < 0x900)
+
+// Enum3DDevicesCallback 0x00444660
+// D3DIsSupported 0x00444720
+// D3DSetViewport 0x00444760
+
 void D3DDeviceCreate(LPDDS lpBackBuffer); // 0x00444820
 void Direct3DRelease(); // 0x004449E0
 bool Direct3DInit(); // 0x00444A30

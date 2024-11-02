@@ -207,7 +207,7 @@ void S_FinishInventory() {
 }
 
 void S_FadeToBlack() {
-#ifdef FEATURE_BACKGROUND_IMPROVED
+#if defined(FEATURE_BACKGROUND_IMPROVED)
 	if (SavedAppSettings.RenderMode == RM_Hardware) {
 		IsFadeToBlack = true;
 		S_CopyScreenToBuffer();
@@ -221,13 +221,8 @@ void S_FadeToBlack() {
 	FadeWait();
 
 	// make two blank frames
-#if (DIRECT3D_VERSION >= 0x900)
 	ScreenClear(false);
 	S_Wait(2 * TICKS_PER_FRAME, FALSE);
-#else // (DIRECT3D_VERSION >= 0x900)
-	ScreenClear(false); ScreenDump();
-	ScreenClear(false); ScreenDump();
-#endif // (DIRECT3D_VERSION >= 0x900)
 }
 
 void S_Wait(int timeout, BOOL inputCheck) {

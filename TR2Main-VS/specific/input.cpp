@@ -31,7 +31,7 @@
 #include "specific/winvid.h"
 #include "global/vars.h"
 
-#ifdef FEATURE_INPUT_IMPROVED
+#if defined(FEATURE_INPUT_IMPROVED)
 bool WalkToSidestep = false;
 #endif // FEATURE_INPUT_IMPROVED
 
@@ -41,7 +41,7 @@ bool WalkToSidestep = false;
 
 // NOTE: not presented in the original game
 static BOOL JoyKey(KEYMAP keyMap) {
-#ifdef FEATURE_HUD_IMPROVED
+#if defined(FEATURE_HUD_IMPROVED)
 	if (keyMap < 4) return FALSE; // ignore direction keys
 	UINT16 key = Layout[CTRL_Joystick].key[keyMap];
 	return CHK_ANY(JoyKeys, (1 << key));
@@ -161,7 +161,7 @@ bool S_UpdateInput() {
 	}
 
 	// Key combinations and alternatives
-#ifdef FEATURE_HUD_IMPROVED
+#if defined(FEATURE_HUD_IMPROVED)
 	if (Key(KM_Step)) {
 		if (CHK_ANY(input, IN_LEFT)) {
 			input &= ~(IN_LEFT | IN_FORWARD | IN_BACK);
@@ -176,7 +176,7 @@ bool S_UpdateInput() {
 		}
 	}
 #endif // FEATURE_HUD_IMPROVED
-#ifdef FEATURE_INPUT_IMPROVED
+#if defined(FEATURE_INPUT_IMPROVED)
 	if (WalkToSidestep && CHK_ANY(input, IN_SLOW) && !CHK_ANY(input, IN_FORWARD | IN_BACK | IN_STEPL | IN_STEPR)) {
 		if (CHK_ANY(input, IN_LEFT)) {
 			input &= ~IN_LEFT;
@@ -249,7 +249,7 @@ bool S_UpdateInput() {
 				mediPackCooldown = 15;
 			}
 		}
-#ifdef FEATURE_CHEAT
+#if defined(FEATURE_CHEAT)
 		// Cheats
 		static bool isStuffCheatKeyPressed = false;
 		if (KEY_DOWN(DIK_I)) {
@@ -268,9 +268,9 @@ bool S_UpdateInput() {
 #endif // FEATURE_CHEAT
 	}
 
-#ifdef FEATURE_BACKGROUND_IMPROVED
+#if defined(FEATURE_BACKGROUND_IMPROVED)
 	static bool isPauseKeyPressed = false;
-#ifdef FEATURE_HUD_IMPROVED
+#if defined(FEATURE_HUD_IMPROVED)
 	if (Key(KM_Pause))
 #else // FEATURE_HUD_IMPROVED
 	if (KEY_DOWN(DIK_P))
@@ -287,18 +287,10 @@ bool S_UpdateInput() {
 #endif // FEATURE_BACKGROUND_IMPROVED
 
 	// Screenshot
-#ifdef FEATURE_SCREENSHOT_IMPROVED
 	if (KEY_DOWN(DIK_BACK)) { // BackSpace Key instead of S
-#else // !FEATURE_SCREENSHOT_IMPROVED
-	if (KEY_DOWN(DIK_S)) {
-#endif // FEATURE_SCREENSHOT_IMPROVED
 		if (!isScreenShotKeyPressed) {
 			isScreenShotKeyPressed = true;
-#if (DIRECT3D_VERSION >= 0x900)
 			ScreenShot(NULL);
-#else // (DIRECT3D_VERSION >= 0x900)
-			ScreenShot(PrimaryBufferSurface);
-#endif // (DIRECT3D_VERSION >= 0x900)
 		}
 	}
 	else {
@@ -322,7 +314,7 @@ bool S_UpdateInput() {
 		if (KEY_DOWN(DIK_F7)) {
 			if (!isF7KeyPressed) {
 				isF7KeyPressed = true;
-#ifndef FEATURE_NOLEGACY_OPTIONS
+#if !defined(FEATURE_NOLEGACY_OPTIONS)
 				if (isShiftKeyPressed) {
 					// Triple Buffer (Shift + F7)
 					if (SavedAppSettings.FullScreen) {
@@ -350,7 +342,7 @@ bool S_UpdateInput() {
 			isF7KeyPressed = false;
 		}
 
-#ifdef FEATURE_VIDEOFX_IMPROVED
+#if defined(FEATURE_VIDEOFX_IMPROVED)
 		// Software Renderer F11 key
 		if (KEY_DOWN(DIK_F11)) {
 			if (!isF11KeyPressed) {
@@ -371,7 +363,7 @@ bool S_UpdateInput() {
 		if (KEY_DOWN(DIK_F7)) {
 			if (!isF7KeyPressed) {
 				isF7KeyPressed = true;
-#ifndef FEATURE_NOLEGACY_OPTIONS
+#if !defined(FEATURE_NOLEGACY_OPTIONS)
 				if (isShiftKeyPressed) {
 					// Triple Buffer (Shift + F7)
 					if (SavedAppSettings.FullScreen) {
@@ -398,7 +390,7 @@ bool S_UpdateInput() {
 		if (KEY_DOWN(DIK_F8)) {
 			if (!isF8KeyPressed) {
 				isF8KeyPressed = true;
-#ifndef FEATURE_NOLEGACY_OPTIONS
+#if !defined(FEATURE_NOLEGACY_OPTIONS)
 				if (isShiftKeyPressed) {
 					// Perspective Correction (Shift + F8)
 					newSettings = SavedAppSettings;
@@ -423,13 +415,13 @@ bool S_UpdateInput() {
 		if (KEY_DOWN(DIK_F11)) {
 			if (!isF11KeyPressed) {
 				isF11KeyPressed = true;
-#ifdef FEATURE_NOLEGACY_OPTIONS
-#if defined(FEATURE_VIDEOFX_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
+#if defined(FEATURE_NOLEGACY_OPTIONS)
+#if defined(FEATURE_VIDEOFX_IMPROVED)
 				// Lighting Contrast (F11)
 				newSettings = SavedAppSettings;
 				newSettings.LightingMode = (newSettings.LightingMode + 1) % 3;
 				GameApplySettings(&newSettings);
-#endif // defined(FEATURE_VIDEOFX_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
+#endif // defined(FEATURE_VIDEOFX_IMPROVED)
 #else // FEATURE_NOLEGACY_OPTIONS
 				// Dithering (F11)
 				newSettings = SavedAppSettings;
@@ -456,7 +448,7 @@ bool S_UpdateInput() {
 
 					if (SavedAppSettings.FullScreen) {
 						// FullScreen to Windowed
-#ifdef FEATURE_NOLEGACY_OPTIONS
+#if defined(FEATURE_NOLEGACY_OPTIONS)
 						CLAMPL(newSettings.WindowWidth, 320);
 						CLAMPL(newSettings.WindowHeight, 240);
 						newSettings.WindowWidth = CalculateWindowWidth(newSettings.WindowWidth, newSettings.WindowHeight);
@@ -487,7 +479,7 @@ bool S_UpdateInput() {
 							targetMode.height = GameVidHeight;
 							targetMode.bpp = GameVidBPP;
 							targetMode.vga = VGA_NoVga;
-#ifdef FEATURE_NOLEGACY_OPTIONS
+#if defined(FEATURE_NOLEGACY_OPTIONS)
 							if (SavedAppSettings.VideoMode) {
 								targetMode.width = SavedAppSettings.VideoMode->body.width;
 								targetMode.height = SavedAppSettings.VideoMode->body.height;
@@ -532,7 +524,7 @@ bool S_UpdateInput() {
 						targetMode.width = GameVidWidth;
 						targetMode.height = GameVidHeight;
 						targetMode.vga = VGA_NoVga;
-#ifdef FEATURE_NOLEGACY_OPTIONS
+#if defined(FEATURE_NOLEGACY_OPTIONS)
 						if (SavedAppSettings.VideoMode) {
 							targetMode.width = SavedAppSettings.VideoMode->body.width;
 							targetMode.height = SavedAppSettings.VideoMode->body.height;
@@ -552,9 +544,6 @@ bool S_UpdateInput() {
 						}
 
 						newSettings.VideoMode = mode;
-#if (DIRECT3D_VERSION < 0x900)
-						newSettings.FullScreen = true;
-#endif // (DIRECT3D_VERSION < 0x900)
 						GameApplySettings(&newSettings);
 					}
 				}
@@ -565,7 +554,7 @@ bool S_UpdateInput() {
 		}
 	}
 
-#ifdef FEATURE_NOLEGACY_OPTIONS
+#if defined(FEATURE_NOLEGACY_OPTIONS)
 	if (SavedAppSettings.RenderMode == RM_Software) {
 		char msg[32] = { 0 };
 		const char* levels[3] = {
@@ -630,7 +619,7 @@ bool S_UpdateInput() {
 			// Additional checks for Hardware Renderer
 			if (SavedAppSettings.RenderMode == RM_Hardware) {
 				for (; mode != NULL; mode = mode->previous) {
-#ifndef FEATURE_NOLEGACY_OPTIONS
+#if !defined(FEATURE_NOLEGACY_OPTIONS)
 					// Decrease depth (Shift + F1)
 					if (isShiftKeyPressed) {
 						if (mode->body.width == SavedAppSettings.VideoMode->body.width &&
@@ -677,7 +666,7 @@ bool S_UpdateInput() {
 			// Additional checks for Hardware Renderer
 			if (SavedAppSettings.RenderMode == RM_Hardware) {
 				for (; mode != NULL; mode = mode->next) {
-#ifndef FEATURE_NOLEGACY_OPTIONS
+#if !defined(FEATURE_NOLEGACY_OPTIONS)
 					// Increase depth (Shift + F2)
 					if (isShiftKeyPressed) {
 						if (mode->body.width == SavedAppSettings.VideoMode->body.width &&
@@ -711,7 +700,7 @@ bool S_UpdateInput() {
 		isF2KeyPressed = false;
 	}
 
-#ifndef FEATURE_NOLEGACY_OPTIONS
+#if !defined(FEATURE_NOLEGACY_OPTIONS)
 	// Decrease inner screen size (F3)
 	if (KEY_DOWN(DIK_F3)) {
 		if (!isF3KeyPressed) {

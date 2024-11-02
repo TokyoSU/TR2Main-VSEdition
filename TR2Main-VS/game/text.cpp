@@ -350,7 +350,7 @@ DWORD T_GetTextWidth(TEXT_STR_INFO* textInfo) {
 			}
 			else {
 				// For "Digit", "Special" and normal letter sprites we use spacing table + letterSpacing
-#if defined(FEATURE_HUD_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
+#if defined(FEATURE_HUD_IMPROVED)
 				spacing = GetTexPagesGlyphSpacing(sprite);
 				if (!spacing) spacing = T_TextSpacing[sprite];
 #else // defined(FEATURE_HUD_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
@@ -523,30 +523,23 @@ void T_DrawThisText(TEXT_STR_INFO* textInfo) {
 			// But sprite itself is center aligned in this space
 			if (*str >= '0' && *str <= '9') {
 				// !!! Here we do LEFT spacing part for digit letters !!!
-#if defined(FEATURE_HUD_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
+#if defined(FEATURE_HUD_IMPROVED)
 				spacing = GetTexPagesGlyphSpacing(sprite);
 				if (!spacing) spacing = T_TextSpacing[sprite];
-#else // defined(FEATURE_HUD_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
+#else // defined(FEATURE_HUD_IMPROVED)
 				spacing = T_TextSpacing[sprite];
-#endif // defined(FEATURE_HUD_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
+#endif // defined(FEATURE_HUD_IMPROVED)
 				xOff = (12 - spacing) / 2;
 				x += xOff * scaleH / PHD_ONE;
 			}
 
 			// Draw letter sprite
-#ifdef FEATURE_HUD_IMPROVED
+#if defined(FEATURE_HUD_IMPROVED)
 			if (x > 0 && x < GetRenderWidthDownscaled() && y > 0 && y < GetRenderHeightDownscaled()) {
-#if (DIRECT3D_VERSION >= 0x900)
 				sx = GetTextScaleH(x + GetTexPagesGlyphXOffset(sprite));
 				sy = GetTextScaleV(y + GetTexPagesGlyphYOffset(sprite));
 				sh = GetTextScaleH(scaleH * GetTexPagesGlyphXStretch(sprite));
 				sv = GetTextScaleV(scaleV * GetTexPagesGlyphYStretch(sprite));
-#else // (DIRECT3D_VERSION >= 0x900)
-				sx = GetTextScaleH(x);
-				sy = GetTextScaleV(y);
-				sh = GetTextScaleH(scaleH);
-				sv = GetTextScaleV(scaleV);
-#endif // (DIRECT3D_VERSION >= 0x900)
 				S_DrawScreenSprite2d(sx, sy, z, sh, sv, (Objects[ID_ALPHABET].meshIndex + sprite), 0x1000, textInfo->textFlags);
 			}
 #else // FEATURE_HUD_IMPROVED
@@ -561,12 +554,12 @@ void T_DrawThisText(TEXT_STR_INFO* textInfo) {
 				continue;
 
 			// Check if normal letter sprite is digit representation
-#if defined(FEATURE_HUD_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
+#if defined(FEATURE_HUD_IMPROVED)
 			spacing = GetTexPagesGlyphSpacing(sprite);
 			if (!spacing) spacing = T_TextSpacing[sprite];
-#else // defined(FEATURE_HUD_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
+#else // defined(FEATURE_HUD_IMPROVED)
 			spacing = T_TextSpacing[sprite];
-#endif // defined(FEATURE_HUD_IMPROVED) && (DIRECT3D_VERSION >= 0x900)
+#endif // defined(FEATURE_HUD_IMPROVED)
 			if (*str >= '0' && *str <= '9') {
 				// !!! Here we do RIGHT spacing part for digit letters !!!
 				xOff = (12 - spacing) / 2;
@@ -595,14 +588,14 @@ void T_DrawThisText(TEXT_STR_INFO* textInfo) {
 			boxH = textInfo->bgndSizeY;
 		}
 		else {
-#ifdef FEATURE_HUD_IMPROVED
+#if defined(FEATURE_HUD_IMPROVED)
 			boxH = (SavedAppSettings.RenderMode == RM_Hardware && InvTextBoxMode ? 14 : 16) * scaleV / PHD_ONE;
 #else // !FEATURE_HUD_IMPROVED
 			boxH = 16 * scaleV / PHD_ONE;
 #endif // FEATURE_HUD_IMPROVED
 		}
 
-#ifdef FEATURE_HUD_IMPROVED
+#if defined(FEATURE_HUD_IMPROVED)
 		sx = GetTextScaleH(boxX);
 		sy = GetTextScaleV(boxY);
 		sh = GetTextScaleH(boxW);
@@ -637,7 +630,7 @@ void T_DrawThisText(TEXT_STR_INFO* textInfo) {
 }
 
 DWORD GetTextScaleH(DWORD baseScale) {
-#ifdef FEATURE_HUD_IMPROVED
+#if defined(FEATURE_HUD_IMPROVED)
 	return GetRenderScale(baseScale);
 #else // !FEATURE_HUD_IMPROVED
 	DWORD renderWidth, renderScale;
@@ -651,7 +644,7 @@ DWORD GetTextScaleH(DWORD baseScale) {
 }
 
 DWORD GetTextScaleV(DWORD baseScale) {
-#ifdef FEATURE_HUD_IMPROVED
+#if defined(FEATURE_HUD_IMPROVED)
 	return GetRenderScale(baseScale);
 #else // !FEATURE_HUD_IMPROVED
 	DWORD renderHeight, renderScale;
@@ -664,7 +657,7 @@ DWORD GetTextScaleV(DWORD baseScale) {
 #endif // FEATURE_HUD_IMPROVED
 }
 
-#ifdef FEATURE_HUD_IMPROVED
+#if defined(FEATURE_HUD_IMPROVED)
 void T_HideText(TEXT_STR_INFO* textInfo, short state) {
 	if (textInfo == NULL)
 		return;

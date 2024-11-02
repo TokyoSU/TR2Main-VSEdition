@@ -58,7 +58,7 @@ extern bool LoadingScreensEnabled;
 #include "modding/mod_utils.h"
 #endif // defined(FEATURE_MOD_CONFIG) || defined(FEATURE_VIDEOFX_IMPROVED)
 
-#if (DIRECT3D_VERSION >= 0x900) || defined(FEATURE_HUD_IMPROVED)
+#if defined(FEATURE_HUD_IMPROVED)
 #include "modding/texture_utils.h"
 #endif // FEATURE_HUD_IMPROVED
 
@@ -361,8 +361,6 @@ static int CreateBgndPatternTexture(HANDLE hFile) {
 		return -1;
 	}
 	int pageIndex = -1;
-
-#if (DIRECT3D_VERSION >= 0x900)
 	if (PathFileExists("textures/background.png")) {
 		pageIndex = AddExternalTexture("textures/background.png", true);
 		if (pageIndex >= 0) {
@@ -372,8 +370,6 @@ static int CreateBgndPatternTexture(HANDLE hFile) {
 			return pageIndex;
 		}
 	}
-#endif // (DIRECT3D_VERSION >= 0x900)
-
 	DWORD bytesRead;
 	int pageCount = 0;
 	SetFilePointer(hFile, LevelFileTexPagesOffset, NULL, FILE_BEGIN);
@@ -381,12 +377,9 @@ static int CreateBgndPatternTexture(HANDLE hFile) {
 	if (BgndPattern.page >= pageCount) {
 		return -1;
 	}
-
-#if (DIRECT3D_VERSION >= 0x900)
 	if (IsExternalTexture(BgndPattern.page)) {
 		return -1;
 	}
-#endif // (DIRECT3D_VERSION >= 0x900)
 
 	DWORD pageSize = (TextureFormat.bpp < 16) ? 256 * 256 * 1 : 256 * 256 * 2;
 	BYTE* bitmap = (BYTE*)GlobalAlloc(GMEM_FIXED, pageSize);
@@ -645,7 +638,6 @@ void AdjustTextureUVs(bool resetUvAdd) {
 	if (resetUvAdd) {
 		memcpy(TextureBackupUV, PhdTextureInfo, TextureInfoCount * sizeof(PHD_TEXTURE));
 	}
-#if (DIRECT3D_VERSION >= 0x900)
 	if (SavedAppSettings.RenderMode == RM_Hardware) {
 		double forcedAdjust = GetTexPagesAdjustment();
 		if (forcedAdjust > 0.0) {
@@ -664,7 +656,6 @@ void AdjustTextureUVs(bool resetUvAdd) {
 			return;
 		}
 	}
-#endif // (DIRECT3D_VERSION >= 0x900)
 
 	if (SavedAppSettings.RenderMode == RM_Hardware && (SavedAppSettings.TexelAdjustMode == TAM_Always ||
 		(SavedAppSettings.TexelAdjustMode == TAM_BilinearOnly && SavedAppSettings.BilinearFiltering)))
@@ -882,32 +873,13 @@ BOOL LoadItems(HANDLE hFile) {
 BOOL LoadDepthQ(HANDLE hFile) {
 	int i, j;
 	DWORD bytesRead;
-#if (DIRECT3D_VERSION < 0x900)
-	RGB888 paletteBuffer[256];
-#endif // (DIRECT3D_VERSION < 0x900)
 
 	ReadFileSync(hFile, DepthQTable, 32 * sizeof(DEPTHQ_ENTRY), &bytesRead, NULL);
-
 	for (i = 0; i < 32; ++i)
 		DepthQTable[i].index[0] = 0;
-
-#if (DIRECT3D_VERSION >= 0x900)
 	memcpy(DepthQIndex, &DepthQTable[24], sizeof(DEPTHQ_ENTRY));
-#else // (DIRECT3D_VERSION >= 0x900)
-	if (GameVid_IsWindowedVga) {
-		CopyBitmapPalette(GamePalette8, DepthQTable[0].index, 32 * sizeof(DEPTHQ_ENTRY), paletteBuffer);
-		SyncSurfacePalettes(DepthQTable, 256, 32, 256, GamePalette8, DepthQTable, 256, paletteBuffer, true);
-		memcpy(GamePalette8, paletteBuffer, sizeof(GamePalette8));
-		for (i = 0; i < 256; ++i) {
-			DepthQIndex[i] = S_COLOUR(GamePalette8[i].red, GamePalette8[i].green, GamePalette8[i].blue);
-		}
-	}
-	else {
-		memcpy(DepthQIndex, &DepthQTable[24], sizeof(DEPTHQ_ENTRY));
-	}
-#endif // (DIRECT3D_VERSION >= 0x900)
 
-#ifdef FEATURE_VIDEOFX_IMPROVED
+#if defined(FEATURE_VIDEOFX_IMPROVED)
 	UpdateDepthQ(true);
 #endif // FEATURE_VIDEOFX_IMPROVED
 
@@ -944,7 +916,6 @@ BOOL LoadPalettes(HANDLE hFile) {
 	}
 
 	ReadFileSync(hFile, GamePalette16, 256 * sizeof(PALETTEENTRY), &bytesRead, NULL);
-#if (DIRECT3D_VERSION >= 0x900)
 	if (!IsTexPagesLegacyColors()) {
 		for (int i = 0; i < 256; ++i) {
 			PALETTEENTRY* pal = &GamePalette16[i];
@@ -953,7 +924,7 @@ BOOL LoadPalettes(HANDLE hFile) {
 			pal->peBlue = (pal->peBlue & 0xF8) | (pal->peBlue >> 5);
 		}
 	}
-#endif // (DIRECT3D_VERSION >= 0x900)
+
 	return TRUE;
 }
 
@@ -1248,11 +1219,9 @@ BOOL LoadLevel(LPCTSTR fileName, int levelID) {
 		goto EXIT;
 	}
 
-#if (DIRECT3D_VERSION >= 0x900)
 	if (SavedAppSettings.RenderMode == RM_Hardware) {
 		LoadTexPagesConfiguration(LevelFileName);
 	}
-#endif // (DIRECT3D_VERSION >= 0x900)
 
 	LevelFilePalettesOffset = SetFilePointer(hFile, 0, NULL, FILE_CURRENT);
 	if (!LoadPalettes(hFile)) {
@@ -1337,9 +1306,7 @@ void S_UnloadLevelFile() {
 	Mod.Release();
 #endif // FEATURE_MOD_CONFIG
 
-#if (DIRECT3D_VERSION >= 0x900)
 	UnloadTexPagesConfiguration();
-#endif // (DIRECT3D_VERSION >= 0x900)
 }
 
 void S_AdjustTexelCoordinates() {
@@ -1356,11 +1323,9 @@ BOOL S_ReloadLevelGraphics(BOOL reloadPalettes, BOOL reloadTexPages) {
 		if (hFile == INVALID_HANDLE_VALUE)
 			return FALSE;
 
-#if (DIRECT3D_VERSION >= 0x900)
 		if (SavedAppSettings.RenderMode == RM_Hardware) {
 			LoadTexPagesConfiguration(LevelFileName);
 		}
-#endif // (DIRECT3D_VERSION >= 0x900)
 
 		if (reloadPalettes && SavedAppSettings.RenderMode == RM_Software) {
 			SetFilePointer(hFile, LevelFilePalettesOffset, NULL, FILE_BEGIN);
@@ -1374,7 +1339,8 @@ BOOL S_ReloadLevelGraphics(BOOL reloadPalettes, BOOL reloadTexPages) {
 				HWR_FreeTexturePages();
 			SetFilePointer(hFile, LevelFileTexPagesOffset, NULL, FILE_BEGIN);
 			LoadTexturePages(hFile);
-#ifdef FEATURE_BACKGROUND_IMPROVED
+
+#if defined(FEATURE_BACKGROUND_IMPROVED)
 			PatternTexPage = CreateBgndPatternTexture(hFile);
 #endif // FEATURE_BACKGROUND_IMPROVED
 		}

@@ -27,25 +27,10 @@
  /*
   * Function list
   */
-#if (DIRECT3D_VERSION < 0x900)
-void CreateScreenBuffers(); // 0x004484E0
-void CreatePrimarySurface(); // 0x00448620
-void CreateBackBuffer(); // 0x004486C0
-void CreateClipper(); // 0x00448760
-void CreateWindowPalette(); // 0x00448800
-void CreateZBuffer(); // 0x004488E0
-DWORD GetZBufferDepth(); // 0x004489A0
-#endif // (DIRECT3D_VERSION < 0x900)
 void CreateRenderBuffer(); // 0x004489D0
 void CreatePictureBuffer(); // 0x00448A80
 void ClearBuffers(DWORD flags, DWORD fillColor); // 0x00448AF0
-#if (DIRECT3D_VERSION < 0x900)
-void RestoreLostBuffers(); // 0x00448CA0
-#endif // (DIRECT3D_VERSION < 0x900)
 void UpdateFrame(bool needRunMessageLoop, LPRECT rect); // 0x00448DE0
-#if (DIRECT3D_VERSION < 0x900)
-void WaitPrimaryBufferFlip(); // 0x00448EB0
-#endif // (DIRECT3D_VERSION < 0x900)
 bool RenderInit(); // 0x00448EF0
 void RenderStart(bool isReset); // 0x00448F00
 void RenderFinish(bool needToClearTextures); // 0x004492B0

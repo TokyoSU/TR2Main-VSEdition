@@ -51,7 +51,9 @@
 #define GRENADE_AMMO_CLIPS 2
 #define FLARE_AMMO_CLIPS 6
 
-#define MAX_EFFECTS 512                      // From 100
+#define MAX_OBJECT_TEXTURES 32768             // From 2000
+#define MAX_TEXTURE_PAGES 1024                // From 128
+#define MAX_EFFECTS 2048                      // From 100
 
 /*
  * General Variables
@@ -214,25 +216,12 @@ extern int PhdFov;
 #define CameraCount					VAR_U_(0x004D7C64, DWORD)
 #define MinesDetonated				VAR_U_(0x004D7E6C, BOOL)
 #define BGND_PictureIsReady			VAR_U_(0x004D7E78, bool)
-#if (DIRECT3D_VERSION >= 0x900)
 #define D3DDev						VAR_U_(0x004D7EAC, LPDIRECT3DDEVICE9)
 #define D3D							VAR_U_(0x004D7EB0, LPDIRECT3D9)
 extern LPDIRECT3DVERTEXBUFFER9 D3DVtx;
-#else // (DIRECT3D_VERSION >= 0x900)
-#define D3DDev						VAR_U_(0x004D7EAC, LPDIRECT3DDEVICE2)
-#define D3D							VAR_U_(0x004D7EB0, LPDIRECT3D2)
-#define D3DView						VAR_U_(0x004D7EB4, LPDIRECT3DVIEWPORT2)
-#define D3DMaterial					VAR_U_(0x004D7EB8, LPDIRECT3DMATERIAL2)
-#endif // (DIRECT3D_VERSION >= 0x900)
 #define MinWindowClientHeight		VAR_U_(0x004D7EC0, int)
-#if (DIRECT3D_VERSION < 0x900)
-#define DDrawInterface				VAR_U_(0x004D7EC4, LPDIRECTDRAW)
-#endif // (DIRECT3D_VERSION < 0x900)
 #define IsGameWindowChanging		VAR_U_(0x004D7EC8, bool)
 #define MaxWindowHeight				VAR_U_(0x004D7ECC, int)
-#if (DIRECT3D_VERSION < 0x900)
-#define DDraw						VAR_U_(0x004D7ED0, LPDIRECTDRAW2)
-#endif // (DIRECT3D_VERSION < 0x900)
 #define IsGameWindowCreated			VAR_U_(0x004D7ED4, bool)
 #define IsGameWindowUpdating		VAR_U_(0x004D7ED8, bool)
 #define IsDDrawGameWindowShow		VAR_U_(0x004D7EDC, bool)
@@ -247,11 +236,8 @@ extern LPDIRECT3DVERTEXBUFFER9 D3DVtx;
 #define HGameWindow					VAR_U_(0x004D7F00, HWND)
 #define GameWindowHeight			VAR_U_(0x004D7F04, int)
 #define PrimaryDisplayAdapter		VAR_U_(0x004D7F08, DISPLAY_ADAPTER_NODE*)
-#if (DIRECT3D_VERSION > 0x500)
 extern DISPLAY_ADAPTER CurrentDisplayAdapter;
-#else // (DIRECT3D_VERSION > 0x500)
-#define CurrentDisplayAdapter		VAR_U_(0x004D7F10, DISPLAY_ADAPTER)
-#endif // (DIRECT3D_VERSION > 0x500)
+static TEXPAGES_CONFIG TexPagesConfig;
 #define LockedBufferCount			VAR_U_(0x004D8328, DWORD)
 #define GameWindowPositionX			VAR_U_(0x004D832C, int)
 #define GameWindowPositionY			VAR_U_(0x004D8330, int)
@@ -274,57 +260,22 @@ extern DISPLAY_ADAPTER CurrentDisplayAdapter;
 #define IsGameWindowActive			VAR_U_(0x004D8380, bool)
 #define CurrentJoystick				VAR_U_(0x004D8388, JOYSTICK)
 #define JoystickList				VAR_U_(0x004D8540, JOYSTICK_LIST)
-#if (DIRECTINPUT_VERSION >= 0x800)
 #define DInput						VAR_U_(0x004D854C, LPDIRECTINPUT8)
 #define IDID_SysKeyboard			VAR_U_(0x004D8550, LPDIRECTINPUTDEVICE8)
 #define IDID_SysJoystick			VAR_U_(0x004D8554, LPDIRECTINPUTDEVICE8)
-#else // (DIRECTINPUT_VERSION >= 0x800)
-#define DInput						VAR_U_(0x004D854C, LPDIRECTINPUT)
-#define IDID_SysKeyboard			VAR_U_(0x004D8550, LPDIRECTINPUTDEVICE)
-#define IDID_SysJoystick			VAR_U_(0x004D8554, LPDIRECTINPUTDEVICE)
-#endif // (DIRECTINPUT_VERSION >= 0x800)
 #define IsVidSizeLock				VAR_U_(0x004D855C, BOOL)
 #define SoundAdapterList			VAR_U_(0x004D8960, SOUND_ADAPTER_LIST)
 #define IsSoundEnabled				VAR_U_(0x004D8D70, bool)
-#if (DIRECTSOUND_VERSION >= 0x800)
 #define DSound						VAR_U_(0x004D8D74, LPDIRECTSOUND8)
-#else // (DIRECTSOUND_VERSION >= 0x800)
-#define DSound						VAR_U_(0x004D8D74, LPDIRECTSOUND)
-#endif // (DIRECTSOUND_VERSION >= 0x800)
 #define CurrentSoundAdapter			VAR_U_(0x004D8E78, SOUND_ADAPTER)
 #define PrimarySoundAdapter			VAR_U_(0x004D8E9C, SOUND_ADAPTER_NODE*)
-#if (DIRECT3D_VERSION >= 0x900)
 extern SWR_BUFFER RenderBuffer;
 extern SWR_BUFFER PictureBuffer;
-#else // (DIRECT3D_VERSION >= 0x900)
-#define RenderBufferSurface			VAR_U_(0x004D8EA0, LPDDS)
-#define DDrawClipper				VAR_U_(0x004D8EA4, LPDIRECTDRAWCLIPPER)
-#define ThirdBufferSurface			VAR_U_(0x004D92A8, LPDDS)
-#define PictureBufferSurface		VAR_U_(0x004D92AC, LPDDS)
-#define ZBufferSurface				VAR_U_(0x004D92B0, LPDDS)
-#define DDrawPalette				VAR_U_(0x004D92B4, LPDIRECTDRAWPALETTE)
-#define PrimaryBufferSurface		VAR_U_(0x004D92B8, LPDDS)
-#define ColorBitMasks				VAR_U_(0x004D92D8, COLOR_BIT_MASKS)
-#define GameVidBufRect				VAR_U_(0x004D9308, RECT)
-#endif // (DIRECT3D_VERSION >= 0x900)
 #define GameVidRect					VAR_U_(0x004D9318, RECT)
 #define GameVidWidth				VAR_U_(0x004D9328, int)
 #define GameVidHeight				VAR_U_(0x004D932C, int)
 #define GameVidBPP					VAR_U_(0x004D9330, int)
-#if (DIRECT3D_VERSION < 0x900)
-#define GameVidBufWidth				VAR_U_(0x004D9334, int)
-#define GameVidBufHeight			VAR_U_(0x004D9338, int)
-#endif // (DIRECT3D_VERSION < 0x900)
 #define UvAdd						VAR_U_(0x004D933C, int)
-#if (DIRECT3D_VERSION < 0x900)
-#define GameVid_IsVga				VAR_U_(0x004D9340, bool)
-#define GameVid_IsWindowedVga		VAR_U_(0x004D9341, bool)
-#define GameVid_IsFullscreenVga		VAR_U_(0x004D9342, bool)
-#define IsWindowedVGA				VAR_U_(0x004D9343, bool)
-#define Is16bitTextures				VAR_U_(0x004D9344, bool)
-#define NeedToReloadTextures		VAR_U_(0x004D9345, bool)
-#define BackBufferSurface			VAR_U_(0x004D9348, LPDDS)
-#endif // (DIRECT3D_VERSION < 0x900)
 #define HwrTexturePagesCount		VAR_U_(0x004D9350, DWORD)
 #define ReadFileBytesCounter		VAR_U_(0x004D9BE0, DWORD)
 #define LevelFilePalettesOffset		VAR_U_(0x004D9BE4, LONG)
@@ -401,7 +352,7 @@ extern BYTE* SG_Point; // 0x0051E9C8: BYTE*
 extern DWORD SG_Count; // 0x005206A4: DWORD
 #define Lara						VAR_U_(0x005206E0, LARA_INFO)
 #define LaraItem					VAR_U_(0x005207BC, ITEM_INFO*)
-extern FX_INFO Effects[MAX_EFFECTS]; // VAR_U_(0x005207C0, FX_INFO*)
+extern FX_INFO Effects[MAX_EFFECTS]; // 0x005207C0
 #define NextItemFree				VAR_U_(0x005207C6, short)
 #define NextItemActive				VAR_U_(0x005207C8, short)
 #define NextEffectFree              VAR_U_(0x005207C4, short)
@@ -547,7 +498,7 @@ extern FX_INFO Effects[MAX_EFFECTS]; // VAR_U_(0x005207C0, FX_INFO*)
 	},
 }; */
 #define SaveSlotFlags				ARRAY_(0x00466B80, short, [16]) /* = {-1, 0}; */
-#ifdef FEATURE_HUD_IMPROVED
+#if defined(FEATURE_HUD_IMPROVED)
 extern CONTROL_LAYOUT Layout[3];
 #else // FEATURE_HUD_IMPROVED
 #define Layout						ARRAY_(0x00466F58, CONTROL_LAYOUT, [2]) /* = {
@@ -588,7 +539,7 @@ extern CONTROL_LAYOUT Layout[3];
 
 // Uninitialized arrays
 #define GouraudTable				ARRAY_(0x0046C300, GOURAUD_ENTRY, [256])
-#ifdef FEATURE_EXTENDED_LIMITS
+#if defined(FEATURE_EXTENDED_LIMITS)
 extern PHD_SPRITE PhdSpriteInfo[2048];
 #else // FEATURE_EXTENDED_LIMITS
 #define PhdSpriteInfo				ARRAY_(0x0046E308, PHD_SPRITE, [512])
@@ -601,8 +552,8 @@ extern short Info3dBuffer[480000];
 #define Info3dBuffer				ARRAY_(0x00478060, short, [120000])
 #endif // defined(FEATURE_EXTENDED_LIMITS) || defined(FEATURE_VIEW_IMPROVED)
 #define RandomTable					ARRAY_(0x004B2A28, int, [32])
-#ifdef FEATURE_EXTENDED_LIMITS
-extern PHD_TEXTURE PhdTextureInfo[0x2000];
+#if defined(FEATURE_EXTENDED_LIMITS)
+extern PHD_TEXTURE PhdTextureInfo[MAX_OBJECT_TEXTURES];
 #else // FEATURE_EXTENDED_LIMITS
 #define PhdTextureInfo				ARRAY_(0x004B2AF0, PHD_TEXTURE, [0x800])
 #endif // FEATURE_EXTENDED_LIMITS
@@ -611,8 +562,8 @@ extern PHD_TEXTURE PhdTextureInfo[0x2000];
 #define DepthQTable					ARRAY_(0x004BD2C8, DEPTHQ_ENTRY, [32])
 #define DepthQIndex					ARRAY_(0x004BF2C8, BYTE, [256])
 #define PhdVBuf						ARRAY_(0x004BF3D0, PHD_VBUF, [1500])
-#ifdef FEATURE_EXTENDED_LIMITS
-extern BYTE* TexturePageBuffer8[128];
+#if defined(FEATURE_EXTENDED_LIMITS)
+extern BYTE* TexturePageBuffer8[MAX_TEXTURE_PAGES];
 #else // FEATURE_EXTENDED_LIMITS
 #define TexturePageBuffer8			ARRAY_(0x004D6AD0, BYTE*, [32])
 #endif // FEATURE_EXTENDED_LIMITS
@@ -621,14 +572,14 @@ extern BYTE* TexturePageBuffer8[128];
 #define InvItemText					ARRAY_(0x004D7938, TEXT_STR_INFO*, [2])
 #define InventoryExtraData			ARRAY_(0x004D7970, int, [8])
 #define SfxInfos					ARRAY_(0x004D7C68, SFX_INFO, [32])
-#ifdef FEATURE_BACKGROUND_IMPROVED
+#if defined(FEATURE_BACKGROUND_IMPROVED)
 extern int BGND_TexturePageIndexes[64];
 extern HWR_TEXHANDLE BGND_PageHandles[64];
 #else // FEATURE_BACKGROUND_IMPROVED
 #define BGND_TexturePageIndexes		ARRAY_(0x004D7E80, int, [5])
 #define BGND_PageHandles			ARRAY_(0x004D7E98, HWR_TEXHANDLE, [5])
 #endif // FEATURE_BACKGROUND_IMPROVED
-#ifdef FEATURE_EXTENDED_LIMITS
+#if defined(FEATURE_BACKGROUND_IMPROVED)
 extern DWORD SampleFreqs[370];
 extern LPDIRECTSOUNDBUFFER SampleBuffers[370];
 #else // FEATURE_EXTENDED_LIMITS
@@ -638,22 +589,22 @@ extern LPDIRECTSOUNDBUFFER SampleBuffers[370];
 #define ChannelSamples				ARRAY_(0x004D8D78, DWORD, [32])
 #define ChannelBuffers				ARRAY_(0x004D8DF8, LPDIRECTSOUNDBUFFER, [32])
 #define WinVidPalette				ARRAY_(0x004D8EA8, PALETTEENTRY, [256])
-#ifdef FEATURE_EXTENDED_LIMITS
-extern BYTE LabTextureUVFlags[0x2000];
+#if defined(FEATURE_BACKGROUND_IMPROVED)
+extern BYTE LabTextureUVFlags[MAX_OBJECT_TEXTURES];
 #else // FEATURE_EXTENDED_LIMITS
 #define LabTextureUVFlags			ARRAY_(0x004D93E0, BYTE, [0x800])
 #endif // FEATURE_EXTENDED_LIMITS
 #define LevelFileName				ARRAY_(0x004D9D88, char, [256])
-#ifdef FEATURE_EXTENDED_LIMITS
+#if defined(FEATURE_EXTENDED_LIMITS)
 extern D3DTLVERTEX HWR_VertexBuffer[32768];
-extern HWR_TEXHANDLE HWR_PageHandles[128];
-extern int HWR_TexturePageIndexes[128];
+extern HWR_TEXHANDLE HWR_PageHandles[MAX_TEXTURE_PAGES];
+extern int HWR_TexturePageIndexes[MAX_TEXTURE_PAGES];
 #else // FEATURE_EXTENDED_LIMITS
 #define HWR_VertexBuffer			ARRAY_(0x004D9EC8, D3DTLVERTEX, [0x2000])
 #define HWR_PageHandles				ARRAY_(0x00519ED0, HWR_TEXHANDLE, [32])
 #define HWR_TexturePageIndexes		ARRAY_(0x00519F68, int, [32])
 #endif // FEATURE_EXTENDED_LIMITS
-#ifdef FEATURE_HUD_IMPROVED
+#if defined(FEATURE_HUD_IMPROVED)
 extern bool ConflictLayout[ARRAY_SIZE(Layout->key)];
 #else // FEATURE_HUD_IMPROVED
 #define ConflictLayout				ARRAY_(0x0051A0C0, BOOL, [14])
@@ -680,7 +631,7 @@ extern bool ConflictLayout[ARRAY_SIZE(Layout->key)];
 #define HairVelocity				ARRAY_(0x00521CE0, PHD_VECTOR, [7])
 #define HairPos						ARRAY_(0x00521D40, PHD_3DPOS, [7])
 #define Objects						ARRAY_(0x00522000, OBJECT_INFO, [265])
-#ifdef FEATURE_EXTENDED_LIMITS
+#if defined(FEATURE_EXTENDED_LIMITS)
 extern LIGHT_INFO DynamicLights[64];
 extern int BoundRooms[1024];
 extern short DrawRoomsArray[1024];
@@ -815,7 +766,7 @@ extern STATIC_INFO StaticObjects[256];
 	&InvPickup2Option,
 	NULL,
 }; */
-#ifdef FEATURE_HUD_IMPROVED
+#if defined(FEATURE_HUD_IMPROVED)
 extern INVENTORY_ITEM* InvOptionList[5];
 extern TEXT_STR_INFO* CtrlTextA[ARRAY_SIZE(Layout->key)];
 extern TEXT_STR_INFO* CtrlTextB[ARRAY_SIZE(Layout->key)];

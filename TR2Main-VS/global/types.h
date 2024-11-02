@@ -21,8 +21,6 @@
 
 #ifndef GLOBAL_TYPES_H_INCLUDED
 #define GLOBAL_TYPES_H_INCLUDED
-#include <d3d9.h>
-#include <d3d9types.h>
 
  /*
   * Inject macro
@@ -58,6 +56,7 @@ typedef struct {
  // If the first item has index=~0 then there are no polys of such type to process.
  // If the first item has index=0 and number=0 then all polys of such type must be processed.
 #define POLYFILTER_SIZE 256
+#define TEXPAGE_CONFIG_NAME "textures/texpages/config.json"
 
  // General values
 #define REQ_LEVEL_VERSION	(45)
@@ -301,7 +300,6 @@ typedef struct {
  * DirectX type definitions
  */
 
-#if (DIRECT3D_VERSION >= 0x900)
 #ifndef RGB_MAKE
 #define RGBA_SETALPHA(rgba, x)		(((x) << 24) | ((rgba) & 0x00ffffff))
 #define RGBA_GETALPHA(rgb)			((rgb) >> 24)
@@ -319,30 +317,22 @@ typedef struct {
 #define D3DFVF_TLVERTEX (D3DFVF_XYZRHW|D3DFVF_DIFFUSE|D3DFVF_SPECULAR|D3DFVF_TEX1)
 #endif // D3DFVF_TLVERTEX
 
+#define VTXBUF_LEN (256)
+
 typedef struct {
 	D3DVALUE sx, sy, sz, rhw;
 	D3DCOLOR color, specular;
 	D3DVALUE tu, tv;
 } D3DTLVERTEX, *LPD3DTLVERTEX;
-
-typedef D3DLOCKED_RECT DDSDESC, * LPDDSDESC;
+typedef D3DLOCKED_RECT DDSDESC, *LPDDSDESC;
 typedef LPDIRECT3DSURFACE9 LPDDS;
 typedef LPDIRECT3DTEXTURE9 HWR_TEXHANDLE;
-#else // (DIRECT3D_VERSION >= 0x900)
-typedef DDSURFACEDESC DDSDESC, * LPDDSDESC;
-typedef LPDIRECTDRAWSURFACE3 LPDDS;
-typedef D3DTEXTUREHANDLE HWR_TEXHANDLE;
-#endif // (DIRECT3D_VERSION >= 0x900)
-
-#if (DIRECT3D_VERSION >= 0x900)
-#define VTXBUF_LEN (256)
 
 typedef struct {
 	DWORD width;
 	DWORD height;
 	LPBYTE bitmap;
 } SWR_BUFFER;
-#endif // (DIRECT3D_VERSION >= 0x900)
 
 /*
  * Enums
@@ -1298,6 +1288,21 @@ typedef enum {
 typedef struct { short idx; short num; } POLYINDEX;
 
 typedef struct {
+	bool isLoaded;
+	bool isLegacyColors;
+	double adjustment;
+#ifdef FEATURE_HUD_IMPROVED
+	struct {
+		int spacing;
+		int xOffset;
+		int yOffset;
+		double xStretch;
+		double yStretch;
+	} glyphs[110];
+#endif // FEATURE_HUD_IMPROVED
+} TEXPAGES_CONFIG;
+
+typedef struct {
 	short n_vtx, n_gt4, n_gt3, n_g4, n_g3;
 	POLYINDEX gt4[POLYFILTER_SIZE];
 	POLYINDEX gt3[POLYFILTER_SIZE];
@@ -1423,10 +1428,17 @@ typedef struct GouraudEntry_t {
 } GOURAUD_ENTRY;
 
 typedef struct DisplayMode_t {
-	int width;
-	int height;
-	int bpp;
-	VGA_MODE vga;
+	int width = 0;
+	int height = 0;
+	int bpp = 0;
+	VGA_MODE vga = VGA_NoVga;
+	DisplayMode_t() = default;
+	DisplayMode_t(int _w, int _h, int _bpp, VGA_MODE _vga) {
+		width = _w;
+		height = _h;
+		bpp = _bpp;
+		vga = _vga;
+	}
 } DISPLAY_MODE;
 
 typedef struct DisplayModeNode_t {
@@ -1451,33 +1463,11 @@ typedef struct DisplayAdapter_t {
 	GUID adapterGuid;
 	STRING_FLAGGED driverDescription;
 	STRING_FLAGGED driverName;
-#if (DIRECT3D_VERSION >= 0x900)
 	UINT index;
 	D3DCAPS9 caps;
 	DISPLAY_MODE_LIST hwDispModeList;
 	DISPLAY_MODE_LIST swDispModeList;
 	DWORD screenWidth;
-#else // (DIRECT3D_VERSION >= 0x900)
-	DDCAPS driverCaps;
-	DDCAPS helCaps;
-	GUID deviceGuid;
-	D3DDEVICEDESC D3DHWDeviceDesc;
-	DISPLAY_MODE_LIST hwDispModeList;
-	DISPLAY_MODE_LIST swDispModeList;
-	DISPLAY_MODE vgaMode1;
-	DISPLAY_MODE vgaMode2;
-	DWORD screenWidth;
-	bool hwRenderSupported;
-	bool swWindowedSupported;
-	bool hwWindowedSupported;
-	bool isVgaMode1Presented;
-	bool isVgaMode2Presented;
-	bool perspectiveCorrectSupported;
-	bool ditherSupported;
-	bool zBufferSupported;
-	bool linearFilterSupported;
-	bool shadeRestricted;
-#endif // (DIRECT3D_VERSION >= 0x900)
 } DISPLAY_ADAPTER;
 
 typedef struct DisplayAdapterNode_t {
@@ -1516,7 +1506,7 @@ typedef struct Joystick_t {
 	GUID joystickGuid;
 	STRING_FLAGGED productName;
 	STRING_FLAGGED instanceName;
-#ifdef FEATURE_INPUT_IMPROVED
+#if defined(FEATURE_INPUT_IMPROVED)
 	JOY_INTERFACE iface;
 #endif // FEATURE_INPUT_IMPROVED
 } JOYSTICK;
@@ -1558,21 +1548,13 @@ typedef struct AppSettings_t {
 	TEX_ADJUST_MODE TexelAdjustMode;
 	int NearestAdjustment;
 	int LinearAdjustment;
-#ifdef FEATURE_VIDEOFX_IMPROVED
+#if defined(FEATURE_VIDEOFX_IMPROVED)
 	int LightingMode;
 #endif // FEATURE_VIDEOFX_IMPROVED
 } APP_SETTINGS;
 
 struct TEXPAGE_DESC {
-#if (DIRECT3D_VERSION >= 0x900)
 	LPDIRECT3DTEXTURE9 texture;
-#else // (DIRECT3D_VERSION >= 0x900)
-	LPDDS sysMemSurface;
-	LPDDS vidMemSurface;
-	LPDIRECTDRAWPALETTE palette;
-	LPDIRECT3DTEXTURE2 texture3d;
-	HWR_TEXHANDLE texHandle;
-#endif // (DIRECT3D_VERSION >= 0x900)
 	int width;
 	int height;
 	int status;
@@ -1605,10 +1587,6 @@ typedef struct ColorBitMasks_t {
 } COLOR_BIT_MASKS;
 
 typedef struct TextureFormat_t {
-#if (DIRECT3D_VERSION < 0x900)
-	DDPIXELFORMAT pixelFmt;
-	COLOR_BIT_MASKS colorBitMasks;
-#endif // (DIRECT3D_VERSION < 0x900)
 	DWORD bpp;
 } TEXTURE_FORMAT;
 
