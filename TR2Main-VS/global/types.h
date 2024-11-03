@@ -1704,10 +1704,10 @@ typedef struct InventoryItem_t {
 	int meshesDrawn;
 	short invPos;
 	void* sprites;
+	int zRotExamine;
 	int reserved1;
 	int reserved2;
 	int reserved3;
-	int reserved4;
 } INVENTORY_ITEM;
 
 typedef struct StatisticsInfo_t {

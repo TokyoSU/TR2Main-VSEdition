@@ -891,7 +891,7 @@ void DrawInventoryItem(INVENTORY_ITEM* invItem) {
 	}
 
 	phd_TranslateRel(0, invItem->yTrans, invItem->zTrans);
-	phd_RotYXZ(invItem->zRot + invItem->reserved1, invItem->yRotSel, 0);
+	phd_RotYXZ(invItem->zRot + invItem->zRotExamine, invItem->yRotSel, 0);
 
 	OBJECT_INFO* obj = &Objects[invItem->objectID];
 	if (!obj->loaded) {
@@ -972,8 +972,6 @@ void DrawInventoryItem(INVENTORY_ITEM* invItem) {
 				switch (i) {
 				case 2:
 					phd_RotZ(seconds);
-					invItem->reserved2 = invItem->reserved1;
-					invItem->reserved1 = seconds;
 					break;
 				case 3:
 					phd_RotZ(minutes);

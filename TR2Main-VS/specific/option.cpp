@@ -640,9 +640,9 @@ void do_inventory_options(INVENTORY_ITEM* item) {
 		{
 			// ROT_Y
 			if (CHK_ANY(InputStatus, IN_LEFT))
-				item->reserved1 -= ANGLE(5);
+				item->zRotExamine -= ANGLE(5);
 			else if (CHK_ANY(InputStatus, IN_RIGHT))
-				item->reserved1 += ANGLE(5);
+				item->zRotExamine += ANGLE(5);
 		}
 
 		if (CHK_ANY(InputDB, IN_SELECT | IN_DESELECT)) {
