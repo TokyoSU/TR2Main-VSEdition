@@ -54,6 +54,7 @@
 #define MAX_OBJECT_TEXTURES 32768             // From 2000
 #define MAX_TEXTURE_PAGES 1024                // From 128
 #define MAX_EFFECTS 2048                      // From 100
+#define MAX_ITEM_IN_INVENTORY 33
 
 /*
  * General Variables
@@ -569,7 +570,8 @@ extern BYTE* TexturePageBuffer8[MAX_TEXTURE_PAGES];
 #endif // FEATURE_EXTENDED_LIMITS
 #define WibbleTable					ARRAY_(0x004D6B68, float, [32])
 #define GamePalette16				ARRAY_(0x004D7370, PALETTEENTRY, [256])
-#define InvItemText					ARRAY_(0x004D7938, TEXT_STR_INFO*, [2])
+//#define InvItemText					ARRAY_(0x004D7938, TEXT_STR_INFO*, [2])
+extern TEXT_STR_INFO* InvItemText[3]; // 0x004D7938
 #define InventoryExtraData			ARRAY_(0x004D7970, int, [8])
 #define SfxInfos					ARRAY_(0x004D7C68, SFX_INFO, [32])
 #if defined(FEATURE_BACKGROUND_IMPROVED)

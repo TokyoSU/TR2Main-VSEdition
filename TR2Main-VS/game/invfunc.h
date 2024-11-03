@@ -32,6 +32,8 @@ void RingIsOpen(RING_INFO* ring); // 0x00423C20
 void RingIsNotOpen(); // 0x00423D90
 void RingNotActive(INVENTORY_ITEM* item); // 0x00423E20
 void RingActive(); // 0x00424290
+void RingExamineSelected(INVENTORY_ITEM* item);
+void RingExamineNotSelected();
 BOOL Inv_AddItem(GAME_OBJECT_ID itemID); // 0x004242D0
 void Inv_InsertItem(INVENTORY_ITEM* item); // 0x00424AE0
 int Inv_RequestItem(GAME_OBJECT_ID itemID); // 0x00424C10
@@ -54,5 +56,6 @@ void Inv_RingMotionCameraPos(RING_INFO* ring, short target); // 0x00425460
 void Inv_RingMotionCameraPitch(RING_INFO* ring, short target); // 0x00425490
 void Inv_RingMotionItemSelect(RING_INFO* ring, INVENTORY_ITEM* item); // 0x004254B0
 void Inv_RingMotionItemDeselect(RING_INFO* ring, INVENTORY_ITEM* item); // 0x00425510
+INVENTORY_ITEM* Inv_GetItemFromIndex(int index); // From 0 to 33
 
 #endif // INVFUNC_H_INCLUDED

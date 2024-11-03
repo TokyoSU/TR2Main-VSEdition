@@ -111,6 +111,10 @@ static DWORD LayoutPage = CTRL_Joystick;
 static DWORD LayoutPage = CTRL_Default;
 #endif // FEATURE_HUD_IMPROVED
 
+#if defined(FEATURE_MOD_CONFIG)
+#include "modding/mod_utils.h"
+#endif
+
 /*
  * Passport option box parameters
  */
@@ -545,7 +549,8 @@ void SetPassportRequesterSize(REQUEST_INFO* req) {
 #endif // FEATURE_HUD_IMPROVED
 }
 
-void do_inventory_options(INVENTORY_ITEM* item) {
+static void do_legacy_inventory_options(INVENTORY_ITEM* item)
+{
 	switch (item->objectID) {
 		// passport
 	case ID_PASSPORT_OPTION:
@@ -614,6 +619,45 @@ void do_inventory_options(INVENTORY_ITEM* item) {
 		}
 		break;
 	}
+}
+
+void do_inventory_options(INVENTORY_ITEM* item) {
+#if defined(FEATURE_MOD_CONFIG)
+	CUST_INVENTORY_ITEM invItem;
+	if (Mod.GetCustomItemFromObjectID(item->objectID, invItem))
+	{
+		// Found item config.
+		// Does item can't be examined ? then select it by default...
+		// Also avoid canExamine if inv mode is keys !
+		if (!invItem.canExamine || InventoryMode == INV_KeysMode)
+		{
+			InputDB |= IN_SELECT;
+		}
+
+		// Does item can be rotated
+		// Avoid rotating when inv mode is keys.
+		if (invItem.canRotateManually && InventoryMode != INV_KeysMode)
+		{
+			// ROT_Y
+			if (CHK_ANY(InputStatus, IN_LEFT))
+				item->reserved1 -= ANGLE(5);
+			else if (CHK_ANY(InputStatus, IN_RIGHT))
+				item->reserved1 += ANGLE(5);
+		}
+
+		if (CHK_ANY(InputDB, IN_SELECT | IN_DESELECT)) {
+			item->goalFrame = 0;
+			item->animDirection = -1;
+		}
+	}
+	else
+	{
+		// Fallback to legacy handling.
+		do_legacy_inventory_options(item);
+	}
+#else
+	do_legacy_inventory_options(item);
+#endif
 }
 
 #ifdef FEATURE_HUD_IMPROVED

@@ -20,6 +20,7 @@
  */
 #include "precompiled.h"
 #include "modding/json_utils.h"
+#include "game/invfunc.h"
 
 #if defined(FEATURE_MOD_CONFIG)
 #include "modding/mod_utils.h"
@@ -84,6 +85,20 @@ bool ModConfig::LoadJson(LPCSTR filePath) {
     return isLoaded;
 }
 
+bool ModConfig::GetCustomItemFromObjectID(int objectID, CUST_INVENTORY_ITEM& invItem)
+{
+    for (int i = 0; i < ARRAY_SIZE(invItemList); i++)
+    {
+        auto& foundItem = invItemList[i];
+        if (foundItem.objectID != -1 && foundItem.objectID == objectID)
+        {
+            invItem = foundItem;
+            return true;
+        }
+    }
+    return false;
+}
+
 void ModConfig::LoadHealthBarConfig(Value& data, BAR_CONFIG* result) {
     result->isCentered = GetValueByNameBool(data, "isCentered", false);
     result->basedOnEnemyHealth = GetValueByNameBool(data, "basedOnEnemyHealth", true);
@@ -144,6 +159,74 @@ void ModConfig::LoadAirBarConfig(Value& data, BAR_CONFIG* result) {
     result->PSX_framecolor[3] = GetColorByName(data, "PSX_framecolor3", RGB_MAKE(0xA0, 0xA0, 0xA0));
     result->PSX_framecolor[4] = GetColorByName(data, "PSX_framecolor4", RGB_MAKE(0x28, 0x42, 0x42));
     result->PSX_framecolor[5] = GetColorByName(data, "PSX_framecolor5", RGB_MAKE(0x50, 0x50, 0x50));
+}
+
+void ModConfig::LoadCustomInventoryItems(Value& data)
+{
+    Value& inventoryItemList = data.GetArray();
+    if (!inventoryItemList.IsArray())
+    {
+        LogWarn("Failed to load inventory_item_list, type is not an array !");
+        return;
+    }
+
+    if (inventoryItemList.Size() <= 0) {
+        LogWarn("Failed to load inventory_item_list, there no value in the array !");
+        return;
+    } else if (inventoryItemList.Size() > MAX_ITEM_IN_INVENTORY) {
+        LogWarn("Failed to load inventory_item_list, array size out of bounds, you can't have more than 23 objects in inventory !");
+        return;
+    }
+
+    for (SizeType i = 0; i < inventoryItemList.Size(); i++)
+    {
+        SizeType destStringSize = 0;
+        auto& invItem = inventoryItemList[i];
+        auto& newItemCust = invItemList[i];
+        int objectID = GetValueByNameInt(invItem, "object_id", -1);
+        if (objectID < 0)
+        {
+            LogWarn("Failed to load inventory_item_list, index number: %d have object_id not set or is negative !", i);
+            continue;
+        }
+        newItemCust.objectID = objectID;
+        newItemCust.message = GetValueByNameString(invItem, "text", &destStringSize, "");
+        LogDebug("Message: %s", newItemCust.message);
+        newItemCust.message_pos_x = GetValueByNameInt(invItem, "text_x", 0);
+        newItemCust.message_pos_y = GetValueByNameInt(invItem, "text_y", 0);
+        if (invItem.HasMember("position"))
+        {
+            auto& offset = invItem["position"];
+            newItemCust.xRotPtSel = GetValueByNameInt(offset, "xRotPtSel", 0);
+            newItemCust.xRotSel = GetValueByNameInt(offset, "xRotSel", 0);
+            newItemCust.yRotSel = GetValueByNameInt(offset, "yRotSel", 0);
+            newItemCust.zTransSel = GetValueByNameInt(offset, "zTransSel", 0);
+            newItemCust.yTransSel = GetValueByNameInt(offset, "yTransSel", 0);
+        }
+        newItemCust.canExamine = GetValueByNameBool(invItem, "canExamine", false);
+        newItemCust.canRotateManually = GetValueByNameBool(invItem, "canRotateManually", false);
+    }
+
+    static bool wasItemInitialized = false;
+    if (!wasItemInitialized)
+    {
+        CUST_INVENTORY_ITEM invItem;
+        for (int index = 0; index < ARRAY_SIZE(Mod.invItemList); index++)
+        {
+            auto* item = Inv_GetItemFromIndex(index);
+            if (item == nullptr)
+                continue;
+            if (Mod.GetCustomItemFromObjectID((int)Inv_GetItemOption((GAME_OBJECT_ID)item->objectID), invItem))
+            {
+                item->xRotSel = invItem.xRotSel;
+                item->xRotPtSel = invItem.xRotPtSel;
+                item->yRotSel = invItem.yRotSel;
+                item->yTransSel = invItem.yTransSel;
+                item->zTransSel = invItem.zTransSel;
+            }
+        }
+        wasItemInitialized = true;
+    }
 }
 
 void ModConfig::LoadLevelConfig(Value& data) {
@@ -366,6 +449,7 @@ void ModConfig::ParseLevelConfiguration(Value& data, LPCSTR currentLevel) {
                 LoadLevelConfig(level);
                 if (level.HasMember("semitransparent")) LoadSemitransConfig(level["semitransparent"], &semitrans);
                 if (level.HasMember("reflective")) LoadReflectConfig(level["reflective"], &reflect);
+                if (level.HasMember("inventory_item_list")) LoadCustomInventoryItems(level["inventory_item_list"]);
                 break;
             }
             else

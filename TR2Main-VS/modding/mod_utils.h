@@ -1,5 +1,6 @@
 #pragma once
 #include "global/types.h"
+#include "global/vars.h"
 
 #if defined(FEATURE_MOD_CONFIG)
 class ModConfig
@@ -61,14 +62,18 @@ public:
 	bool loadingPixFound = false;
 	char loadingPix[256];
 
+	CUST_INVENTORY_ITEM invItemList[MAX_ITEM_IN_INVENTORY];
 	LARA_BAR_CONFIG laraBar;
 	BAR_CONFIG enemyBar;
 	ENEMY_HEALTH_INFO enemyHealth;
 	SEMITRANS_CONFIG semitrans;
 	REFLECT_CONFIG reflect;
+
+	bool GetCustomItemFromObjectID(int objectID, CUST_INVENTORY_ITEM& invItem);
 private: // Loader for data inside json:
 	void LoadHealthBarConfig(Value& data, BAR_CONFIG* result);
 	void LoadAirBarConfig(Value& data, BAR_CONFIG* result);
+	void LoadCustomInventoryItems(Value& data);
 	void LoadLevelConfig(Value& data);
 	void LoadSemitransConfig(Value& data, SEMITRANS_CONFIG* semitrans);
 	void LoadPolyfilterConfig(Value& data, LPCSTR name, POLYFILTER_NODE** filterNodes);

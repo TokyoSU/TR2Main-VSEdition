@@ -28,6 +28,15 @@
 #include "specific/frontend.h"
 #include "global/vars.h"
 
+#if defined(FEATURE_MOD_CONFIG)
+#include "modding/mod_utils.h"
+#endif
+
+ // 0=name
+ // 1=count
+ // 2=description
+TEXT_STR_INFO* InvItemText[3];
+
  // X coordinates relative to the center of the screen
  // Y coordinates relative to the bottom of the screen
 #define ITEMNAME_X_POS		(0)
@@ -280,9 +289,10 @@ void RingNotActive(INVENTORY_ITEM* item) {
 	if (InvItemText[1] == NULL) {
 		MakeAmmoString(strBuf);
 		InvItemText[1] = T_Print(ITEMCOUNT_X_POS, ITEMCOUNT_Y_POS, 0, strBuf);
-		T_BottomAlign(InvItemText[1], 1);
-		T_CentreH(InvItemText[1], 1);
+		T_BottomAlign(InvItemText[1], true);
+		T_CentreH(InvItemText[1], true);
 	}
+
 }
 
 void RingActive() {
@@ -290,6 +300,28 @@ void RingActive() {
 	InvItemText[0] = NULL;
 	T_RemovePrint(InvItemText[1]);
 	InvItemText[1] = NULL;
+}
+
+void RingExamineSelected(INVENTORY_ITEM* item) {
+#if defined(FEATURE_MOD_CONFIG)
+	if (InvItemText[2] == NULL) {
+		CUST_INVENTORY_ITEM invItem;
+		if (Mod.GetCustomItemFromObjectID(item->objectID, invItem))
+		{
+			if (invItem.canExamine && invItem.message.size() > 0)
+			{
+				InvItemText[2] = T_Print(invItem.message_pos_x, ITEMCOUNT_Y_POS + invItem.message_pos_y, 0, invItem.message.c_str());
+				T_BottomAlign(InvItemText[2], true);
+				T_CentreH(InvItemText[2], true);
+			}
+		}
+	}
+#endif
+}
+
+void RingExamineNotSelected() {
+	T_RemovePrint(InvItemText[2]);
+	InvItemText[2] = NULL;
 }
 
 BOOL Inv_AddItem(GAME_OBJECT_ID itemID) {
@@ -979,6 +1011,47 @@ void Inv_RingMotionItemDeselect(RING_INFO* ring, INVENTORY_ITEM* item) {
 	mi->itemRate_yTrans = -(item->yTransSel / mi->framesCount);
 	mi->itemTarget_zTrans = 0;
 	mi->itemRate_zTrans = -(item->zTransSel / mi->framesCount);
+}
+
+INVENTORY_ITEM* Inv_GetItemFromIndex(int index)
+{
+	switch (index)
+	{
+	case 0: return &InvCompassOption;
+	case 1: return &InvPistolOption;
+	case 2: return &InvFlareOption;
+	case 3: return &InvShotgunOption;
+	case 4: return &InvMagnumOption;
+	case 5: return &InvUziOption;
+	case 6: return &InvHarpoonOption;
+	case 7: return &InvM16Option;
+	case 8: return &InvGrenadeOption;
+	case 9: return &InvPistolAmmoOption;
+	case 10: return &InvShotgunAmmoOption;
+	case 11: return &InvMagnumAmmoOption;
+	case 12: return &InvUziAmmoOption;
+	case 13: return &InvHarpoonAmmoOption;
+	case 14: return &InvM16AmmoOption;
+	case 15: return &InvGrenadeAmmoOption;
+	case 16: return &InvSmallMedipackOption;
+	case 17: return &InvLargeMedipackOption;
+	case 18: return &InvPickup1Option;
+	case 19: return &InvPickup2Option;
+	case 20: return &InvPuzzle1Option;
+	case 21: return &InvPuzzle2Option;
+	case 22: return &InvPuzzle3Option;
+	case 23: return &InvPuzzle4Option;
+	case 24: return &InvKey1Option;
+	case 25: return &InvKey2Option;
+	case 26: return &InvKey3Option;
+	case 27: return &InvKey4Option;
+	case 28: return &InvPassportOption;
+	case 29: return &InvDetailOption;
+	case 30: return &InvSoundOption;
+	case 31: return &InvControlOption;
+	case 32: return &InvPhotoOption;
+	}
+	return nullptr;
 }
 
 /*

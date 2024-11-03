@@ -203,7 +203,42 @@
         "filename": "TITLE",
         "comment2": "Example of the 'enemy health' and 'enable enemy bar' command, only the title level will have a dog with 250hp and no enemy bar, the other level will have default value.",
         "enableenemybar": false,
-        "dogHealth": 250
+        "dogHealth": 250,
+        "comment3": "Example of changing KEY1 item position and making it examine item, also able to rotate when selected",
+        "inventory_item_list": [
+            {
+                "#comment": "This is an entry for object number 197 (KEY1) for the TITLE level",
+                "object_id": 197,
+                "text": "Test for description in key1",
+                "text_x": 0,
+                "text_y": 0,
+                "position": {
+                    "yTransSel": 0,
+                    "zTransSel": 256,
+                    "yRotSel": 0,
+                    "xRotPtSel": 4352,
+                    "xRotSel": 0
+                },
+                "canExamine": true,
+                "canRotateManually": true
+            },
+		    {
+                "#comment": "This is an entry for object number 198 (KEY2) for the TITLE level",
+                "object_id": 198,
+                "text": "Test for description in key2",
+                "text_x": 0,
+                "text_y": 0,
+                "position": {
+                    "yTransSel": 0,
+                    "zTransSel": 256,
+                    "yRotSel": 0,
+                    "xRotPtSel": 4352,
+                    "xRotSel": 0
+                },
+                "canExamine": true,
+                "canRotateManually": true
+            }
+        ]
     },
 	{
         "comment": "Lara's Home",
@@ -218,12 +253,12 @@
             }]
         }
     },
-	{
+      {
         "comment": "The Great Wall",
         "filename": "WALL",
         "picture": "CHINA",
         "watercolor": "B2E6E6"
-    },
+      },
 	{
         "comment": "Venice",
         "filename": "BOAT",

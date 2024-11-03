@@ -39,6 +39,10 @@
 #include "specific/sndpc.h"
 #include "global/vars.h"
 
+#if defined(FEATURE_MOD_CONFIG)
+#include "modding/mod_utils.h"
+#endif
+
 #ifdef FEATURE_INPUT_IMPROVED
 #include "modding/joy_output.h"
 #endif // FEATURE_INPUT_IMPROVED
@@ -51,23 +55,6 @@ extern void DisplayVolumeBars(bool isSmooth);
 extern bool PsxFovEnabled;
 extern DWORD InvTextBoxMode;
 #endif // FEATURE_HUD_IMPROVED
-
-typedef enum {
-	RINGSTATE_OPENING,
-	RINGSTATE_OPEN,
-	RINGSTATE_CLOSING,
-	RINGSTATE_MAIN2OPTION,
-	RINGSTATE_MAIN2KEYS,
-	RINGSTATE_KEYS2MAIN,
-	RINGSTATE_OPTION2MAIN,
-	RINGSTATE_SELECTING,
-	RINGSTATE_SELECTED,
-	RINGSTATE_DESELECTING,
-	RINGSTATE_DESELECT,
-	RINGSTATE_CLOSING_ITEM,
-	RINGSTATE_EXITING_INVENTORY,
-	RINGSTATE_DONE
-} RING_STATES;
 
 #define PASS_SPINE		(0x01)
 #define PASS_FRONT		(0x02)
@@ -345,12 +332,16 @@ int Display_Inventory(INVENTORY_MODE invMode) {
 #endif // FEATURE_HUD_IMPROVED
 		S_OutputPolyList();
 		SOUND_EndScene();
-
 		Camera.numberFrames = nTicks = S_DumpScreen();
 
 		if (CurrentLevel != 0) { // not Lara home
 			SaveGame.statistics.timer += nTicks / TICKS_PER_FRAME;
 		}
+
+		if (motion.status == RINGSTATE_SELECTED)
+			RingExamineSelected(item);
+		else
+			RingExamineNotSelected();
 
 		if (!ring.isRotating) {
 			switch (motion.status) {
@@ -577,7 +568,6 @@ int Display_Inventory(INVENTORY_MODE invMode) {
 				DisplayJoystickHintText(true, false, InventoryMode != INV_DeathMode);
 #endif // FEATURE_HUD_IMPROVED
 				item = ring.itemList[ring.currentObj];
-
 				if (item->objectID == ID_PASSPORT_CLOSED) {
 					item->objectID = ID_PASSPORT_OPTION;
 				}
@@ -589,6 +579,7 @@ int Display_Inventory(INVENTORY_MODE invMode) {
 				}
 
 				if (!itemAnimateFrame && !IsInvOptionsDelay) {
+
 					do_inventory_options(item);
 
 					if (CHK_ANY(InputDB, IN_DESELECT)) {
@@ -616,10 +607,10 @@ int Display_Inventory(INVENTORY_MODE invMode) {
 						}
 
 						if (InventoryMode == INV_TitleMode
-							&& (item->objectID == ID_DETAIL_OPTION
-								|| item->objectID == ID_SOUND_OPTION
-								|| item->objectID == ID_CONTROL_OPTION
-								|| item->objectID == ID_GAMMA_OPTION))
+						&& (item->objectID == ID_DETAIL_OPTION
+						||  item->objectID == ID_SOUND_OPTION
+						||  item->objectID == ID_CONTROL_OPTION
+						||  item->objectID == ID_GAMMA_OPTION))
 						{
 							Inv_RingMotionSetup(&ring, RINGSTATE_CLOSING_ITEM, RINGSTATE_DESELECT, 0);
 						}
@@ -900,9 +891,9 @@ void DrawInventoryItem(INVENTORY_ITEM* invItem) {
 	}
 
 	phd_TranslateRel(0, invItem->yTrans, invItem->zTrans);
-	phd_RotYXZ(invItem->zRot, invItem->yRotSel, 0);
-	OBJECT_INFO* obj = &Objects[invItem->objectID];
+	phd_RotYXZ(invItem->zRot + invItem->reserved1, invItem->yRotSel, 0);
 
+	OBJECT_INFO* obj = &Objects[invItem->objectID];
 	if (!obj->loaded) {
 		return;
 	}
