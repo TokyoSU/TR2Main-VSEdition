@@ -11,8 +11,8 @@ Global
 		Release_DX9|x86 = Release_DX9|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0B1D052A-052D-450B-8D60-EABEDBD17D91}.Debug_DX9|x86.ActiveCfg = Release_DX9|Win32
-		{0B1D052A-052D-450B-8D60-EABEDBD17D91}.Debug_DX9|x86.Build.0 = Release_DX9|Win32
+		{0B1D052A-052D-450B-8D60-EABEDBD17D91}.Debug_DX9|x86.ActiveCfg = Debug_DX9|Win32
+		{0B1D052A-052D-450B-8D60-EABEDBD17D91}.Debug_DX9|x86.Build.0 = Debug_DX9|Win32
 		{0B1D052A-052D-450B-8D60-EABEDBD17D91}.Release_DX9|x86.ActiveCfg = Release_DX9|Win32
 		{0B1D052A-052D-450B-8D60-EABEDBD17D91}.Release_DX9|x86.Build.0 = Release_DX9|Win32
 	EndGlobalSection
