@@ -1,204 +1,296 @@
 {
-    "default": {
-        "comment": "Default settings for all levels",
+  "default": {
+    "comment": "Default settings for all levels",
+
+    "invloadingpixlanguage": "data/title%s.pcx",
+    "invloadingpix": "data/title.pcx",
+    "invloadingpixgold": "data/titleg.pcx",
+
+    "pistolsatstart": true,
+    "shotgunatstart": true,
+    "uzisatstart": false,
+    "autopistolsatstart": false,
+    "m16atstart": false,
+    "grenadeatstart": false,
+    "harpoonatstart": false,
+
+    "shotgunammoatstart": 2,
+    "uzisammoatstart": 0,
+    "autopistolsammoatstart": 0,
+    "m16ammoatstart": 0,
+    "grenadeammoatstart": 0,
+    "harpoonammoatstart": 0,
+
+    "flaresatstart": 2,
+    "smallmedikitatstart": 1,
+    "bigmedikitatstart": 1,
         
-        "pistolsatstart": true,
-        "shotgunatstart": true,
-        "uzisatstart": false,
-        "autopistolsatstart": false,
-        "m16atstart": false,
-        "grenadeatstart": false,
-        "harpoonatstart": false,
-        
-        "shotgunammoatstart": 2,
-        "uzisammoatstart": 0,
-        "autopistolsammoatstart": 0,
-        "m16ammoatstart": 0,
-        "grenadeammoatstart": 0,
-        "harpoonammoatstart": 0,
-        
-        "flaresatstart": 2,
-        "smallmedikitatstart": 1,
-        "bigmedikitatstart": 1,
-        
-        "larahealthbar": {
-            "isCentered": false,
-            "PC_x": 8,
-            "PC_y": 8,
-            "PC_color0": 3,
-            "PC_color1": 4,
-            "PSX_x": 20,
-            "PSX_y": 18,
-            "CENTER_x": 50,
-            "CENTER_y": 3000,
-            "PSX_leftcolor0": "680000",
-            "PSX_leftcolor1": "700000",
-            "PSX_leftcolor2": "980000",
-            "PSX_leftcolor3": "D80000",
-            "PSX_leftcolor4": "E40000",
-            "PSX_leftcolor5": "F00000",
-            "PSX_rightcolor0": "004400",
-            "PSX_rightcolor1": "007400",
-            "PSX_rightcolor2": "009C00",
-            "PSX_rightcolor3": "00D400",
-            "PSX_rightcolor4": "00E800",
-            "PSX_rightcolor5": "00FC00",
-            "PSX_framecolor0": "000000",
-            "PSX_framecolor1": "000000",
-            "PSX_framecolor2": "508484",
-            "PSX_framecolor3": "A0A0A0",
-            "PSX_framecolor4": "284242",
-            "PSX_framecolor5": "505050"
+    "ui_config": {
+        "req_bgnd": {
+            "0": "002000", "1": "002000", "2": "006000", "3": "002000",
+            "4": "002000", "5": "002000", "6": "002000", "7": "006000",
+            "8": "006000", "9": "002000", "10": "002000", "11": "002000",
+            "12": "002000", "13": "006000", "14": "002000", "15": "002000"
         },
-        "laraairbar": {
-            "isCentered": false,
-            "PC_x": 8,
-            "PC_y": 8,
-            "PC_color0": 15,
-            "PC_color1": 2,
-            "PSX_x": 20,
-            "PSX_y": 32,
-            "CENTER_x": 0,
-            "CENTER_y": 0,
-            "PSX_leftcolor0": "004054",
-            "PSX_leftcolor1": "005064",
-            "PSX_leftcolor2": "006874",
-            "PSX_leftcolor3": "007884",
-            "PSX_leftcolor4": "00848E",
-            "PSX_leftcolor5": "009098",
-            "PSX_rightcolor0": "004000",
-            "PSX_rightcolor1": "005000",
-            "PSX_rightcolor2": "006800",
-            "PSX_rightcolor3": "007800",
-            "PSX_rightcolor4": "008400",
-            "PSX_rightcolor5": "009000",
-            "PSX_framecolor0": "000000",
-            "PSX_framecolor1": "000000",
-            "PSX_framecolor2": "508484",
-            "PSX_framecolor3": "A0A0A0",
-            "PSX_framecolor4": "284242",
-            "PSX_framecolor5": "505050"
+        "req_bgnd_alpha": 128,
+        "req_bgnd_outline": {
+            "0": "606060", "1": "808080", "2": "202020",
+            "3": "000000", "4": "000000", "5": "202020",
+            "6": "404040", "7": "404040", "8": "606060"
         },
-        "enemyhealthbar": {
-            "isCentered": false,
-            "basedOnEnemyHealth": true,
-            "PC_x": 120,
-            "PC_y": 8,
-            "PC_color0": 3,
-            "PC_color1": 3,
-            "PSX_x": 121,
-            "PSX_y": 18,
-            "CENTER_x": 0,
-            "CENTER_y": -3000,
-            "PSX_leftcolor0": "680000",
-            "PSX_leftcolor1": "700000",
-            "PSX_leftcolor2": "980000",
-            "PSX_leftcolor3": "D80000",
-            "PSX_leftcolor4": "E40000",
-            "PSX_leftcolor5": "FF0000",
-            "PSX_rightcolor0": "310000",
-            "PSX_rightcolor1": "3A0000",
-            "PSX_rightcolor2": "400000",
-            "PSX_rightcolor3": "780000",
-            "PSX_rightcolor4": "9E0000",
-            "PSX_rightcolor5": "DC0000",
-            "PSX_framecolor0": "000000",
-            "PSX_framecolor1": "000000",
-            "PSX_framecolor2": "508484",
-            "PSX_framecolor3": "A0A0A0",
-            "PSX_framecolor4": "284242",
-            "PSX_framecolor5": "505050"
+        "req_main": {
+            "0": "000000", "1": "000000", "2": "108038", "3": "000000",
+            "4": "000000", "5": "000000", "6": "000000", "7": "108038",
+            "8": "108038", "9": "000000", "10": "000000", "11": "000000",
+            "12": "000000", "13": "108038", "14": "000000", "15": "000000"
         },
-        
-        "semitransparent": {
-            "animtex": "auto",
-            "objects": [{
-                "comment": "Windshield of a red fast snowmobile",
-                "object": 13,
-                "meshes": [{
-                    "mesh": 0,
-                    "filter": {"v":59, "t4":14, "t3":104},
-                    "t3list": "48-51, 54-71, 73-78"
-                }]
-            }, {
-                "comment": "Sunglasses lenses in the menu (Details option)",
-                "object": 153,
-                "meshes": [{
-                    "mesh": 0,
-                    "filter": {"v":80, "t4":66, "t3":4, "c4":2},
-                    "t4list": "23-30, 44-51",
-                    "t3list": "all"
-                }]
-            }, {
-                "comment": "Sphere of Doom 1 (Dragon transformation)",
-                "object": 209,
-                "meshes": [{"mesh": 0}]
-            }, {
-                "comment": "Sphere of Doom 2 (Dragon transformation)",
-                "object": 210,
-                "meshes": [{"mesh": 0}]
-            }, {
-                "comment": "Flare fire",
-                "object": 235,
-                "meshes": [{"mesh": 0}]
-            }, {
-                "comment": "Pistols/uzi/magnums gunfire flash",
-                "object": 240,
-                "meshes": [{"mesh": 0}]
-            }, {
-                "comment": "M16 gunfire flash",
-                "object": 241,
-                "meshes": [{"mesh": 0}]
-            }]
+        "req_main_alpha": 128,
+        "req_main_outline": {
+            "0": "000000", "1": "000000", "2": "000000",
+            "3": "000000", "4": "000000", "5": "000000",
+            "6": "000000", "7": "000000", "8": "000000"
         },
-        "reflective": {
-            "objects": [{
-                "comment": "Windshield of a gray fast snowmobile (The Golden Mask)",
-                "object": 13,
-                "meshes": [{
-                    "mesh": 0,
-                    "filter": {"v":59, "t4":14, "t3":73, "c3":17},
-                    "t3list": "48",
-                    "c3list": "all"
-                }]
-            }, {
-                "comment": "Flamethrower mask",
-                "object": 34,
-                "meshes": [{
-                    "mesh": 15,
-                    "filter": {"v":38, "t4":30, "t3":12},
-                    "t4list": "22-26"
-                }]
-            }, {
-                "comment": "Windshield of an armed snowmobile",
-                "object": 51,
-                "meshes": [{
-                    "mesh": 0,
-                    "filter": {"v":88, "t4":45, "t3":60},
-                    "t4list": "21-22",
-                    "t3list": "34-47"
-                }]
-            }, {
-                "comment": "Rolling wheel blade",
-                "object": 80,
-                "meshes": [{
-                    "mesh": 0,
-                    "t4list": "all",
-                    "c4list": "all"
-                }]
-            }, {
-                "comment": "Wall mounted blade",
-                "object": 81,
-                "meshes": [{"mesh": 1}]
-            }, {
-                "comment": "Sword of killing statue",
-                "object": 82,
-                "meshes": [{"mesh": 7}]
-            }]
+        "req_sel": {
+            "0": "000000", "1": "000000", "2": "38F080", "3": "000000",
+            "4": "000000", "5": "000000", "6": "000000", "7": "38F080",
+            "8": "38F080", "9": "000000", "10": "000000", "11": "000000",
+            "12": "000000", "13": "38F080", "14": "000000", "15": "000000"
+        },
+        "req_sel_alpha": 128,
+        "req_sel_outline": {
+            "0": "000000", "1": "FFFFFF", "2": "000000",
+            "3": "38F080", "4": "000000", "5": "FFFFFF",
+            "6": "000000", "7": "38F080", "8": "000000"
         }
     },
+
+    "larahealthbar": {
+      "isCentered": false,
+      "PC_x": 8,
+      "PC_y": 8,
+      "PC_color0": 3,
+      "PC_color1": 4,
+      "PSX_x": 20,
+      "PSX_y": 18,
+      "CENTER_x": 50,
+      "CENTER_y": 3000,
+      "PSX_leftcolor0": "680000",
+      "PSX_leftcolor1": "700000",
+      "PSX_leftcolor2": "980000",
+      "PSX_leftcolor3": "D80000",
+      "PSX_leftcolor4": "E40000",
+      "PSX_leftcolor5": "F00000",
+      "PSX_rightcolor0": "004400",
+      "PSX_rightcolor1": "007400",
+      "PSX_rightcolor2": "009C00",
+      "PSX_rightcolor3": "00D400",
+      "PSX_rightcolor4": "00E800",
+      "PSX_rightcolor5": "00FC00",
+      "PSX_framecolor0": "000000",
+      "PSX_framecolor1": "000000",
+      "PSX_framecolor2": "508484",
+      "PSX_framecolor3": "A0A0A0",
+      "PSX_framecolor4": "284242",
+      "PSX_framecolor5": "505050"
+    },
+    "laraairbar": {
+      "isCentered": false,
+      "PC_x": 8,
+      "PC_y": 8,
+      "PC_color0": 15,
+      "PC_color1": 2,
+      "PSX_x": 20,
+      "PSX_y": 32,
+      "CENTER_x": 0,
+      "CENTER_y": 0,
+      "PSX_leftcolor0": "004054",
+      "PSX_leftcolor1": "005064",
+      "PSX_leftcolor2": "006874",
+      "PSX_leftcolor3": "007884",
+      "PSX_leftcolor4": "00848E",
+      "PSX_leftcolor5": "009098",
+      "PSX_rightcolor0": "004000",
+      "PSX_rightcolor1": "005000",
+      "PSX_rightcolor2": "006800",
+      "PSX_rightcolor3": "007800",
+      "PSX_rightcolor4": "008400",
+      "PSX_rightcolor5": "009000",
+      "PSX_framecolor0": "000000",
+      "PSX_framecolor1": "000000",
+      "PSX_framecolor2": "508484",
+      "PSX_framecolor3": "A0A0A0",
+      "PSX_framecolor4": "284242",
+      "PSX_framecolor5": "505050"
+    },
+    "enemyhealthbar": {
+      "isCentered": false,
+      "basedOnEnemyHealth": true,
+      "PC_x": 120,
+      "PC_y": 8,
+      "PC_color0": 3,
+      "PC_color1": 3,
+      "PSX_x": 121,
+      "PSX_y": 18,
+      "CENTER_x": 0,
+      "CENTER_y": -3000,
+      "PSX_leftcolor0": "680000",
+      "PSX_leftcolor1": "700000",
+      "PSX_leftcolor2": "980000",
+      "PSX_leftcolor3": "D80000",
+      "PSX_leftcolor4": "E40000",
+      "PSX_leftcolor5": "FF0000",
+      "PSX_rightcolor0": "310000",
+      "PSX_rightcolor1": "3A0000",
+      "PSX_rightcolor2": "400000",
+      "PSX_rightcolor3": "780000",
+      "PSX_rightcolor4": "9E0000",
+      "PSX_rightcolor5": "DC0000",
+      "PSX_framecolor0": "000000",
+      "PSX_framecolor1": "000000",
+      "PSX_framecolor2": "508484",
+      "PSX_framecolor3": "A0A0A0",
+      "PSX_framecolor4": "284242",
+      "PSX_framecolor5": "505050"
+    },
+
+    "semitransparent": {
+      "animtex": "auto",
+      "objects": [
+        {
+          "comment": "Windshield of a red fast snowmobile",
+          "object": 13,
+          "meshes": [
+            {
+              "mesh": 0,
+              "filter": {
+                "v": 59,
+                "t4": 14,
+                "t3": 104
+              },
+              "t3list": "48-51, 54-71, 73-78"
+            }
+          ]
+        },
+        {
+          "comment": "Sunglasses lenses in the menu (Details option)",
+          "object": 153,
+          "meshes": [
+            {
+              "mesh": 0,
+              "filter": {
+                "v": 80,
+                "t4": 66,
+                "t3": 4,
+                "c4": 2
+              },
+              "t4list": "23-30, 44-51",
+              "t3list": "all"
+            }
+          ]
+        },
+        {
+          "comment": "Sphere of Doom 1 (Dragon transformation)",
+          "object": 209,
+          "meshes": [ { "mesh": 0 } ]
+        },
+        {
+          "comment": "Sphere of Doom 2 (Dragon transformation)",
+          "object": 210,
+          "meshes": [ { "mesh": 0 } ]
+        },
+        {
+          "comment": "Flare fire",
+          "object": 235,
+          "meshes": [ { "mesh": 0 } ]
+        },
+        {
+          "comment": "Pistols/uzi/magnums gunfire flash",
+          "object": 240,
+          "meshes": [ { "mesh": 0 } ]
+        },
+        {
+          "comment": "M16 gunfire flash",
+          "object": 241,
+          "meshes": [ { "mesh": 0 } ]
+        }
+      ]
+    },
+    "reflective": {
+      "objects": [
+        {
+          "comment": "Windshield of a gray fast snowmobile (The Golden Mask)",
+          "object": 13,
+          "meshes": [
+            {
+              "mesh": 0,
+              "filter": {
+                "v": 59,
+                "t4": 14,
+                "t3": 73,
+                "c3": 17
+              },
+              "t3list": "48",
+              "c3list": "all"
+            }
+          ]
+        },
+        {
+          "comment": "Flamethrower mask",
+          "object": 34,
+          "meshes": [
+            {
+              "mesh": 15,
+              "filter": {
+                "v": 38,
+                "t4": 30,
+                "t3": 12
+              },
+              "t4list": "22-26"
+            }
+          ]
+        },
+        {
+          "comment": "Windshield of an armed snowmobile",
+          "object": 51,
+          "meshes": [
+            {
+              "mesh": 0,
+              "filter": {
+                "v": 88,
+                "t4": 45,
+                "t3": 60
+              },
+              "t4list": "21-22",
+              "t3list": "34-47"
+            }
+          ]
+        },
+        {
+          "comment": "Rolling wheel blade",
+          "object": 80,
+          "meshes": [
+            {
+              "mesh": 0,
+              "t4list": "all",
+              "c4list": "all"
+            }
+          ]
+        },
+        {
+          "comment": "Wall mounted blade",
+          "object": 81,
+          "meshes": [ { "mesh": 1 } ]
+        },
+        {
+          "comment": "Sword of killing statue",
+          "object": 82,
+          "meshes": [ { "mesh": 7 } ]
+        }
+      ]
+    }
+  },
     "levels": [
-	{
+    {
         "comment": "Title",
         "filename": "TITLE",
         "comment2": "Example of the 'enemy health' and 'enable enemy bar' command, only the title level will have a dog with 250hp and no enemy bar, the other level will have default value.",
@@ -222,7 +314,7 @@
                 "canExamine": true,
                 "canRotateManually": true
             },
-		    {
+            {
                 "#comment": "This is an entry for object number 198 (KEY2) for the TITLE level",
                 "object_id": 198,
                 "text": "Test for description in key2",
@@ -240,7 +332,7 @@
             }
         ]
     },
-	{
+    {
         "comment": "Lara's Home",
         "filename": "ASSAULT",
         "picture": "MANSION",
@@ -259,7 +351,7 @@
         "picture": "CHINA",
         "watercolor": "B2E6E6"
       },
-	{
+    {
         "comment": "Venice",
         "filename": "BOAT",
         "picture": "VENICE",

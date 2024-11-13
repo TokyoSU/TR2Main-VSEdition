@@ -7,7 +7,7 @@ static T GetValueByNameInt(Value& data, LPCSTR name, T defaultValue) {
 	return defaultValue;
 }
 double GetValueByNameDouble(Value& data, LPCSTR name, double defaultValue);
-extern D3DCOLOR GetColorByName(Value& data, LPCSTR name, D3DCOLOR defaultValue);
+extern D3DCOLOR GetColorRGBByName(Value& data, LPCSTR name, D3DCOLOR defaultValue);
 extern bool GetValueByNameBool(Value& data, LPCSTR name, bool defaultValue);
-extern LPCSTR GetValueByNameString(Value& data, LPCSTR name, SizeType* destStringSize, LPCSTR defaultValue);
+extern std::string GetValueByNameString(Value& data, LPCSTR name, SizeType* destStringSize, std::string defaultValue);
 extern void ParseJsonError(LPCSTR filePath, size_t line, int parseCode);

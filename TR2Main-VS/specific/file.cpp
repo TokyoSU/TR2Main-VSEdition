@@ -110,7 +110,7 @@ static bool MarkSemitransMesh(int objID, int meshIdx, POLYFILTER* filter) {
 		if (!obj->loaded || meshIdx >= obj->nMeshes) return false; // no such object/mesh for patching
 		ptrObj = MeshPtr[obj->meshIndex + meshIdx];
 	}
-	return Mod.EnumeratePolysObjects(ptrObj, MarkSemitransPolyObjects, filter, NULL);
+	return EnumeratePolysObjects(ptrObj, MarkSemitransPolyObjects, filter, NULL);
 }
 
 static void MarkSemitransObjects() {
@@ -130,8 +130,8 @@ static void MarkSemitransObjects() {
 		for (node = Mod.semitrans.rooms; node != NULL; node = node->next) {
 			if (node->id >= 0 && node->id < RoomCount) {
 				ROOM_INFO* room = &RoomInfo[node->id];
-				Mod.EnumeratePolysRoomFace4(room->data->gt4, room->data->gt4Size, MarkSemitransPolyFace4, &node->filter, NULL);
-				Mod.EnumeratePolysRoomFace3(room->data->gt3, room->data->gt3Size, MarkSemitransPolyFace3, &node->filter, NULL);
+				EnumeratePolysRoomFace4(room->data->gt4, room->data->gt4Size, MarkSemitransPolyFace4, &node->filter, NULL);
+				EnumeratePolysRoomFace3(room->data->gt3, room->data->gt3Size, MarkSemitransPolyFace3, &node->filter, NULL);
 			}
 		}
 		return;
@@ -1213,9 +1213,9 @@ BOOL LoadLevel(LPCTSTR fileName, int levelID) {
 	ReadFileSync(hFile, &levelVersion, sizeof(levelVersion), &bytesRead, NULL);
 	if (levelVersion != REQ_LEVEL_VERSION) {
 		if (levelVersion < REQ_LEVEL_VERSION)
-			wsprintf(StringToShow, "FATAL: Level %d (%s) is OUT OF DATE (version %d). COPY NEW EDITOR", levelID, fullPath, fileName);
+			wsprintf(StringToShow, "FATAL: Level %d (%s) is OUT OF DATE (version %d). COPY NEW EDITOR", levelID, fileName, levelVersion);
 		else
-			wsprintf(StringToShow, "FATAL: Level %d (%s) requires a new TOMB2.EXE (version %d) to run", levelID, fullPath, fileName);
+			wsprintf(StringToShow, "FATAL: Level %d (%s) requires a new TOMB2.EXE (version %d) to run", levelID, fileName, levelVersion);
 		goto EXIT;
 	}
 
@@ -1277,10 +1277,10 @@ BOOL S_LoadLevelFile(LPCTSTR fileName, int levelID, GF_LEVEL_TYPE levelType) {
 	Mod.LoadJson(fileName);
 	BOOL result = LoadLevel(fileName, levelID);
 #if defined(FEATURE_BACKGROUND_IMPROVED)
-	if (LoadingScreensEnabled && Mod.loadingPixFound && (levelType == GFL_NORMAL || levelType == GFL_SAVED)) {
+	if (LoadingScreensEnabled && Mod.levelLoadingPix.size() > 0 && (levelType == GFL_NORMAL || levelType == GFL_SAVED)) {
 		RGB888 palette[256];
 		memcpy(palette, GamePalette8, sizeof(GamePalette8));
-		if (!BGND2_LoadPicture(Mod.loadingPix, FALSE, FALSE)) {
+		if (!BGND2_LoadPicture(Mod.levelLoadingPix.c_str(), FALSE, FALSE)) {
 			BGND2_ShowPicture(30, 90, 10, 2, TRUE);
 			S_DontDisplayPicture();
 			InputStatus = 0;

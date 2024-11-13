@@ -3,21 +3,17 @@
 #include "global/vars.h"
 
 #if defined(FEATURE_MOD_CONFIG)
-class ModConfig
+struct ModConfig
 {
-public:
 	ModConfig() {
 		Initialize();
 	}
 	~ModConfig() {
 		Release();
 	}
-	void Initialize();
-	void Release();
-public:
-	bool LoadJson(LPCSTR filePath);
-public:
+
 	bool isLoaded = false;
+
 	bool isBarefoot = false;
 	bool disableGiantYetiNextLevelOnDeath = false;
 	bool laraIgnoreMonkIfNotAngry = true;
@@ -58,10 +54,14 @@ public:
 	short smallMediAtStart = 1;
 	short bigMediAtStart = 1;
 
-	D3DCOLOR waterColor;
-	bool loadingPixFound = false;
-	char loadingPix[256];
+	std::string levelLoadingPix;
+	std::string titleLoadingPixLanguage;
+	std::string titleLoadingPix;
+	std::string titleLoadingPixGold;
 
+	bool isUIColorLoaded = false;
+
+	D3DCOLOR waterColor;
 	CUST_INVENTORY_ITEM invItemList[MAX_ITEM_IN_INVENTORY];
 	LARA_BAR_CONFIG laraBar;
 	BAR_CONFIG enemyBar;
@@ -69,32 +69,37 @@ public:
 	SEMITRANS_CONFIG semitrans;
 	REFLECT_CONFIG reflect;
 
-	bool GetCustomItemFromObjectID(int objectID, CUST_INVENTORY_ITEM& invItem);
-private: // Loader for data inside json:
-	void LoadHealthBarConfig(Value& data, BAR_CONFIG* result);
-	void LoadAirBarConfig(Value& data, BAR_CONFIG* result);
-	void LoadCustomInventoryItems(Value& data);
-	void LoadLevelConfig(Value& data);
-	void LoadSemitransConfig(Value& data, SEMITRANS_CONFIG* semitrans);
-	void LoadPolyfilterConfig(Value& data, LPCSTR name, POLYFILTER_NODE** filterNodes);
-	void LoadReflectConfig(Value& data, REFLECT_CONFIG* reflect);
-private:
-	void ParseDefaultConfiguration(Value& data);
-	void ParseLevelConfiguration(Value& data, LPCSTR currentLevel);
-
-public: // Utilities.
-	POLYFILTER* CreatePolyfilterNode(POLYFILTER_NODE** root, int id);
-	void FreePolyfilterNodes(POLYFILTER_NODE** root);
-	bool IsCompatibleFilterObjects(short* ptrObj, POLYFILTER* filter);
-	short* EnumeratePolysSpecificObjects(short* ptrObj, int vtxCount, bool colored, ENUM_POLYS_OBJECTS_CB callback, POLYINDEX* filter, LPVOID param);
-	void EnumeratePolysSpecificRoomFace4(FACE4* ptrObj, int faceCount, bool colored, ENUM_POLYS_FACE4_CB callback, POLYINDEX* filter, LPVOID param);
-	void EnumeratePolysSpecificRoomFace3(FACE3* ptrObj, int faceCount, bool colored, ENUM_POLYS_FACE3_CB callback, POLYINDEX* filter, LPVOID param);
-	bool EnumeratePolysObjects(short* ptrObj, ENUM_POLYS_OBJECTS_CB callback, POLYFILTER* filter, LPVOID param);
-	bool EnumeratePolysRoomFace3(FACE3* ptrObj, int faceCount, ENUM_POLYS_FACE3_CB callback, POLYFILTER* filter, LPVOID param);
-	bool EnumeratePolysRoomFace4(FACE4* ptrObj, int faceCount, ENUM_POLYS_FACE4_CB callback, POLYFILTER* filter, LPVOID param);
-	int ParsePolyString(LPCSTR str, POLYINDEX* lst, DWORD lstLen);
-	int ParsePolyValue(LPCSTR value, POLYINDEX* lst, DWORD lstLen);
+	void Initialize();
+	void Release();
+	bool LoadJson(LPCSTR filePath);
 };
+
+extern bool GetCustomItemFromObjectID(int objectID, CUST_INVENTORY_ITEM& invItem);
+
+extern void LoadHealthBarConfig(Value& data, BAR_CONFIG* result);
+extern void LoadAirBarConfig(Value& data, BAR_CONFIG* result);
+extern void LoadCustomInventoryItems(Value& data);
+extern void LoadLevelConfig(Value& data);
+extern void LoadSemitransConfig(Value& data, SEMITRANS_CONFIG* semitrans);
+extern void LoadPolyfilterConfig(Value& data, LPCSTR name, POLYFILTER_NODE** filterNodes);
+extern void LoadReflectConfig(Value& data, REFLECT_CONFIG* reflect);
+extern void LoadUIConfig(Value& data, LPCSTR name);
+extern void LoadUIConfigDefault();
+
+extern void ParseDefaultConfiguration(Value& data);
+extern void ParseLevelConfiguration(Value& data, LPCSTR currentLevel);
+
+extern POLYFILTER* CreatePolyfilterNode(POLYFILTER_NODE** root, int id);
+extern void FreePolyfilterNodes(POLYFILTER_NODE** root);
+extern bool IsCompatibleFilterObjects(short* ptrObj, POLYFILTER* filter);
+extern short* EnumeratePolysSpecificObjects(short* ptrObj, int vtxCount, bool colored, ENUM_POLYS_OBJECTS_CB callback, POLYINDEX* filter, LPVOID param);
+extern void EnumeratePolysSpecificRoomFace4(FACE4* ptrObj, int faceCount, bool colored, ENUM_POLYS_FACE4_CB callback, POLYINDEX* filter, LPVOID param);
+extern void EnumeratePolysSpecificRoomFace3(FACE3* ptrObj, int faceCount, bool colored, ENUM_POLYS_FACE3_CB callback, POLYINDEX* filter, LPVOID param);
+extern bool EnumeratePolysObjects(short* ptrObj, ENUM_POLYS_OBJECTS_CB callback, POLYFILTER* filter, LPVOID param);
+extern bool EnumeratePolysRoomFace3(FACE3* ptrObj, int faceCount, ENUM_POLYS_FACE3_CB callback, POLYFILTER* filter, LPVOID param);
+extern bool EnumeratePolysRoomFace4(FACE4* ptrObj, int faceCount, ENUM_POLYS_FACE4_CB callback, POLYFILTER* filter, LPVOID param);
+extern int ParsePolyString(LPCSTR str, POLYINDEX* lst, DWORD lstLen);
+extern int ParsePolyValue(std::string value, POLYINDEX* lst, DWORD lstLen);
 
 extern ModConfig Mod;
 #endif

@@ -557,7 +557,7 @@ typedef enum {
 	ID_DINO,
 	ID_BIRD_TWEETER2,
 	ID_CLOCK_CHIMES,
-	ID_DRAGON_BONES1,
+	ID_TRIPLE_CANDLE,
 	ID_DRAGON_BONES2,
 	ID_DRAGON_BONES3,
 	ID_HOT_LIQUID,
@@ -577,7 +577,7 @@ typedef enum {
 	ID_DART_EFFECT,
 	ID_FLARE_FIRE,
 	ID_GLOW,
-	ID_GLOW_RESERVED,
+	ID_CANDLE_SPRITE,
 	ID_RICOCHET,
 	ID_TWINKLE,
 	ID_GUN_FLASH,
@@ -1849,7 +1849,6 @@ typedef struct ItemInfo_t {
 	UINT16 looked_at : 1;
 	UINT16 dynamic_light : 1;
 	UINT16 clear_body : 1;
-	UINT16 pad : 7;
 } ITEM_INFO;
 
 typedef struct CameraInfo_t {
@@ -1907,12 +1906,11 @@ typedef struct CollInfo_t {
 	char zTilt;
 	char hitByBaddie;
 	char hitStatic;
-	UINT16 slopesAreWalls : 1;
+	UINT16 slopesAreWalls : 2;
 	UINT16 slopesArePits : 1;
 	UINT16 lavaIsPit : 1;
 	UINT16 enableBaddiePush : 1;
 	UINT16 enableSpaz : 1;
-	UINT16 hitCeiling : 1;
 } COLL_INFO;
 
 typedef struct ObjectInfo_t {
@@ -1922,10 +1920,10 @@ typedef struct ObjectInfo_t {
 	short* frameBase;
 	void(__cdecl* initialise)(short itemNumber);
 	void(__cdecl* control)(short itemNumber);
-	void(__cdecl* floor)(ITEM_INFO* item, int x, int y, int z, short* height);
-	void(__cdecl* ceiling)(ITEM_INFO* item, int x, int y, int z, short* height);
+	void(__cdecl* floor)(ITEM_INFO* item, int x, int y, int z, int* height);
+	void(__cdecl* ceiling)(ITEM_INFO* item, int x, int y, int z, int* height);
 	void(__cdecl* drawRoutine)(ITEM_INFO* item);
-	void(__cdecl* collision)(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll);
+	void(__cdecl* collision)(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll);
 	short animIndex;
 	short hitPoints;
 	short pivotLength;
@@ -1939,7 +1937,6 @@ typedef struct ObjectInfo_t {
 	UINT16 save_anim : 1;
 	UINT16 semi_transparent : 1;
 	UINT16 water_creature : 1;
-	UINT16 pad : 8;
 } OBJECT_INFO;
 
 typedef struct PhdMatrix_t {
@@ -1962,12 +1959,12 @@ typedef struct DoorInfos_t {
 } DOOR_INFOS;
 
 typedef struct FloorInfo_t {
-	USHORT index;
-	USHORT box;
-	BYTE pitRoom;
-	char floor;
-	BYTE skyRoom;
-	char ceiling;
+	unsigned short index;
+	short box;
+	unsigned char pitRoom;
+	signed char floor;
+	unsigned char skyRoom;
+	signed char ceiling;
 } FLOOR_INFO;
 
 typedef struct LightInfo_t {
@@ -2302,6 +2299,13 @@ typedef struct BoatInfo_t {
 	int water;
 	int pitch;
 } BOAT_INFO;
+
+typedef struct CandleEmitterData_t {
+	short leftID;
+	short middleID;
+	short rightID;
+	bool on;
+} CANDLE_EMITTER_DATA;
 
 typedef struct SkidooInfo_t {
 	short trackMesh;

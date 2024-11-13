@@ -56,11 +56,9 @@ static void SEH_TR(unsigned int error, EXCEPTION_POINTERS* pExp) {
 
 #ifdef FEATURE_GOLD
 static bool gold = false;
-
-void SetGold(bool state) {
+static void SetGold(bool state) {
 	gold = state;
 }
-
 bool IsGold() {
 	return gold;
 }

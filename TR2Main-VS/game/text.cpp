@@ -109,39 +109,40 @@ TEXT_STR_INFO* T_Print(int x, int y, short z, const char* str) {
 		return NULL;
 
 	for (int i = 0; i < 64; ++i) {
-		if (!CHK_ANY(TextInfoTable[i].flags, TIF_Active)) {
+		TEXT_STR_INFO* pText = &TextInfoTable[i];
+		STRING_FIXED64* pStr = &TheStrings[i];
+		if (!CHK_ANY(pText->flags, TIF_Active)) {
 			int stringLen = T_GetStringLen(str);
 			CLAMPG(stringLen, 64); // NOTE: useless check, but decided to leave it here
 
-			TextInfoTable[i].scaleH = PHD_ONE;
-			TextInfoTable[i].scaleV = PHD_ONE;
+			pText->scaleH = PHD_ONE;
+			pText->scaleV = PHD_ONE;
 #ifdef FEATURE_HUD_IMPROVED
-			TextInfoTable[i].xPos = x;
-			TextInfoTable[i].yPos = y;
+			pText->xPos = x;
+			pText->yPos = y;
 #else // FEATURE_HUD_IMPROVED
-			TextInfoTable[i].xPos = x * GetTextScaleH(PHD_ONE) / PHD_ONE;
-			TextInfoTable[i].yPos = y * GetTextScaleV(PHD_ONE) / PHD_ONE;
+			text->xPos = x * GetTextScaleH(PHD_ONE) / PHD_ONE;
+			text->yPos = y * GetTextScaleV(PHD_ONE) / PHD_ONE;
 #endif // FEATURE_HUD_IMPROVED
-			TextInfoTable[i].zPos = z;
-			TextInfoTable[i].letterSpacing = 1;
-			TextInfoTable[i].wordSpacing = 6;
+			pText->zPos = z;
+			pText->letterSpacing = 1;
+			pText->wordSpacing = 6;
 
-			TextInfoTable[i].textFlags = 0;
-			TextInfoTable[i].outlFlags = 0;
-			TextInfoTable[i].bgndFlags = 0;
-			TextInfoTable[i].bgndSizeX = 0;
-			TextInfoTable[i].bgndSizeY = 0;
-			TextInfoTable[i].bgndOffX = 0;
-			TextInfoTable[i].bgndOffY = 0;
-			TextInfoTable[i].bgndOffZ = 0;
+			pText->textFlags = 0;
+			pText->outlFlags = 0;
+			pText->bgndFlags = 0;
+			pText->bgndSizeX = 0;
+			pText->bgndSizeY = 0;
+			pText->bgndOffX = 0;
+			pText->bgndOffY = 0;
+			pText->bgndOffZ = 0;
 
-			TextInfoTable[i].flags = TIF_Active;
-			TextInfoTable[i].pString = TheStrings[i].str;
+			pText->flags = TIF_Active;
+			pText->pString = pStr->str;
 
-			memcpy(TheStrings[i].str, str, stringLen);
+			memcpy(pStr->str, str, stringLen);
 			++TextStringCount;
-
-			return &TextInfoTable[i];
+			return pText;
 		}
 	}
 	return NULL;

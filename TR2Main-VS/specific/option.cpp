@@ -624,7 +624,7 @@ static void do_legacy_inventory_options(INVENTORY_ITEM* item)
 void do_inventory_options(INVENTORY_ITEM* item) {
 #if defined(FEATURE_MOD_CONFIG)
 	CUST_INVENTORY_ITEM invItem;
-	if (Mod.GetCustomItemFromObjectID(item->objectID, invItem))
+	if (GetCustomItemFromObjectID(item->objectID, invItem))
 	{
 		// Found item config.
 		// Does item can't be examined ? then select it by default...
@@ -833,7 +833,7 @@ void do_passport_option(INVENTORY_ITEM* item) {
 				else if (CHK_ANY(GF_GameFlow.flags, GFF_SelectAnyLevel)) {
 					T_RemovePrint(InvItemText[0]);
 					InvItemText[0] = 0;
-					Init_Requester(&SaveGameRequester);
+					InitRequester(&SaveGameRequester);
 					GetValidLevelsList(&SaveGameRequester);
 					SetRequesterHeading(&SaveGameRequester, GF_GameStringTable[GSI_Passport_SelectLevel], 0, NULL, 0);
 					passportMode = 2;
@@ -968,10 +968,10 @@ void do_detail_option(INVENTORY_ITEM * item) {
 		DetailTextInfo[0] = T_Print(0, DETAIL_Y_LINE3, 0, GF_GameStringTable[GSI_Detail_Low]);
 
 		T_AddBackground(DetailTextInfo[4], DETAIL_WIDTH_M, 0, 0, 0, DETAIL_NEARZ, ICLR_Black, &ReqMainGour1, 0);
-		T_AddOutline(DetailTextInfo[4], TRUE, ICLR_Orange, &ReqMainGour2, 0);
+		T_AddOutline(DetailTextInfo[4], TRUE, ICLR_Blue, &ReqMainGour2, 0);
 
 		T_AddBackground(DetailTextInfo[DetailLevel], DETAIL_WIDTH_S, 0, 0, 0, DETAIL_NEARZ, ICLR_Black, &ReqSelGour1, 0);
-		T_AddOutline(DetailTextInfo[DetailLevel], TRUE, ICLR_Orange, &ReqSelGour2, 0);
+		T_AddOutline(DetailTextInfo[DetailLevel], TRUE, ICLR_Blue, &ReqSelGour2, 0);
 
 		T_AddBackground(DetailTextInfo[3], DETAIL_WIDTH_L, DETAIL_HEIGHT, 0, 0, DETAIL_FARZ, ICLR_Black, &ReqBgndGour1, 0);
 		T_AddOutline(DetailTextInfo[3], TRUE, ICLR_Blue, &ReqBgndGour2, 0);
@@ -986,7 +986,7 @@ void do_detail_option(INVENTORY_ITEM * item) {
 		T_RemoveOutline(DetailTextInfo[DetailLevel]);
 		T_RemoveBackground(DetailTextInfo[DetailLevel]);
 		--DetailLevel;
-		T_AddOutline(DetailTextInfo[DetailLevel], TRUE, ICLR_Orange, &ReqSelGour2, 0);
+		T_AddOutline(DetailTextInfo[DetailLevel], TRUE, ICLR_Blue, &ReqSelGour2, 0);
 		T_AddBackground(DetailTextInfo[DetailLevel], DETAIL_WIDTH_S, 0, 0, 0, DETAIL_NEARZ, ICLR_Black, &ReqSelGour1, 0);
 	}
 
@@ -994,7 +994,7 @@ void do_detail_option(INVENTORY_ITEM * item) {
 		T_RemoveOutline(DetailTextInfo[DetailLevel]);
 		T_RemoveBackground(DetailTextInfo[DetailLevel]);
 		++DetailLevel;
-		T_AddOutline(DetailTextInfo[DetailLevel], TRUE, ICLR_Orange, &ReqSelGour2, 0);
+		T_AddOutline(DetailTextInfo[DetailLevel], TRUE, ICLR_Blue, &ReqSelGour2, 0);
 		T_AddBackground(DetailTextInfo[DetailLevel], DETAIL_WIDTH_S, 0, 0, 0, DETAIL_NEARZ, ICLR_Black, &ReqSelGour1, 0);
 	}
 
@@ -1048,7 +1048,7 @@ void do_sound_option(INVENTORY_ITEM * item) {
 			SoundTextInfo[7] = T_Print(10, 25, 0, volumeString);
 
 			T_AddBackground(SoundTextInfo[0], SOUND_WIDTH_S, 0, 0, 0, SOUND_NEARZ, ICLR_Black, &ReqSelGour1, 0);
-			T_AddOutline(SoundTextInfo[0], TRUE, ICLR_Orange, &ReqSelGour2, 0);
+			T_AddOutline(SoundTextInfo[0], TRUE, ICLR_Blue, &ReqSelGour2, 0);
 		}
 #else // FEATURE_HUD_IMPROVED
 		sprintf(volumeString, "| %2d", MusicVolume); // Char '|' is musical note picture
@@ -1084,7 +1084,7 @@ void do_sound_option(INVENTORY_ITEM * item) {
 			T_RemoveBackground(SoundTextInfo[SoundOptionLine]);
 			--SoundOptionLine;
 			T_AddBackground(SoundTextInfo[SoundOptionLine], SOUND_WIDTH_S, 0, 0, 0, SOUND_NEARZ, ICLR_Black, &ReqSelGour1, 0);
-			T_AddOutline(SoundTextInfo[SoundOptionLine], TRUE, ICLR_Orange, &ReqSelGour2, 0);
+			T_AddOutline(SoundTextInfo[SoundOptionLine], TRUE, ICLR_Blue, &ReqSelGour2, 0);
 		}
 #else // FEATURE_HUD_IMPROVED
 		T_RemoveOutline(SoundTextInfo[SoundOptionLine]);
@@ -1105,7 +1105,7 @@ void do_sound_option(INVENTORY_ITEM * item) {
 			T_RemoveBackground(SoundTextInfo[SoundOptionLine]);
 			++SoundOptionLine;
 			T_AddBackground(SoundTextInfo[SoundOptionLine], SOUND_WIDTH_S, 0, 0, 0, SOUND_NEARZ, ICLR_Black, &ReqSelGour1, 0);
-			T_AddOutline(SoundTextInfo[SoundOptionLine], TRUE, ICLR_Orange, &ReqSelGour2, 0);
+			T_AddOutline(SoundTextInfo[SoundOptionLine], TRUE, ICLR_Blue, &ReqSelGour2, 0);
 		}
 #else // FEATURE_HUD_IMPROVED
 		T_RemoveOutline(SoundTextInfo[SoundOptionLine]);

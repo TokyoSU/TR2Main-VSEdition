@@ -525,7 +525,7 @@ BOOL S_FrontEndCheck() {
 	char fileName[16] = { 0 };
 #endif // !FEATURE_SUBFOLDERS
 
-	Init_Requester(&LoadGameRequester);
+	InitRequester(&LoadGameRequester);
 	SavedGamesCount = 0;
 
 	for (DWORD i = 0; i < SavegameSlots; ++i) {

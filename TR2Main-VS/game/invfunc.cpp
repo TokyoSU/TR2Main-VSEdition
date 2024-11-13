@@ -306,7 +306,7 @@ void RingExamineSelected(INVENTORY_ITEM* item) {
 #if defined(FEATURE_MOD_CONFIG)
 	if (InvItemText[2] == NULL) {
 		CUST_INVENTORY_ITEM invItem;
-		if (Mod.GetCustomItemFromObjectID(item->objectID, invItem))
+		if (GetCustomItemFromObjectID(item->objectID, invItem))
 		{
 			if (invItem.canExamine && invItem.message.size() > 0)
 			{

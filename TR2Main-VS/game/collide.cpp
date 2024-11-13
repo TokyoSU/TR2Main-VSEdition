@@ -329,7 +329,7 @@ int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomID, int
 			{
 				continue;
 			}
-			int shift[2];
+			int shift[2]{};
 
 			shift[0] = rxMax - xMin;
 			shift[1] = xMax - rxMin;

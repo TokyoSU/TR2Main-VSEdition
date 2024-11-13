@@ -25,6 +25,7 @@
 #include "3dsystem/phd_math.h"
 #include "game/collide.h"
 #include "game/control.h"
+#include "game/draw.h"
 #include "game/effects.h"
 #include "game/items.h"
 #include "game/missile.h"
@@ -881,6 +882,72 @@ void ControlLavaBlob(short fxNum)
 	if (newRoom != fx->roomNumber)
 		EffectNewRoom(fxNum, newRoom);
 
+}
+
+static CANDLE_EMITTER_DATA* GetCandleFlameData(ITEM_INFO* item)
+{
+	return (CANDLE_EMITTER_DATA*)item->data;
+}
+
+void InitializeCandleFlameEmitter(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	item->data = (CANDLE_EMITTER_DATA*)game_malloc(sizeof(CANDLE_EMITTER_DATA), GBUF_TempAlloc);
+}
+
+static void SpawnCandleFlame(ITEM_INFO* item, int radius, short angle, int height, short* candleID)
+{
+	*candleID = CreateEffect(item->roomNumber);
+	if (*candleID != -1) {
+		FX_INFO* fx = &Effects[*candleID];
+		fx->pos.x = item->pos.x + (radius * phd_sin(item->pos.rotY + angle) >> W2V_SHIFT);
+		fx->pos.y = item->pos.y + height;
+		fx->pos.z = item->pos.z + (radius * phd_cos(item->pos.rotY + angle) >> W2V_SHIFT);
+		fx->objectID = ID_CANDLE_SPRITE;
+		fx->frameNumber = Objects[fx->objectID].nMeshes * GetRandomControl() / 0x7FFF;
+	}
+}
+
+void CandleFlameEmitterControl(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	CANDLE_EMITTER_DATA* candle = GetCandleFlameData(item);
+	if (candle->on)
+	{
+		AddDynamicLight(item->pos.x, item->pos.y, item->pos.z, 12, 11); // power, range
+	}
+	if (candle->on && !TriggerActive(item))
+	{
+		KillEffect(candle->leftID);
+		KillEffect(candle->middleID);
+		KillEffect(candle->rightID);
+		candle->on = false;
+	}
+	else if (!candle->on && TriggerActive(item))
+	{
+		SpawnCandleFlame(item, 182, -ANGLE(90), 32, &candle->leftID);
+		SpawnCandleFlame(item, 0, ANGLE(0), 0, &candle->middleID);
+		SpawnCandleFlame(item, 182, ANGLE(90), 0, &candle->rightID);
+		candle->on = true;
+	}
+}
+
+#define CANDLE_TIMER (FRAMES_PER_SECOND / 4)
+void CandleEmitterSpriteControl(short fxNumber)
+{
+	FX_INFO* fx = &Effects[fxNumber];
+	if (fx->counter <= 0)
+	{
+		if (--fx->frameNumber <= Objects[ID_CANDLE_SPRITE].nMeshes) {
+			fx->frameNumber = 0;
+		}
+		fx->counter = CANDLE_TIMER;
+	}
+	else
+	{
+		fx->counter--;
+	}
+	PlaySoundEffect(150, &fx->pos, NULL);
 }
 
 /*

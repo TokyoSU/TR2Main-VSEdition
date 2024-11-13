@@ -50,41 +50,12 @@ static const char MoreUpString[] = " \x10                                       
 // NOTE: gouraud arrays have been taken from PlayStation version of the game.
 // These arrays are not used in the original PC version of the game.
 
-GOURAUD_FILL ReqBgndGour1 = { {
-	{0x80002000, 0x80002000, 0x80006000, 0x80002000},
-	{0x80002000, 0x80002000, 0x80002000, 0x80006000},
-	{0x80006000, 0x80002000, 0x80002000, 0x80002000},
-	{0x80002000, 0x80006000, 0x80002000, 0x80002000},
-} };
-GOURAUD_OUTLINE ReqBgndGour2 = {
-	0xFF606060, 0xFF808080, 0xFF202020,
-	0xFF000000, 0xFF000000, 0xFF202020,
-	0xFF404040, 0xFF404040, 0xFF606060,
-};
-
-GOURAUD_FILL ReqMainGour1 = { {
-	{0x80000000, 0x80000000, 0x80108038, 0x80000000},
-	{0x80000000, 0x80000000, 0x80000000, 0x80108038},
-	{0x80108038, 0x80000000, 0x80000000, 0x80000000},
-	{0x80000000, 0x80108038, 0x80000000, 0x80000000},
-} };
-GOURAUD_OUTLINE ReqMainGour2 = {
-	0xFF000000, 0xFF000000, 0xFF000000,
-	0xFF000000, 0xFF000000, 0xFF000000,
-	0xFF000000, 0xFF000000, 0xFF000000,
-};
-
-GOURAUD_FILL ReqSelGour1 = { {
-	{0x80000000, 0x80000000, 0x8038F080, 0x80000000},
-	{0x80000000, 0x80000000, 0x80000000, 0x8038F080},
-	{0x8038F080, 0x80000000, 0x80000000, 0x80000000},
-	{0x80000000, 0x8038F080, 0x80000000, 0x80000000},
-} };
-GOURAUD_OUTLINE ReqSelGour2 = {
-	0xFF000000, 0xFFFFFFFF, 0xFF000000,
-	0xFF38F080, 0xFF000000, 0xFFFFFFFF,
-	0xFF000000, 0xFF38F080, 0xFF000000,
-};
+GOURAUD_FILL ReqBgndGour1;
+GOURAUD_OUTLINE ReqBgndGour2;
+GOURAUD_FILL ReqMainGour1;
+GOURAUD_OUTLINE ReqMainGour2;
+GOURAUD_FILL ReqSelGour1;
+GOURAUD_OUTLINE ReqSelGour2;
 
 extern int GF_GetNumSecrets(DWORD levelID);
 
@@ -92,7 +63,7 @@ extern int GF_GetNumSecrets(DWORD levelID);
 extern void SaveAssault();
 #endif // FEATURE_ASSAULT_SAVE
 
-void Init_Requester(REQUEST_INFO* req) {
+void InitRequester(REQUEST_INFO* req) {
 	req->headingText1 = NULL;
 	req->headingText2 = NULL;
 	req->headingFlags1 = 0;
@@ -612,7 +583,7 @@ void ShowGymStatsText() {
 		StatsRequester.lpItemStrings2 = (char*)SaveGameStrings2;
 		StatsRequester.itemStringLen = 50;
 
-		Init_Requester(&StatsRequester);
+		InitRequester(&StatsRequester);
 		SetRequesterHeading(&StatsRequester, GF_GameStringTable[GSI_String_BestTimes], 0, NULL, 0);
 
 		for (int i = 0; i < 10; ++i) {
@@ -663,7 +634,7 @@ void ShowStatsText(char* timeString, BOOL removeOnDeselect) {
 		StatsRequester.lpItemStrings2 = (char*)SaveGameStrings2;
 		StatsRequester.itemStringLen = 50;
 
-		Init_Requester(&StatsRequester);
+		InitRequester(&StatsRequester);
 		SetRequesterHeading(&StatsRequester, GF_LevelNamesStringTable[CurrentLevel], 0, NULL, 0);
 
 		// Time taken
@@ -784,7 +755,7 @@ void ShowEndStatsText() {
 		StatsRequester.lpItemStrings2 = (char*)SaveGameStrings2;
 		StatsRequester.itemStringLen = 50;
 
-		Init_Requester(&StatsRequester);
+		InitRequester(&StatsRequester);
 		SetRequesterHeading(&StatsRequester, GF_GameStringTable[GSI_String_FinalStatistics], 0, NULL, 0);
 
 		// Time taken
@@ -881,7 +852,7 @@ void ShowEndStatsText() {
  * Inject function
  */
 void Inject_InvText() {
-	INJECT(0x00425580, Init_Requester);
+	INJECT(0x00425580, InitRequester);
 	INJECT(0x00425610, Remove_Requester);
 	INJECT(0x004256C0, ReqItemCentreAlign);
 	INJECT(0x004256E0, ReqItemLeftAlign);

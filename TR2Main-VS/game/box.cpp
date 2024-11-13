@@ -45,12 +45,12 @@ void InitialiseCreature(short itemNumber)
 	item->pos.rotY += (GetRandomControl() - PHD_90) >> 1;
 }
 
-int CreatureActive(short itemNum)
+int CreatureActive(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 	if (item->status == ITEM_INVISIBLE)
 	{
-		if (!EnableBaddieAI(itemNum, FALSE))
+		if (!EnableBaddieAI(itemNumber, FALSE))
 			return FALSE;
 		item->status = ITEM_ACTIVE;
 	}
@@ -88,7 +88,6 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 	room = &RoomInfo[item->roomNumber];
 	item->boxNumber = GetSectorBoxXZ(item, room);
 	AI->zoneNumber = zone[item->boxNumber];
-	
 	room = &RoomInfo[enemy->roomNumber];
 	enemy->boxNumber = GetSectorBoxXZ(enemy, room);
 	AI->enemyZone = zone[enemy->boxNumber];
@@ -110,22 +109,22 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 	AI->bite = AI->ahead && enemy->hitPoints > 0 && ABS(item->pos.y - enemy->pos.y) <= 384;
 }
 
-void TargetBox(LOT_INFO* LOT, short boxNum)
+void TargetBox(LOT_INFO* LOT, short boxNumber)
 {
-	BOX_INFO* box = &Boxes[boxNum];
+	BOX_INFO* box = &Boxes[boxNumber];
 	LOT->target.x = GetRandomControl() * (((int)box->bottom - (int)box->top - 1) >> 5) + 512 + ((int)box->top * 1024);
 	LOT->target.y = LOT->fly != 0 ? box->height - 384 : box->height;
 	LOT->target.z = GetRandomControl() * (((int)box->right - (int)box->left - 1) >> 5) + 512 + ((int)box->left * 1024);
-	LOT->requiredBox = boxNum;
+	LOT->requiredBox = boxNumber;
 }
 
-int ValidBox(ITEM_INFO* item, short zoneNum, short boxNum)
+int ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber)
 {
 	CREATURE_INFO* creature = GetCreatureInfo(item);
 	short* zone = creature->LOT.fly != 0 ? FlyZones[FlipStatus] : GroundZones[2 * (creature->LOT.step >> 8) + FlipStatus];
-	if (zone[boxNum] != zoneNum)
+	if (zone[boxNumber] != zoneNumber)
 		return FALSE;
-	BOX_INFO* box = &Boxes[boxNum];
+	BOX_INFO* box = &Boxes[boxNumber];
 	if (creature->LOT.blockMask & box->overlapIndex)
 		return FALSE;
 	if (item->pos.z > ((int)box->left << WALL_SHIFT) && item->pos.z < ((int)box->right << WALL_SHIFT)
@@ -222,7 +221,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* ai, BOOL isViolent)
 		creature->LOT.requiredBox = -1;
 	}
 
-	short boxNum = 0;
+	short boxNumber = 0;
 	switch (creature->mood)
 	{
 	case MOOD_ATTACK:
@@ -234,32 +233,32 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* ai, BOOL isViolent)
 			creature->LOT.target.y += GetBestFrame(enemy)[2]; // ymin (above)
 		break;
 	case MOOD_BORED:
-		boxNum = LOT->node[creature->LOT.zoneCount * GetRandomControl() >> 15].boxNumber;
-		if (ValidBox(item, ai->zoneNumber, boxNum))
+		boxNumber = LOT->node[creature->LOT.zoneCount * GetRandomControl() >> 15].boxNumber;
+		if (ValidBox(item, ai->zoneNumber, boxNumber))
 		{
-			if (StalkBox(item, enemy, boxNum) && enemy->hitPoints > 0 && creature->enemy != NULL)
+			if (StalkBox(item, enemy, boxNumber) && enemy->hitPoints > 0 && creature->enemy != NULL)
 			{
-				TargetBox(LOT, boxNum);
+				TargetBox(LOT, boxNumber);
 				creature->mood = MOOD_STALK;
 			}
 			else if (creature->LOT.requiredBox == -1)
-				TargetBox(LOT, boxNum);
+				TargetBox(LOT, boxNumber);
 		}
 		break;
 	case MOOD_STALK:
-		boxNum = creature->LOT.requiredBox;
-		if (boxNum == -1 || !StalkBox(item, enemy, boxNum))
+		boxNumber = creature->LOT.requiredBox;
+		if (boxNumber == -1 || !StalkBox(item, enemy, boxNumber))
 		{
-			boxNum = LOT->node[creature->LOT.zoneCount * GetRandomControl() >> 15].boxNumber;
-			if (ValidBox(item, ai->zoneNumber, boxNum))
+			boxNumber = LOT->node[creature->LOT.zoneCount * GetRandomControl() >> 15].boxNumber;
+			if (ValidBox(item, ai->zoneNumber, boxNumber))
 			{
-				if (StalkBox(item, enemy, boxNum))
+				if (StalkBox(item, enemy, boxNumber))
 				{
-					TargetBox(LOT, boxNum);
+					TargetBox(LOT, boxNumber);
 				}
 				else if (creature->LOT.requiredBox == -1)
 				{
-					TargetBox(LOT, boxNum);
+					TargetBox(LOT, boxNumber);
 					if (ai->zoneNumber != ai->enemyZone)
 						creature->mood = MOOD_BORED;
 				}
@@ -267,16 +266,16 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* ai, BOOL isViolent)
 		}
 		break;
 	case MOOD_ESCAPE:
-		boxNum = LOT->node[creature->LOT.zoneCount * GetRandomControl() >> 15].boxNumber;
-		if (ValidBox(item, ai->zoneNumber, boxNum) && creature->LOT.requiredBox == -1)
+		boxNumber = LOT->node[creature->LOT.zoneCount * GetRandomControl() >> 15].boxNumber;
+		if (ValidBox(item, ai->zoneNumber, boxNumber) && creature->LOT.requiredBox == -1)
 		{
-			if (EscapeBox(item, enemy, boxNum))
+			if (EscapeBox(item, enemy, boxNumber))
 			{
-				TargetBox(LOT, boxNum);
+				TargetBox(LOT, boxNumber);
 			}
-			else if (ai->zoneNumber == ai->enemyZone && StalkBox(item, enemy, boxNum))
+			else if (ai->zoneNumber == ai->enemyZone && StalkBox(item, enemy, boxNumber))
 			{
-				TargetBox(LOT, boxNum);
+				TargetBox(LOT, boxNumber);
 				creature->mood = MOOD_STALK;
 			}
 		}
@@ -288,9 +287,9 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* ai, BOOL isViolent)
 	CalculateTarget(&creature->target, item, LOT);
 }
 
-int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNum, LOT_INFO* LOT)
+int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOT_INFO* LOT)
 {
-	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNum);
+	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 	if (floor->box == -1)
 		return TRUE;
 	BOX_INFO* box = &Boxes[floor->box];
@@ -328,6 +327,92 @@ void CreatureDie(short itemID, BOOL explode) {
 	}
 
 	CreatureDropItem(item);
+}
+
+short CreatureTurn(ITEM_INFO* item, short maximumTurn)
+{
+	CREATURE_INFO* creature = GetCreatureInfo(item);
+	if (creature == NULL)
+		return 0;
+	if (item->speed == 0 || maximumTurn == 0)
+		return 0;
+
+	int x = creature->target.x - item->pos.x;
+	int z = creature->target.z - item->pos.z;
+	int range = (item->speed << W2V_SHIFT) / maximumTurn;
+	short angle = phd_atan(z, x) - item->pos.rotY;
+	bool in_range = SQR(x) + SQR(z) < SQR(range);
+	if ((angle > ANGLE(90) || angle < ANGLE(90)) && in_range)
+		maximumTurn >>= 1;
+
+	if (angle > maximumTurn)
+		angle = maximumTurn;
+	else if (angle < -maximumTurn)
+		angle = -maximumTurn;
+
+	item->pos.rotY += angle;
+	return angle;
+}
+
+int CreatureVault(short itemNumber, short angle, int vault, int shift)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	int x = item->pos.x >> WALL_SHIFT;
+	int y = item->pos.y;
+	int z = item->pos.z >> WALL_SHIFT;
+	short roomNumber = item->roomNumber;
+
+	CreatureAnimation(itemNumber, angle, 0);
+
+	if (item->floor > y + (CLICK_SIZE * 7 / 2))
+		vault = -4;
+	else if (item->pos.y > y - (CLICK_SIZE * 3 / 2))
+		return 0;
+	else if (item->pos.y > y - (CLICK_SIZE * 5 / 2))
+		vault = 2;
+	else if (item->pos.y > y - (CLICK_SIZE * 7 / 2))
+		vault = 3;
+	else
+		vault = 4;
+
+	int xFloor = item->pos.x >> WALL_SHIFT;
+	int zFloor = item->pos.z >> WALL_SHIFT;
+	if (z == zFloor)
+	{
+		if (x == xFloor)
+			return 0;
+
+		if (x < xFloor)
+		{
+			item->pos.x = (xFloor << WALL_SHIFT) - shift;
+			item->pos.rotY = ANGLE(90);
+		}
+		else
+		{
+			item->pos.x = (xFloor << WALL_SHIFT) - shift;
+			item->pos.rotY = -ANGLE(90);
+		}
+	}
+	else if (x == xFloor)
+	{
+		if (z < zFloor)
+		{
+			item->pos.z = (zFloor << WALL_SHIFT) - shift;
+			item->pos.rotY = ANGLE(0);
+		}
+		else
+		{
+			item->pos.z = (z << WALL_SHIFT) - shift;
+			item->pos.rotY = -ANGLE(180);
+		}
+	}
+
+	item->pos.y = y;
+	item->floor = y;
+	if (roomNumber != item->roomNumber)
+		ItemNewRoom(itemNumber, roomNumber);
+
+	return vault;
 }
 
 void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillState) {
@@ -527,14 +612,14 @@ void Inject_Box() {
 	INJECT(0x0040F3B0, BadFloor);
 	INJECT(0x0040F440, CreatureDie);
 	//INJECT(0x0040F500, CreatureAnimation);
-	//INJECT(0x0040FDD0, CreatureTurn);
+	INJECT(0x0040FDD0, CreatureTurn);
 	//INJECT(0x0040FEB0, CreatureTilt);
 	//INJECT(0x0040FEF0, CreatureHead);
 	//INJECT(0x0040FF40, CreatureNeck);
 	//INJECT(0x0040FF90, CreatureFloat);
 	//INJECT(0x00410040, CreatureUnderwater);
 	//INJECT(0x00410090, CreatureEffect);
-	//INJECT(0x004100F0, CreatureVault);
+	INJECT(0x004100F0, CreatureVault);
 	INJECT(0x00410230, CreatureKill);
 	INJECT(0x004103A0, GetBaddieTarget);
 }

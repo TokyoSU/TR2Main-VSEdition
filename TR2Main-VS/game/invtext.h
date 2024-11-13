@@ -35,7 +35,7 @@
 /*
  * Function list
  */
-void Init_Requester(REQUEST_INFO* req); // 0x00425580
+void InitRequester(REQUEST_INFO* req); // 0x00425580
 void Remove_Requester(REQUEST_INFO* req); // 0x00425610
 void ReqItemCentreAlign(REQUEST_INFO* req, TEXT_STR_INFO* textInfo); // 0x004256C0
 void ReqItemLeftAlign(REQUEST_INFO* req, TEXT_STR_INFO* textInfo); // 0x004256E0

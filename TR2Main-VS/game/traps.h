@@ -45,13 +45,13 @@ void RollingBallControl(short itemID); // 0x00441C20
 void RollingBallCollision(short itemID, ITEM_INFO* laraItem, COLL_INFO* coll); // 0x00441F70
 #define SpikeCollision ((void(__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x004421C0)
 #define TrapDoorControl ((void(__cdecl*)(short)) 0x00442320)
-#define TrapDoorFloor ((void(__cdecl*)(ITEM_INFO*,int,int,int,short*)) 0x00442370)
-#define TrapDoorCeiling ((void(__cdecl*)(ITEM_INFO*,int,int,int,short*)) 0x004423B0)
+#define TrapDoorFloor ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00442370)
+#define TrapDoorCeiling ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x004423B0)
 #define OnTrapDoor ((int(__cdecl*)(ITEM_INFO*,int,int)) 0x004423F0)
 void Pendulum(short itemID); // 0x004424A0
 #define FallingBlock ((void(__cdecl*)(short)) 0x004425B0)
-#define FallingBlockFloor ((void(__cdecl*)(ITEM_INFO*,int,int,int,short*)) 0x004426C0)
-#define FallingBlockCeiling ((void(__cdecl*)(ITEM_INFO*,int,int,int,short*)) 0x00442700)
+#define FallingBlockFloor ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x004426C0)
+#define FallingBlockCeiling ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00442700)
 void TeethTrap(short itemID); // 0x00442750
 void FallingCeiling(short itemID); // 0x00442810
 void DartEmitterControl(short itemID); // 0x004428F0
@@ -63,5 +63,8 @@ void LaraBurn(); // 0x00442DE0
 void LavaBurn(ITEM_INFO* item); // 0x00442E30
 void LavaSpray(short itemNum); // 0x00442F20
 void ControlLavaBlob(short fxNum); // 0x00442FF0
+void InitializeCandleFlameEmitter(short itemNum);
+void CandleFlameEmitterControl(short itemNum);
+void CandleEmitterSpriteControl(short fxNum);
 
 #endif // TRAPS_H_INCLUDED

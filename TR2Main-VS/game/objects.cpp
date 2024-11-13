@@ -214,7 +214,7 @@ void LiftControl(short itemID) {
 		ItemNewRoom(itemID, roomID);
 }
 
-void LiftFloorCeiling(ITEM_INFO* item, int x, int y, int z, short* floor, short* ceiling) {
+void LiftFloorCeiling(ITEM_INFO* item, int x, int y, int z, int* floor, int* ceiling) {
 	int liftX, liftZ, laraX, laraZ;
 	BOOL inside;
 
@@ -277,15 +277,15 @@ void LiftFloorCeiling(ITEM_INFO* item, int x, int y, int z, short* floor, short*
 	}
 }
 
-void LiftFloor(ITEM_INFO* item, int x, int y, int z, short* height) {
-	short floor, ceiling;
+void LiftFloor(ITEM_INFO* item, int x, int y, int z, int* height) {
+	int floor, ceiling;
 	LiftFloorCeiling(item, x, y, z, &floor, &ceiling);
 	if (floor < *height)
 		*height = floor;
 }
 
-void LiftCeiling(ITEM_INFO* item, int x, int y, int z, short* height) {
-	short floor, ceiling;
+void LiftCeiling(ITEM_INFO* item, int x, int y, int z, int* height) {
+	int floor, ceiling;
 	LiftFloorCeiling(item, x, y, z, &floor, &ceiling);
 	if (ceiling > *height)
 		*height = ceiling;

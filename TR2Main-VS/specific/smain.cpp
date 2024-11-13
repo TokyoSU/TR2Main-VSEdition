@@ -43,8 +43,12 @@
 #include "specific/setupdlg.h"
 #include "specific/sndpc.h"
 #include "specific/winmain.h"
-#include "modding/background_new.h"
 #include "global/vars.h"
+
+#if defined(FEATURE_BACKGROUND_IMPROVED)
+#include "modding/background_new.h"
+#include "modding/mod_utils.h"
+#endif
 
 #ifdef FEATURE_HUD_IMPROVED
 extern DWORD DemoTextMode;
@@ -298,20 +302,20 @@ short TitleSequence() {
 	int res = -1;
 	if (*PictureSuffix) {
 		char fname[256];
-		snprintf(fname, sizeof(fname), "data\\title%s.pcx", PictureSuffix);
+		snprintf(fname, sizeof(fname), Mod.titleLoadingPixLanguage.c_str(), PictureSuffix);
 		res = BGND2_LoadPicture(fname, TRUE, FALSE);
 	}
 	if (res) {
-		res = BGND2_LoadPicture("data\\title.pcx", TRUE, FALSE);
+		res = BGND2_LoadPicture(Mod.titleLoadingPix.c_str(), TRUE, FALSE);
 	}
 	if (!res) {
 		// NOTE: title menu fade-in was absent in the original game
 		BGND2_ShowPicture(15, 0, 0, 0, FALSE);
 	}
 #elif defined(FEATURE_GOLD)
-	S_DisplayPicture(IsGold() ? "data\\titleg.pcx" : "data\\title.pcx", TRUE);
+	S_DisplayPicture(IsGold() ? Mod.titleLoadingPixGold.c_str() : Mod.titleLoadingPix.c_str(), TRUE);
 #else // FEATURE_BACKGROUND_IMPROVED
-	S_DisplayPicture("data\\title.pcx", TRUE);
+	S_DisplayPicture(Mod.titleLoadingPix.c_str(), TRUE);
 #endif // FEATURE_BACKGROUND_IMPROVED
 
 	if (GF_GameFlow.titleTrack != 0)

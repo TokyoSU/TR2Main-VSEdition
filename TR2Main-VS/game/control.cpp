@@ -559,7 +559,7 @@ void TestTriggers(short* data, BOOL isHeavy)
 			{
 				if (CHK_ANY(flags, IFL_ONESHOT))
 					FlipMaps[value] |= IFL_ONESHOT;
-				if (FlipStatus == 0)
+				if (!FlipStatus)
 					flip = 1;
 			}
 			else if (FlipStatus)

@@ -24,6 +24,78 @@
 #include "specific/init.h"
 #include "global/vars.h"
 
+#ifdef FEATURE_GOLD
+extern bool IsGold();
+#endif
+
+void InitialiseSlot(short itemNumber, int baddieSlotID)
+{
+    CREATURE_INFO* creature = &BaddiesSlots[baddieSlotID];
+    ITEM_INFO* item = &Items[itemNumber];
+    if (itemNumber == Lara.item_number)
+        Lara.creature = &BaddiesSlots[baddieSlotID];
+    else
+        item->data = creature;
+    creature->itemID = itemNumber;
+    creature->mood = MOOD_BORED;
+    creature->neckRotation = 0;
+    creature->headRotation = 0;
+    creature->maximumTurn = ANGLE(1);
+    creature->flags = 0;
+    creature->enemy = NULL;
+    creature->LOT.step = CLICK_SIZE;
+    creature->LOT.drop = -(CLICK_SIZE * 2);
+    creature->LOT.blockMask = 0x4000;
+    creature->LOT.fly = 0;
+    switch (item->objectID)
+    {
+    case ID_LARA:
+        creature->LOT.step = WALL_SIZE * 20;
+        creature->LOT.drop = -(WALL_SIZE * 20);
+        creature->LOT.fly = 256;
+        break;
+    case ID_SHARK:
+    case ID_BARRACUDA:
+    case ID_DIVER:
+    case ID_JELLY:
+    case ID_CROW:
+    case ID_EAGLE:
+        creature->LOT.step = WALL_SIZE * 20;
+        creature->LOT.drop = -(WALL_SIZE * 20);
+        creature->LOT.fly = 16;
+        if (item->objectID == ID_SHARK)
+            creature->LOT.blockMask = 0x8000;
+        break;
+    case ID_WORKER3:
+    case ID_WORKER4:
+    case ID_YETI:
+        creature->LOT.step = WALL_SIZE * 4;
+        creature->LOT.drop = -(WALL_SIZE * 4);
+        break;
+    case ID_SPIDER_or_WOLF:
+#ifdef FEATURE_GOLD
+        if (IsGold()) // NOTE: Wolf don't climb or drop 4 clicks !
+            break;
+#endif
+        creature->LOT.step = CLICK_SIZE / 2;
+        creature->LOT.drop = -(WALL_SIZE * 4);
+        break;
+    case ID_SKIDOO_ARMED:
+        creature->LOT.step = CLICK_SIZE / 2;
+        creature->LOT.drop = -(WALL_SIZE * 4);
+        break;
+    case ID_DINO:
+        creature->LOT.blockMask = 0x8000;
+        break;
+    default:
+        break;
+    }
+    ClearLOT(&creature->LOT);
+    if (itemNumber != Lara.item_number)
+        CreateZone(item);
+    ++BaddiesSlotsCount;
+}
+
  /*
   * Inject function
   */
@@ -31,7 +103,7 @@ void Inject_Lot() {
 	//INJECT(0x00432B10, InitialiseLOTarray);
 	//INJECT(0x00432B70, DisableBaddieAI);
 	//INJECT(0x00432BC0, EnableBaddieAI);
-	//INJECT(0x00432D70, InitialiseSlot);
+	INJECT(0x00432D70, InitialiseSlot);
 	//INJECT(0x00432F80, CreateZone);
 	//INJECT(0x00433040, ClearLOT);
 }

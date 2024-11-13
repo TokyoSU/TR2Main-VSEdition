@@ -70,7 +70,7 @@ static int DisplayPauseRequester(const char* header, const char* option1, const 
 		StatsRequester.lpItemStrings2 = (char*)SaveGameStrings2;
 		StatsRequester.itemStringLen = 50;
 
-		Init_Requester(&StatsRequester);
+		InitRequester(&StatsRequester);
 		SetRequesterHeading(&StatsRequester, header, 0, NULL, 0);
 
 		memset(SaveGameStrings1, 0, sizeof(SaveGameStrings1));

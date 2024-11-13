@@ -182,10 +182,10 @@ void ins_room_sprite(ROOM_SPRITE* ptrObj, int spriteCount) {
 		if ((vbuf->clip & 0x80) == 0) {
 			sprite = &PhdSpriteInfo[ptrObj->spriteIndex];
 			zp = (double)vbuf->zv / (double)PhdPersp;
-			x1 = (int)((vbuf->xv + (double)((int)sprite->x1 << W2V_SHIFT)) / zp) + PhdWinCenterX;
-			y1 = (int)((vbuf->yv + (double)((int)sprite->y1 << W2V_SHIFT)) / zp) + PhdWinCenterY;
-			x2 = (int)((vbuf->xv + (double)((int)sprite->x2 << W2V_SHIFT)) / zp) + PhdWinCenterX;
-			y2 = (int)((vbuf->yv + (double)((int)sprite->y2 << W2V_SHIFT)) / zp) + PhdWinCenterY;
+			x1 = (int)((vbuf->xv + (double)(((int)sprite->x1) << W2V_SHIFT)) / zp) + PhdWinCenterX;
+			y1 = (int)((vbuf->yv + (double)(((int)sprite->y1) << W2V_SHIFT)) / zp) + PhdWinCenterY;
+			x2 = (int)((vbuf->xv + (double)(((int)sprite->x2) << W2V_SHIFT)) / zp) + PhdWinCenterX;
+			y2 = (int)((vbuf->yv + (double)(((int)sprite->y2) << W2V_SHIFT)) / zp) + PhdWinCenterY;
 			if (x2 >= PhdWinLeft && y2 >= PhdWinTop && x1 < PhdWinRight && y1 < PhdWinBottom) {
 #ifdef FEATURE_VIDEOFX_IMPROVED
 				ins_sprite((int)vbuf->zv, x1, y1, x2, y2, ptrObj->spriteIndex, vbuf->g, NULL);

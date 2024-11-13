@@ -1215,6 +1215,15 @@ void TrapObjects()
 #else
 	obj->semi_transparent = TRUE;
 #endif
+
+	obj = &Objects[ID_TRIPLE_CANDLE];
+	obj->initialise = InitializeCandleFlameEmitter;
+	obj->control = CandleFlameEmitterControl;
+	obj->drawRoutine = DrawDummyItem;
+
+	obj = &Objects[ID_CANDLE_SPRITE];
+	obj->control = CandleEmitterSpriteControl;
+	obj->semi_transparent = TRUE;
 }
 
 void ObjectObjects()

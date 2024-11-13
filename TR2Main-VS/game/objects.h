@@ -49,21 +49,21 @@ void OpenNearestDoor();
 #define InitialiseDoor ((void(__cdecl*)(short)) 0x00435190)
 #define DoorControl ((void(__cdecl*)(short)) 0x00435570)
 //0x00435640:		OnDrawBridge
-#define DrawBridgeFloor ((void(__cdecl*)(ITEM_INFO*,int,int,int,short*)) 0x00435700)
-#define DrawBridgeCeiling ((void(__cdecl*)(ITEM_INFO*,int,int,int,short*)) 0x00435740)
+#define DrawBridgeFloor ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00435700)
+#define DrawBridgeCeiling ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00435740)
 #define DrawBridgeCollision ((void(__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x00435780)
 void InitialiseLift(short itemID); // 0x004357B0
 void LiftControl(short itemID); // 0x004357F0
-void LiftFloorCeiling(ITEM_INFO* item, int x, int y, int z, short* floor, short* ceiling); // 0x004358D0
-void LiftFloor(ITEM_INFO* item, int x, int y, int z, short* height); // 0x00435A50
-void LiftCeiling(ITEM_INFO* item, int x, int y, int z, short* height); // 0x00435A90
-#define BridgeFlatFloor ((void(__cdecl*)(ITEM_INFO*,int,int,int,short*)) 0x00435AD0)
-#define BridgeFlatCeiling ((void(__cdecl*)(ITEM_INFO*,int,int,int,short*)) 0x00435AF0)
+void LiftFloorCeiling(ITEM_INFO* item, int x, int y, int z, int* floor, int* ceiling); // 0x004358D0
+void LiftFloor(ITEM_INFO* item, int x, int y, int z, int* height); // 0x00435A50
+void LiftCeiling(ITEM_INFO* item, int x, int y, int z, int* height); // 0x00435A90
+#define BridgeFlatFloor ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00435AD0)
+#define BridgeFlatCeiling ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00435AF0)
 //0x00435B10:		GetOffset
-#define BridgeTilt1Floor ((void(__cdecl*)(ITEM_INFO*,int,int,int,short*)) 0x00435B50)
-#define BridgeTilt1Ceiling ((void(__cdecl*)(ITEM_INFO*,int,int,int,short*)) 0x00435B80)
-#define BridgeTilt2Floor ((void(__cdecl*)(ITEM_INFO*,int,int,int,short*)) 0x00435BC0)
-#define BridgeTilt2Ceiling ((void(__cdecl*)(ITEM_INFO*,int,int,int,short*)) 0x00435BF0)
+#define BridgeTilt1Floor ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00435B50)
+#define BridgeTilt1Ceiling ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00435B80)
+#define BridgeTilt2Floor ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00435BC0)
+#define BridgeTilt2Ceiling ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00435BF0)
 #define CopterControl ((void(__cdecl*)(short)) 0x00435C30)
 #define GeneralControl ((void(__cdecl*)(short)) 0x00435D40)
 #define DetonatorControl ((void(__cdecl*)(short)) 0x00435E20)

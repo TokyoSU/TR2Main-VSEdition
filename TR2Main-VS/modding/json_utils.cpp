@@ -28,7 +28,7 @@ double GetValueByNameDouble(Value& data, LPCSTR name, double defaultValue)
     return defaultValue;
 }
 
-D3DCOLOR GetColorByName(Value& data, LPCSTR name, D3DCOLOR defaultValue)
+D3DCOLOR GetColorRGBByName(Value& data, LPCSTR name, D3DCOLOR defaultValue)
 {
     if (data.HasMember(name) && data[name].GetStringLength() == 6)
         return strtol(data[name].GetString(), NULL, 16);
@@ -42,7 +42,7 @@ bool GetValueByNameBool(Value& data, LPCSTR name, bool defaultValue)
     return defaultValue;
 }
 
-LPCSTR GetValueByNameString(Value& data, LPCSTR name, SizeType* destStringSize, LPCSTR defaultValue)
+std::string GetValueByNameString(Value& data, LPCSTR name, SizeType* destStringSize, std::string defaultValue)
 {
     if (data.HasMember(name))
     {

@@ -32,16 +32,16 @@ void ModConfig::Initialize() {
 }
 
 void ModConfig::Release() {
-    if (semitrans.animtex != NULL) {
-        free(semitrans.animtex);
-        semitrans.animtex = NULL;
+    if (Mod.semitrans.animtex != NULL) {
+        free(Mod.semitrans.animtex);
+        Mod.semitrans.animtex = NULL;
     }
-    FreePolyfilterNodes(&semitrans.rooms);
-    FreePolyfilterNodes(&semitrans.statics);
-    FreePolyfilterNodes(&reflect.statics);
-    for (DWORD i = 0; i < ARRAY_SIZE(semitrans.objects); ++i) {
-        FreePolyfilterNodes(&semitrans.objects[i]);
-        FreePolyfilterNodes(&reflect.objects[i]);
+    FreePolyfilterNodes(&Mod.semitrans.rooms);
+    FreePolyfilterNodes(&Mod.semitrans.statics);
+    FreePolyfilterNodes(&Mod.reflect.statics);
+    for (DWORD i = 0; i < ARRAY_SIZE(Mod.semitrans.objects); ++i) {
+        FreePolyfilterNodes(&Mod.semitrans.objects[i]);
+        FreePolyfilterNodes(&Mod.reflect.objects[i]);
     }
     ZeroMemory(&Mod, sizeof(Mod));
 }
@@ -82,14 +82,14 @@ bool ModConfig::LoadJson(LPCSTR filePath) {
         ParseDefaultConfiguration(doc["default"]);
     if (doc.HasMember("levels"))
         ParseLevelConfiguration(doc["levels"], levelName);
-    return isLoaded;
+    return Mod.isLoaded;
 }
 
-bool ModConfig::GetCustomItemFromObjectID(int objectID, CUST_INVENTORY_ITEM& invItem)
+bool GetCustomItemFromObjectID(int objectID, CUST_INVENTORY_ITEM& invItem)
 {
-    for (int i = 0; i < ARRAY_SIZE(invItemList); i++)
+    for (int i = 0; i < ARRAY_SIZE(Mod.invItemList); i++)
     {
-        auto& foundItem = invItemList[i];
+        auto& foundItem = Mod.invItemList[i];
         if (foundItem.objectID != -1 && foundItem.objectID == objectID)
         {
             invItem = foundItem;
@@ -99,7 +99,7 @@ bool ModConfig::GetCustomItemFromObjectID(int objectID, CUST_INVENTORY_ITEM& inv
     return false;
 }
 
-void ModConfig::LoadHealthBarConfig(Value& data, BAR_CONFIG* result) {
+void LoadHealthBarConfig(Value& data, BAR_CONFIG* result) {
     result->isCentered = GetValueByNameBool(data, "isCentered", false);
     result->basedOnEnemyHealth = GetValueByNameBool(data, "basedOnEnemyHealth", true);
     result->PC_xpos = GetValueByNameInt<int>(data, "PC_x", 8);
@@ -110,27 +110,27 @@ void ModConfig::LoadHealthBarConfig(Value& data, BAR_CONFIG* result) {
     result->PSX_ypos = GetValueByNameInt<int>(data, "PSX_y", 18);
     result->CENTER_xpos = GetValueByNameInt<int>(data, "CENTER_x", 0);
     result->CENTER_ypos = GetValueByNameInt<int>(data, "CENTER_y", 0);
-    result->PSX_leftcolor[0] = GetColorByName(data, "PSX_leftcolor0", RGB_MAKE(0x68, 0, 0));
-    result->PSX_leftcolor[1] = GetColorByName(data, "PSX_leftcolor1", RGB_MAKE(0x70, 0, 0));
-    result->PSX_leftcolor[2] = GetColorByName(data, "PSX_leftcolor2", RGB_MAKE(0x98, 0, 0));
-    result->PSX_leftcolor[3] = GetColorByName(data, "PSX_leftcolor3", RGB_MAKE(0xD8, 0, 0));
-    result->PSX_leftcolor[4] = GetColorByName(data, "PSX_leftcolor4", RGB_MAKE(0xE4, 0, 0));
-    result->PSX_leftcolor[5] = GetColorByName(data, "PSX_leftcolor5", RGB_MAKE(0xF0, 0, 0));
-    result->PSX_rightcolor[0] = GetColorByName(data, "PSX_rightcolor0", RGB_MAKE(0, 0x44, 0));
-    result->PSX_rightcolor[1] = GetColorByName(data, "PSX_rightcolor1", RGB_MAKE(0, 0x74, 0));
-    result->PSX_rightcolor[2] = GetColorByName(data, "PSX_rightcolor2", RGB_MAKE(0, 0x9C, 0));
-    result->PSX_rightcolor[3] = GetColorByName(data, "PSX_rightcolor3", RGB_MAKE(0, 0xD4, 0));
-    result->PSX_rightcolor[4] = GetColorByName(data, "PSX_rightcolor4", RGB_MAKE(0, 0xE8, 0));
-    result->PSX_rightcolor[5] = GetColorByName(data, "PSX_rightcolor5", RGB_MAKE(0, 0xFC, 0));
-    result->PSX_framecolor[0] = GetColorByName(data, "PSX_framecolor0", RGB_MAKE(0, 0, 0));
-    result->PSX_framecolor[1] = GetColorByName(data, "PSX_framecolor1", RGB_MAKE(0, 0, 0));
-    result->PSX_framecolor[2] = GetColorByName(data, "PSX_framecolor2", RGB_MAKE(0x50, 0x84, 0x84));
-    result->PSX_framecolor[3] = GetColorByName(data, "PSX_framecolor3", RGB_MAKE(0xA0, 0xA0, 0xA0));
-    result->PSX_framecolor[4] = GetColorByName(data, "PSX_framecolor4", RGB_MAKE(0x28, 0x42, 0x42));
-    result->PSX_framecolor[5] = GetColorByName(data, "PSX_framecolor5", RGB_MAKE(0x50, 0x50, 0x50));
+    result->PSX_leftcolor[0] = GetColorRGBByName(data, "PSX_leftcolor0", RGB_MAKE(0x68, 0, 0));
+    result->PSX_leftcolor[1] = GetColorRGBByName(data, "PSX_leftcolor1", RGB_MAKE(0x70, 0, 0));
+    result->PSX_leftcolor[2] = GetColorRGBByName(data, "PSX_leftcolor2", RGB_MAKE(0x98, 0, 0));
+    result->PSX_leftcolor[3] = GetColorRGBByName(data, "PSX_leftcolor3", RGB_MAKE(0xD8, 0, 0));
+    result->PSX_leftcolor[4] = GetColorRGBByName(data, "PSX_leftcolor4", RGB_MAKE(0xE4, 0, 0));
+    result->PSX_leftcolor[5] = GetColorRGBByName(data, "PSX_leftcolor5", RGB_MAKE(0xF0, 0, 0));
+    result->PSX_rightcolor[0] = GetColorRGBByName(data, "PSX_rightcolor0", RGB_MAKE(0, 0x44, 0));
+    result->PSX_rightcolor[1] = GetColorRGBByName(data, "PSX_rightcolor1", RGB_MAKE(0, 0x74, 0));
+    result->PSX_rightcolor[2] = GetColorRGBByName(data, "PSX_rightcolor2", RGB_MAKE(0, 0x9C, 0));
+    result->PSX_rightcolor[3] = GetColorRGBByName(data, "PSX_rightcolor3", RGB_MAKE(0, 0xD4, 0));
+    result->PSX_rightcolor[4] = GetColorRGBByName(data, "PSX_rightcolor4", RGB_MAKE(0, 0xE8, 0));
+    result->PSX_rightcolor[5] = GetColorRGBByName(data, "PSX_rightcolor5", RGB_MAKE(0, 0xFC, 0));
+    result->PSX_framecolor[0] = GetColorRGBByName(data, "PSX_framecolor0", RGB_MAKE(0, 0, 0));
+    result->PSX_framecolor[1] = GetColorRGBByName(data, "PSX_framecolor1", RGB_MAKE(0, 0, 0));
+    result->PSX_framecolor[2] = GetColorRGBByName(data, "PSX_framecolor2", RGB_MAKE(0x50, 0x84, 0x84));
+    result->PSX_framecolor[3] = GetColorRGBByName(data, "PSX_framecolor3", RGB_MAKE(0xA0, 0xA0, 0xA0));
+    result->PSX_framecolor[4] = GetColorRGBByName(data, "PSX_framecolor4", RGB_MAKE(0x28, 0x42, 0x42));
+    result->PSX_framecolor[5] = GetColorRGBByName(data, "PSX_framecolor5", RGB_MAKE(0x50, 0x50, 0x50));
 }
 
-void ModConfig::LoadAirBarConfig(Value& data, BAR_CONFIG* result) {
+void LoadAirBarConfig(Value& data, BAR_CONFIG* result) {
     result->isCentered = GetValueByNameBool(data, "is_centered", false);
     result->basedOnEnemyHealth = false;
     result->PC_xpos = GetValueByNameInt<int>(data, "PC_x", 8);
@@ -141,27 +141,27 @@ void ModConfig::LoadAirBarConfig(Value& data, BAR_CONFIG* result) {
     result->PSX_ypos = GetValueByNameInt<int>(data, "PSX_y", 18);
     result->CENTER_xpos = GetValueByNameInt<int>(data, "CENTER_x", 0);
     result->CENTER_ypos = GetValueByNameInt<int>(data, "CENTER_y", 0);
-    result->PSX_leftcolor[0] = GetColorByName(data, "PSX_leftcolor0", RGB_MAKE(0, 0x40, 0x54));
-    result->PSX_leftcolor[1] = GetColorByName(data, "PSX_leftcolor1", RGB_MAKE(0, 0x50, 0x64));
-    result->PSX_leftcolor[2] = GetColorByName(data, "PSX_leftcolor2", RGB_MAKE(0, 0x68, 0x74));
-    result->PSX_leftcolor[3] = GetColorByName(data, "PSX_leftcolor3", RGB_MAKE(0, 0x78, 0x84));
-    result->PSX_leftcolor[4] = GetColorByName(data, "PSX_leftcolor4", RGB_MAKE(0, 0x84, 0x8E));
-    result->PSX_leftcolor[5] = GetColorByName(data, "PSX_leftcolor5", RGB_MAKE(0, 0x90, 0x98));
-    result->PSX_rightcolor[0] = GetColorByName(data, "PSX_rightcolor0", RGB_MAKE(0, 0x40, 0));
-    result->PSX_rightcolor[1] = GetColorByName(data, "PSX_rightcolor1", RGB_MAKE(0, 0x50, 0));
-    result->PSX_rightcolor[2] = GetColorByName(data, "PSX_rightcolor2", RGB_MAKE(0, 0x68, 0));
-    result->PSX_rightcolor[3] = GetColorByName(data, "PSX_rightcolor3", RGB_MAKE(0, 0x78, 0));
-    result->PSX_rightcolor[4] = GetColorByName(data, "PSX_rightcolor4", RGB_MAKE(0, 0x84, 0));
-    result->PSX_rightcolor[5] = GetColorByName(data, "PSX_rightcolor5", RGB_MAKE(0, 0x90, 0));
-    result->PSX_framecolor[0] = GetColorByName(data, "PSX_framecolor0", RGB_MAKE(0, 0, 0));
-    result->PSX_framecolor[1] = GetColorByName(data, "PSX_framecolor1", RGB_MAKE(0, 0, 0));
-    result->PSX_framecolor[2] = GetColorByName(data, "PSX_framecolor2", RGB_MAKE(0x50, 0x84, 0x84));
-    result->PSX_framecolor[3] = GetColorByName(data, "PSX_framecolor3", RGB_MAKE(0xA0, 0xA0, 0xA0));
-    result->PSX_framecolor[4] = GetColorByName(data, "PSX_framecolor4", RGB_MAKE(0x28, 0x42, 0x42));
-    result->PSX_framecolor[5] = GetColorByName(data, "PSX_framecolor5", RGB_MAKE(0x50, 0x50, 0x50));
+    result->PSX_leftcolor[0] = GetColorRGBByName(data, "PSX_leftcolor0", RGB_MAKE(0, 0x40, 0x54));
+    result->PSX_leftcolor[1] = GetColorRGBByName(data, "PSX_leftcolor1", RGB_MAKE(0, 0x50, 0x64));
+    result->PSX_leftcolor[2] = GetColorRGBByName(data, "PSX_leftcolor2", RGB_MAKE(0, 0x68, 0x74));
+    result->PSX_leftcolor[3] = GetColorRGBByName(data, "PSX_leftcolor3", RGB_MAKE(0, 0x78, 0x84));
+    result->PSX_leftcolor[4] = GetColorRGBByName(data, "PSX_leftcolor4", RGB_MAKE(0, 0x84, 0x8E));
+    result->PSX_leftcolor[5] = GetColorRGBByName(data, "PSX_leftcolor5", RGB_MAKE(0, 0x90, 0x98));
+    result->PSX_rightcolor[0] = GetColorRGBByName(data, "PSX_rightcolor0", RGB_MAKE(0, 0x40, 0));
+    result->PSX_rightcolor[1] = GetColorRGBByName(data, "PSX_rightcolor1", RGB_MAKE(0, 0x50, 0));
+    result->PSX_rightcolor[2] = GetColorRGBByName(data, "PSX_rightcolor2", RGB_MAKE(0, 0x68, 0));
+    result->PSX_rightcolor[3] = GetColorRGBByName(data, "PSX_rightcolor3", RGB_MAKE(0, 0x78, 0));
+    result->PSX_rightcolor[4] = GetColorRGBByName(data, "PSX_rightcolor4", RGB_MAKE(0, 0x84, 0));
+    result->PSX_rightcolor[5] = GetColorRGBByName(data, "PSX_rightcolor5", RGB_MAKE(0, 0x90, 0));
+    result->PSX_framecolor[0] = GetColorRGBByName(data, "PSX_framecolor0", RGB_MAKE(0, 0, 0));
+    result->PSX_framecolor[1] = GetColorRGBByName(data, "PSX_framecolor1", RGB_MAKE(0, 0, 0));
+    result->PSX_framecolor[2] = GetColorRGBByName(data, "PSX_framecolor2", RGB_MAKE(0x50, 0x84, 0x84));
+    result->PSX_framecolor[3] = GetColorRGBByName(data, "PSX_framecolor3", RGB_MAKE(0xA0, 0xA0, 0xA0));
+    result->PSX_framecolor[4] = GetColorRGBByName(data, "PSX_framecolor4", RGB_MAKE(0x28, 0x42, 0x42));
+    result->PSX_framecolor[5] = GetColorRGBByName(data, "PSX_framecolor5", RGB_MAKE(0x50, 0x50, 0x50));
 }
 
-void ModConfig::LoadCustomInventoryItems(Value& data)
+void LoadCustomInventoryItems(Value& data)
 {
     Value& inventoryItemList = data.GetArray();
     if (!inventoryItemList.IsArray())
@@ -182,7 +182,7 @@ void ModConfig::LoadCustomInventoryItems(Value& data)
     {
         SizeType destStringSize = 0;
         auto& invItem = inventoryItemList[i];
-        auto& newItemCust = invItemList[i];
+        auto& newItemCust = Mod.invItemList[i];
         int objectID = GetValueByNameInt(invItem, "object_id", -1);
         if (objectID < 0)
         {
@@ -216,7 +216,7 @@ void ModConfig::LoadCustomInventoryItems(Value& data)
             auto* item = Inv_GetItemFromIndex(index);
             if (item == nullptr)
                 continue;
-            if (Mod.GetCustomItemFromObjectID((int)Inv_GetItemOption((GAME_OBJECT_ID)item->objectID), invItem))
+            if (GetCustomItemFromObjectID((int)Inv_GetItemOption((GAME_OBJECT_ID)item->objectID), invItem))
             {
                 item->xRotSel = invItem.xRotSel;
                 item->xRotPtSel = invItem.xRotPtSel;
@@ -229,80 +229,75 @@ void ModConfig::LoadCustomInventoryItems(Value& data)
     }
 }
 
-void ModConfig::LoadLevelConfig(Value& data) {
-    SizeType pictureStrSize = 0;
-    const char* pictureName = GetValueByNameString(data, "picture", &pictureStrSize, NULL);
-    if (pictureStrSize > 0)
-    {
-        snprintf(loadingPix, sizeof(loadingPix), "data\\%.*s.pcx", pictureStrSize, pictureName);
-        loadingPixFound = true;
-    }
+void LoadLevelConfig(Value& data) {
+    SizeType size = 0;
 
-    waterColor = GetColorByName(data, "watercolor", RGB_MAKE(255, 255, 255));
-    isBarefoot = GetValueByNameBool(data, "barefoot", false);
+    Mod.levelLoadingPix = GetValueByNameString(data, "picture", &size, "");
+    Mod.waterColor = GetColorRGBByName(data, "watercolor", RGB_MAKE(255, 255, 255));
+    Mod.isBarefoot = GetValueByNameBool(data, "barefoot", false);
 
     // Reset the enemyHealth structure to 1 hp to avoid them dying when triggered !
-    memset(&enemyHealth, 1, sizeof(enemyHealth));
-    enemyHealth.dog = GetValueByNameInt<short>(data, "dogHealth", 10);
-    enemyHealth.mouse = GetValueByNameInt<short>(data, "mouseHealth", 4);
-    enemyHealth.cult1 = GetValueByNameInt<short>(data, "cult1Health", 25);
-    enemyHealth.cult1A = GetValueByNameInt<short>(data, "cult1AHealth", 25);
-    enemyHealth.cult1B = GetValueByNameInt<short>(data, "cult1BHealth", 25);
-    enemyHealth.cult2 = GetValueByNameInt<short>(data, "cult2Health", 60);
-    enemyHealth.shark = GetValueByNameInt<short>(data, "sharkHealth", 30);
-    enemyHealth.tiger = GetValueByNameInt<short>(data, "tigerHealth", 20);
-    enemyHealth.barracuda = GetValueByNameInt<short>(data, "barracudaHealth", 12);
-    enemyHealth.smallSpider = GetValueByNameInt<short>(data, "smallSpiderHealth", 5);
-    enemyHealth.wolf = GetValueByNameInt<short>(data, "wolfHealth", 10);
-    enemyHealth.bigSpider = GetValueByNameInt<short>(data, "bigSpiderHealth", 40);
-    enemyHealth.bear = GetValueByNameInt<short>(data, "bearHealth", 30);
-    enemyHealth.yeti = GetValueByNameInt<short>(data, "yetiHealth", 30);
-    enemyHealth.jelly = GetValueByNameInt<short>(data, "jellyHealth", 10);
-    enemyHealth.diver = GetValueByNameInt<short>(data, "diverHealth", 20);
-    enemyHealth.worker1 = GetValueByNameInt<short>(data, "worker1Health", 25);
-    enemyHealth.worker2 = GetValueByNameInt<short>(data, "worker2Health", 20);
-    enemyHealth.worker3 = GetValueByNameInt<short>(data, "worker3Health", 27);
-    enemyHealth.worker4 = GetValueByNameInt<short>(data, "worker4Health", 27);
-    enemyHealth.worker5 = GetValueByNameInt<short>(data, "worker5Health", 20);
-    enemyHealth.cult3 = GetValueByNameInt<short>(data, "cult3Health", 150);
-    enemyHealth.monk1 = GetValueByNameInt<short>(data, "monk1Health", 30);
-    enemyHealth.monk2 = GetValueByNameInt<short>(data, "monk2Health", 30);
-    enemyHealth.eagle = GetValueByNameInt<short>(data, "eagleHealth", 20);
-    enemyHealth.crow = GetValueByNameInt<short>(data, "crowHealth", 15);
-    enemyHealth.bigEel = GetValueByNameInt<short>(data, "bigEelHealth", 20);
-    enemyHealth.eel = GetValueByNameInt<short>(data, "eelHealth", 5);
-    enemyHealth.bandit1 = GetValueByNameInt<short>(data, "bandit1Health", 45);
-    enemyHealth.bandit2 = GetValueByNameInt<short>(data, "bandit2Health", 50);
-    enemyHealth.bandit2B = GetValueByNameInt<short>(data, "bandit2BHealth", 50);
-    enemyHealth.skidman = GetValueByNameInt<short>(data, "skidmanHealth", 100);
-    enemyHealth.xianLord = GetValueByNameInt<short>(data, "xianLordHealth", 100);
-    enemyHealth.warrior = GetValueByNameInt<short>(data, "warriorHealth", 80);
-    enemyHealth.dragon = GetValueByNameInt<short>(data, "dragonHealth", 300);
-    enemyHealth.giantYeti = GetValueByNameInt<short>(data, "giantYetiHealth", 200);
-    enemyHealth.dino = GetValueByNameInt<short>(data, "dinoHealth", 100);
+    memset(&Mod.enemyHealth, 1, sizeof(Mod.enemyHealth));
+    Mod.enemyHealth.dog = GetValueByNameInt<short>(data, "dogHealth", 10);
+    Mod.enemyHealth.mouse = GetValueByNameInt<short>(data, "mouseHealth", 4);
+    Mod.enemyHealth.cult1 = GetValueByNameInt<short>(data, "cult1Health", 25);
+    Mod.enemyHealth.cult1A = GetValueByNameInt<short>(data, "cult1AHealth", 25);
+    Mod.enemyHealth.cult1B = GetValueByNameInt<short>(data, "cult1BHealth", 25);
+    Mod.enemyHealth.cult2 = GetValueByNameInt<short>(data, "cult2Health", 60);
+    Mod.enemyHealth.shark = GetValueByNameInt<short>(data, "sharkHealth", 30);
+    Mod.enemyHealth.tiger = GetValueByNameInt<short>(data, "tigerHealth", 20);
+    Mod.enemyHealth.barracuda = GetValueByNameInt<short>(data, "barracudaHealth", 12);
+    Mod.enemyHealth.smallSpider = GetValueByNameInt<short>(data, "smallSpiderHealth", 5);
+    Mod.enemyHealth.wolf = GetValueByNameInt<short>(data, "wolfHealth", 10);
+    Mod.enemyHealth.bigSpider = GetValueByNameInt<short>(data, "bigSpiderHealth", 40);
+    Mod.enemyHealth.bear = GetValueByNameInt<short>(data, "bearHealth", 30);
+    Mod.enemyHealth.yeti = GetValueByNameInt<short>(data, "yetiHealth", 30);
+    Mod.enemyHealth.jelly = GetValueByNameInt<short>(data, "jellyHealth", 10);
+    Mod.enemyHealth.diver = GetValueByNameInt<short>(data, "diverHealth", 20);
+    Mod.enemyHealth.worker1 = GetValueByNameInt<short>(data, "worker1Health", 25);
+    Mod.enemyHealth.worker2 = GetValueByNameInt<short>(data, "worker2Health", 20);
+    Mod.enemyHealth.worker3 = GetValueByNameInt<short>(data, "worker3Health", 27);
+    Mod.enemyHealth.worker4 = GetValueByNameInt<short>(data, "worker4Health", 27);
+    Mod.enemyHealth.worker5 = GetValueByNameInt<short>(data, "worker5Health", 20);
+    Mod.enemyHealth.cult3 = GetValueByNameInt<short>(data, "cult3Health", 150);
+    Mod.enemyHealth.monk1 = GetValueByNameInt<short>(data, "monk1Health", 30);
+    Mod.enemyHealth.monk2 = GetValueByNameInt<short>(data, "monk2Health", 30);
+    Mod.enemyHealth.eagle = GetValueByNameInt<short>(data, "eagleHealth", 20);
+    Mod.enemyHealth.crow = GetValueByNameInt<short>(data, "crowHealth", 15);
+    Mod.enemyHealth.bigEel = GetValueByNameInt<short>(data, "bigEelHealth", 20);
+    Mod.enemyHealth.eel = GetValueByNameInt<short>(data, "eelHealth", 5);
+    Mod.enemyHealth.bandit1 = GetValueByNameInt<short>(data, "bandit1Health", 45);
+    Mod.enemyHealth.bandit2 = GetValueByNameInt<short>(data, "bandit2Health", 50);
+    Mod.enemyHealth.bandit2B = GetValueByNameInt<short>(data, "bandit2BHealth", 50);
+    Mod.enemyHealth.skidman = GetValueByNameInt<short>(data, "skidmanHealth", 100);
+    Mod.enemyHealth.xianLord = GetValueByNameInt<short>(data, "xianLordHealth", 100);
+    Mod.enemyHealth.warrior = GetValueByNameInt<short>(data, "warriorHealth", 80);
+    Mod.enemyHealth.dragon = GetValueByNameInt<short>(data, "dragonHealth", 300);
+    Mod.enemyHealth.giantYeti = GetValueByNameInt<short>(data, "giantYetiHealth", 200);
+    Mod.enemyHealth.dino = GetValueByNameInt<short>(data, "dinoHealth", 100);
 
-    disableGiantYetiNextLevelOnDeath = GetValueByNameBool(data, "disableGiantYetiNextLevelOnDeath", false);
-    laraIgnoreMonkIfNotAngry = GetValueByNameBool(data, "laraignoremonkifnotangry", true);
-    makeMercenaryAttackLaraFirst = GetValueByNameBool(data, "mercenaryattacklaradirectly", false);
-    makeMonkAttackLaraFirst = GetValueByNameBool(data, "monksattacklaradirectly", false);
-    enemyBarEnabled = GetValueByNameBool(data, "enableenemybar", true);
-    makeYetiExplodeOnDeath = GetValueByNameBool(data, "makeyetiexplodeondeath", false);
+    Mod.disableGiantYetiNextLevelOnDeath = GetValueByNameBool(data, "disableGiantYetiNextLevelOnDeath", false);
+    Mod.laraIgnoreMonkIfNotAngry = GetValueByNameBool(data, "laraignoremonkifnotangry", true);
+    Mod.makeMercenaryAttackLaraFirst = GetValueByNameBool(data, "mercenaryattacklaradirectly", false);
+    Mod.makeMonkAttackLaraFirst = GetValueByNameBool(data, "monksattacklaradirectly", false);
+    Mod.enemyBarEnabled = GetValueByNameBool(data, "enableenemybar", true);
+    Mod.makeYetiExplodeOnDeath = GetValueByNameBool(data, "makeyetiexplodeondeath", false);
 
-    isDartEffectOpaque = GetValueByNameBool(data, "isDartEffectOpaque", false);
-    isFlameOpaque = GetValueByNameBool(data, "isFlameOpaque", false);
-    isLavaFountainOpaque = GetValueByNameBool(data, "isLavaFountainOpaque", false);
-    isDragonFlameOpaque = GetValueByNameBool(data, "isDragonFlameOpaque", false);
-    isSphereOfDoom1Opaque = GetValueByNameBool(data, "isSphereOfDoom1Opaque", false);
-    isSphereOfDoom2Opaque = GetValueByNameBool(data, "isSphereOfDoom2Opaque", false);
-    isBloodOpaque = GetValueByNameBool(data, "isBloodOpaque", false);
-    isExplosionOpaque = GetValueByNameBool(data, "isExplosionOpaque", false);
-    isTwinkleOpaque = GetValueByNameBool(data, "isTwinkleOpaque", false);
-    isSplashOpaque = GetValueByNameBool(data, "isSplashOpaque", false);
-    isWaterSpriteOpaque = GetValueByNameBool(data, "isWaterSpriteOpaque", false);
-    isHotLiquidOpaque = GetValueByNameBool(data, "isHotLiquidOpaque", false);
+    Mod.isDartEffectOpaque = GetValueByNameBool(data, "isDartEffectOpaque", false);
+    Mod.isFlameOpaque = GetValueByNameBool(data, "isFlameOpaque", false);
+    Mod.isLavaFountainOpaque = GetValueByNameBool(data, "isLavaFountainOpaque", false);
+    Mod.isDragonFlameOpaque = GetValueByNameBool(data, "isDragonFlameOpaque", false);
+    Mod.isSphereOfDoom1Opaque = GetValueByNameBool(data, "isSphereOfDoom1Opaque", false);
+    Mod.isSphereOfDoom2Opaque = GetValueByNameBool(data, "isSphereOfDoom2Opaque", false);
+    Mod.isBloodOpaque = GetValueByNameBool(data, "isBloodOpaque", false);
+    Mod.isExplosionOpaque = GetValueByNameBool(data, "isExplosionOpaque", false);
+    Mod.isTwinkleOpaque = GetValueByNameBool(data, "isTwinkleOpaque", false);
+    Mod.isSplashOpaque = GetValueByNameBool(data, "isSplashOpaque", false);
+    Mod.isWaterSpriteOpaque = GetValueByNameBool(data, "isWaterSpriteOpaque", false);
+    Mod.isHotLiquidOpaque = GetValueByNameBool(data, "isHotLiquidOpaque", false);
 }
 
-void ModConfig::LoadSemitransConfig(Value& data, SEMITRANS_CONFIG* semitrans) {
+void LoadSemitransConfig(Value& data, SEMITRANS_CONFIG* semitrans) {
     if (data.HasMember("animtex"))
     {
         LPCSTR animTexStr = data["animtex"].GetString();
@@ -333,7 +328,7 @@ void ModConfig::LoadSemitransConfig(Value& data, SEMITRANS_CONFIG* semitrans) {
     semitrans->isLoaded = true;
 }
 
-void ModConfig::LoadPolyfilterConfig(Value& data, LPCSTR name, POLYFILTER_NODE** filterNodes)
+void LoadPolyfilterConfig(Value& data, LPCSTR name, POLYFILTER_NODE** filterNodes)
 {
     FreePolyfilterNodes(filterNodes);
 
@@ -365,11 +360,11 @@ void ModConfig::LoadPolyfilterConfig(Value& data, LPCSTR name, POLYFILTER_NODE**
         }
 
         SizeType size = 0;
-        LPCSTR t4list = GetValueByNameString(poly, "t4list", &size, NULL);
-        LPCSTR t3list = GetValueByNameString(poly, "t3list", &size, NULL);
-        LPCSTR c4list = GetValueByNameString(poly, "c4list", &size, NULL);
-        LPCSTR c3list = GetValueByNameString(poly, "c3list", &size, NULL);
-        if (t4list || t3list || c4list || c3list)
+        std::string t4list = GetValueByNameString(poly, "t4list", &size, "");
+        std::string t3list = GetValueByNameString(poly, "t3list", &size, "");
+        std::string c4list = GetValueByNameString(poly, "c4list", &size, "");
+        std::string c3list = GetValueByNameString(poly, "c3list", &size, "");
+        if (t4list.size() > 0 || t3list.size() > 0 || c4list.size() > 0 || c3list.size() > 0)
         {
             ParsePolyValue(t4list, meshFilter->gt4, ARRAY_SIZE(meshFilter->gt4));
             ParsePolyValue(t3list, meshFilter->gt3, ARRAY_SIZE(meshFilter->gt3));
@@ -379,7 +374,7 @@ void ModConfig::LoadPolyfilterConfig(Value& data, LPCSTR name, POLYFILTER_NODE**
     }
 }
 
-void ModConfig::LoadReflectConfig(Value& data, REFLECT_CONFIG* reflect) {
+void LoadReflectConfig(Value& data, REFLECT_CONFIG* reflect) {
     if (data.HasMember("objects") && data["objects"].IsArray())
     {
         Value& objectList = data["objects"].GetArray();
@@ -397,36 +392,310 @@ void ModConfig::LoadReflectConfig(Value& data, REFLECT_CONFIG* reflect) {
     reflect->isLoaded = true;
 }
 
-void ModConfig::ParseDefaultConfiguration(Value& data) {
-    pistolAtStart = GetValueByNameBool(data, "pistolsatstart", true);
-    shotgunAtStart = GetValueByNameBool(data, "shotgunatstart", true);
-    uzisAtStart = GetValueByNameBool(data, "uzisatstart", false);
-    autoPistolAtStart = GetValueByNameBool(data, "autopistolsatstart", false);
-    m16AtStart = GetValueByNameBool(data, "m16atstart", false);
-    grenadeAtStart = GetValueByNameBool(data, "grenadeatstart", false);
-    harpoonAtStart = GetValueByNameBool(data, "harpoonatstart", false);
-
-    shotgunAmmoAtStart = GetValueByNameInt<short>(data, "shotgunammoatstart", 2);
-    uzisAmmoAtStart = GetValueByNameInt<short>(data, "uzisammoatstart", 0);
-    autoPistolAmmoAtStart = GetValueByNameInt<short>(data, "autopistolsammoatstart", 0);
-    m16AmmoAtStart = GetValueByNameInt<short>(data, "m16ammoatstart", 0);
-    grenadeAmmoAtStart = GetValueByNameInt<short>(data, "grenadeammoatstart", 0);
-    harpoonAmmoAtStart = GetValueByNameInt<short>(data, "harpoonammoatstart", 0);
-
-    flareAtStart = GetValueByNameInt<short>(data, "flaresatstart", 2);
-    smallMediAtStart = GetValueByNameInt<short>(data, "smallmedikitatstart", 1);
-    bigMediAtStart = GetValueByNameInt<short>(data, "bigmedikitatstart", 1);
-
-    LoadHealthBarConfig(data["larahealthbar"], &laraBar.health);
-    laraBar.health.basedOnEnemyHealth = false;
-    LoadAirBarConfig(data["laraairbar"], &laraBar.air);
-    LoadHealthBarConfig(data["enemyhealthbar"], &enemyBar);
-
-    LoadSemitransConfig(data["semitransparent"], &semitrans);
-    LoadReflectConfig(data["reflective"], &reflect);
+/// <param name="type">0 Bgnd, 1 Main, 2 Seq</param>
+static void LoadGouraudFill(Value& data, int type, GOURAUD_FILL* fill)
+{
+    switch (type)
+    {
+    case 0:
+        fill->clr[0][0] = GetColorRGBByName(data, "0", RGB_MAKE(0, 32, 0));
+        fill->clr[0][1] = GetColorRGBByName(data, "1", RGB_MAKE(0, 32, 0));
+        fill->clr[0][2] = GetColorRGBByName(data, "2", RGB_MAKE(0, 96, 0));
+        fill->clr[0][3] = GetColorRGBByName(data, "3", RGB_MAKE(0, 32, 0));
+        fill->clr[1][0] = GetColorRGBByName(data, "4", RGB_MAKE(0, 32, 0));
+        fill->clr[1][1] = GetColorRGBByName(data, "5", RGB_MAKE(0, 32, 0));
+        fill->clr[1][2] = GetColorRGBByName(data, "6", RGB_MAKE(0, 32, 0));
+        fill->clr[1][3] = GetColorRGBByName(data, "7", RGB_MAKE(0, 96, 0));
+        fill->clr[2][0] = GetColorRGBByName(data, "8", RGB_MAKE(0, 96, 0));
+        fill->clr[2][1] = GetColorRGBByName(data, "9", RGB_MAKE(0, 32, 0));
+        fill->clr[2][2] = GetColorRGBByName(data, "10", RGB_MAKE(0, 32, 0));
+        fill->clr[2][3] = GetColorRGBByName(data, "11", RGB_MAKE(0, 32, 0));
+        fill->clr[3][0] = GetColorRGBByName(data, "12", RGB_MAKE(0, 32, 0));
+        fill->clr[3][1] = GetColorRGBByName(data, "13", RGB_MAKE(0, 96, 0));
+        fill->clr[3][2] = GetColorRGBByName(data, "14", RGB_MAKE(0, 32, 0));
+        fill->clr[3][3] = GetColorRGBByName(data, "15", RGB_MAKE(0, 32, 0));
+        break;
+    case 1:
+        fill->clr[0][0] = GetColorRGBByName(data, "0", RGB_MAKE(0, 0, 0));
+        fill->clr[0][1] = GetColorRGBByName(data, "1", RGB_MAKE(0, 0, 0));
+        fill->clr[0][2] = GetColorRGBByName(data, "2", RGB_MAKE(16, 128, 56));
+        fill->clr[0][3] = GetColorRGBByName(data, "3", RGB_MAKE(0, 0, 0));
+        fill->clr[1][0] = GetColorRGBByName(data, "4", RGB_MAKE(0, 0, 0));
+        fill->clr[1][1] = GetColorRGBByName(data, "5", RGB_MAKE(0, 0, 0));
+        fill->clr[1][2] = GetColorRGBByName(data, "6", RGB_MAKE(0, 0, 0));
+        fill->clr[1][3] = GetColorRGBByName(data, "7", RGB_MAKE(16, 128, 56));
+        fill->clr[2][0] = GetColorRGBByName(data, "8", RGB_MAKE(16, 128, 56));
+        fill->clr[2][1] = GetColorRGBByName(data, "9", RGB_MAKE(0, 0, 0));
+        fill->clr[2][2] = GetColorRGBByName(data, "10", RGB_MAKE(0, 0, 0));
+        fill->clr[2][3] = GetColorRGBByName(data, "11", RGB_MAKE(0, 0, 0));
+        fill->clr[3][0] = GetColorRGBByName(data, "12", RGB_MAKE(0, 0, 0));
+        fill->clr[3][1] = GetColorRGBByName(data, "13", RGB_MAKE(16, 128, 56));
+        fill->clr[3][2] = GetColorRGBByName(data, "14", RGB_MAKE(0, 0, 0));
+        fill->clr[3][3] = GetColorRGBByName(data, "15", RGB_MAKE(0, 0, 0));
+        break;
+    case 2:
+        fill->clr[0][0] = GetColorRGBByName(data, "0", RGB_MAKE(0, 0, 0));
+        fill->clr[0][1] = GetColorRGBByName(data, "1", RGB_MAKE(0, 0, 0));
+        fill->clr[0][2] = GetColorRGBByName(data, "2", RGB_MAKE(56, 240, 128));
+        fill->clr[0][3] = GetColorRGBByName(data, "3", RGB_MAKE(0, 0, 0));
+        fill->clr[1][0] = GetColorRGBByName(data, "4", RGB_MAKE(0, 0, 0));
+        fill->clr[1][1] = GetColorRGBByName(data, "5", RGB_MAKE(0, 0, 0));
+        fill->clr[1][2] = GetColorRGBByName(data, "6", RGB_MAKE(0, 0, 0));
+        fill->clr[1][3] = GetColorRGBByName(data, "7", RGB_MAKE(56, 240, 128));
+        fill->clr[2][0] = GetColorRGBByName(data, "8", RGB_MAKE(56, 240, 128));
+        fill->clr[2][1] = GetColorRGBByName(data, "9", RGB_MAKE(0, 0, 0));
+        fill->clr[2][2] = GetColorRGBByName(data, "10", RGB_MAKE(0, 0, 0));
+        fill->clr[2][3] = GetColorRGBByName(data, "11", RGB_MAKE(0, 0, 0));
+        fill->clr[3][0] = GetColorRGBByName(data, "12", RGB_MAKE(0, 0, 0));
+        fill->clr[3][1] = GetColorRGBByName(data, "13", RGB_MAKE(56, 240, 128));
+        fill->clr[3][2] = GetColorRGBByName(data, "14", RGB_MAKE(0, 0, 0));
+        fill->clr[3][3] = GetColorRGBByName(data, "15", RGB_MAKE(0, 0, 0));
+        break;
+    }
 }
 
-void ModConfig::ParseLevelConfiguration(Value& data, LPCSTR currentLevel) {
+/// <param name="type">0 Bgnd, 1 Main, 2 Seq</param>
+static void LoadGouraudFillDefault(int type, GOURAUD_FILL* fill)
+{
+    switch (type)
+    {
+    case 0:
+        fill->clr[0][0] = RGBA_MAKE(0, 32, 0, 128); // 0
+        fill->clr[0][1] = RGBA_MAKE(0, 32, 0, 128); // 1
+        fill->clr[0][2] = RGBA_MAKE(0, 96, 0, 128); // 2
+        fill->clr[0][3] = RGBA_MAKE(0, 32, 0, 128); // 3
+        fill->clr[1][0] = RGBA_MAKE(0, 32, 0, 128); // 4
+        fill->clr[1][1] = RGBA_MAKE(0, 32, 0, 128); // 5
+        fill->clr[1][2] = RGBA_MAKE(0, 32, 0, 128); // 6
+        fill->clr[1][3] = RGBA_MAKE(0, 96, 0, 128); // 7
+        fill->clr[2][0] = RGBA_MAKE(0, 96, 0, 128); // 8
+        fill->clr[2][1] = RGBA_MAKE(0, 32, 0, 128); // 9
+        fill->clr[2][2] = RGBA_MAKE(0, 32, 0, 128); // 10
+        fill->clr[2][3] = RGBA_MAKE(0, 32, 0, 128); // 11
+        fill->clr[3][0] = RGBA_MAKE(0, 32, 0, 128); // 12
+        fill->clr[3][1] = RGBA_MAKE(0, 96, 0, 128); // 13
+        fill->clr[3][2] = RGBA_MAKE(0, 32, 0, 128); // 14
+        fill->clr[3][3] = RGBA_MAKE(0, 32, 0, 128); // 15
+        break;
+    case 1:
+        fill->clr[0][0] = RGBA_MAKE(0, 0, 0, 128); // 0
+        fill->clr[0][1] = RGBA_MAKE(0, 0, 0, 128); // 1
+        fill->clr[0][2] = RGBA_MAKE(16, 128, 56, 128); // 2
+        fill->clr[0][3] = RGBA_MAKE(0, 0, 0, 128); // 3
+        fill->clr[1][0] = RGBA_MAKE(0, 0, 0, 128); // 4
+        fill->clr[1][1] = RGBA_MAKE(0, 0, 0, 128); // 5
+        fill->clr[1][2] = RGBA_MAKE(0, 0, 0, 128); // 6
+        fill->clr[1][3] = RGBA_MAKE(16, 128, 56, 128); // 7
+        fill->clr[2][0] = RGBA_MAKE(16, 128, 56, 128); // 8
+        fill->clr[2][1] = RGBA_MAKE(0, 0, 0, 128); // 9
+        fill->clr[2][2] = RGBA_MAKE(0, 0, 0, 128); // 10
+        fill->clr[2][3] = RGBA_MAKE(0, 0, 0, 128); // 11
+        fill->clr[3][0] = RGBA_MAKE(0, 0, 0, 128); // 12
+        fill->clr[3][1] = RGBA_MAKE(16, 128, 56, 128); // 13
+        fill->clr[3][2] = RGBA_MAKE(0, 0, 0, 128); // 14
+        fill->clr[3][3] = RGBA_MAKE(0, 0, 0, 128); // 15
+        break;
+    case 2:
+        fill->clr[0][0] = RGBA_MAKE(0, 0, 0, 128); // 0
+        fill->clr[0][1] = RGBA_MAKE(0, 0, 0, 128); // 1
+        fill->clr[0][2] = RGBA_MAKE(56, 240, 128, 128); // 2
+        fill->clr[0][3] = RGBA_MAKE(0, 0, 0, 128); // 3
+        fill->clr[1][0] = RGBA_MAKE(0, 0, 0, 128); // 4
+        fill->clr[1][1] = RGBA_MAKE(0, 0, 0, 128); // 5
+        fill->clr[1][2] = RGBA_MAKE(0, 0, 0, 128); // 6
+        fill->clr[1][3] = RGBA_MAKE(56, 240, 128, 128); // 7
+        fill->clr[2][0] = RGBA_MAKE(56, 240, 128, 128); // 8
+        fill->clr[2][1] = RGBA_MAKE(0, 0, 0, 128); // 9
+        fill->clr[2][2] = RGBA_MAKE(0, 0, 0, 128); // 10
+        fill->clr[2][3] = RGBA_MAKE(0, 0, 0, 128); // 11
+        fill->clr[3][0] = RGBA_MAKE(0, 0, 0, 128); // 12
+        fill->clr[3][1] = RGBA_MAKE(56, 240, 128, 128); // 13
+        fill->clr[3][2] = RGBA_MAKE(0, 0, 0, 128); // 14
+        fill->clr[3][3] = RGBA_MAKE(0, 0, 0, 128); // 15
+        break;
+    }
+}
+
+/// <param name="type">0 Bgnd, 1 Main, 2 Seq</param>
+static void LoadGouraudOutlineDefault(int type, GOURAUD_OUTLINE* outline)
+{
+    switch (type)
+    {
+    case 0:
+        outline->clr[0] = RGBA_MAKE(96, 96, 96, 128);
+        outline->clr[1] = RGBA_MAKE(128, 128, 128, 128);
+        outline->clr[2] = RGBA_MAKE(32, 32, 32, 128);
+        outline->clr[3] = RGBA_MAKE(0, 0, 0, 128);
+        outline->clr[4] = RGBA_MAKE(0, 0, 0, 128);
+        outline->clr[5] = RGBA_MAKE(32, 32, 32, 128);
+        outline->clr[6] = RGBA_MAKE(64, 64, 64, 128);
+        outline->clr[7] = RGBA_MAKE(64, 64, 64, 128);
+        outline->clr[8] = RGBA_MAKE(96, 96, 96, 128);
+        break;
+    case 1:
+        for (int i = 0; i < 9; i++)
+            outline->clr[i] = RGBA_MAKE(0, 0, 0, 128);
+        break;
+    case 2:
+        outline->clr[0] = RGBA_MAKE(0, 0, 0, 128);
+        outline->clr[1] = RGBA_MAKE(255, 255, 255, 128);
+        outline->clr[2] = RGBA_MAKE(0, 0, 0, 128);
+        outline->clr[3] = RGBA_MAKE(56, 240, 128, 128);
+        outline->clr[4] = RGBA_MAKE(0, 0, 0, 128);
+        outline->clr[5] = RGBA_MAKE(255, 255, 255, 128);
+        outline->clr[6] = RGBA_MAKE(0, 0, 0, 128);
+        outline->clr[7] = RGBA_MAKE(56, 240, 128, 128);
+        outline->clr[8] = RGBA_MAKE(0, 0, 0, 128);
+        break;
+    }
+}
+
+/// <param name="type">0 Bgnd, 1 Main, 2 Seq</param>
+static void LoadGouraudOutline(Value& data, int type, GOURAUD_OUTLINE* outline)
+{
+    switch (type)
+    {
+    case 0:
+        outline->clr[0] = GetColorRGBByName(data, "0", RGBA_MAKE(96, 96, 96, 128));
+        outline->clr[1] = GetColorRGBByName(data, "1", RGBA_MAKE(128, 128, 128, 128));
+        outline->clr[2] = GetColorRGBByName(data, "2", RGBA_MAKE(32, 32, 32, 128));
+        outline->clr[3] = GetColorRGBByName(data, "3", RGBA_MAKE(0, 0, 0, 128));
+        outline->clr[4] = GetColorRGBByName(data, "4", RGBA_MAKE(0, 0, 0, 128));
+        outline->clr[5] = GetColorRGBByName(data, "5", RGBA_MAKE(32, 32, 32, 128));
+        outline->clr[6] = GetColorRGBByName(data, "6", RGBA_MAKE(64, 64, 64, 128));
+        outline->clr[7] = GetColorRGBByName(data, "7", RGBA_MAKE(64, 64, 64, 128));
+        outline->clr[8] = GetColorRGBByName(data, "8", RGBA_MAKE(96, 96, 96, 128));
+        break;
+    case 1:
+        outline->clr[0] = GetColorRGBByName(data, "0", RGBA_MAKE(0, 0, 0, 128));
+        outline->clr[1] = GetColorRGBByName(data, "1", RGBA_MAKE(0, 0, 0, 128));
+        outline->clr[2] = GetColorRGBByName(data, "2", RGBA_MAKE(0, 0, 0, 128));
+        outline->clr[3] = GetColorRGBByName(data, "3", RGBA_MAKE(0, 0, 0, 128));
+        outline->clr[4] = GetColorRGBByName(data, "4", RGBA_MAKE(0, 0, 0, 128));
+        outline->clr[5] = GetColorRGBByName(data, "5", RGBA_MAKE(0, 0, 0, 128));
+        outline->clr[6] = GetColorRGBByName(data, "6", RGBA_MAKE(0, 0, 0, 128));
+        outline->clr[7] = GetColorRGBByName(data, "7", RGBA_MAKE(0, 0, 0, 128));
+        outline->clr[8] = GetColorRGBByName(data, "8", RGBA_MAKE(0, 0, 0, 128));
+        break;
+    case 2:
+        outline->clr[0] = GetColorRGBByName(data, "0", RGBA_MAKE(0, 0, 0, 128));
+        outline->clr[1] = GetColorRGBByName(data, "1", RGBA_MAKE(255, 255, 255, 128));
+        outline->clr[2] = GetColorRGBByName(data, "2", RGBA_MAKE(0, 0, 0, 128));
+        outline->clr[3] = GetColorRGBByName(data, "3", RGBA_MAKE(56, 240, 128, 128));
+        outline->clr[4] = GetColorRGBByName(data, "4", RGBA_MAKE(0, 0, 0, 128));
+        outline->clr[5] = GetColorRGBByName(data, "5", RGBA_MAKE(255, 255, 255, 128));
+        outline->clr[6] = GetColorRGBByName(data, "6", RGBA_MAKE(0, 0, 0, 128));
+        outline->clr[7] = GetColorRGBByName(data, "7", RGBA_MAKE(56, 240, 128, 128));
+        outline->clr[8] = GetColorRGBByName(data, "8", RGBA_MAKE(0, 0, 0, 128));
+        break;
+    }
+}
+
+static void LoadGouraudAlpha(Value& data, GOURAUD_FILL* fill, GOURAUD_OUTLINE* outline, unsigned char defaultValue = 128)
+{
+    unsigned char alpha = data.GetInt() & 255;
+    for (int i = 0; i < 4; i++)
+    {
+        for (int y = 0; y < 4; y++)
+        {
+            fill->clr[i][y] = RGBA_SETALPHA(fill->clr[i][y], alpha);
+        }
+    }
+    for (int i = 0; i < 9; i++)
+    {
+        outline->clr[i] = RGBA_SETALPHA(outline->clr[i], alpha);
+    }
+}
+
+static void LoadGouraudAlphaDefault(GOURAUD_FILL* fill, GOURAUD_OUTLINE* outline, unsigned char defaultValue = 128)
+{
+    for (int i = 0; i < 4; i++)
+    {
+        for (int y = 0; y < 4; y++)
+        {
+            fill->clr[i][y] = RGBA_SETALPHA(fill->clr[i][y], defaultValue);
+        }
+    }
+    for (int i = 0; i < 9; i++)
+    {
+        outline->clr[i] = RGBA_SETALPHA(outline->clr[i], defaultValue);
+    }
+}
+
+extern GOURAUD_FILL ReqBgndGour1;
+extern GOURAUD_OUTLINE ReqBgndGour2;
+extern GOURAUD_FILL ReqMainGour1;
+extern GOURAUD_OUTLINE ReqMainGour2;
+extern GOURAUD_FILL ReqSelGour1;
+extern GOURAUD_OUTLINE ReqSelGour2;
+
+void LoadUIConfig(Value& data, LPCSTR name)
+{
+    LoadGouraudFill(data["req_bgnd"], 0, &ReqBgndGour1);
+    LoadGouraudOutline(data["req_bgnd_outline"], 0, &ReqBgndGour2);
+    LoadGouraudAlpha(data["req_bgnd_alpha"], &ReqBgndGour1, &ReqBgndGour2, 128);
+    LoadGouraudFill(data["req_main"], 1, &ReqMainGour1);
+    LoadGouraudOutline(data["req_main_outline"], 1, &ReqMainGour2);
+    LoadGouraudAlpha(data["req_main_alpha"], &ReqMainGour1, &ReqMainGour2, 128);
+    LoadGouraudFill(data["req_sel"], 2, &ReqSelGour1);
+    LoadGouraudOutline(data["req_sel_outline"], 2, &ReqSelGour2);
+    LoadGouraudAlpha(data["req_sel_alpha"], &ReqSelGour1, &ReqSelGour2, 128);
+    Mod.isUIColorLoaded = true;
+}
+
+void LoadUIConfigDefault()
+{
+    LoadGouraudFillDefault(0, &ReqBgndGour1);
+    LoadGouraudOutlineDefault(0, &ReqBgndGour2);
+    LoadGouraudAlphaDefault(&ReqBgndGour1, &ReqBgndGour2, 128);
+    LoadGouraudFillDefault(1, &ReqMainGour1);
+    LoadGouraudOutlineDefault(1, &ReqMainGour2);
+    LoadGouraudAlphaDefault(&ReqMainGour1, &ReqMainGour2, 128);
+    LoadGouraudFillDefault(2, &ReqSelGour1);
+    LoadGouraudOutlineDefault(2, &ReqSelGour2);
+    LoadGouraudAlphaDefault(&ReqSelGour1, &ReqSelGour2, 128);
+    Mod.isUIColorLoaded = false;
+}
+
+void ParseDefaultConfiguration(Value& data) {
+    SizeType a, b, c;
+
+    Mod.pistolAtStart = GetValueByNameBool(data, "pistolsatstart", true);
+    Mod.shotgunAtStart = GetValueByNameBool(data, "shotgunatstart", true);
+    Mod.uzisAtStart = GetValueByNameBool(data, "uzisatstart", false);
+    Mod.autoPistolAtStart = GetValueByNameBool(data, "autopistolsatstart", false);
+    Mod.m16AtStart = GetValueByNameBool(data, "m16atstart", false);
+    Mod.grenadeAtStart = GetValueByNameBool(data, "grenadeatstart", false);
+    Mod.harpoonAtStart = GetValueByNameBool(data, "harpoonatstart", false);
+
+    Mod.shotgunAmmoAtStart = GetValueByNameInt<short>(data, "shotgunammoatstart", 2);
+    Mod.uzisAmmoAtStart = GetValueByNameInt<short>(data, "uzisammoatstart", 0);
+    Mod.autoPistolAmmoAtStart = GetValueByNameInt<short>(data, "autopistolsammoatstart", 0);
+    Mod.m16AmmoAtStart = GetValueByNameInt<short>(data, "m16ammoatstart", 0);
+    Mod.grenadeAmmoAtStart = GetValueByNameInt<short>(data, "grenadeammoatstart", 0);
+    Mod.harpoonAmmoAtStart = GetValueByNameInt<short>(data, "harpoonammoatstart", 0);
+
+    Mod.flareAtStart = GetValueByNameInt<short>(data, "flaresatstart", 2);
+    Mod.smallMediAtStart = GetValueByNameInt<short>(data, "smallmedikitatstart", 1);
+    Mod.bigMediAtStart = GetValueByNameInt<short>(data, "bigmedikitatstart", 1);
+
+    Mod.titleLoadingPixLanguage = GetValueByNameString(data, "invloadingpixlanguage", &a, "data/title%s.pcx");
+    Mod.titleLoadingPix = GetValueByNameString(data, "invLoadingpix", &b, "data/title.pcx");
+    Mod.titleLoadingPixGold = GetValueByNameString(data, "invloadingpixgold", &c, "data/titleg.pcx");
+
+    LoadHealthBarConfig(data["larahealthbar"], &Mod.laraBar.health);
+    Mod.laraBar.health.basedOnEnemyHealth = false;
+    LoadAirBarConfig(data["laraairbar"], &Mod.laraBar.air);
+    LoadHealthBarConfig(data["enemyhealthbar"], &Mod.enemyBar);
+
+    LoadSemitransConfig(data["semitransparent"], &Mod.semitrans);
+    LoadReflectConfig(data["reflective"], &Mod.reflect);
+
+    if (data.HasMember("ui_config")) LoadUIConfig(data["ui_config"], "ui_config");
+    else if (!Mod.isUIColorLoaded) LoadUIConfigDefault();
+}
+
+void ParseLevelConfiguration(Value& data, LPCSTR currentLevel) {
     if (!data.IsArray()) {
         LogWarn("Failed to load level configuration (json), 'levels' is not an array !");
         return;
@@ -447,9 +716,11 @@ void ModConfig::ParseLevelConfiguration(Value& data, LPCSTR currentLevel) {
             // If the filename is equal then load it !
             if (strcasecmp(level["filename"].GetString(), currentLevel) == 0) {
                 LoadLevelConfig(level);
-                if (level.HasMember("semitransparent")) LoadSemitransConfig(level["semitransparent"], &semitrans);
-                if (level.HasMember("reflective")) LoadReflectConfig(level["reflective"], &reflect);
+                if (level.HasMember("semitransparent")) LoadSemitransConfig(level["semitransparent"], &Mod.semitrans);
+                if (level.HasMember("reflective")) LoadReflectConfig(level["reflective"], &Mod.reflect);
                 if (level.HasMember("inventory_item_list")) LoadCustomInventoryItems(level["inventory_item_list"]);
+                if (level.HasMember("ui_config")) LoadUIConfig(level["ui_config"], "ui_config");
+                else if (!Mod.isUIColorLoaded) LoadUIConfigDefault();
                 break;
             }
             else
@@ -465,7 +736,7 @@ void ModConfig::ParseLevelConfiguration(Value& data, LPCSTR currentLevel) {
     }
 }
 
-POLYFILTER* ModConfig::CreatePolyfilterNode(POLYFILTER_NODE** data, int id)
+POLYFILTER* CreatePolyfilterNode(POLYFILTER_NODE** data, int id)
 {
     if (data == NULL) return NULL;
     POLYFILTER_NODE* node = (POLYFILTER_NODE*)malloc(sizeof(POLYFILTER_NODE));
@@ -477,7 +748,7 @@ POLYFILTER* ModConfig::CreatePolyfilterNode(POLYFILTER_NODE** data, int id)
     return &node->filter;
 }
 
-void ModConfig::FreePolyfilterNodes(POLYFILTER_NODE** data)
+void FreePolyfilterNodes(POLYFILTER_NODE** data)
 {
     if (data == NULL) return;
     POLYFILTER_NODE* node = *data;
@@ -489,7 +760,7 @@ void ModConfig::FreePolyfilterNodes(POLYFILTER_NODE** data)
     *data = NULL;
 }
 
-bool ModConfig::IsCompatibleFilterObjects(short* ptrObj, POLYFILTER* filter)
+bool IsCompatibleFilterObjects(short* ptrObj, POLYFILTER* filter)
 {
     if (!ptrObj || !filter || !filter->n_vtx) return true;
     ptrObj += 5; // skip x, y, z, radius, flags
@@ -512,7 +783,7 @@ bool ModConfig::IsCompatibleFilterObjects(short* ptrObj, POLYFILTER* filter)
     return true;
 }
 
-short* ModConfig::EnumeratePolysSpecificObjects(short* ptrObj, int vtxCount, bool colored, ENUM_POLYS_OBJECTS_CB callback, POLYINDEX* filter, LPVOID param)
+short* EnumeratePolysSpecificObjects(short* ptrObj, int vtxCount, bool colored, ENUM_POLYS_OBJECTS_CB callback, POLYINDEX* filter, LPVOID param)
 {
     int polyNumber = *ptrObj++;
     if (filter == NULL || (!filter[0].idx && !filter[0].num)) {
@@ -544,7 +815,7 @@ short* ModConfig::EnumeratePolysSpecificObjects(short* ptrObj, int vtxCount, boo
     return ptrObj;
 }
 
-void ModConfig::EnumeratePolysSpecificRoomFace4(FACE4* ptrObj, int faceCount, bool colored, ENUM_POLYS_FACE4_CB callback, POLYINDEX* filter, LPVOID param)
+void EnumeratePolysSpecificRoomFace4(FACE4* ptrObj, int faceCount, bool colored, ENUM_POLYS_FACE4_CB callback, POLYINDEX* filter, LPVOID param)
 {
     if (filter == NULL || (!filter[0].idx && !filter[0].num)) {
         for (int i = 0; i < faceCount; ++i) {
@@ -562,7 +833,7 @@ void ModConfig::EnumeratePolysSpecificRoomFace4(FACE4* ptrObj, int faceCount, bo
     }
 }
 
-void ModConfig::EnumeratePolysSpecificRoomFace3(FACE3* ptrObj, int faceCount, bool colored, ENUM_POLYS_FACE3_CB callback, POLYINDEX* filter, LPVOID param)
+void EnumeratePolysSpecificRoomFace3(FACE3* ptrObj, int faceCount, bool colored, ENUM_POLYS_FACE3_CB callback, POLYINDEX* filter, LPVOID param)
 {
     if (filter == NULL || (!filter[0].idx && !filter[0].num)) {
         for (int i = 0; i < faceCount; ++i) {
@@ -580,7 +851,7 @@ void ModConfig::EnumeratePolysSpecificRoomFace3(FACE3* ptrObj, int faceCount, bo
     }
 }
 
-bool ModConfig::EnumeratePolysObjects(short* ptrObj, ENUM_POLYS_OBJECTS_CB callback, POLYFILTER* filter, LPVOID param)
+bool EnumeratePolysObjects(short* ptrObj, ENUM_POLYS_OBJECTS_CB callback, POLYFILTER* filter, LPVOID param)
 {
     if (ptrObj == NULL || callback == NULL) return false; // wrong parameters
     if (!IsCompatibleFilterObjects(ptrObj, filter)) return false; // filter is not compatible
@@ -600,7 +871,7 @@ bool ModConfig::EnumeratePolysObjects(short* ptrObj, ENUM_POLYS_OBJECTS_CB callb
     return true;
 }
 
-bool ModConfig::EnumeratePolysRoomFace3(FACE3* ptrObj, int faceCount, ENUM_POLYS_FACE3_CB callback, POLYFILTER* filter, LPVOID param)
+bool EnumeratePolysRoomFace3(FACE3* ptrObj, int faceCount, ENUM_POLYS_FACE3_CB callback, POLYFILTER* filter, LPVOID param)
 {
     if (ptrObj == NULL) return false; // wrong parameters
     if (faceCount != filter->n_gt3) return false;
@@ -608,7 +879,7 @@ bool ModConfig::EnumeratePolysRoomFace3(FACE3* ptrObj, int faceCount, ENUM_POLYS
     return false;
 }
 
-bool ModConfig::EnumeratePolysRoomFace4(FACE4* ptrObj, int faceCount, ENUM_POLYS_FACE4_CB callback, POLYFILTER* filter, LPVOID param)
+bool EnumeratePolysRoomFace4(FACE4* ptrObj, int faceCount, ENUM_POLYS_FACE4_CB callback, POLYFILTER* filter, LPVOID param)
 {
     if (ptrObj == NULL) return false; // wrong parameters
     if (faceCount != filter->n_gt4) return false;
@@ -616,7 +887,7 @@ bool ModConfig::EnumeratePolysRoomFace4(FACE4* ptrObj, int faceCount, ENUM_POLYS
     return false;
 }
 
-int ModConfig::ParsePolyString(LPCSTR str, POLYINDEX* lst, DWORD lstLen) {
+int ParsePolyString(LPCSTR str, POLYINDEX* lst, DWORD lstLen) {
     if (!lst || !lstLen) {
         return -1;
     }
@@ -695,18 +966,18 @@ int ModConfig::ParsePolyString(LPCSTR str, POLYINDEX* lst, DWORD lstLen) {
     return resLen;
 }
 
-int ModConfig::ParsePolyValue(LPCSTR value, POLYINDEX* lst, DWORD lstLen) {
+int ParsePolyValue(std::string value, POLYINDEX* lst, DWORD lstLen) {
     if (!lst || !lstLen) {
         return -1;
     }
 
     lst[0].idx = ~0;
     lst[0].num = ~0;
-    if (value == NULL) {
+    if (value.empty()) {
         return 0;
     }
 
-    const char* str = value;
+    const char* str = value.c_str();
     if (!str || !*str || !strcasecmp(str, "none")) {
         return 0;
     }
