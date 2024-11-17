@@ -903,7 +903,7 @@ static void SpawnCandleFlame(ITEM_INFO* item, int radius, short angle, int heigh
 		fx->pos.x = item->pos.x + (radius * phd_sin(item->pos.rotY + angle) >> W2V_SHIFT);
 		fx->pos.y = item->pos.y + height;
 		fx->pos.z = item->pos.z + (radius * phd_cos(item->pos.rotY + angle) >> W2V_SHIFT);
-		fx->objectID = ID_CANDLE_SPRITE;
+		fx->objectID = ID_CANDLE_FLAME_SPRITE;
 		fx->frameNumber = Objects[fx->objectID].nMeshes * GetRandomControl() / 0x7FFF;
 	}
 }
@@ -938,7 +938,7 @@ void CandleEmitterSpriteControl(short fxNumber)
 	FX_INFO* fx = &Effects[fxNumber];
 	if (fx->counter <= 0)
 	{
-		if (--fx->frameNumber <= Objects[ID_CANDLE_SPRITE].nMeshes) {
+		if (--fx->frameNumber <= Objects[ID_CANDLE_FLAME_SPRITE].nMeshes) {
 			fx->frameNumber = 0;
 		}
 		fx->counter = CANDLE_TIMER;
