@@ -1,6 +1,6 @@
 {
   "default": {
-    "comment": "Default settings for all levels",
+    "comment": "To customize it, read this: https://docs.google.com/document/d/1D2Qr_aKDE4DfDAdhLkCfn7OY5RIrodF4Fh7wumWDM6A/edit?usp=sharing",
 
     "invloadingpixlanguage": "data/title%s.pcx",
     "invloadingpix": "data/title.pcx",
