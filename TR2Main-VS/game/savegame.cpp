@@ -304,17 +304,15 @@ void CreateSaveGameInfo() {
 			WriteSG(&item->hitPoints, sizeof(item->hitPoints));
 		}
 		if (obj->save_flags) {
-			short flags = item->flags;
-			flags |= item->active | (item->status << 1) | (item->gravity << 3) | (item->collidable << 4);
-			if (obj->intelligent && item->data != NULL) {
-				flags |= SGF_CREATURE;
-			}
+			UINT16 flags = item->flags | item->active | (item->status << 1) | (item->gravity << 3) | (item->collidable << 4);
+			bool is_creature = obj->intelligent && item->data != NULL;
+			WriteSG(&is_creature, sizeof(is_creature));
 			WriteSG(&flags, sizeof(flags));
 			if (obj->intelligent) {
 				WriteSG(&item->carriedItem, sizeof(item->carriedItem));
 			}
 			WriteSG(&item->timer, sizeof(item->timer));
-			if (CHK_ANY(flags, SGF_CREATURE)) {
+			if (is_creature) {
 				CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 				WriteSG(&creature->headRotation, sizeof(creature->headRotation));
 				WriteSG(&creature->neckRotation, sizeof(creature->neckRotation));
@@ -460,6 +458,8 @@ void ExtractSaveGameInfo() {
 			ReadSG(&item->hitPoints, sizeof(item->hitPoints));
 		}
 		if (obj->save_flags) {
+			bool is_creature = false;
+			ReadSG(&is_creature, sizeof(is_creature));
 			ReadSG(&item->flags, sizeof(item->flags));
 			if (obj->intelligent) {
 				ReadSG(&item->carriedItem, sizeof(item->carriedItem));
@@ -483,7 +483,7 @@ void ExtractSaveGameInfo() {
 				}
 			}
 
-			if (CHK_ANY(item->flags, SGF_CREATURE)) {
+			if (is_creature) {
 				EnableBaddieAI(i, 1);
 				CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 				if (creature != NULL) {
@@ -494,7 +494,11 @@ void ExtractSaveGameInfo() {
 					ReadSG(&creature->mood, sizeof(creature->mood));
 				}
 				else {
-					SG_Point += sizeof(short) * 4 + sizeof(MOOD_TYPE);
+					SG_Point += sizeof(creature->headRotation) +
+						        sizeof(creature->neckRotation) +
+						        sizeof(creature->maximumTurn) +
+						        sizeof(creature->flags) +
+						        sizeof(creature->mood);
 				}
 			}
 			else if (obj->intelligent) {
