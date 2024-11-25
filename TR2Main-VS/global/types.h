@@ -1121,6 +1121,11 @@ typedef enum {
 	RING_Keys,
 } RING_TYPE;
 
+typedef enum {
+	DOOR_CLOSED,
+	DOOR_OPEN
+} DOOR_STATE;
+
 typedef enum
 {
 	ZT_Skelly,
@@ -1996,6 +2001,11 @@ typedef struct RoomVertex_t {
 	BYTE flags;
 	short lightAdder;
 } ROOM_VERTEX;
+
+typedef struct LiftData_t {
+	int oldY;
+	int timer;
+} LIFT_DATA;
 
 typedef struct Face4_t {
 	short vertices[4];

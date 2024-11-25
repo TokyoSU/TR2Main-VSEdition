@@ -65,7 +65,7 @@ void LiftCeiling(ITEM_INFO* item, int x, int y, int z, int* height); // 0x00435A
 #define BridgeTilt2Floor ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00435BC0)
 #define BridgeTilt2Ceiling ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00435BF0)
 #define CopterControl ((void(__cdecl*)(short)) 0x00435C30)
-#define GeneralControl ((void(__cdecl*)(short)) 0x00435D40)
+void GeneralControl(short itemNumber); // 0x00435D40
 #define DetonatorControl ((void(__cdecl*)(short)) 0x00435E20)
 
 #endif // OBJECTS_H_INCLUDED

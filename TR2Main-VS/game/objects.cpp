@@ -23,10 +23,12 @@
 #include "game/objects.h"
 #include "3dsystem/phd_math.h"
 #include "game/control.h"
+#include "game/draw.h"
 #include "game/effects.h"
 #include "game/items.h"
 #include "game/missile.h"
 #include "game/sound.h"
+#include "game/sphere.h"
 #include "specific/game.h"
 #include "specific/init.h"
 #include "global/vars.h"
@@ -157,58 +159,65 @@ void OpenNearestDoor()
 	}
 }
 
-void InitialiseLift(short itemNumber) {
-	ITEM_INFO* item;
-	int* data;
+constexpr auto LIFT_FLOOR = 16;
+constexpr auto LIFT_FLOOR_NEXT = (BLOCK(5) + CLICK(2)) - LIFT_FLOOR;
+constexpr auto LIFT_SPEED = 16;
+constexpr auto LIFT_TIMER = 90; // Before the door close.
+constexpr auto LIFT_CLOSE = 0; // State
+constexpr auto LIFT_OPEN = 1;
 
-	item = &Items[itemNumber];
-	item->data = game_malloc(8, GBUF_TempAlloc);
-	data = (int*)item->data;
-	data[1] = 0;
-	data[0] = item->pos.y;
+static LIFT_DATA* GetLiftData(ITEM_INFO* item)
+{
+	return (LIFT_DATA*)item->data;
+}
+
+void InitialiseLift(short itemNumber) {
+	ITEM_INFO* item = &Items[itemNumber];
+	item->data = (LIFT_DATA*)game_malloc(sizeof(LIFT_DATA), GBUF_TempAlloc);
+	LIFT_DATA* lift = GetLiftData(item);
+	lift->oldY = item->pos.y;
+	lift->timer = 0;
 }
 
 void LiftControl(short itemNumber) {
-	ITEM_INFO* item;
-	int* data;
-	short roomID;
+	ITEM_INFO* item = &Items[itemNumber];
+	LIFT_DATA* lift = GetLiftData(item);
 
-	item = &Items[itemNumber];
-	data = (int*)item->data;
 	if (TriggerActive(item)) {
-		if (item->pos.y < data[0] + 5616) {
-			if (data[1] < 90) {
-				item->goalAnimState = 1;
-				++data[1];
+		if (item->pos.y < (lift->oldY + LIFT_FLOOR_NEXT)) {
+			if (lift->timer < LIFT_TIMER) {
+				item->goalAnimState = LIFT_OPEN;
+				++lift->timer;
 			}
 			else {
-				item->goalAnimState = 0;
-				item->pos.y += 16;
+				item->goalAnimState = LIFT_CLOSE;
+				item->pos.y += LIFT_SPEED;
 			}
 		}
 		else {
-			item->goalAnimState = 1;
-			data[1] = 0;
+			item->goalAnimState = LIFT_OPEN;
+			lift->timer = 0;
 		}
 	}
 	else {
-		if (item->pos.y > data[0] + 16) {
-			if (data[1] < 90) {
-				item->goalAnimState = 1;
-				++data[1];
+		if (item->pos.y > (lift->oldY + LIFT_FLOOR)) {
+			if (lift->timer < LIFT_TIMER) {
+				item->goalAnimState = LIFT_OPEN;
+				lift->timer++;
 			}
 			else {
-				item->goalAnimState = 0;
-				item->pos.y -= 16;
+				item->goalAnimState = LIFT_CLOSE;
+				item->pos.y -= LIFT_SPEED;
 			}
 		}
 		else {
-			item->goalAnimState = 1;
-			data[1] = 0;
+			item->goalAnimState = LIFT_OPEN;
+			lift->timer = 0;
 		}
 	}
+
 	AnimateItem(item);
-	roomID = item->roomNumber;
+	short roomID = item->roomNumber;
 	GetFloor(item->pos.x, item->pos.y, item->pos.z, &roomID);
 	if (item->roomNumber != roomID)
 		ItemNewRoom(itemNumber, roomID);
@@ -223,8 +232,8 @@ void LiftFloorCeiling(ITEM_INFO* item, int x, int y, int z, int* floor, int* cei
 	laraX = LaraItem->pos.x >> WALL_SHIFT;
 	laraZ = LaraItem->pos.z >> WALL_SHIFT;
 	inside = (x >> WALL_SHIFT == liftX || (x >> WALL_SHIFT) + 1 == liftX) && (z >> WALL_SHIFT == liftZ || (z >> WALL_SHIFT) - 1 == liftZ);
-	*floor = 32767;
-	*ceiling = -32767;
+	*floor = NO_HEIGHT;
+	*ceiling = NO_HEIGHT;
 	if ((laraX != liftX && laraX + 1 != liftX) || (laraZ != liftZ && laraZ - 1 != liftZ)) {
 		if (inside) {
 			if (y <= item->pos.y - 1280) {
@@ -234,7 +243,7 @@ void LiftFloorCeiling(ITEM_INFO* item, int x, int y, int z, int* floor, int* cei
 				if (y < item->pos.y + 256) {
 					if (!item->currentAnimState) {
 						*floor = NO_HEIGHT;
-						*ceiling = 32767;
+						*ceiling = NO_HEIGHT;
 					}
 					else {
 						*floor = item->pos.y;
@@ -255,7 +264,7 @@ void LiftFloorCeiling(ITEM_INFO* item, int x, int y, int z, int* floor, int* cei
 			}
 			else {
 				*floor = NO_HEIGHT;
-				*ceiling = 32767;
+				*ceiling = NO_HEIGHT;
 			}
 		}
 		else {
@@ -280,6 +289,7 @@ void LiftFloorCeiling(ITEM_INFO* item, int x, int y, int z, int* floor, int* cei
 void LiftFloor(ITEM_INFO* item, int x, int y, int z, int* height) {
 	int floor, ceiling;
 	LiftFloorCeiling(item, x, y, z, &floor, &ceiling);
+	if (ceiling == NO_HEIGHT) return;
 	if (floor < *height)
 		*height = floor;
 }
@@ -287,8 +297,41 @@ void LiftFloor(ITEM_INFO* item, int x, int y, int z, int* height) {
 void LiftCeiling(ITEM_INFO* item, int x, int y, int z, int* height) {
 	int floor, ceiling;
 	LiftFloorCeiling(item, x, y, z, &floor, &ceiling);
+	if (ceiling == NO_HEIGHT) return;
 	if (ceiling > *height)
 		*height = ceiling;
+}
+
+void GeneralControl(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	if (TriggerActive(item))
+		item->goalAnimState = DOOR_OPEN;
+	else
+		item->goalAnimState = DOOR_CLOSED;
+	AnimateItem(item);
+
+	short roomNumber = item->roomNumber;
+	GetFloor(item->pos.x, item->pos.y, item->pos.z, &roomNumber);
+	if (roomNumber != item->roomNumber)
+		ItemNewRoom(itemNumber, roomNumber);
+
+	// NOTE: This code is actually for the MiniSub
+	// This caused the DRAW_BRIDGE to also have a light which dont make sense !
+	if (item->objectID == ID_GENERAL)
+	{
+		PHD_VECTOR pos = {};
+		pos.x = 3000;
+		pos.y = 720;
+		pos.z = 0;
+		GetJointAbsPosition(item, &pos, 0);
+		AddDynamicLight(pos.x, pos.y, pos.z, 14, 12);
+		if (item->status == ITEM_DISABLED)
+		{
+			RemoveActiveItem(itemNumber);
+			item->flags |= IFL_ONESHOT;
+		}
+	}
 }
 
  /*
@@ -332,6 +375,6 @@ void Inject_Objects() {
 	//INJECT(0x00435BC0, BridgeTilt2Floor);
 	//INJECT(0x00435BF0, BridgeTilt2Ceiling);
 	//INJECT(0x00435C30, CopterControl);
-	//INJECT(0x00435D40, GeneralControl);
+	INJECT(0x00435D40, GeneralControl);
 	//INJECT(0x00435E20, DetonatorControl);
 }
