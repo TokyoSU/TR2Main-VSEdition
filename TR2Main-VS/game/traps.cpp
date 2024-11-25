@@ -222,11 +222,8 @@ void SpinningBlade(short itemNumber) {
 }
 
 void IcicleControl(short itemNumber) {
-	ITEM_INFO* item;
-	short roomID;
-	FLOOR_INFO* floor;
+	ITEM_INFO* item = &Items[itemNumber];
 
-	item = &Items[itemNumber];
 	switch (item->currentAnimState) {
 	case 1:
 		item->goalAnimState = 2;
@@ -245,15 +242,18 @@ void IcicleControl(short itemNumber) {
 		item->gravity = 0;
 		break;
 	}
+
 	AnimateItem(item);
+
 	if (item->status == ITEM_DISABLED) {
 		RemoveActiveItem(itemNumber);
 	}
 	else {
-		roomID = item->roomNumber;
-		floor = GetFloor(item->pos.x, item->pos.y, item->pos.z, &roomID);
+		short roomID = item->roomNumber;
+		FLOOR_INFO* floor = GetFloor(item->pos.x, item->pos.y, item->pos.z, &roomID);
 		if (item->roomNumber != roomID)
 			ItemNewRoom(itemNumber, roomID);
+
 		item->floor = GetHeight(floor, item->pos.x, item->pos.y, item->pos.z);
 		if (item->currentAnimState == 2 && item->pos.y >= item->floor) {
 			item->gravity = 0;
@@ -266,18 +266,14 @@ void IcicleControl(short itemNumber) {
 }
 
 void InitialiseBlade(short itemNumber) {
-	ITEM_INFO* item;
-
-	item = &Items[itemNumber];
+	ITEM_INFO* item = &Items[itemNumber];
 	item->animNumber = Objects[ID_BLADE].animIndex + 2;
 	item->currentAnimState = 1;
 	item->frameNumber = Anims[item->animNumber].frameBase;
 }
 
 void BladeControl(short itemNumber) {
-	ITEM_INFO* item;
-
-	item = &Items[itemNumber];
+	ITEM_INFO* item = &Items[itemNumber];
 	if (TriggerActive(item) && item->currentAnimState == 1) {
 		item->goalAnimState = 2;
 	}
@@ -287,24 +283,20 @@ void BladeControl(short itemNumber) {
 	if (CHK_ANY(item->touchBits, 2) && item->currentAnimState == 2) {
 		LaraItem->hitStatus = 1;
 		LaraItem->hitPoints -= 100;
-		DoLotsOfBlood(LaraItem->pos.x, item->pos.y - 256, LaraItem->pos.z, LaraItem->speed, LaraItem->pos.rotY, LaraItem->roomNumber, 2);
+		DoLotsOfBlood(LaraItem->pos.x, item->pos.y - CLICK(1), LaraItem->pos.z, LaraItem->speed, LaraItem->pos.rotY, LaraItem->roomNumber, 2);
 	}
 	AnimateItem(item);
 }
 
 void InitialiseKillerStatue(short itemNumber) {
-	ITEM_INFO* item;
-
-	item = &Items[itemNumber];
+	ITEM_INFO* item = &Items[itemNumber];
 	item->animNumber = Objects[item->objectID].animIndex + 3;
 	item->currentAnimState = 1;
 	item->frameNumber = Anims[item->animNumber].frameBase;
 }
 
 void KillerStatueControl(short itemNumber) {
-	ITEM_INFO* item;
-
-	item = &Items[itemNumber];
+	ITEM_INFO* item = &Items[itemNumber];
 	if (TriggerActive(item) && item->currentAnimState == 1) {
 		item->goalAnimState = 2;
 	}
@@ -312,8 +304,8 @@ void KillerStatueControl(short itemNumber) {
 		item->goalAnimState = 1;
 	}
 	if (CHK_ANY(item->touchBits, 0x80) && item->currentAnimState == 2) {
-		LaraItem->hitStatus = 1;
 		LaraItem->hitPoints -= 20;
+		LaraItem->hitStatus = 1;
 		DoBloodSplat(LaraItem->pos.x + (GetRandomControl() - 16384) / 256,
 			LaraItem->pos.y - GetRandomControl() / 44,
 			LaraItem->pos.z + (GetRandomControl() - 16384) / 256,
@@ -328,47 +320,38 @@ void SpringBoardControl(short itemNumber) {
 	ITEM_INFO* item = &Items[itemNumber];
 	if (item->currentAnimState == 0 && item->pos.y == LaraItem->pos.y &&
 		(LaraItem->pos.x >> WALL_SHIFT) == (item->pos.x >> WALL_SHIFT) &&
-		(LaraItem->pos.z >> WALL_SHIFT) == (item->pos.z >> WALL_SHIFT))
+		(LaraItem->pos.z >> WALL_SHIFT) == (item->pos.z >> WALL_SHIFT) &&
+		LaraItem->hitPoints > 0)
 	{
-		if (LaraItem->hitPoints > 0) {
-			if (LaraItem->currentAnimState == AS_BACK || LaraItem->currentAnimState == AS_FASTBACK)
-				LaraItem->speed = -LaraItem->speed;
-			LaraItem->fallSpeed = -240;
-			LaraItem->gravity = 1;
-			LaraItem->animNumber = 34;
-			LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
-			LaraItem->currentAnimState = AS_FORWARDJUMP;
-			LaraItem->goalAnimState = AS_FORWARDJUMP;
-			item->goalAnimState = 1;
-			AnimateItem(item);
-		}
+		if (LaraItem->currentAnimState == AS_BACK || LaraItem->currentAnimState == AS_FASTBACK)
+			LaraItem->speed = -LaraItem->speed;
+		LaraItem->fallSpeed = -240;
+		LaraItem->gravity = 1;
+		LaraItem->animNumber = 34;
+		LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+		LaraItem->currentAnimState = AS_FORWARDJUMP;
+		LaraItem->goalAnimState = AS_FORWARDJUMP;
+		item->goalAnimState = 1;
 	}
-	else {
-		AnimateItem(item);
-	}
+	AnimateItem(item);
 }
 
 void InitialiseRollingBall(short itemNumber) {
-	ITEM_INFO* item;
-	GAME_VECTOR* pos;
-
-	item = &Items[itemNumber];
+	ITEM_INFO* item = &Items[itemNumber];
 	item->data = game_malloc(sizeof(GAME_VECTOR), GBUF_RollingBallStuff);
-	pos = (GAME_VECTOR*)item->data;
-	pos->x = item->pos.x;
-	pos->y = item->pos.y;
-	pos->z = item->pos.z;
-	pos->roomNumber = item->roomNumber;
+	GAME_VECTOR* oldPos = (GAME_VECTOR*)item->data;
+	oldPos->x = item->pos.x;
+	oldPos->y = item->pos.y;
+	oldPos->z = item->pos.z;
+	oldPos->roomNumber = item->roomNumber;
 }
 
 void RollingBallControl(short itemNumber) {
-	ITEM_INFO* item;
 	int oldX, oldZ, distance, x, z;
 	short roomID;
 	FLOOR_INFO* floor;
-	GAME_VECTOR* pos;
 
-	item = &Items[itemNumber];
+	ITEM_INFO* item = &Items[itemNumber];
 	if (item->status == ITEM_ACTIVE) {
 		if (item->goalAnimState == 2) {
 			AnimateItem(item);
@@ -438,26 +421,24 @@ void RollingBallControl(short itemNumber) {
 			}
 		}
 	}
-	else {
-		if (item->status == ITEM_DISABLED && !TriggerActive(item)) {
-			pos = (GAME_VECTOR*)item->data;
-			item->status = ITEM_INACTIVE;
-			item->pos.x = pos->x;
-			item->pos.y = pos->y;
-			item->pos.z = pos->z;
-			if (item->roomNumber != pos->roomNumber) {
-				RemoveDrawnItem(itemNumber);
-				item->nextItem = RoomInfo[pos->roomNumber].itemNumber;
-				RoomInfo[pos->roomNumber].itemNumber = itemNumber;
-				item->roomNumber = pos->roomNumber;
-			}
-			item->animNumber = Objects[item->objectID].animIndex;
-			item->frameNumber = Anims[item->animNumber].frameBase;
-			item->requiredAnimState = 0;
-			item->goalAnimState = Anims[item->animNumber].currentAnimState;
-			item->currentAnimState = item->goalAnimState;
-			RemoveActiveItem(itemNumber);
+	else if (item->status == ITEM_DISABLED && !TriggerActive(item)) {
+		GAME_VECTOR* oldPos = (GAME_VECTOR*)item->data;
+		item->status = ITEM_INACTIVE;
+		item->pos.x = oldPos->x;
+		item->pos.y = oldPos->y;
+		item->pos.z = oldPos->z;
+		if (item->roomNumber != oldPos->roomNumber) {
+			RemoveDrawnItem(itemNumber);
+			item->nextItem = RoomInfo[oldPos->roomNumber].itemNumber;
+			RoomInfo[oldPos->roomNumber].itemNumber = itemNumber;
+			item->roomNumber = oldPos->roomNumber;
 		}
+		item->animNumber = Objects[item->objectID].animIndex;
+		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->requiredAnimState = 0;
+		item->goalAnimState = Anims[item->animNumber].currentAnimState;
+		item->currentAnimState = item->goalAnimState;
+		RemoveActiveItem(itemNumber);
 	}
 }
 
@@ -518,18 +499,25 @@ void RollingBallCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll
 
 void Pendulum(short itemNumber) {
 	ITEM_INFO* item = &Items[itemNumber];
-	if (item->touchBits) {
-		LaraItem->hitPoints -= 50;
-		LaraItem->hitStatus = 1;
-		DoBloodSplat(LaraItem->pos.x + (GetRandomControl() - 16384) / 256,
-			LaraItem->pos.y - GetRandomControl() / 44,
-			LaraItem->pos.z + (GetRandomControl() - 16384) / 256,
-			LaraItem->speed,
-			LaraItem->pos.rotY + (GetRandomControl() - 16384) / 8,
-			LaraItem->roomNumber);
+	if (TriggerActive(item))
+	{
+		if (item->touchBits != 0) {
+			LaraItem->hitPoints -= 50;
+			LaraItem->hitStatus = 1;
+			DoBloodSplat(LaraItem->pos.x + (GetRandomControl() - 16384) / 256,
+				LaraItem->pos.y - GetRandomControl() / 44,
+				LaraItem->pos.z + (GetRandomControl() - 16384) / 256,
+				LaraItem->speed,
+				LaraItem->pos.rotY + (GetRandomControl() - 16384) / 8,
+				LaraItem->roomNumber);
+		}
+		item->floor = GetHeight(GetFloor(item->pos.x, item->pos.y, item->pos.z, &item->roomNumber), item->pos.x, item->pos.y, item->pos.z);
+		AnimateItem(item);
 	}
-	item->floor = GetHeight(GetFloor(item->pos.x, item->pos.y, item->pos.z, &item->roomNumber), item->pos.x, item->pos.y, item->pos.z);
-	AnimateItem(item);
+	else if (item->frameNumber != 0)
+	{
+		AnimateItem(item);
+	}
 }
 
 void TeethTrap(short itemNumber) {
