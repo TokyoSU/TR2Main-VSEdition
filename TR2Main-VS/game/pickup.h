@@ -27,7 +27,7 @@
  /*
   * Function list
   */
-void PickUpCollision(short itemID, ITEM_INFO* laraitem, COLL_INFO* coll); // 0x00437F20
+void PickUpCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll); // 0x00437F20
 #define SwitchCollision ((void(__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x004383A0)
 #define SwitchCollision2 ((void(__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x004385B0)
 #define DetonatorCollision ((void(__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x004386B0)

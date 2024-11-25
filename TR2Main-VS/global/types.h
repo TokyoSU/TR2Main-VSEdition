@@ -2279,7 +2279,7 @@ typedef struct CreatureInfo_t {
 	short neckRotation;
 	short maximumTurn;
 	UINT16 flags;
-	short itemID;
+	short itemNumber;
 	MOOD_TYPE mood;
 	LOT_INFO LOT;
 	PHD_VECTOR target;

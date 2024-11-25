@@ -588,15 +588,15 @@ void ExtractSaveGameInfo() {
 	int numFlares = 0;
 	ReadSG(&numFlares, sizeof(numFlares));
 	for (int i = 0; i < numFlares; ++i) {
-		short itemID = CreateItem();
-		item = &Items[itemID];
+		short itemNumber = CreateItem();
+		item = &Items[itemNumber];
 		item->objectID = ID_FLARE_ITEM;
 		ReadSG(&item->pos, sizeof(item->pos));
 		ReadSG(&item->roomNumber, sizeof(item->roomNumber));
 		ReadSG(&item->speed, sizeof(item->speed));
 		ReadSG(&item->fallSpeed, sizeof(item->fallSpeed));
-		InitialiseItem(itemID);
-		AddActiveItem(itemID);
+		InitialiseItem(itemNumber);
+		AddActiveItem(itemNumber);
 		int flareAge;
 		ReadSG(&flareAge, sizeof(flareAge));
 		item->data = (LPVOID)flareAge;

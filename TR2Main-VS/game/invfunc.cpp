@@ -324,10 +324,10 @@ void RingExamineNotSelected() {
 	InvItemText[2] = NULL;
 }
 
-BOOL Inv_AddItem(GAME_OBJECT_ID itemID) {
+BOOL Inv_AddItem(GAME_OBJECT_ID itemNumber) {
 	int i, j, items;
 	int found = 0;
-	GAME_OBJECT_ID optionID = Inv_GetItemOption(itemID);
+	GAME_OBJECT_ID optionID = Inv_GetItemOption(itemNumber);
 
 	for (i = 0; i < InvMainObjectsCount; ++i) {
 		if (InvMainList[i]->objectID == optionID) {
@@ -344,7 +344,7 @@ BOOL Inv_AddItem(GAME_OBJECT_ID itemID) {
 	}
 
 	if (found == 1) {
-		if (itemID == ID_FLARES_ITEM)
+		if (itemNumber == ID_FLARES_ITEM)
 			InvMainQtys[i] += FLARE_AMMO_CLIPS;
 		else
 			InvMainQtys[i] += 1;
@@ -357,7 +357,7 @@ BOOL Inv_AddItem(GAME_OBJECT_ID itemID) {
 		return TRUE;
 	}
 
-	switch (itemID) {
+	switch (itemNumber) {
 	case ID_COMPASS_ITEM:
 	case ID_COMPASS_OPTION:
 		Inv_InsertItem(&InvCompassOption);
@@ -617,9 +617,9 @@ void Inv_InsertItem(INVENTORY_ITEM* item) {
 	}
 }
 
-int Inv_RequestItem(GAME_OBJECT_ID itemID) {
+int Inv_RequestItem(GAME_OBJECT_ID itemNumber) {
 	int i;
-	int optionID = Inv_GetItemOption(itemID);
+	int optionID = Inv_GetItemOption(itemNumber);
 
 	for (i = 0; i < InvMainObjectsCount; ++i)
 		if (InvMainList[i]->objectID == optionID)
@@ -639,9 +639,9 @@ void Inv_RemoveAllItems() {
 	InvKeysCurrent = 0;
 }
 
-BOOL Inv_RemoveItem(GAME_OBJECT_ID itemID) {
+BOOL Inv_RemoveItem(GAME_OBJECT_ID itemNumber) {
 	int i, j;
-	GAME_OBJECT_ID optionID = Inv_GetItemOption(itemID);
+	GAME_OBJECT_ID optionID = Inv_GetItemOption(itemNumber);
 
 	for (i = 0; i < InvMainObjectsCount; ++i) {
 		if (InvMainList[i]->objectID == optionID) {
@@ -674,8 +674,8 @@ BOOL Inv_RemoveItem(GAME_OBJECT_ID itemID) {
 	return FALSE;
 }
 
-GAME_OBJECT_ID Inv_GetItemOption(GAME_OBJECT_ID itemID) {
-	switch (itemID) {
+GAME_OBJECT_ID Inv_GetItemOption(GAME_OBJECT_ID itemNumber) {
+	switch (itemNumber) {
 		// Weapons
 	case ID_PISTOL_ITEM:
 	case ID_PISTOL_OPTION:

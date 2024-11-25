@@ -319,12 +319,12 @@ BOOL ShotTarget(ITEM_INFO* item, AI_INFO* AI, const BITE_INFO* bite, short angle
 	return ShotTargetNew(item, AI, bite, angle, damage, damage / 10);
 }
 
-void BanditControl(short itemID)
+void BanditControl(short itemNumber)
 {
-	if (!CreatureActive(itemID))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemID];
+	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* bandit = GetCreatureInfo(item);
 	if (bandit == NULL) return; // NOTE: Not exist in the original code.
 	AI_INFO AI{};
@@ -469,15 +469,15 @@ void BanditControl(short itemID)
 	CreatureTilt(item, tilt);
 	CreatureHead(item, head);
 	CreatureNeck(item, neck);
-	CreatureAnimation(itemID, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 }
 
-void Bandit2Control(short itemID)
+void Bandit2Control(short itemNumber)
 {
-	if (!CreatureActive(itemID))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemID];
+	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* bandit = GetCreatureInfo(item);
 	if (bandit == NULL) return; // NOTE: Not exist in the original code.
 	AI_INFO AI{};
@@ -647,14 +647,14 @@ void Bandit2Control(short itemID)
 	CreatureTilt(item, tilt);
 	CreatureHead(item, head);
 	CreatureNeck(item, neck);
-	CreatureAnimation(itemID, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 }
 
-void WinstonControl(short itemID) {
-	if (!CreatureActive(itemID))
+void WinstonControl(short itemNumber) {
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemID];
+	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* winston = (CREATURE_INFO*)item->data;
 	AI_INFO info;
 	CreatureAIInfo(item, &info);
@@ -693,7 +693,7 @@ void WinstonControl(short itemID) {
 	}
 	if (GetRandomDraw() < 256)
 		PlaySoundEffect(347, &item->pos, 0);
-	CreatureAnimation(itemID, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 }
 
 /*

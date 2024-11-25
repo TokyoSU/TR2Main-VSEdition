@@ -167,10 +167,10 @@ void FireM16(BOOL isRunning) {
 void FireHarpoon() {
 	GAME_VECTOR pos{};
 	if (Lara.harpoon_ammo <= 0) return;
-	short itemID = CreateItem();
-	if (itemID < 0) return;
+	short itemNumber = CreateItem();
+	if (itemNumber < 0) return;
 
-	ITEM_INFO* item = &Items[itemID];
+	ITEM_INFO* item = &Items[itemNumber];
 	item->objectID = ID_HARPOON_BOLT;
 	item->roomNumber = LaraItem->roomNumber;
 	pos.x = -2;
@@ -180,7 +180,7 @@ void FireHarpoon() {
 	item->pos.x = pos.x;
 	item->pos.y = pos.y;
 	item->pos.z = pos.z;
-	InitialiseItem(itemID);
+	InitialiseItem(itemNumber);
 	if (Lara.target) {
 		find_target_point(Lara.target, &pos);
 		item->pos.rotY = phd_atan(pos.z - item->pos.z, pos.x - item->pos.x);
@@ -194,7 +194,7 @@ void FireHarpoon() {
 	item->pos.rotZ = 0;
 	item->fallSpeed = -150 * phd_sin(item->pos.rotX) >> W2V_SHIFT;
 	item->speed = 150 * phd_cos(item->pos.rotX) >> W2V_SHIFT;
-	AddActiveItem(itemID);
+	AddActiveItem(itemNumber);
 	if (!SaveGame.bonusFlag) {
 		--Lara.harpoon_ammo;
 	}
@@ -204,7 +204,7 @@ void FireHarpoon() {
 #endif // FEATURE_INPUT_IMPROVED
 }
 
-void ControlHarpoonBolt(short itemID)
+void ControlHarpoonBolt(short itemNumber)
 {
 	FLOOR_INFO* floor = NULL;
 	ITEM_INFO* item = NULL, *target = NULL;
@@ -213,7 +213,7 @@ void ControlHarpoonBolt(short itemID)
 	short* bounds = NULL;
 	short roomNumber = 0, targetID = 0;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	oldPos.x = item->pos.x;
 	oldPos.y = item->pos.y;
 	oldPos.z = item->pos.z;
@@ -229,14 +229,14 @@ void ControlHarpoonBolt(short itemID)
 	floor = GetFloor(item->pos.x, item->pos.y, item->pos.z, &roomNumber);
 	item->floor = GetHeight(floor, item->pos.x, item->pos.y, item->pos.z);
 	if (item->roomNumber != roomNumber)
-		ItemNewRoom(itemID, roomNumber);
+		ItemNewRoom(itemNumber, roomNumber);
 	if (CHK_ANY(RoomInfo[item->roomNumber].flags, ROOM_UNDERWATER))
 		CreateBubble(&item->pos, item->roomNumber);
 
 	// Hit wall, ceiling or floor !
 	if (item->pos.y >= item->floor || item->pos.y <= GetCeiling(floor, item->pos.x, item->pos.y, item->pos.z))
 	{
-		KillItem(itemID);
+		KillItem(itemNumber);
 		return;
 	}
 
@@ -278,7 +278,7 @@ void ControlHarpoonBolt(short itemID)
 					HitTarget(target, 0, Weapons[LGT_Harpoon].damage);
 					++SaveGame.statistics.hits;
 				}
-				KillItem(itemID);
+				KillItem(itemNumber);
 				return;
 			}
 		}
@@ -286,14 +286,14 @@ void ControlHarpoonBolt(short itemID)
 }
 
 void FireRocket() {
-	short itemID;
+	short itemNumber;
 	ITEM_INFO* item;
 	PHD_VECTOR pos{};
 
 	if (Lara.grenade_ammo > 0) {
-		itemID = CreateItem();
-		if (itemID != -1) {
-			item = &Items[itemID];
+		itemNumber = CreateItem();
+		if (itemNumber != -1) {
+			item = &Items[itemNumber];
 			item->objectID = ID_ROCKET;
 			item->roomNumber = LaraItem->roomNumber;
 			pos.x = -2;
@@ -303,13 +303,13 @@ void FireRocket() {
 			item->pos.x = pos.x;
 			item->pos.y = pos.y;
 			item->pos.z = pos.z;
-			InitialiseItem(itemID);
+			InitialiseItem(itemNumber);
 			item->pos.rotX = LaraItem->pos.rotX + Lara.left_arm.x_rot;
 			item->pos.rotZ = 0;
 			item->speed = 200;
 			item->fallSpeed = 0;
 			item->pos.rotY = LaraItem->pos.rotY + Lara.left_arm.y_rot;
-			AddActiveItem(itemID);
+			AddActiveItem(itemNumber);
 			if (!SaveGame.bonusFlag)
 				--Lara.grenade_ammo;
 			++SaveGame.statistics.shots;
@@ -320,7 +320,7 @@ void FireRocket() {
 	}
 }
 
-void ControlRocket(short itemID) {
+void ControlRocket(short itemNumber) {
 	ITEM_INFO* item, * link;
 	int oldX, oldY, oldZ, displacement, c, s, r, oldR;
 	short room, linkID, * frame, fxID;
@@ -328,7 +328,7 @@ void ControlRocket(short itemID) {
 	BOOL collision;
 	FX_INFO* fx;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	oldX = item->pos.x;
 	oldY = item->pos.y;
 	oldZ = item->pos.z;
@@ -342,7 +342,7 @@ void ControlRocket(short itemID) {
 	floor = GetFloor(item->pos.x, item->pos.y, item->pos.z, &room);
 	item->floor = GetHeight(floor, item->pos.x, item->pos.y, item->pos.z);
 	if (item->roomNumber != room)
-		ItemNewRoom(itemID, room);
+		ItemNewRoom(itemNumber, room);
 	if (item->pos.y < item->floor && item->pos.y > GetCeiling(floor, item->pos.x, item->pos.y, item->pos.z)) {
 		collision = FALSE;
 		displacement = 0;
@@ -402,7 +402,7 @@ void ControlRocket(short itemID) {
 			fx->objectID = ID_EXPLOSION;
 		}
 		PlaySoundEffect(105, NULL, 0);
-		KillItem(itemID);
+		KillItem(itemNumber);
 #ifdef FEATURE_INPUT_IMPROVED
 		JoyRumbleExplode(oldX, oldY, oldZ, 0x1400, true);
 #endif // FEATURE_INPUT_IMPROVED

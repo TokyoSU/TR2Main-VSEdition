@@ -65,21 +65,21 @@ static void InitialiseCrow(ITEM_INFO* item)
 	item->goalAnimState = BIRD_STATE_IDLE;
 }
 
-void InitialiseBird(short itemID)
+void InitialiseBird(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemID];
-	InitialiseCreature(itemID);
+	ITEM_INFO* item = &Items[itemNumber];
+	InitialiseCreature(itemNumber);
 	if (item->objectID == ID_CROW)
 		InitialiseCrow(item);
 	else
 		InitialiseEagle(item);
 }
 
-void BirdControl(short itemID)
+void BirdControl(short itemNumber)
 {
-	if (!CreatureActive(itemID))
+	if (!CreatureActive(itemNumber))
 		return;
-	ITEM_INFO* item = &Items[itemID];
+	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* bird = GetCreatureInfo(item);
 	if (bird == NULL) return; // NOTE: Not exist in the original game.
 	AI_INFO ai = {};
@@ -160,16 +160,16 @@ void BirdControl(short itemID)
 		case BIRD_STATE_ATTACK:
 			if (bird->flags == 0)
 			{
-				if (item->objectID == ID_CROW && DamageLaraOrEnemy(item, bird->enemy, &CrowBite, CROW_DAMAGE, CROW_DAMAGE_TO_OTHER, item->touchBits))
+				if (item->objectID == ID_CROW && DamageLaraOrEnemy(item, bird->enemy, &CrowBite, CROW_DAMAGE, CROW_DAMAGE_TO_OTHER, item->touchBits != 0))
 					bird->flags = 1;
-				else if (DamageLaraOrEnemy(item, bird->enemy, &EagleBite, EAGLE_DAMAGE, EAGLE_DAMAGE_TO_OTHER, item->touchBits))
+				else if (DamageLaraOrEnemy(item, bird->enemy, &EagleBite, EAGLE_DAMAGE, EAGLE_DAMAGE_TO_OTHER, item->touchBits != 0))
 					bird->flags = 1;
 			}
 			break;
 		}
 	}
 
-	CreatureAnimation(itemID, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 }
 
  /*

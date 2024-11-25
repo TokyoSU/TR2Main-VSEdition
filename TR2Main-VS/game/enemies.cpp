@@ -26,6 +26,7 @@
 #include "game/larafire.h"
 #include "game/effects.h"
 #include "game/missile.h"
+#include "game/people.h"
 #include "game/sound.h"
 #include "specific/game.h"
 #include "global/vars.h"
@@ -34,11 +35,18 @@
 #define MONK_DAMAGE 150
 #define MONK_DEATH_ANIM 20
 #define MONK_TOUCHBITS MESH_BITS(14)
-#define MONK_CLOSE_RANGE SQR(WALL_SIZE/2)
-#define MONK_LONG_RANGE SQR(WALL_SIZE)
-#define MONK_ATTACK5_RANGE SQR(WALL_SIZE*3)
-#define MONK_WALK_RANGE SQR(WALL_SIZE*2)
-#define MONK_HIT_RANGE (CLICK_SIZE*2)
+#define MONK_CLOSE_RANGE SQR(CLICK(2))
+#define MONK_LONG_RANGE SQR(BLOCK(1))
+#define MONK_ATTACK5_RANGE SQR(BLOCK(3))
+#define MONK_WALK_RANGE SQR(BLOCK(2))
+#define MONK_HIT_RANGE CLICK(2)
+
+#define CULT2_DEATH_ANIM 23
+#define CULT2_WALK_TURN ANGLE(3)
+#define CULT2_RUN_TURN ANGLE(6)
+#define CULT2_WALK_RANGE SQR(BLOCK(4))
+#define CULT2_KNIFE_RANGE SQR(BLOCK(6))
+#define CULT2_STOP_RANGE SQR(BLOCK(5) / 2)
 
 enum MonkState
 {
@@ -55,7 +63,23 @@ enum MonkState
 	MONK_STOP2
 };
 
+enum Cult2State // Knifethrower StateIDs
+{
+	CULT2_STOP = 1,
+	CULT2_WALK,
+	CULT2_RUN,
+	CULT2_AIM1L,
+	CULT2_SHOOT1L,
+	CULT2_AIM1R,
+	CULT2_SHOOT1R,
+	CULT2_AIM2,
+	CULT2_SHOOT2,
+	CULT2_DEATH
+};
+
 static const BITE_INFO MonkBite = { -23, 16, 265, 14 };
+static const BITE_INFO Cult2Left = { 0, 0, 0, 5 };
+static const BITE_INFO Cult2Right = { 0, 0, 0, 8 };
 
 short Knife(int x, int y, int z, short speed, short rotY, short roomNum)
 {
@@ -79,12 +103,162 @@ short Knife(int x, int y, int z, short speed, short rotY, short roomNum)
 	return fxNum;
 }
 
-void MonkControl(short itemID)
+void Cult2Control(short itemNumber)
 {
-	if (!CreatureActive(itemID))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemID];
+	ITEM_INFO* item = &Items[itemNumber];
+	CREATURE_INFO* cult2 = GetCreatureInfo(item);
+	if (cult2 == NULL) return; // NOTE: Not exist in the original game.
+	short tilt = 0, neck = 0, head = 0, angle = 0;
+
+	if (item->hitPoints <= 0)
+	{
+		if (item->currentAnimState != CULT2_DEATH)
+			SetAnimation(item, CULT2_DEATH_ANIM, CULT2_DEATH);
+	}
+	else
+	{
+		AI_INFO ai = {};
+		bool isLeft = false;
+
+		CreatureAIInfo(item, &ai);
+		CreatureMood(item, &ai, FALSE);
+		angle = CreatureTurn(item, cult2->maximumTurn);
+
+		switch (item->currentAnimState)
+		{
+		case CULT2_STOP:
+			cult2->maximumTurn = 0;
+			if (ai.ahead)
+				neck = ai.angle;
+
+			if (cult2->mood == MOOD_ESCAPE)
+				item->goalAnimState = CULT2_RUN;
+			else if (Targetable(item, &ai))
+				item->goalAnimState = CULT2_AIM2;
+			else if (cult2->mood == MOOD_BORED)
+			{
+				if (!ai.ahead || ai.distance > CULT2_KNIFE_RANGE)
+					item->goalAnimState = CULT2_WALK;
+			}
+			else if (ai.ahead && ai.distance < CULT2_WALK_RANGE)
+				item->goalAnimState = CULT2_WALK;
+			else
+				item->goalAnimState = CULT2_RUN;
+
+			break;
+		case CULT2_WALK:
+			cult2->maximumTurn = CULT2_WALK_TURN;
+			if (ai.ahead)
+				neck = ai.angle;
+
+			if (cult2->mood == MOOD_ESCAPE)
+				item->goalAnimState = CULT2_RUN;
+			else if (Targetable(item, &ai))
+			{
+				if (ai.distance < CULT2_STOP_RANGE || ai.zoneNumber != ai.enemyZone)
+					item->goalAnimState = CULT2_STOP;
+				else if (GetRandomControl() & 0x4000)
+					item->goalAnimState = CULT2_AIM1L;
+				else
+					item->goalAnimState = CULT2_AIM1R;
+			}
+			else if (cult2->mood == MOOD_BORED)
+			{
+				if (ai.ahead && ai.distance < CULT2_KNIFE_RANGE)
+					item->goalAnimState = CULT2_STOP;
+			}
+			else if (!ai.ahead || ai.distance > CULT2_WALK_RANGE)
+				item->goalAnimState = CULT2_RUN;
+
+			break;
+		case CULT2_RUN:
+			cult2->maximumTurn = CULT2_RUN_TURN;
+			tilt = angle >> 2;
+			if (ai.ahead)
+				neck = ai.angle;
+
+			if (cult2->mood == MOOD_ESCAPE)
+				break;
+			else if (Targetable(item, &ai))
+				item->goalAnimState = CULT2_WALK;
+			else if (cult2->mood == MOOD_BORED)
+			{
+				if (ai.ahead && ai.distance < CULT2_KNIFE_RANGE)
+					item->goalAnimState = CULT2_STOP;
+				else
+					item->goalAnimState = CULT2_WALK;
+			}
+			else if (ai.ahead && ai.distance < CULT2_WALK_RANGE)
+				item->goalAnimState = CULT2_WALK;
+
+			break;
+		case CULT2_AIM1L:
+		case CULT2_AIM1R:
+			cult2->flags = 0;
+			if (ai.ahead)
+				head = ai.angle;
+
+			isLeft = (item->currentAnimState == CULT2_AIM1L);
+			if (Targetable(item, &ai))
+				item->goalAnimState = isLeft ? CULT2_SHOOT1L : CULT2_SHOOT1R;
+			else
+				item->goalAnimState = CULT2_WALK;
+
+			break;
+		case CULT2_AIM2:
+			cult2->flags = 0;
+			if (ai.ahead)
+				head = ai.angle;
+			
+			if (Targetable(item, &ai))
+				item->goalAnimState = CULT2_SHOOT2;
+			else
+				item->goalAnimState = CULT2_WALK;
+
+			break;
+		case CULT2_SHOOT1L:
+		case CULT2_SHOOT1R:
+			if (ai.ahead)
+				head = ai.angle;
+
+			isLeft = (item->currentAnimState == CULT2_SHOOT1L);
+			if (!cult2->flags)
+			{
+				CreatureEffect(item, isLeft ? &Cult2Left : &Cult2Right, Knife);
+				cult2->flags = 1;
+			}
+
+			break;
+		case CULT2_SHOOT2:
+			if (ai.ahead)
+				head = ai.angle;
+
+			if (!cult2->flags)
+			{
+				CreatureEffect(item, &Cult2Left, Knife);
+				CreatureEffect(item, &Cult2Right, Knife);
+				cult2->flags = 1;
+			}
+
+			break;
+		}
+	}
+
+	CreatureTilt(item, tilt);
+	CreatureNeck(item, neck);
+	CreatureHead(item, head);
+	CreatureAnimation(itemNumber, angle, 0);
+}
+
+void MonkControl(short itemNumber)
+{
+	if (!CreatureActive(itemNumber))
+		return;
+
+	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* monk = GetCreatureInfo(item);
 	if (monk == NULL) return; // NOTE: Not exist in the original game.
 	AI_INFO ai{};
@@ -279,7 +453,7 @@ void MonkControl(short itemID)
 
 	CreatureTilt(item, tilt);
 	CreatureHead(item, head);
-	CreatureAnimation(itemID, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 }
 
 void WarriorSparkleTrail(ITEM_INFO* item)
@@ -304,7 +478,7 @@ void WarriorSparkleTrail(ITEM_INFO* item)
   */
 void Inject_Enemies() {
 	INJECT(0x0041DB30, Knife);
-	//INJECT(0x0041DBB0, Cult2Control);
+	INJECT(0x0041DBB0, Cult2Control);
 	INJECT(0x0041DFE0, MonkControl);
 	//INJECT(0x0041E4B0, Worker3Control);
 	//INJECT(0x0041EAC0, DrawXianLord);

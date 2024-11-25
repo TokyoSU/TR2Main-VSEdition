@@ -91,12 +91,12 @@ BITE_INFO YetiBiteHandL = { 12, 101, 19, 13 };
 BITE_INFO BirdyBiteHandL = { 0, 224, 0, 19 };
 BITE_INFO BirdyBiteHandR = { 0, 224, 0, 22 };
 
-void GiantYetiControl(short itemID)
+void GiantYetiControl(short itemNumber)
 {
-	if (!CreatureActive(itemID))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemID];
+	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* birdy = GetCreatureInfo(item);
 	AI_INFO AI = {};
 	short angle = 0, head = 0;
@@ -195,15 +195,15 @@ void GiantYetiControl(short itemID)
 	}
 
 	CreatureHead(item, head);
-	CreatureAnimation(itemID, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 }
 
-void YetiControl(short itemID)
+void YetiControl(short itemNumber)
 {
-	if (!CreatureActive(itemID))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemID];
+	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* yeti = GetCreatureInfo(item);
 	OBJECT_INFO* obj = &Objects[item->objectID];
 	AI_INFO AI = {};
@@ -216,7 +216,7 @@ void YetiControl(short itemID)
 		if (Mod.makeYetiExplodeOnDeath)
 		{
 			CreateExplosion(&item->pos, item->roomNumber, 384);
-			CreatureDie(itemID, TRUE);
+			CreatureDie(itemNumber, TRUE);
 			item->currentAnimState = YETI_DEATH;
 			return;
 		}
@@ -460,7 +460,7 @@ void YetiControl(short itemID)
 
 	if (item->currentAnimState < YETI_CLIMB2)
 	{
-		switch (CreatureVault(itemID, angle, 2, 300))
+		switch (CreatureVault(itemNumber, angle, 2, 300))
 		{
 		case 2:
 			SetAnimation(item, YETI_CLIMB2_ANIM, YETI_CLIMB2);
@@ -478,7 +478,7 @@ void YetiControl(short itemID)
 	}
 	else
 	{
-		CreatureAnimation(itemID, angle, 0);
+		CreatureAnimation(itemNumber, angle, 0);
 	}
 }
 

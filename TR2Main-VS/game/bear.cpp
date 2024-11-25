@@ -31,6 +31,12 @@
 #define BEAR_DAMAGE1 (400)
 #define BEAR_DAMAGE2 (200)
 #define BEAR_DAMAGE_TOUCH (3)
+
+#define BEAR_DAMAGE0_TO_OTHER (7)
+#define BEAR_DAMAGE1_TO_OTHER (10)
+#define BEAR_DAMAGE2_TO_OTHER (5)
+#define BEAR_DAMAGE_TOUCH_TO_OTHER (1)
+
 #define BEAR_TOUCH (0x2406C)
 
 typedef enum {
@@ -44,15 +50,15 @@ typedef enum {
 	BEAR_ATTACK2,
 	BEAR_EAT,
 	BEAR_DEATH
-} BEAR_ANIMS;
+} BEAR_STATES;
 
 static const BITE_INFO BearBite = { 0, 96, 335, 14 };
 
-void BearControl(short itemID) {
-	if (!CreatureActive(itemID))
+void BearControl(short itemNumber) {
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemID];
+	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* bear = GetCreatureInfo(item);
 	if (bear == NULL) return; // NOTE: additional check not presented in the original game
 	AI_INFO info{};
@@ -60,7 +66,7 @@ void BearControl(short itemID) {
 	short angle = 0, head = 0;
 
 	if (item->hitPoints <= 0) {
-		angle = CreatureTurn(item, 182);
+		angle = CreatureTurn(item, ANGLE(1));
 		switch (item->currentAnimState) {
 		case BEAR_STROLL:
 		case BEAR_RUN:
@@ -75,11 +81,8 @@ void BearControl(short itemID) {
 			item->goalAnimState = BEAR_DEATH;
 			break;
 		case BEAR_DEATH:
-			if (bear->flags && CHK_ANY(item->touchBits, BEAR_TOUCH)) {
-				bear->enemy->hitPoints -= BEAR_DAMAGE2;
-				bear->enemy->hitStatus = 1;
+			if (bear->flags != 0 && DamageLaraOrEnemy(item, bear->enemy, &BearBite, BEAR_DAMAGE2, BEAR_DAMAGE2_TO_OTHER, CHK_ANY(item->touchBits, BEAR_TOUCH)))
 				bear->flags = 0;
-			}
 			break;
 		case BEAR_WALK:
 			item->goalAnimState = BEAR_REAR;
@@ -123,7 +126,7 @@ void BearControl(short itemID) {
 			break;
 
 		case BEAR_STROLL:
-			bear->maximumTurn = 364;
+			bear->maximumTurn = ANGLE(2);
 			if (isLaraDead && CHK_ANY(item->touchBits, BEAR_TOUCH) && info.ahead) {
 				item->goalAnimState = BEAR_STOP;
 			}
@@ -140,11 +143,9 @@ void BearControl(short itemID) {
 			break;
 
 		case BEAR_RUN:
-			bear->maximumTurn = 910;
-			if (CHK_ANY(item->touchBits, BEAR_TOUCH)) {
-				bear->enemy->hitPoints -= BEAR_DAMAGE_TOUCH;
-				bear->enemy->hitStatus = 1;
-			}
+			bear->maximumTurn = ANGLE(5);
+
+			DamageLaraOrEnemy(item, bear->enemy, &BearBite, BEAR_DAMAGE_TOUCH, BEAR_DAMAGE_TOUCH / 15, CHK_ANY(item->touchBits, BEAR_TOUCH));
 
 			if (bear->mood == MOOD_BORED || isLaraDead) {
 				item->goalAnimState = BEAR_STOP;
@@ -184,7 +185,7 @@ void BearControl(short itemID) {
 				item->requiredAnimState = BEAR_STROLL;
 				item->goalAnimState = BEAR_REAR;
 			}
-			else if (info.ahead && CHK_ANY(item->touchBits, BEAR_TOUCH)) {
+			else if (info.ahead && (CHK_ANY(item->touchBits, BEAR_TOUCH) || (bear->enemy->objectID != ID_LARA && IsCreatureNearTarget(item, bear->enemy)))) {
 				item->goalAnimState = BEAR_REAR;
 			}
 			else if (bear->mood == MOOD_ESCAPE) {
@@ -202,30 +203,19 @@ void BearControl(short itemID) {
 			break;
 
 		case BEAR_ATTACK2:
-			if (item->requiredAnimState == BEAR_STROLL && CHK_ANY(item->touchBits, BEAR_TOUCH)) {
-				bear->enemy->hitPoints -= BEAR_DAMAGE1;
-				bear->enemy->hitStatus = 1;
+			if (item->requiredAnimState == BEAR_STROLL && DamageLaraOrEnemy(item, bear->enemy, &BearBite, BEAR_DAMAGE1, BEAR_DAMAGE1_TO_OTHER, CHK_ANY(item->touchBits, BEAR_TOUCH)))
 				item->requiredAnimState = BEAR_REAR;
-			}
 			break;
 
 		case BEAR_ATTACK1:
-			if (item->requiredAnimState == BEAR_STROLL && CHK_ANY(item->touchBits, BEAR_TOUCH))
-			{
-				CreatureEffect(item, &BearBite, DoBloodSplat);
-				bear->enemy->hitPoints -= BEAR_DAMAGE0;
-				bear->enemy->hitStatus = 1;
+			if (item->requiredAnimState == BEAR_STROLL && DamageLaraOrEnemy(item, bear->enemy, &BearBite, BEAR_DAMAGE0, BEAR_DAMAGE0_TO_OTHER, CHK_ANY(item->touchBits, BEAR_TOUCH)))
 				item->requiredAnimState = BEAR_STOP;
-			}
-			break;
-
-		default:
 			break;
 		}
 	}
 
 	CreatureHead(item, head);
-	CreatureAnimation(itemID, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 }
 
 /*

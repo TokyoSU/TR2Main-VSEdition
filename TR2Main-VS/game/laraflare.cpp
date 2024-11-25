@@ -149,13 +149,13 @@ void DrawFlareInAir(ITEM_INFO* item) {
 }
 
 void CreateFlare(BOOL isFlying) {
-	short itemID;
+	short itemNumber;
 	ITEM_INFO* item;
 	PHD_VECTOR pos;
 
-	itemID = CreateItem();
-	if (itemID != -1) {
-		item = &Items[itemID];
+	itemNumber = CreateItem();
+	if (itemNumber != -1) {
+		item = &Items[itemNumber];
 		item->objectID = ID_FLARE_ITEM;
 		item->roomNumber = LaraItem->roomNumber;
 		pos.x = -16;
@@ -175,7 +175,7 @@ void CreateFlare(BOOL isFlying) {
 			item->pos.z = pos.z;
 			item->pos.rotY = isFlying ? LaraItem->pos.rotY : LaraItem->pos.rotY - PHD_45;
 		}
-		InitialiseItem(itemID);
+		InitialiseItem(itemNumber);
 		item->pos.rotZ = 0;
 		item->pos.rotX = 0;
 		item->shade1 = -1;
@@ -193,7 +193,7 @@ void CreateFlare(BOOL isFlying) {
 		else {
 			item->data = (LPVOID)(Lara.flare_age & 0x7FFF);
 		}
-		AddActiveItem(itemID);
+		AddActiveItem(itemNumber);
 		item->status = ITEM_ACTIVE;
 	}
 }
@@ -358,13 +358,13 @@ void ready_flare() {
 	Lara.target = NULL;
 }
 
-void FlareControl(short itemID) {
+void FlareControl(short itemNumber) {
 	FLOOR_INFO* floor;
 	ITEM_INFO* item;
 	int x, y, z, height, ceiling, age;
 	short roomID;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	if (item->fallSpeed) {
 		item->pos.rotX += 3 * PHD_DEGREE;
 		item->pos.rotZ += 5 * PHD_DEGREE;
@@ -419,7 +419,7 @@ void FlareControl(short itemID) {
 		}
 	}
 	if (roomID != item->roomNumber)
-		ItemNewRoom(itemID, roomID);
+		ItemNewRoom(itemNumber, roomID);
 	age = (int)item->data & 0x7FFF;
 	if (age < 1800 || item->fallSpeed || item->speed) {
 		if (age < 1800)
@@ -438,7 +438,7 @@ void FlareControl(short itemID) {
 		item->data = (LPVOID)age;
 	}
 	else {
-		KillItem(itemID);
+		KillItem(itemNumber);
 	}
 }
 

@@ -33,10 +33,10 @@ void InitCinematicRooms(); // 0x00412060
 int DoCinematic(int nTicks); // 0x00412100
 void CalculateCinematicCamera(); // 0x00412270
 int GetCinematicRoom(int x, int y, int z); // 0x004123B0
-void ControlCinematicPlayer(short itemID); // 0x00412430
-void LaraControlCinematic(short itemID); // 0x00412510
-void InitialisePlayer1(short itemID); // 0x004125B0
-void InitialiseGenPlayer(short itemID); // 0x00412640
+void ControlCinematicPlayer(short itemNumber); // 0x00412430
+void LaraControlCinematic(short itemNumber); // 0x00412510
+void InitialisePlayer1(short itemNumber); // 0x004125B0
+void InitialiseGenPlayer(short itemNumber); // 0x00412640
 void InGameCinematicCamera(); // 0x00412680
 
 #endif // CINEMA_H_INCLUDED

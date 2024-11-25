@@ -37,11 +37,11 @@
 #define ControlGongBonger ((void(__cdecl*)(short)) 0x004348B0)
 #define DeathSlideCollision ((void(__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x00434970)
 #define ControlDeathSlide ((void(__cdecl*)(short)) 0x00434A30)
-void BigBowlControl(short itemID); // 0x00434CC0
-void BellControl(short itemID); // 0x00434DB0
-void InitialiseWindow(short itemID); // 0x00434E30
-void SmashWindow(short itemID); // 0x00434EB0
-void WindowControl(short itemID); // 0x00434F80
+void BigBowlControl(short itemNumber); // 0x00434CC0
+void BellControl(short itemNumber); // 0x00434DB0
+void InitialiseWindow(short itemNumber); // 0x00434E30
+void SmashWindow(short itemNumber); // 0x00434EB0
+void WindowControl(short itemNumber); // 0x00434F80
 void OpenNearestDoor();
 #define SmashIceControl ((void(__cdecl*)(short)) 0x00435020)
 //0x00435100:		ShutThatDoor
@@ -52,8 +52,8 @@ void OpenNearestDoor();
 #define DrawBridgeFloor ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00435700)
 #define DrawBridgeCeiling ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00435740)
 #define DrawBridgeCollision ((void(__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x00435780)
-void InitialiseLift(short itemID); // 0x004357B0
-void LiftControl(short itemID); // 0x004357F0
+void InitialiseLift(short itemNumber); // 0x004357B0
+void LiftControl(short itemNumber); // 0x004357F0
 void LiftFloorCeiling(ITEM_INFO* item, int x, int y, int z, int* floor, int* ceiling); // 0x004358D0
 void LiftFloor(ITEM_INFO* item, int x, int y, int z, int* height); // 0x00435A50
 void LiftCeiling(ITEM_INFO* item, int x, int y, int z, int* height); // 0x00435A90

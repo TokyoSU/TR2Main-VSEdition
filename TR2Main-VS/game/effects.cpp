@@ -369,12 +369,12 @@ void ControlHotLiquid(short fxID) {
 	}
 }
 
-void WaterFall(short itemID) {
+void WaterFall(short itemNumber) {
 	ITEM_INFO* item;
 	short fxID;
 	FX_INFO* fx;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	if (ABS(item->pos.x - LaraItem->pos.x) <= 10240 &&
 		ABS(item->pos.z - LaraItem->pos.z) <= 10240 &&
 		ABS(item->pos.y - LaraItem->pos.y) <= 10240)
@@ -487,29 +487,29 @@ void SetChangeFX(ITEM_INFO* item) {
 	FlipEffect = -1;
 }
 
-void ControlDingDong(short itemID) {
+void ControlDingDong(short itemNumber) {
 	ITEM_INFO* item;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	if (CHK_ALL(item->flags, IFL_CODEBITS)) {
 		PlaySoundEffect(334, &item->pos, 0);
 		item->flags -= IFL_CODEBITS;
 	}
 }
 
-void ControlLaraAlarm(short itemID) {
+void ControlLaraAlarm(short itemNumber) {
 	ITEM_INFO* item;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	if (CHK_ALL(item->flags, IFL_CODEBITS))
 		PlaySoundEffect(335, &item->pos, 0);
 }
 
-void ControlAlarmSound(short itemID) {
+void ControlAlarmSound(short itemNumber) {
 	ITEM_INFO* item;
 	int counter;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	if (CHK_ALL(item->flags, IFL_CODEBITS)) {
 		PlaySoundEffect(332, &item->pos, 0);
 		counter = (int)item->data + 1;
@@ -522,10 +522,10 @@ void ControlAlarmSound(short itemID) {
 	}
 }
 
-void ControlBirdTweeter(short itemID) {
+void ControlBirdTweeter(short itemNumber) {
 	ITEM_INFO* item;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	if (item->objectID == ID_BIRD_TWEETER2) {
 		if (GetRandomDraw() < 1024)
 			PlaySoundEffect(316, &item->pos, 0);
@@ -545,10 +545,10 @@ void DoChimeSound(ITEM_INFO* item) {
 	PlaySoundEffect(208, &pos, 0);
 }
 
-void ControlClockChimes(short itemID) {
+void ControlClockChimes(short itemNumber) {
 	ITEM_INFO* item;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	if (item->timer) {
 		if (item->timer % 60 == 59)
 			DoChimeSound(item);
@@ -556,19 +556,19 @@ void ControlClockChimes(short itemID) {
 		if (!item->timer) {
 			DoChimeSound(item);
 			item->timer = -1;
-			RemoveActiveItem(itemID);
+			RemoveActiveItem(itemNumber);
 			item->status = ITEM_INACTIVE;
 			item->flags &= ~IFL_CODEBITS;
 		}
 	}
 }
 
-void SphereOfDoomCollision(short itemID, ITEM_INFO* laraItem, COLL_INFO* coll) {
+void SphereOfDoomCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll) {
 	ITEM_INFO* item;
 	int dx, dz, distance, angle;
 
 	if (!CHK_ANY(RoomInfo[laraItem->roomNumber].flags, ROOM_UNDERWATER)) {
-		item = &Items[itemID];
+		item = &Items[itemNumber];
 		dx = laraItem->pos.x - item->pos.x;
 		dz = laraItem->pos.z - item->pos.z;
 		distance = 5 * item->timer >> 1;
@@ -596,12 +596,12 @@ void SphereOfDoomCollision(short itemID, ITEM_INFO* laraItem, COLL_INFO* coll) {
 	}
 }
 
-void SphereOfDoom(short itemID) {
+void SphereOfDoom(short itemNumber) {
 	ITEM_INFO* item;
 	int dx, dy, dz, distance, difference;
 	PHD_3DPOS pos;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	item->timer += 64;
 	item->pos.rotY += (item->objectID == ID_SPHERE_OF_DOOM2) ? ANGLE(10) : -ANGLE(10);
 	dx = item->pos.x - LaraItem->pos.x;
@@ -614,7 +614,7 @@ void SphereOfDoom(short itemID) {
 	pos.z = LaraItem->pos.z + difference * dz / distance;
 	PlaySoundEffect(341, &pos, 0);
 	if (item->timer > 3840)
-		KillItem(itemID);
+		KillItem(itemNumber);
 }
 
 void DrawSphereOfDoom(ITEM_INFO* item) {

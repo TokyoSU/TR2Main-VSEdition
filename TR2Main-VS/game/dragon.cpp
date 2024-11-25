@@ -66,9 +66,9 @@ void ControlTwinkle(short fxNum)
 	}
 }
 
-void CreateBartoliLight(short itemNum)
+void CreateBartoliLight(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 	short fxNum = CreateEffect(item->roomNumber);
 	if (fxNum != -1)
 	{
@@ -78,7 +78,7 @@ void CreateBartoliLight(short itemNum)
 		fx->pos.y = (GetRandomDraw() >> 2) + item->pos.y - 1024;
 		fx->pos.z = item->pos.z + (ANGLE(5) * phd_cos(fx->pos.rotY) >> W2V_SHIFT);
 		fx->roomNumber = item->roomNumber;
-		fx->counter = itemNum;
+		fx->counter = itemNumber;
 		fx->frameNumber = 0;
 		fx->objectID = ID_TWINKLE;
 	}

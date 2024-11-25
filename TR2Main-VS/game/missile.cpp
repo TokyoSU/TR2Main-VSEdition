@@ -152,9 +152,9 @@ static void CreateExplodingMesh(ITEM_INFO* item, short meshIndex, short damage)
 	}
 }
 
-BOOL ExplodingDeath(short itemNum, DWORD meshBits, short damage)
+BOOL ExplodingDeath(short itemNumber, DWORD meshBits, short damage)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 	OBJECT_INFO* obj = &Objects[item->objectID];
 	PhdMatrixPtr->_23 = 0;
 	S_CalculateLight(item->pos.x, item->pos.y, item->pos.z, item->roomNumber);

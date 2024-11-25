@@ -34,12 +34,12 @@ void RingNotActive(INVENTORY_ITEM* item); // 0x00423E20
 void RingActive(); // 0x00424290
 void RingExamineSelected(INVENTORY_ITEM* item);
 void RingExamineNotSelected();
-BOOL Inv_AddItem(GAME_OBJECT_ID itemID); // 0x004242D0
+BOOL Inv_AddItem(GAME_OBJECT_ID itemNumber); // 0x004242D0
 void Inv_InsertItem(INVENTORY_ITEM* item); // 0x00424AE0
-int Inv_RequestItem(GAME_OBJECT_ID itemID); // 0x00424C10
+int Inv_RequestItem(GAME_OBJECT_ID itemNumber); // 0x00424C10
 void Inv_RemoveAllItems(); // 0x00424C90
-BOOL Inv_RemoveItem(GAME_OBJECT_ID itemID); // 0x00424CB0
-GAME_OBJECT_ID Inv_GetItemOption(GAME_OBJECT_ID itemID); // 0x00424DC0
+BOOL Inv_RemoveItem(GAME_OBJECT_ID itemNumber); // 0x00424CB0
+GAME_OBJECT_ID Inv_GetItemOption(GAME_OBJECT_ID itemNumber); // 0x00424DC0
 void RemoveInventoryText(); // 0x00424FB0
 void Inv_RingInit(RING_INFO* ring, short type, INVENTORY_ITEM** itemList, short objCount, short currentObj, INV_MOTION_INFO* motionInfo); // 0x00424FE0
 void Inv_RingGetView(RING_INFO* ring, PHD_3DPOS* view); // 0x004250F0

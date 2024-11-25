@@ -50,9 +50,9 @@ typedef enum {
 
 static const BITE_INFO WolfBite = { 0, -14, 174, 6 };
 
-void InitialiseWolf(short itemID) {
-	ITEM_INFO* item = &Items[itemID];
-	InitialiseCreature(itemID);
+void InitialiseWolf(short itemNumber) {
+	ITEM_INFO* item = &Items[itemNumber];
+	InitialiseCreature(itemNumber);
 	// Wolf is sleeping by default.
 	// NOTE: this code was refactored to use Anims[].frameBase instead of raw value.
 	item->animNumber = Objects[item->objectID].animIndex + WOLF_SLEEP_ANIM;
@@ -61,11 +61,11 @@ void InitialiseWolf(short itemID) {
 	item->goalAnimState = WOLF_SLEEP;
 }
 
-void WolfControl(short itemID) {
-	if (!CreatureActive(itemID))
+void WolfControl(short itemNumber) {
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemID];
+	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* wolf = (CREATURE_INFO*)item->data;
 	if (wolf == NULL) return; // NOTE: additional check not presented in the original game
 	AI_INFO info{};
@@ -226,7 +226,7 @@ void WolfControl(short itemID) {
 
 	CreatureTilt(item, tilt);
 	CreatureHead(item, head);
-	CreatureAnimation(itemID, angle, tilt);
+	CreatureAnimation(itemNumber, angle, tilt);
 }
 
 /*

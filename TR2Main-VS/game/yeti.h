@@ -28,7 +28,7 @@
   * Function list
   */
 
-void GiantYetiControl(short itemID); // 0x00443100
-void YetiControl(short itemID); // 0x00443400
+void GiantYetiControl(short itemNumber); // 0x00443100
+void YetiControl(short itemNumber); // 0x00443400
 
 #endif // YETI_H_INCLUDED

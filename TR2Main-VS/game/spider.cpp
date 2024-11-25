@@ -49,33 +49,33 @@ typedef enum
 
 static const BITE_INFO SpiderBite = { 0, 0, 41, 1 };
 
-void SpiderLeap(short itemID, short angle)
+void SpiderLeap(short itemNumber, short angle)
 {
-	ITEM_INFO* item = &Items[itemID];
+	ITEM_INFO* item = &Items[itemNumber];
 	PHD_3DPOS oldPos = item->pos;
 	short oldRoomNumber = item->roomNumber;
-	CreatureAnimation(itemID, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 	if (item->pos.y <= oldPos.y - 384)
 	{
 		item->pos.x = oldPos.x;
 		item->pos.y = oldPos.y;
 		item->pos.z = oldPos.z;
 		if (item->roomNumber != oldRoomNumber)
-			ItemNewRoom(itemID, oldRoomNumber);
+			ItemNewRoom(itemNumber, oldRoomNumber);
 		item->animNumber = Objects[item->objectID].animIndex + SPIDER_JUMP_ANIM;
 		item->frameNumber = Anims[item->animNumber].frameBase;
 		item->currentAnimState = SPIDER_ATTACK2;
 		item->goalAnimState = SPIDER_STOP;
-		CreatureAnimation(itemID, angle, 0);
+		CreatureAnimation(itemNumber, angle, 0);
 	}
 }
 
-void SpiderControl(short itemID)
+void SpiderControl(short itemNumber)
 {
-	if (!CreatureActive(itemID))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemID];
+	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* spider = GetCreatureInfo(item);
 	if (spider == NULL) return;
 	AI_INFO AI{};
@@ -83,10 +83,10 @@ void SpiderControl(short itemID)
 
 	if (item->hitPoints <= 0)
 	{
-		if (ExplodingDeath(itemID, 0xFFFFFFFF, 0))
+		if (ExplodingDeath(itemNumber, 0xFFFFFFFF, 0))
 		{
-			DisableBaddieAI(itemID);
-			KillItem(itemID);
+			DisableBaddieAI(itemNumber);
+			KillItem(itemNumber);
 			item->status = ITEM_DISABLED;
 			PlaySoundEffect(349, &item->pos, 0);
 			return;
@@ -167,15 +167,15 @@ void SpiderControl(short itemID)
 		}
 	}
 
-	SpiderLeap(itemID, angle);
+	SpiderLeap(itemNumber, angle);
 }
 
-void BigSpiderControl(short itemID)
+void BigSpiderControl(short itemNumber)
 {
-	if (!CreatureActive(itemID))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemID];
+	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* spider = GetCreatureInfo(item);
 	if (spider == NULL) return;
 	AI_INFO AI{};
@@ -247,7 +247,7 @@ void BigSpiderControl(short itemID)
 		}
 	}
 
-	CreatureAnimation(itemID, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 }
 
  /*

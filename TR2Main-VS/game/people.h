@@ -42,8 +42,8 @@ BOOL ShotTarget(ITEM_INFO* item, AI_INFO* AI, const BITE_INFO* bite, short angle
 #define Cult3Control ((void(__cdecl*)(short)) 0x00436850)
 #define Worker1Control ((void(__cdecl*)(short)) 0x00436DC0)
 #define Worker2Control ((void(__cdecl*)(short)) 0x004371C0)
-void BanditControl(short itemID); // 0x00437620
-void Bandit2Control(short itemID); // 0x00437960
-void WinstonControl(short itemID); // 0x00437DA0
+void BanditControl(short itemNumber); // 0x00437620
+void Bandit2Control(short itemNumber); // 0x00437960
+void WinstonControl(short itemNumber); // 0x00437DA0
 
 #endif // PEOPLE_H_INCLUDED

@@ -64,9 +64,9 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 
 #if defined(FEATURE_MOD_CONFIG)
 	if ((item->objectID == ID_BANDIT1 || item->objectID == ID_BANDIT2 || item->objectID == ID_BANDIT2B) && !Mod.makeMercenaryAttackLaraFirst)
-		GetBaddieTarget(creature->itemID, FALSE);
+		GetBaddieTarget(creature->itemNumber, FALSE);
 	else if ((item->objectID == ID_MONK1 || item->objectID == ID_MONK2) && !Mod.makeMonkAttackLaraFirst)
-		GetBaddieTarget(creature->itemID, TRUE);
+		GetBaddieTarget(creature->itemNumber, TRUE);
 #else
 	if (item->objectID == ID_BANDIT1 || item->objectID == ID_BANDIT2 || item->objectID == ID_BANDIT2B)
 		GetBaddieTarget(creature->item_num, FALSE);
@@ -305,25 +305,25 @@ int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumbe
 	return FALSE;
 }
 
-void CreatureDie(short itemID, BOOL explode) {
-	ITEM_INFO* item = &Items[itemID];
+void CreatureDie(short itemNumber, BOOL explode) {
+	ITEM_INFO* item = &Items[itemNumber];
 	item->collidable = FALSE;
 	item->hitPoints = HP_DONT_TARGET;
 
 	if (explode) {
-		ExplodingDeath(itemID, ~0, 0);
-		KillItem(itemID);
+		ExplodingDeath(itemNumber, ~0, 0);
+		KillItem(itemNumber);
 		item->status = ITEM_DISABLED;
 	}
 	else {
-		RemoveActiveItem(itemID);
+		RemoveActiveItem(itemNumber);
 	}
 
-	DisableBaddieAI(itemID);
+	DisableBaddieAI(itemNumber);
 	item->flags |= IFL_ONESHOT;
 	if (item->clear_body) {
 		item->nextActive = PrevItemActive;
-		PrevItemActive = itemID;
+		PrevItemActive = itemNumber;
 	}
 
 	CreatureDropItem(item);
@@ -468,9 +468,9 @@ void GetBaddieTarget(short creatureIdx, BOOL isMonk)
 	for (int i = 0; i < MAX_CREATURES; i++)
 	{
 		baddy = &BaddiesSlots[i];
-		if (baddy->itemID == -1 || creatureIdx == baddy->itemID)
+		if (baddy->itemNumber == -1 || creatureIdx == baddy->itemNumber)
 			continue;
-		targetItem = &Items[baddy->itemID];
+		targetItem = &Items[baddy->itemNumber];
 		if (isMonk)
 		{
 			if (targetItem->objectID != ID_BANDIT1 && targetItem->objectID != ID_BANDIT2 && targetItem->objectID != ID_BANDIT2B)

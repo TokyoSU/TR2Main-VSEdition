@@ -30,6 +30,6 @@
 
 short Harpoon(int x, int y, int z, short speed, short rotY, short roomNum); // 0x00416BF0
 int GetWaterSurface(int x, int y, int z, short roomNum); // 0x00416C70
-void DiverControl(short itemNum); // 0x00416D80
+void DiverControl(short itemNumber); // 0x00416D80
 
 #endif // DIVER_H_INCLUDED

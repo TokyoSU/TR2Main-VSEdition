@@ -50,7 +50,7 @@ void ControlSplash1(short fxID); // 0x0041CB40
 void ControlWaterSprite(short fxID); // 0x0041CBC0
 void ControlSnowSprite(short fxID); // 0x0041CC70
 void ControlHotLiquid(short fxID); // 0x0041CD00
-void WaterFall(short itemID); // 0x0041CDE0
+void WaterFall(short itemNumber); // 0x0041CDE0
 void finish_level_effect(ITEM_INFO* item); // 0x0041CF20
 void turn180_effect(ITEM_INFO* item); // 0x0041CF30
 void floor_shake_effect(ITEM_INFO* item); // 0x0041CF50
@@ -64,14 +64,14 @@ void PistonFX(ITEM_INFO* item); // 0x0041D170
 void CurtainFX(ITEM_INFO* item); // 0x0041D190
 void StatueFX(ITEM_INFO* item); // 0x0041D1B0
 void SetChangeFX(ITEM_INFO* item); // 0x0041D1D0
-void ControlDingDong(short itemID); // 0x0041D1F0
-void ControlLaraAlarm(short itemID); // 0x0041D230
-void ControlAlarmSound(short itemID); // 0x0041D270
-void ControlBirdTweeter(short itemID); // 0x0041D2E0
+void ControlDingDong(short itemNumber); // 0x0041D1F0
+void ControlLaraAlarm(short itemNumber); // 0x0041D230
+void ControlAlarmSound(short itemNumber); // 0x0041D270
+void ControlBirdTweeter(short itemNumber); // 0x0041D2E0
 void DoChimeSound(ITEM_INFO* item); // 0x0041D340
-void ControlClockChimes(short itemID); // 0x0041D3A0
-void SphereOfDoomCollision(short itemID, ITEM_INFO* laraItem, COLL_INFO* coll); // 0x0041D410
-void SphereOfDoom(short itemID); // 0x0041D540
+void ControlClockChimes(short itemNumber); // 0x0041D3A0
+void SphereOfDoomCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll); // 0x0041D410
+void SphereOfDoom(short itemNumber); // 0x0041D540
 void DrawSphereOfDoom(ITEM_INFO* item); // 0x0041D630
 void lara_hands_free(ITEM_INFO* item); // 0x0041D760
 void flip_map_effect(ITEM_INFO* item); // 0x0041D770

@@ -35,7 +35,7 @@
 #include "specific/sndpc.h"
 #include "global/vars.h"
 
-void LaraControl(short itemID) {
+void LaraControl(short itemNumber) {
 	COLL_INFO coll;
 	ITEM_INFO* item = LaraItem;
 
@@ -464,11 +464,11 @@ void AnimateLara(ITEM_INFO* item)
 	item->pos.z += item->speed * phd_cos(Lara.move_angle) >> W2V_SHIFT;
 }
 
-void UseItem(short itemID) {
-	if (itemID <= ID_NONE || itemID >= ID_NUMBER_OBJECTS)
+void UseItem(short itemNumber) {
+	if (itemNumber <= ID_NONE || itemNumber >= ID_NUMBER_OBJECTS)
 		return;
 
-	switch (itemID) {
+	switch (itemNumber) {
 	case ID_PISTOL_ITEM:
 	case ID_PISTOL_OPTION:
 		Lara.request_gun_type = LGT_Pistols;
@@ -627,13 +627,13 @@ void LaraCheatGetStuff() {
 #endif // FEATURE_CHEAT
 }
 
-void ControlLaraExtra(short itemID) {
-	AnimateItem(&Items[itemID]);
+void ControlLaraExtra(short itemNumber) {
+	AnimateItem(&Items[itemNumber]);
 }
 
-void InitialiseLaraLoad(short itemID) {
-	Lara.item_number = itemID;
-	LaraItem = &Items[itemID];
+void InitialiseLaraLoad(short itemNumber) {
+	Lara.item_number = itemNumber;
+	LaraItem = &Items[itemNumber];
 }
 
 void InitialiseLaraInventory(int levelID) {

@@ -1380,11 +1380,11 @@ BOOL Read_Strings(DWORD dwCount, char** stringTable, char** stringBuffer, LPDWOR
 }
 
 BOOL S_LoadGameFlow(LPCTSTR fileName) {
-	DWORD scriptVersion;
-	char scriptDescription[DESCRIPTION_LENGTH];
-	UINT16 offsets[200]; // buffer for offsets
+	DWORD scriptVersion = 0;
+	char scriptDescription[DESCRIPTION_LENGTH] = {};
+	UINT16 offsets[200] = {}; // buffer for offsets
 	DWORD bytesRead;
-	UINT16 flowSize, scriptSize, gameStringsCount;
+	UINT16 flowSize = 0, scriptSize = 0, gameStringsCount = 0;
 	BOOL result = FALSE;
 	LPCTSTR filePath = GetFullPath(fileName);
 	HANDLE hFile = CreateFile(filePath, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -1396,8 +1396,8 @@ BOOL S_LoadGameFlow(LPCTSTR fileName) {
 	if (scriptVersion != REQ_SCRIPT_VERSION)
 		goto CLEANUP;
 
-	ReadFileSync(hFile, &scriptDescription, DESCRIPTION_LENGTH, &bytesRead, NULL);
-	ReadFileSync(hFile, &flowSize, sizeof(flowSize), &bytesRead, NULL);
+	ReadFileSync(hFile, scriptDescription, DESCRIPTION_LENGTH, &bytesRead, NULL);
+	ReadFileSync(hFile, &flowSize, sizeof(UINT16), &bytesRead, NULL);
 	if (flowSize != sizeof(GAME_FLOW))
 		goto CLEANUP;
 
@@ -1411,13 +1411,13 @@ BOOL S_LoadGameFlow(LPCTSTR fileName) {
 	READ_STRINGS(GF_GameFlow.num_Cutscenes, GF_CutsFilesStringTable, &GF_CutsFilesStringBuffer, &bytesRead, hFile, CLEANUP);
 
 	ReadFileSync(hFile, offsets, sizeof(UINT16) * (GF_GameFlow.num_Levels + 1), &bytesRead, NULL);
-	ReadFileSync(hFile, &scriptSize, sizeof(scriptSize), &bytesRead, NULL);
+	ReadFileSync(hFile, &scriptSize, sizeof(UINT16), &bytesRead, NULL);
 
 	GF_ScriptBuffer = (short*)GlobalAlloc(GMEM_FIXED, scriptSize);
 	if (GF_ScriptBuffer == NULL)
 		goto CLEANUP;
 
-	ReadFileSync(hFile, GF_ScriptBuffer, scriptSize, &bytesRead, NULL);
+	ReadFileSync(hFile, GF_ScriptBuffer, sizeof(BYTE) * scriptSize, &bytesRead, NULL); // NOTE: This read BYTE not SHORT
 	for (int i = 0; i < (GF_GameFlow.num_Levels + 1); ++i) {
 		GF_ScriptTable[i] = &GF_ScriptBuffer[offsets[i + 1] / 2];
 	}
@@ -1425,7 +1425,7 @@ BOOL S_LoadGameFlow(LPCTSTR fileName) {
 	if (GF_GameFlow.num_Demos > 0)
 		ReadFileSync(hFile, GF_DemoLevels, sizeof(UINT16) * GF_GameFlow.num_Demos, &bytesRead, NULL);
 
-	ReadFileSync(hFile, &gameStringsCount, sizeof(gameStringsCount), &bytesRead, NULL);
+	ReadFileSync(hFile, &gameStringsCount, sizeof(UINT16), &bytesRead, NULL);
 	if (gameStringsCount != REQ_GAME_STR_COUNT)
 		goto CLEANUP;
 

@@ -27,8 +27,8 @@
  /*
   * Function list
   */
-void SpiderLeap(short itemID, short angle); // 0x00440070
-void SpiderControl(short itemID); // 0x00440120
-void BigSpiderControl(short itemID); // 0x00440340
+void SpiderLeap(short itemNumber, short angle); // 0x00440070
+void SpiderControl(short itemNumber); // 0x00440120
+void BigSpiderControl(short itemNumber); // 0x00440340
 
 #endif // SPIDER_H_INCLUDED

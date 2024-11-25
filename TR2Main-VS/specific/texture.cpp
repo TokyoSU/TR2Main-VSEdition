@@ -176,14 +176,12 @@ void CopyBitmapPalette(RGB888* srcPal, BYTE* srcBitmap, int bitmapSize, RGB888* 
 	}
 }
 
-BYTE FindNearestPaletteEntry(RGB888* palette, int red, int green, int blue, bool ignoreSysPalette) {
-	int i;
-	int diffRed, diffGreen, diffBlue, diffTotal;
-	int diffMin = INT_MAX;
-	int palStartIdx = 0;
-	int palEndIdx = 256;
+BYTE FindNearestPaletteEntry(RGB888* palette, BYTE red, BYTE green, BYTE blue, bool ignoreSysPalette) {
+	INT diffTotal = 0;
+	INT diffMin = INT_MAX;
+	BYTE diffRed, diffGreen, diffBlue;
 	BYTE result = 0;
-	for (i = palStartIdx; i < palEndIdx; ++i) {
+	for (int i = 0; i < 256; ++i) {
 		diffRed = red - palette[i].red;
 		diffGreen = green - palette[i].green;
 		diffBlue = blue - palette[i].blue;

@@ -37,6 +37,6 @@ void undraw_flare(); // 0x0042FE60
 void draw_flare_meshes(); // 0x00430090
 void undraw_flare_meshes(); // 0x004300B0
 void ready_flare(); // 0x004300D0
-void FlareControl(short itemID); // 0x00430110
+void FlareControl(short itemNumber); // 0x00430110
 
 #endif // LARA_FLARE_H_INCLUDED

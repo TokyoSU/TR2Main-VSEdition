@@ -55,9 +55,9 @@ static BOAT_INFO* GetBoatData(ITEM_INFO* item)
 	return static_cast<BOAT_INFO*>(item->data);
 }
 
-void InitialiseBoat(short itemNum)
+void InitialiseBoat(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 	item->data = (BOAT_INFO*)game_malloc(sizeof(BOAT_INFO), GBUF_TempAlloc);
 
 	BOAT_INFO* boat = GetBoatData(item);
@@ -70,12 +70,12 @@ void InitialiseBoat(short itemNum)
 	boat->pitch = 0;
 }
 
-int BoatCheckGeton(short itemNum, COLL_INFO* coll)
+int BoatCheckGeton(short itemNumber, COLL_INFO* coll)
 {
 	if (Lara.gun_status != LGS_Armless)
 		return BGF_NOTON;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 	int distance = ((LaraItem->pos.z - item->pos.z) * phd_cos(-item->pos.rotY) - (LaraItem->pos.x - item->pos.x) * phd_sin(-item->pos.rotY)) >> W2V_SHIFT;
 	if (distance > 200)
 		return BGF_NOTON;
@@ -122,16 +122,16 @@ int BoatCheckGeton(short itemNum, COLL_INFO* coll)
 	return geton;
 }
 
-void BoatCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
+void BoatCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
 {
 	if (laraitem->hitPoints <= 0 || Lara.skidoo != -1)
 		return;
 
-	int onflag = BoatCheckGeton(itemNum, coll);
+	int onflag = BoatCheckGeton(itemNumber, coll);
 	if (onflag == BGF_NOTON)
 	{
 		coll->enableBaddiePush = TRUE;
-		ObjectCollision(itemNum, laraitem, coll);
+		ObjectCollision(itemNumber, laraitem, coll);
 		return;
 	}
 
@@ -152,7 +152,7 @@ void BoatCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 		break;
 	}
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 	laraitem->frameNumber = Anims[laraitem->animNumber].frameBase;
 	laraitem->pos.x = item->pos.x;
 	laraitem->pos.y = item->pos.y - 5;
@@ -174,12 +174,12 @@ void BoatCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 
 	if (item->status != ITEM_ACTIVE)
 	{
-		AddActiveItem(itemNum);
+		AddActiveItem(itemNumber);
 		item->status = ITEM_ACTIVE;
 	}
 
 	Lara.water_status = LWS_AboveWater;
-	Lara.skidoo = itemNum;
+	Lara.skidoo = itemNumber;
 }
 
 int TestWaterHeight(ITEM_INFO* item, int zoff, int xoff, PHD_VECTOR* pos)
@@ -202,15 +202,15 @@ int TestWaterHeight(ITEM_INFO* item, int zoff, int xoff, PHD_VECTOR* pos)
 	return height - 5;
 }
 
-void DoBoatShift(int itemID) {
+void DoBoatShift(int itemNumber) {
 	ITEM_INFO* item, *link = NULL;
 	short linkID;
 	int x, z, dx, dz;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	for (linkID = RoomInfo[item->roomNumber].itemNumber; linkID != -1; linkID = link->nextItem) {
 		link = &Items[linkID];
-		if (link->objectID == ID_BOAT && linkID != itemID && Lara.skidoo != linkID) {
+		if (link->objectID == ID_BOAT && linkID != itemNumber && Lara.skidoo != linkID) {
 			dz = link->pos.z - item->pos.z;
 			dx = link->pos.x - item->pos.x;
 			if (SQR(dx) + SQR(dz) < SQR(1000)) {
@@ -303,9 +303,9 @@ int DoBoatDynamics(int height, int fallspeed, int* y)
 	return result;
 }
 
-int BoatDynamics(short itemNum)
+int BoatDynamics(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 	BOAT_INFO* boat = GetBoatData(item);
 	item->pos.rotZ -= boat->tiltAngle;
 
@@ -355,7 +355,7 @@ int BoatDynamics(short itemNum)
 	moved.x = item->pos.x;
 	moved.y = item->pos.y;
 	moved.z = item->pos.z;
-	DoBoatShift(itemNum);
+	DoBoatShift(itemNumber);
 
 	PHD_VECTOR fl;
 	PHD_VECTOR bl;
@@ -394,7 +394,7 @@ int BoatDynamics(short itemNum)
 	if (slip || collide)
 	{
 		int newspeed = (((item->pos.z - old.z) * phd_cos(item->pos.rotY)) + ((item->pos.x - old.x) * phd_sin(item->pos.rotY))) >> W2V_SHIFT;
-		if (Lara.skidoo == itemNum && item->speed > 95 && newspeed < item->speed - 10)
+		if (Lara.skidoo == itemNumber && item->speed > 95 && newspeed < item->speed - 10)
 		{
 			LaraItem->hitPoints -= (item->speed - newspeed) >> 1;
 			LaraItem->hitStatus = TRUE;
@@ -561,7 +561,7 @@ void BoatAnimation(ITEM_INFO* item, int collide)
 	}
 }
 
-void BoatControl(short itemNum)
+void BoatControl(short itemNumber)
 {
 	ITEM_INFO* item;
 	BOAT_INFO* boat;
@@ -570,11 +570,11 @@ void BoatControl(short itemNum)
 	long hitWall, driving, no_turn, front_left, front_right, h, wh, x, y, z;
 	short room_number, oldFallSpeed, x_rot, z_rot;
 
-	item = &Items[itemNum];
+	item = &Items[itemNumber];
 	boat = GetBoatData(item);
 	no_turn = 1;
 	driving = 0;
-	hitWall = BoatDynamics(itemNum);
+	hitWall = BoatDynamics(itemNumber);
 	front_left = TestWaterHeight(item, 750, -300, &flPos);
 	front_right = TestWaterHeight(item, 750, 300, &frPos);
 
@@ -583,7 +583,7 @@ void BoatControl(short itemNum)
 	h = GetHeight(floor, item->pos.x, item->pos.y, item->pos.z);
 	GetCeiling(floor, item->pos.x, item->pos.y, item->pos.z);
 
-	if (Lara.skidoo == itemNum)
+	if (Lara.skidoo == itemNumber)
 	{
 		TestTriggers(TriggerPtr, FALSE);
 		TestTriggers(TriggerPtr, TRUE);
@@ -592,7 +592,7 @@ void BoatControl(short itemNum)
 	boat->water = GetWaterHeight(item->pos.x, item->pos.y, item->pos.z, room_number);
 	wh = boat->water;
 
-	if (Lara.skidoo == itemNum && LaraItem->hitPoints > 0)
+	if (Lara.skidoo == itemNumber && LaraItem->hitPoints > 0)
 	{
 		if (LaraItem->currentAnimState && (LaraItem->currentAnimState <= BOAT_MOVING || LaraItem->currentAnimState > BOAT_JUMPL))
 		{
@@ -645,14 +645,14 @@ void BoatControl(short itemNum)
 	if (!z_rot && abs(item->pos.rotZ) < 4)
 		item->pos.rotZ = 0;
 
-	if (Lara.skidoo == itemNum)
+	if (Lara.skidoo == itemNumber)
 	{
 		BoatAnimation(item, hitWall);
 
 		// NOTE: Changed how lara change room there, to fix a bug where lara don't update room correctly !
 		UpdateLaraRoom(LaraItem, -768); // 768 is the height of lara from 0,0,0 to the eyes.
 		if (room_number != item->roomNumber)
-			ItemNewRoom(itemNum, room_number);
+			ItemNewRoom(itemNumber, room_number);
 
 		item->pos.rotZ += boat->tiltAngle;
 		LaraItem->pos.x = item->pos.x;
@@ -675,7 +675,7 @@ void BoatControl(short itemNum)
 	else
 	{
 		if (room_number != item->roomNumber)
-			ItemNewRoom(itemNum, room_number);
+			ItemNewRoom(itemNumber, room_number);
 		item->pos.rotZ += boat->tiltAngle;
 	}
 
@@ -690,7 +690,7 @@ void BoatControl(short itemNum)
 	if (item->speed != 0 && (wh - 5) == item->pos.y)
 		DoWakeEffect(item);
 
-	if (Lara.skidoo == itemNum && (LaraItem->currentAnimState == BOAT_JUMPR || LaraItem->currentAnimState == BOAT_JUMPL) && LaraItem->frameNumber == Anims[LaraItem->animNumber].frameEnd)
+	if (Lara.skidoo == itemNumber && (LaraItem->currentAnimState == BOAT_JUMPR || LaraItem->currentAnimState == BOAT_JUMPL) && LaraItem->frameNumber == Anims[LaraItem->animNumber].frameEnd)
 	{
 		if (LaraItem->currentAnimState == BOAT_JUMPL)
 			LaraItem->pos.rotY -= PHD_90;
@@ -728,16 +728,16 @@ void BoatControl(short itemNum)
 	}
 }
 
-void GondolaControl(short itemID) {
+void GondolaControl(short itemNumber) {
 	ITEM_INFO* item;
 	short roomID;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	switch (item->currentAnimState) {
 	case 1:
 		if (item->goalAnimState == 2) {
 			item->meshBits = 0xFF;
-			ExplodingDeath(itemID, 0xF0, 0);
+			ExplodingDeath(itemNumber, 0xF0, 0);
 		}
 		break;
 	case 3:
@@ -752,7 +752,7 @@ void GondolaControl(short itemID) {
 	}
 	AnimateItem(item);
 	if (item->status == ITEM_DISABLED)
-		RemoveActiveItem(itemID);
+		RemoveActiveItem(itemNumber);
 }
 
 /*

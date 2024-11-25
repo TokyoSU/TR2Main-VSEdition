@@ -116,12 +116,12 @@ int GetWaterSurface(int x, int y, int z, short roomNum)
     return floor->floor << 8;
 }
 
-void DiverControl(short itemNum)
+void DiverControl(short itemNumber)
 {
-    if (!CreatureActive(itemNum))
+    if (!CreatureActive(itemNumber))
         return;
 
-    ITEM_INFO* item = &Items[itemNum];
+    ITEM_INFO* item = &Items[itemNumber];
     CREATURE_INFO* creature = GetCreatureInfo(item);
     if (creature == NULL) return; // NOTE: Not in the original code..
     GAME_VECTOR src = {}, target = {};
@@ -133,7 +133,7 @@ void DiverControl(short itemNum)
     {
         if (item->currentAnimState != DIVER_DEATH)
             SetAnimation(item, DIVER_DEATH_ANIM, DIVER_DEATH);
-        CreatureFloat(itemNum);
+        CreatureFloat(itemNumber);
         return;
     }
     else
@@ -221,7 +221,7 @@ void DiverControl(short itemNum)
 
     CreatureHead(item, headAngle);
     CreatureNeck(item, neckAngle);
-    CreatureAnimation(itemNum, angle, 0);
+    CreatureAnimation(itemNumber, angle, 0);
     switch (item->currentAnimState)
     {
     case DIVER_UNDERWATER_SWIM:

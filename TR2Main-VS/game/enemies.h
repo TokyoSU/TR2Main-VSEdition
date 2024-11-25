@@ -28,11 +28,11 @@
   * Function list
   */
 short Knife(int x, int y, int z, short speed, short rotY, short roomNum); // 0x0041DB30
-#define Cult2Control ((void(__cdecl*)(short)) 0x0041DBB0)
-void MonkControl(short itemID); // 0x0041DFE0
+void Cult2Control(short itemNumber); // 0x0041DBB0
+void MonkControl(short itemNumber); // 0x0041DFE0
 #define Worker3Control ((void(__cdecl*)(short)) 0x0041E4B0)
 #define DrawXianLord ((void(__cdecl*)(ITEM_INFO *)) 0x0041EAC0)
-//0x0041EEC0:		XianDamage
+#define XianDamage ((void(__cdecl*)(ITEM_INFO*,CREATURE_INFO*,int)) 0x0041EEC0)
 #define InitialiseXianLord ((void(__cdecl*)(short)) 0x0041EF70)
 #define XianLordControl ((void(__cdecl*)(short)) 0x0041EFD0)
 void WarriorSparkleTrail(ITEM_INFO* item); // 0x0041F5B0

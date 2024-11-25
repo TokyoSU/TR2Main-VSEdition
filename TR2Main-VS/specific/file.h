@@ -42,7 +42,7 @@ BOOL LoadBoxes(HANDLE hFile); // 0x0044AB10
 BOOL LoadAnimatedTextures(HANDLE hFile); // 0x0044AD40
 BOOL LoadCinematic(HANDLE hFile); // 0x0044ADA0
 BOOL LoadDemo(HANDLE hFile); // 0x0044AE20
-void LoadDemoExternal(LPCSTR levelName); // 0x0044AEB0
+void LoadDemoExternal(LPCTSTR levelName); // 0x0044AEB0
 BOOL LoadSamples(HANDLE hFile); // 0x0044AF50
 void ChangeFileNameExtension(char* fileName, const char* fileExt); // 0x0044B1C0
 LPCTSTR GetFullPath(LPCTSTR path); // 0x0044B200

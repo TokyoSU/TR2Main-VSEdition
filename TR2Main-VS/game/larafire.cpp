@@ -265,9 +265,9 @@ void LaraGetNewTarget(WEAPON_INFO* weapon)
 	for (int i = 0; i < MAX_CREATURES; i++)
 	{
 		creature = &BaddiesSlots[i];
-		if (creature->itemID == -1 || Lara.item_number == creature->itemID)
+		if (creature->itemNumber == -1 || Lara.item_number == creature->itemNumber)
 			continue;
-		targetItem = &Items[creature->itemID];
+		targetItem = &Items[creature->itemNumber];
 		if (targetItem->hitPoints <= 0)
 			continue;
 #if defined(FEATURE_MOD_CONFIG)
@@ -448,15 +448,15 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* dest, int damage) {
 	}
 }
 
-void SmashItem(short itemID, int weaponType) {
-	ITEM_INFO* item = &Items[itemID];
+void SmashItem(short itemNumber, int weaponType) {
+	ITEM_INFO* item = &Items[itemNumber];
 	if (item->objectID == ID_WINDOW1 || item->objectID == ID_WINDOW3) {
-		SmashWindow(itemID);
+		SmashWindow(itemNumber);
 	}
 	else {
 		if (item->objectID == ID_BELL && item->status != ITEM_ACTIVE) {
 			item->status = ITEM_ACTIVE;
-			AddActiveItem(itemID);
+			AddActiveItem(itemNumber);
 		}
 	}
 }

@@ -50,9 +50,9 @@ void MineControl(short mineID) {
 		GetFloor(mine->pos.x, mine->pos.y - 0x800, mine->pos.z, &roomNumber);
 
 		ITEM_INFO* item = NULL;
-		short itemID = RoomInfo[roomNumber].itemNumber;
-		for (; itemID >= 0; itemID = item->nextItem) {
-			item = &Items[itemID];
+		short itemNumber = RoomInfo[roomNumber].itemNumber;
+		for (; itemNumber >= 0; itemNumber = item->nextItem) {
+			item = &Items[itemNumber];
 			if (item->objectID == ID_BOAT) {
 				int x = item->pos.x - mine->pos.x;
 				int y = item->pos.z - mine->pos.z;
@@ -62,18 +62,18 @@ void MineControl(short mineID) {
 			}
 		}
 
-		if (itemID < 0) {
+		if (itemNumber < 0) {
 			return;
 		}
 
-		if (Lara.skidoo == itemID) {
+		if (Lara.skidoo == itemNumber) {
 			ExplodingDeath(Lara.item_number, ~0, 0);
 			LaraItem->hitPoints = 0;
 			LaraItem->flags |= IFL_ONESHOT;
 		}
 		item->objectID = ID_BOAT_BITS;
-		ExplodingDeath(itemID, ~0, 0);
-		KillItem(itemID);
+		ExplodingDeath(itemNumber, ~0, 0);
+		KillItem(itemNumber);
 		item->objectID = ID_BOAT;
 
 		FLOOR_INFO* floor = GetFloor(mine->pos.x, mine->pos.y, mine->pos.z, &roomNumber);
@@ -108,12 +108,12 @@ void MineControl(short mineID) {
 #endif // FEATURE_INPUT_IMPROVED
 }
 
-void ControlSpikeWall(short itemID) {
+void ControlSpikeWall(short itemNumber) {
 	ITEM_INFO* item;
 	int x, z;
 	short roomID;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	if (TriggerActive(item) && item->status != ITEM_DISABLED) {
 		z = item->pos.z + (16 * phd_cos(item->pos.rotY) >> W2V_SHIFT);
 		x = item->pos.x + (16 * phd_sin(item->pos.rotY) >> W2V_SHIFT);
@@ -125,7 +125,7 @@ void ControlSpikeWall(short itemID) {
 			item->pos.z = z;
 			item->pos.x = x;
 			if (roomID != item->roomNumber)
-				ItemNewRoom(itemID, roomID);
+				ItemNewRoom(itemNumber, roomID);
 		}
 		PlaySoundEffect(204, &item->pos, 0);
 	}
@@ -138,12 +138,12 @@ void ControlSpikeWall(short itemID) {
 	}
 }
 
-void ControlCeilingSpikes(short itemID) {
+void ControlCeilingSpikes(short itemNumber) {
 	ITEM_INFO* item;
 	int y;
 	short roomID;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	if (TriggerActive(item) && item->status != ITEM_DISABLED) {
 		y = item->pos.y + 5;
 		roomID = item->roomNumber;
@@ -153,7 +153,7 @@ void ControlCeilingSpikes(short itemID) {
 		else {
 			item->pos.y = y;
 			if (roomID != item->roomNumber)
-				ItemNewRoom(itemID, roomID);
+				ItemNewRoom(itemNumber, roomID);
 		}
 		PlaySoundEffect(204, &item->pos, 0);
 	}
@@ -166,11 +166,11 @@ void ControlCeilingSpikes(short itemID) {
 	}
 }
 
-void HookControl(short itemID) {
+void HookControl(short itemNumber) {
 	ITEM_INFO* item;
 	static BOOL IsHookHit = FALSE;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	if (item->touchBits && !IsHookHit) {
 		LaraItem->hitPoints -= 50;
 		LaraItem->hitStatus = 1;
@@ -183,13 +183,13 @@ void HookControl(short itemID) {
 	AnimateItem(item);
 }
 
-void SpinningBlade(short itemID) {
+void SpinningBlade(short itemNumber) {
 	ITEM_INFO* item;
 	int x, z;
 	short roomID;
 	BOOL reverse;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	if (item->currentAnimState == 2) {
 		if (item->goalAnimState != 1) {
 			z = item->pos.z + (1536 * phd_cos(item->pos.rotY) >> W2V_SHIFT);
@@ -216,17 +216,17 @@ void SpinningBlade(short itemID) {
 	item->pos.y = GetHeight(GetFloor(item->pos.x, item->pos.y, item->pos.z, &roomID), item->pos.x, item->pos.y, item->pos.z);
 	item->floor = item->pos.y;
 	if (roomID != item->roomNumber)
-		ItemNewRoom(itemID, roomID);
+		ItemNewRoom(itemNumber, roomID);
 	if (reverse && item->currentAnimState == 1)
 		item->pos.rotY += PHD_180;
 }
 
-void IcicleControl(short itemID) {
+void IcicleControl(short itemNumber) {
 	ITEM_INFO* item;
 	short roomID;
 	FLOOR_INFO* floor;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	switch (item->currentAnimState) {
 	case 1:
 		item->goalAnimState = 2;
@@ -247,13 +247,13 @@ void IcicleControl(short itemID) {
 	}
 	AnimateItem(item);
 	if (item->status == ITEM_DISABLED) {
-		RemoveActiveItem(itemID);
+		RemoveActiveItem(itemNumber);
 	}
 	else {
 		roomID = item->roomNumber;
 		floor = GetFloor(item->pos.x, item->pos.y, item->pos.z, &roomID);
 		if (item->roomNumber != roomID)
-			ItemNewRoom(itemID, roomID);
+			ItemNewRoom(itemNumber, roomID);
 		item->floor = GetHeight(floor, item->pos.x, item->pos.y, item->pos.z);
 		if (item->currentAnimState == 2 && item->pos.y >= item->floor) {
 			item->gravity = 0;
@@ -265,19 +265,19 @@ void IcicleControl(short itemID) {
 	}
 }
 
-void InitialiseBlade(short itemID) {
+void InitialiseBlade(short itemNumber) {
 	ITEM_INFO* item;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	item->animNumber = Objects[ID_BLADE].animIndex + 2;
 	item->currentAnimState = 1;
 	item->frameNumber = Anims[item->animNumber].frameBase;
 }
 
-void BladeControl(short itemID) {
+void BladeControl(short itemNumber) {
 	ITEM_INFO* item;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	if (TriggerActive(item) && item->currentAnimState == 1) {
 		item->goalAnimState = 2;
 	}
@@ -292,19 +292,19 @@ void BladeControl(short itemID) {
 	AnimateItem(item);
 }
 
-void InitialiseKillerStatue(short itemID) {
+void InitialiseKillerStatue(short itemNumber) {
 	ITEM_INFO* item;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	item->animNumber = Objects[item->objectID].animIndex + 3;
 	item->currentAnimState = 1;
 	item->frameNumber = Anims[item->animNumber].frameBase;
 }
 
-void KillerStatueControl(short itemID) {
+void KillerStatueControl(short itemNumber) {
 	ITEM_INFO* item;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	if (TriggerActive(item) && item->currentAnimState == 1) {
 		item->goalAnimState = 2;
 	}
@@ -324,8 +324,8 @@ void KillerStatueControl(short itemID) {
 	AnimateItem(item);
 }
 
-void SpringBoardControl(short itemID) {
-	ITEM_INFO* item = &Items[itemID];
+void SpringBoardControl(short itemNumber) {
+	ITEM_INFO* item = &Items[itemNumber];
 	if (item->currentAnimState == 0 && item->pos.y == LaraItem->pos.y &&
 		(LaraItem->pos.x >> WALL_SHIFT) == (item->pos.x >> WALL_SHIFT) &&
 		(LaraItem->pos.z >> WALL_SHIFT) == (item->pos.z >> WALL_SHIFT))
@@ -348,11 +348,11 @@ void SpringBoardControl(short itemID) {
 	}
 }
 
-void InitialiseRollingBall(short itemID) {
+void InitialiseRollingBall(short itemNumber) {
 	ITEM_INFO* item;
 	GAME_VECTOR* pos;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	item->data = game_malloc(sizeof(GAME_VECTOR), GBUF_RollingBallStuff);
 	pos = (GAME_VECTOR*)item->data;
 	pos->x = item->pos.x;
@@ -361,14 +361,14 @@ void InitialiseRollingBall(short itemID) {
 	pos->roomNumber = item->roomNumber;
 }
 
-void RollingBallControl(short itemID) {
+void RollingBallControl(short itemNumber) {
 	ITEM_INFO* item;
 	int oldX, oldZ, distance, x, z;
 	short roomID;
 	FLOOR_INFO* floor;
 	GAME_VECTOR* pos;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	if (item->status == ITEM_ACTIVE) {
 		if (item->goalAnimState == 2) {
 			AnimateItem(item);
@@ -390,7 +390,7 @@ void RollingBallControl(short itemID) {
 			roomID = item->roomNumber;
 			floor = GetFloor(item->pos.x, item->pos.y, item->pos.z, &roomID);
 			if (item->roomNumber != roomID)
-				ItemNewRoom(itemID, roomID);
+				ItemNewRoom(itemNumber, roomID);
 			item->floor = GetHeight(floor, item->pos.x, item->pos.y, item->pos.z);
 			TestTriggers(TriggerPtr, TRUE);
 			if (item->pos.y >= item->floor - 256) {
@@ -446,9 +446,9 @@ void RollingBallControl(short itemID) {
 			item->pos.y = pos->y;
 			item->pos.z = pos->z;
 			if (item->roomNumber != pos->roomNumber) {
-				RemoveDrawnItem(itemID);
+				RemoveDrawnItem(itemNumber);
 				item->nextItem = RoomInfo[pos->roomNumber].itemNumber;
-				RoomInfo[pos->roomNumber].itemNumber = itemID;
+				RoomInfo[pos->roomNumber].itemNumber = itemNumber;
 				item->roomNumber = pos->roomNumber;
 			}
 			item->animNumber = Objects[item->objectID].animIndex;
@@ -456,16 +456,16 @@ void RollingBallControl(short itemID) {
 			item->requiredAnimState = 0;
 			item->goalAnimState = Anims[item->animNumber].currentAnimState;
 			item->currentAnimState = item->goalAnimState;
-			RemoveActiveItem(itemID);
+			RemoveActiveItem(itemNumber);
 		}
 	}
 }
 
-void RollingBallCollision(short itemID, ITEM_INFO* laraItem, COLL_INFO* coll) {
+void RollingBallCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll) {
 	ITEM_INFO* item;
 	int dx, dy, dz, distance, i;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	if (item->status == ITEM_ACTIVE) {
 		if (TestBoundsCollide(item, laraItem, coll->radius) && TestCollision(item, laraItem)) {
 			if (laraItem->gravity) {
@@ -512,12 +512,12 @@ void RollingBallCollision(short itemID, ITEM_INFO* laraItem, COLL_INFO* coll) {
 	}
 	else {
 		if (item->status != ITEM_INVISIBLE)
-			ObjectCollision(itemID, laraItem, coll);
+			ObjectCollision(itemNumber, laraItem, coll);
 	}
 }
 
-void Pendulum(short itemID) {
-	ITEM_INFO* item = &Items[itemID];
+void Pendulum(short itemNumber) {
+	ITEM_INFO* item = &Items[itemNumber];
 	if (item->touchBits) {
 		LaraItem->hitPoints -= 50;
 		LaraItem->hitStatus = 1;
@@ -532,7 +532,7 @@ void Pendulum(short itemID) {
 	AnimateItem(item);
 }
 
-void TeethTrap(short itemID) {
+void TeethTrap(short itemNumber) {
 	ITEM_INFO* item;
 	static BITE_INFO Teeth[3][2] = {
 		{{-23, 0, -1718, 0}, {71, 0, -1718, 1}},
@@ -540,7 +540,7 @@ void TeethTrap(short itemID) {
 		{{-23, -10, -1718, 0}, {71, -10, -1718, 1}}
 	};
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	if (TriggerActive(item)) {
 		item->goalAnimState = 1;
 		if (item->touchBits && item->currentAnimState == 1) {
@@ -560,11 +560,11 @@ void TeethTrap(short itemID) {
 	AnimateItem(item);
 }
 
-void FallingCeiling(short itemID) {
+void FallingCeiling(short itemNumber) {
 	ITEM_INFO* item;
 	short roomID;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	if (!item->currentAnimState) {
 		item->gravity = 1;
 		item->goalAnimState = 1;
@@ -577,13 +577,13 @@ void FallingCeiling(short itemID) {
 	}
 	AnimateItem(item);
 	if (item->status == ITEM_DISABLED) {
-		RemoveActiveItem(itemID);
+		RemoveActiveItem(itemNumber);
 	}
 	else {
 		roomID = item->roomNumber;
 		item->floor = GetHeight(GetFloor(item->pos.x, item->pos.y, item->pos.z, &roomID), item->pos.x, item->pos.y, item->pos.z);
 		if (roomID != item->roomNumber)
-			ItemNewRoom(itemID, roomID);
+			ItemNewRoom(itemNumber, roomID);
 		if (item->currentAnimState == 1 && item->pos.y >= item->floor) {
 			item->gravity = 0;
 			item->goalAnimState = 2;
@@ -593,12 +593,12 @@ void FallingCeiling(short itemID) {
 	}
 }
 
-void DartEmitterControl(short itemID) {
+void DartEmitterControl(short itemNumber) {
 	ITEM_INFO* item, * dynamic;
 	short dynamicID;
 	int dx, dz;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	if (TriggerActive(item)) {
 		if (!item->currentAnimState)
 			item->goalAnimState = 1;
@@ -647,13 +647,13 @@ void DartEmitterControl(short itemID) {
 	AnimateItem(item);
 }
 
-void DartsControl(short itemID) {
+void DartsControl(short itemNumber) {
 	ITEM_INFO* item;
 	short roomID, fxID;
 	FLOOR_INFO* floor;
 	FX_INFO* fx;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	if (item->touchBits) {
 		LaraItem->hitPoints -= 50;
 		LaraItem->hitStatus = 1;
@@ -663,11 +663,11 @@ void DartsControl(short itemID) {
 	roomID = item->roomNumber;
 	floor = GetFloor(item->pos.x, item->pos.y, item->pos.z, &roomID);
 	if (item->roomNumber != roomID)
-		ItemNewRoom(itemID, roomID);
+		ItemNewRoom(itemNumber, roomID);
 	item->floor = GetHeight(floor, item->pos.x, item->pos.y, item->pos.z);
 	item->pos.rotX += PHD_45 / 2;
 	if (item->pos.y >= item->floor) {
-		KillItem(itemID);
+		KillItem(itemNumber);
 		fxID = CreateEffect(item->roomNumber);
 		if (fxID != -1) {
 			fx = &Effects[fxID];
@@ -823,9 +823,9 @@ void LavaBurn(ITEM_INFO* item) {
 	}
 }
 
-void LavaSpray(short itemNum)
+void LavaSpray(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 	short fxNum = CreateEffect(item->roomNumber);
 	if (fxNum != -1)
 	{

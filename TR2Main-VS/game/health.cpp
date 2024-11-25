@@ -308,15 +308,15 @@ void DrawPickups(BOOL pickupState) {
 	}
 }
 
-void AddDisplayPickup(short itemID) {
-	if (itemID == ID_SECRET1 || itemID == ID_SECRET2 || itemID == ID_SECRET3) {
+void AddDisplayPickup(short itemNumber) {
+	if (itemNumber == ID_SECRET1 || itemNumber == ID_SECRET2 || itemNumber == ID_SECRET3) {
 		S_CDPlay(GF_GameFlow.secretTrack, FALSE);
 	}
 
 	for (int i = 0; i < 12; ++i) {
 		if (PickupInfos[i].timer <= 0) {
 			PickupInfos[i].timer = 75; // 2.5 seconds
-			PickupInfos[i].sprite = Objects[itemID].meshIndex;
+			PickupInfos[i].sprite = Objects[itemNumber].meshIndex;
 			break;
 		}
 	}

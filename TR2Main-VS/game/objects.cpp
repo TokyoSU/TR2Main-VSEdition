@@ -31,9 +31,9 @@
 #include "specific/init.h"
 #include "global/vars.h"
 
-void BigBowlControl(short itemID)
+void BigBowlControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemID];
+	ITEM_INFO* item = &Items[itemNumber];
 	if (item->currentAnimState == 1)
 	{
 		short fxNum = CreateEffect(item->roomNumber);
@@ -59,27 +59,27 @@ void BigBowlControl(short itemID)
 	}
 	AnimateItem(item);
 	if (item->status == ITEM_DISABLED && item->timer >= (FRAMES_PER_SECOND * 7)) // 7 seconds
-		RemoveActiveItem(itemID);
+		RemoveActiveItem(itemNumber);
 }
 
-void BellControl(short itemID) {
-	ITEM_INFO* item = &Items[itemID];
+void BellControl(short itemNumber) {
+	ITEM_INFO* item = &Items[itemNumber];
 	item->goalAnimState = 1;
 	item->floor = GetHeight(GetFloor(item->pos.x, item->pos.y, item->pos.z, &item->roomNumber), item->pos.x, item->pos.y, item->pos.z);
 	TestTriggers(TriggerPtr, TRUE);
 	AnimateItem(item);
 	if (!item->currentAnimState) {
 		item->status = ITEM_INACTIVE;
-		RemoveActiveItem(itemID);
+		RemoveActiveItem(itemNumber);
 	}
 }
 
-void InitialiseWindow(short itemID) {
+void InitialiseWindow(short itemNumber) {
 	ITEM_INFO* item;
 	ROOM_INFO* room;
 	BOX_INFO* box;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	item->flags = 0;
 	item->meshBits = 1;
 	room = &RoomInfo[item->roomNumber];
@@ -88,12 +88,12 @@ void InitialiseWindow(short itemID) {
 		box->overlapIndex |= 0x4000;
 }
 
-void SmashWindow(short itemID) {
+void SmashWindow(short itemNumber) {
 	ITEM_INFO* item;
 	ROOM_INFO* room;
 	BOX_INFO* box;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	room = &RoomInfo[item->roomNumber];
 	box = &Boxes[room->floor[((item->pos.x - room->x) >> WALL_SHIFT) * room->xSize + ((item->pos.z - room->z) >> WALL_SHIFT)].box];
 	if (CHK_ANY(box->overlapIndex, 0x8000))
@@ -101,38 +101,38 @@ void SmashWindow(short itemID) {
 	PlaySoundEffect(58, &item->pos, 0);
 	item->collidable = 0;
 	item->meshBits = 0xFFFE;
-	ExplodingDeath(itemID, 0xFEFE, 0);
+	ExplodingDeath(itemNumber, 0xFEFE, 0);
 	item->flags |= IFL_ONESHOT;
 	if (item->status == ITEM_ACTIVE)
-		RemoveActiveItem(itemID);
+		RemoveActiveItem(itemNumber);
 	item->status = ITEM_DISABLED;
 }
 
-void WindowControl(short itemID) {
+void WindowControl(short itemNumber) {
 	ITEM_INFO* item;
 	int val;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	if (!CHK_ANY(item->flags, IFL_ONESHOT)) {
 		if (Lara.skidoo == -1) {
 			if (item->touchBits) {
 				item->touchBits = 0;
 				val = phd_cos(LaraItem->pos.rotY - item->pos.rotY) * LaraItem->speed >> W2V_SHIFT;
 				if (ABS(val) >= 50)
-					SmashWindow(itemID);
+					SmashWindow(itemNumber);
 			}
 		}
 		else {
 			if (ItemNearLara(&item->pos, 512))
-				SmashWindow(itemID);
+				SmashWindow(itemNumber);
 		}
 	}
 }
 
 void OpenNearestDoor()
 {
-	for (short itemNum = 0; itemNum < LevelItemCount; itemNum++) {
-		ITEM_INFO* item = &Items[itemNum];
+	for (short itemNumber = 0; itemNumber < LevelItemCount; itemNumber++) {
+		ITEM_INFO* item = &Items[itemNumber];
 		int dx = (item->pos.x - LaraItem->pos.x);
 		int dy = (item->pos.y - LaraItem->pos.y);
 		int dz = (item->pos.z - LaraItem->pos.z);
@@ -143,7 +143,7 @@ void OpenNearestDoor()
 			continue;
 
 		if (!item->active) {
-			AddActiveItem(itemNum);
+			AddActiveItem(itemNumber);
 			item->flags |= IFL_CODEBITS;
 		}
 		else if (item->flags & IFL_CODEBITS) {
@@ -157,23 +157,23 @@ void OpenNearestDoor()
 	}
 }
 
-void InitialiseLift(short itemID) {
+void InitialiseLift(short itemNumber) {
 	ITEM_INFO* item;
 	int* data;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	item->data = game_malloc(8, GBUF_TempAlloc);
 	data = (int*)item->data;
 	data[1] = 0;
 	data[0] = item->pos.y;
 }
 
-void LiftControl(short itemID) {
+void LiftControl(short itemNumber) {
 	ITEM_INFO* item;
 	int* data;
 	short roomID;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	data = (int*)item->data;
 	if (TriggerActive(item)) {
 		if (item->pos.y < data[0] + 5616) {
@@ -211,7 +211,7 @@ void LiftControl(short itemID) {
 	roomID = item->roomNumber;
 	GetFloor(item->pos.x, item->pos.y, item->pos.z, &roomID);
 	if (item->roomNumber != roomID)
-		ItemNewRoom(itemID, roomID);
+		ItemNewRoom(itemNumber, roomID);
 }
 
 void LiftFloorCeiling(ITEM_INFO* item, int x, int y, int z, int* floor, int* ceiling) {

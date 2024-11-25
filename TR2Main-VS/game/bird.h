@@ -28,7 +28,7 @@
   * Function list
   */
 
-void InitialiseBird(short itemID); // 0x0040C860
-void BirdControl(short itemID); // 0x0040C8F0
+void InitialiseBird(short itemNumber); // 0x0040C860
+void BirdControl(short itemNumber); // 0x0040C8F0
 
 #endif // BIRD_H_INCLUDED

@@ -44,7 +44,7 @@ static void FadeWait() {
 	// Null function
 }
 
-UINT16 S_COLOUR(int red, int green, int blue) {
+UINT16 S_COLOUR(BYTE red, BYTE green, BYTE blue) {
 	return FindNearestPaletteEntry(GamePalette8, red, green, blue, false);
 }
 

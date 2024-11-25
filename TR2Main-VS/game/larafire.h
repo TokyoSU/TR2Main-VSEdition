@@ -38,7 +38,7 @@ void LaraGetNewTarget(WEAPON_INFO* weapon); // 0x0042EFD0
 #define AimWeapon ((void(__cdecl*)(WEAPON_INFO*,LARA_ARM*)) 0x0042F2A0)
 int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles); // 0x0042F370
 void HitTarget(ITEM_INFO* item, GAME_VECTOR* dest, int damage); // 0x0042F6E0
-void SmashItem(short itemID, int weaponType); // 0x0042F780
+void SmashItem(short itemNumber, int weaponType); // 0x0042F780
 #define WeaponObject ((int(__cdecl*)(int)) 0x0042F7E0)
 
 #endif // LARA_FIRE_H_INCLUDED

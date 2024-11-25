@@ -37,7 +37,7 @@ void MakeAmmoString(char* str); // 0x00421CA0
 void DrawAmmoInfo(); // 0x00421CD0
 void InitialisePickUpDisplay(); // 0x00421E20
 void DrawPickups(BOOL pickupState); // 0x00421E40
-void AddDisplayPickup(short itemID); // 0x00421F40
+void AddDisplayPickup(short itemNumber); // 0x00421F40
 void DisplayModeInfo(char* modeString); // 0x00421FB0
 void DrawModeInfo(); // 0x00422030
 

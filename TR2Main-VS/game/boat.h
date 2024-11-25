@@ -36,17 +36,17 @@ typedef enum {
 	BGF_SAMESPOT
 } BOAT_GETON_FLAGS; // used for BoatCheckGeton return value.
 
-void InitialiseBoat(short itemNum); // 0x0040CB10
-int BoatCheckGeton(short itemNum, COLL_INFO* coll); // 0x0040CB50
-void BoatCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll); // 0x0040CCC0
+void InitialiseBoat(short itemNumber); // 0x0040CB10
+int BoatCheckGeton(short itemNumber, COLL_INFO* coll); // 0x0040CB50
+void BoatCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll); // 0x0040CCC0
 int TestWaterHeight(ITEM_INFO* item, int zoff, int xoff, PHD_VECTOR* pos); // 0x0040CE20
-void DoBoatShift(int itemID); // 0x0040CF20
+void DoBoatShift(int itemNumber); // 0x0040CF20
 void DoWakeEffect(ITEM_INFO* item); // 0x0040D0F0
 int DoBoatDynamics(int height, int fallspeed, int* y); // 0x0040D270
-int BoatDynamics(short itemNum); // 0x0040D2C0
+int BoatDynamics(short itemNumber); // 0x0040D2C0
 int BoatUserControl(ITEM_INFO* item); // 0x0040D7A0
 void BoatAnimation(ITEM_INFO* item, int collide); // 0x0040D930
-void BoatControl(short itemNum); // 0x0040DAA0
-void GondolaControl(short itemID); // 0x0040E0D0
+void BoatControl(short itemNumber); // 0x0040DAA0
+void GondolaControl(short itemNumber); // 0x0040E0D0
 
 #endif // BOAT_H_INCLUDED

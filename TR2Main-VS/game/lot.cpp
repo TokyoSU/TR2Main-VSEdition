@@ -36,7 +36,7 @@ void InitialiseSlot(short itemNumber, int baddieSlotID)
         Lara.creature = &BaddiesSlots[baddieSlotID];
     else
         item->data = creature;
-    creature->itemID = itemNumber;
+    creature->itemNumber = itemNumber;
     creature->mood = MOOD_BORED;
     creature->neckRotation = 0;
     creature->headRotation = 0;

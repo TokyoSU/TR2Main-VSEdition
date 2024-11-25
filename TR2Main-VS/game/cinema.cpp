@@ -207,12 +207,12 @@ int GetCinematicRoom(int x, int y, int z) {
 	return roomID;
 }
 
-void ControlCinematicPlayer(short itemID) {
+void ControlCinematicPlayer(short itemNumber) {
 	ITEM_INFO* item;
 	PHD_VECTOR pos;
 	short roomID;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	item->pos.rotY = Camera.targetAngle;
 	item->pos.x = Camera.pos.x;
 	item->pos.y = Camera.pos.y;
@@ -223,7 +223,7 @@ void ControlCinematicPlayer(short itemID) {
 	GetJointAbsPosition(item, &pos, 0);
 	roomID = GetCinematicRoom(pos.x, pos.y, pos.z);
 	if (roomID != -1 && item->roomNumber != roomID)
-		ItemNewRoom(itemID, roomID);
+		ItemNewRoom(itemNumber, roomID);
 	if (item->dynamic_light && item->status != ITEM_INVISIBLE) {
 		pos.x = 0;
 		pos.y = 0;
@@ -234,12 +234,12 @@ void ControlCinematicPlayer(short itemID) {
 	AnimateItem(item);
 }
 
-void LaraControlCinematic(short itemID) {
+void LaraControlCinematic(short itemNumber) {
 	ITEM_INFO* item;
 	PHD_VECTOR pos;
 	short roomID;
 
-	item = &Items[itemID];
+	item = &Items[itemNumber];
 	item->pos.rotY = Camera.targetAngle;
 	item->pos.x = Camera.pos.x;
 	item->pos.y = Camera.pos.y;
@@ -250,17 +250,17 @@ void LaraControlCinematic(short itemID) {
 	GetJointAbsPosition(item, &pos, 0);
 	roomID = GetCinematicRoom(pos.x, pos.y, pos.z);
 	if (roomID != -1 && item->roomNumber != roomID)
-		ItemNewRoom(itemID, roomID);
+		ItemNewRoom(itemNumber, roomID);
 	AnimateLara(item);
 }
 
-void InitialisePlayer1(short itemID) {
+void InitialisePlayer1(short itemNumber) {
 	ITEM_INFO* item;
 
 	Objects[ID_LARA].drawRoutine = DrawLara;
 	Objects[ID_LARA].control = LaraControlCinematic;
-	AddActiveItem(itemID);
-	item = &Items[itemID];
+	AddActiveItem(itemNumber);
+	item = &Items[itemNumber];
 	Camera.pos.x = item->pos.x;
 	Camera.pos.y = item->pos.y;
 	Camera.pos.z = item->pos.z;
@@ -275,11 +275,11 @@ void InitialisePlayer1(short itemID) {
 	Lara.hit_direction = -1;
 }
 
-void InitialiseGenPlayer(short itemID) {
+void InitialiseGenPlayer(short itemNumber) {
 	ITEM_INFO* item;
 
-	AddActiveItem(itemID);
-	item = &Items[itemID];
+	AddActiveItem(itemNumber);
+	item = &Items[itemNumber];
 	item->pos.rotY = 0;
 	item->dynamic_light = 0;
 }

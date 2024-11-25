@@ -31,9 +31,9 @@
 #include "game/items.h"
 #include "global/vars.h"
 
-void PickUpCollision(short itemID, ITEM_INFO* laraitem, COLL_INFO* coll)
+void PickUpCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &Items[itemID];
+	ITEM_INFO* item = &Items[itemNumber];
 	short oldrotX = item->pos.rotX;
 	short oldrotY = item->pos.rotY;
 	short oldrotZ = item->pos.rotZ;
@@ -65,7 +65,7 @@ void PickUpCollision(short itemID, ITEM_INFO* laraitem, COLL_INFO* coll)
 					GF_ModifyInventory(CurrentLevel, TRUE);
 				}
 				item->status = ITEM_INVISIBLE;
-				RemoveDrawnItem(itemID);
+				RemoveDrawnItem(itemNumber);
 			}
 		}
 		else if (laraitem->currentAnimState == AS_FLAREPICKUP)
@@ -77,7 +77,7 @@ void PickUpCollision(short itemID, ITEM_INFO* laraitem, COLL_INFO* coll)
 				InitialiseNewWeapon();
 				Lara.gun_status = LGS_Special;
 				Lara.flare_age = (short)int(item->data) & 0x7FFF;
-				KillItem(itemID);
+				KillItem(itemNumber);
 			}
 			return;
 		}
@@ -129,7 +129,7 @@ void PickUpCollision(short itemID, ITEM_INFO* laraitem, COLL_INFO* coll)
 					GF_ModifyInventory(CurrentLevel, TRUE);
 				}
 				item->status = ITEM_INVISIBLE;
-				RemoveDrawnItem(itemID);
+				RemoveDrawnItem(itemNumber);
 			}
 		}
 		else if (laraitem->currentAnimState == AS_FLAREPICKUP)
@@ -142,7 +142,7 @@ void PickUpCollision(short itemID, ITEM_INFO* laraitem, COLL_INFO* coll)
 				Lara.gun_status = LGS_Special;
 				Lara.flare_age = (short)int(item->data) & 0x7FFF;
 				draw_flare_meshes();
-				KillItem(itemID);
+				KillItem(itemNumber);
 			}
 			return;
 		}

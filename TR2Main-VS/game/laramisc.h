@@ -27,12 +27,12 @@
  /*
   * Function list
   */
-void LaraControl(short itemID);
+void LaraControl(short itemNumber);
 void AnimateLara(ITEM_INFO* item); // 0x00430A10
-void UseItem(short itemID); // 0x00430D10
+void UseItem(short itemNumber); // 0x00430D10
 void LaraCheatGetStuff(); // 0x00430ED0
-void ControlLaraExtra(short itemID); // 0x00430F90
-void InitialiseLaraLoad(short itemID); // 0x00430FB0
+void ControlLaraExtra(short itemNumber); // 0x00430F90
+void InitialiseLaraLoad(short itemNumber); // 0x00430FB0
 #define InitialiseLara ((void(__cdecl*)(int)) 0x00430FE0)
 void InitialiseLaraInventory(int levelID); // 0x004312A0
 void LaraInitialiseMeshes(int levelID); // 0x00431610
