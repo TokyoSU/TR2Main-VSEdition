@@ -38,6 +38,11 @@
 #define VAR_I_(address, type, value)	(*(type*)(address)) // initialized variable (value is just for info)
 #define ARRAY_(address, type, length)	(*(type(*)length)(address)) // array (can be multidimensional)
 
+// Camera flags values.
+#define FOLLOW_CENTRE 	1
+#define NO_CHUNKY     	2
+#define CHASE_OBJECT  	3
+
 // Macros values.
 #define WEAPON_UNLIMITED 10001
 #define PISTOLS_AMMO_DEFAULT 1000

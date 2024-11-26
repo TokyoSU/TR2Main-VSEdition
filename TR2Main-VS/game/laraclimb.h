@@ -28,21 +28,22 @@
   * Function list
   */
 
-//0x0042D8F0:		lara_as_climbleft
-//0x0042D930:		lara_as_climbright
-//0x0042D970:		lara_as_climbstnc
-//0x0042D9F0:		lara_as_climbing
-//0x0042DA10:		lara_as_climbend
-//0x0042DA30:		lara_as_climbdown
-#define lara_col_climbleft ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x0042DA50)
-#define lara_col_climbright ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x0042DAB0)
-#define lara_col_climbstnc ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x0042DB10)
-#define lara_col_climbing ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x0042DD20)
-#define lara_col_climbdown ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x0042DE70)
-//0x0042E010:		LaraCheckForLetGo
-//0x0042E0C0:		LaraTestClimb
-//0x0042E330:		LaraTestClimbPos
-//0x0042E400:		LaraDoClimbLeftRight
-//0x0042E4F0:		LaraTestClimbUpPos
+void lara_as_climbleft(ITEM_INFO* item, COLL_INFO* coll); // 0x0042D8F0
+void lara_as_climbright(ITEM_INFO* item, COLL_INFO* coll); // 0x0042D930
+void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll); // 0x0042D970
+void lara_as_climbing(ITEM_INFO* item, COLL_INFO* coll); // 0x0042D9F0
+void lara_as_climbend(ITEM_INFO* item, COLL_INFO* coll); // 0x0042DA10
+void lara_as_climbdown(ITEM_INFO* item, COLL_INFO* coll); // 0x0042DA30
+void lara_col_climbleft(ITEM_INFO* item, COLL_INFO* coll); // 0x0042DA50
+void lara_col_climbright(ITEM_INFO* item, COLL_INFO* coll); // 0x0042DAB0
+void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll); // 0x0042DB10
+void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll); // 0x0042DD20
+void lara_col_climbdown(ITEM_INFO* item, COLL_INFO* coll); // 0x0042DE70
+
+#define LaraCheckForLetGo ((BOOL(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x0042E010)
+#define LaraTestClimb ((BOOL(__cdecl*)(int x, int y, int z, int xfront, int zfront, int height, short roomNumber, int *shift)) 0x0042E0C0)
+#define LaraTestClimbPos ((BOOL(__cdecl*)(ITEM_INFO* item,int front,int right,int origin,int height,int* shift)) 0x0042E330)
+#define LaraDoClimbLeftRight ((void(__cdecl*)(ITEM_INFO* item,COLL_INFO* coll,BOOL result,int shift)) 0x0042E400)
+#define LaraTestClimbUpPos ((BOOL(__cdecl*)(ITEM_INFO *item, int front, int right, int *shift, int *ledge)) 0x0042E4F0)
 
 #endif // _H_INCLUDED
