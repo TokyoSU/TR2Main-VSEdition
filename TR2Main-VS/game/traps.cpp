@@ -221,47 +221,74 @@ void SpinningBlade(short itemNumber) {
 		item->pos.rotY += PHD_180;
 }
 
+#define ICICLE_FALLSPEED 50
+#define ICICLE_DAMAGE 200
+#define ICICLE_FULLMESH (MESHBITS_GET(1) | MESHBITS_GET(2) | MESHBITS_GET(3) | MESHBITS_GET(4) | MESHBITS_GET(5) |  MESHBITS_GET(6))
+#define ICICLE_NOTIPMESH (MESHBITS_GET(1) | MESHBITS_GET(3) | MESHBITS_GET(5))
+
+
+void InitialiseIcicle(short itemNumber) {
+	ITEM_INFO* item = &Items[itemNumber];
+	item->data = game_malloc(sizeof(GAME_VECTOR), GBUF_TempAlloc);
+	GAME_VECTOR* oldPos = (GAME_VECTOR*)item->data;
+	oldPos->x = item->pos.x;
+	oldPos->y = item->pos.y;
+	oldPos->z = item->pos.z;
+	oldPos->roomNumber = item->roomNumber;
+}
+
 void IcicleControl(short itemNumber) {
 	ITEM_INFO* item = &Items[itemNumber];
+	GAME_VECTOR* oldPos = (GAME_VECTOR*)item->data;
 
-	switch (item->currentAnimState) {
-	case 1:
-		item->goalAnimState = 2;
-		break;
-	case 2:
-		if (!item->gravity) {
-			item->fallSpeed = 50;
-			item->gravity = 1;
+	if (TriggerActive(item))
+	{
+		switch (item->currentAnimState) {
+		case 1:
+			item->goalAnimState = 2;
+			break;
+		case 2:
+			if (!item->gravity) {
+				item->fallSpeed = ICICLE_FALLSPEED;
+				item->gravity = TRUE;
+			}
+			if (item->touchBits != 0) {
+				LaraItem->hitPoints -= ICICLE_DAMAGE;
+				LaraItem->hitStatus = TRUE;
+			}
+			break;
+		case 3:
+			item->gravity = FALSE;
+			break;
 		}
-		if (item->touchBits) {
-			LaraItem->hitPoints -= 200;
-			LaraItem->hitStatus = 1;
-		}
-		break;
-	case 3:
-		item->gravity = 0;
-		break;
-	}
 
-	AnimateItem(item);
+		AnimateItem(item);
 
-	if (item->status == ITEM_DISABLED) {
-		RemoveActiveItem(itemNumber);
-	}
-	else {
 		short roomID = item->roomNumber;
 		FLOOR_INFO* floor = GetFloor(item->pos.x, item->pos.y, item->pos.z, &roomID);
 		if (item->roomNumber != roomID)
 			ItemNewRoom(itemNumber, roomID);
-
 		item->floor = GetHeight(floor, item->pos.x, item->pos.y, item->pos.z);
 		if (item->currentAnimState == 2 && item->pos.y >= item->floor) {
 			item->gravity = 0;
 			item->goalAnimState = 3;
 			item->pos.y = item->floor;
 			item->fallSpeed = 0;
-			item->meshBits = 0x2B;
+			item->meshBits = ICICLE_NOTIPMESH;
 		}
+	}
+	else // Reset position back to original
+	{
+		item->gravity = FALSE;
+		item->animNumber = Objects[item->objectID].animIndex;
+		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->currentAnimState = 1;
+		item->pos.x = oldPos->x;
+		item->pos.y = oldPos->y;
+		item->pos.z = oldPos->z;
+		if (oldPos->roomNumber != item->roomNumber)
+			ItemNewRoom(itemNumber, oldPos->roomNumber);
+		item->meshBits = ICICLE_FULLMESH;
 	}
 }
 

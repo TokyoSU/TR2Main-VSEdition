@@ -26,12 +26,11 @@
   * String Constants
   */
 
+// Window and class names.
 #define GameWindowName		"Tomb Raider II"
 #define GameClassName		"Dude:TombRaiderII:DDWndClass"
-
 #define GameDialogName		"Tomb Raider II"
 #define DialogClassName		"Dude:TombRaiderII:DWWndClass"
-
 #define MessageBoxName		"Tomb Raider II"
 
 // Variable macros
@@ -51,6 +50,24 @@
 #define GRENADE_AMMO_CLIPS 2
 #define FLARE_AMMO_CLIPS 6
 
+// Lara values.
+#define NO_AIR -1
+#define LARA_RESTORE_AIR_PER_TICK 10
+#define LARA_AIR_MAX 1800
+#define LARA_NO_AIR_DAMAGE_PER_TICK 5
+#if defined(FEATURE_MOD_CONFIG)
+#define AIR_100(x) (x)
+#define AIR_75(x) (AIR_100(x)*3/4)
+#define AIR_50(x) (AIR_100(x)/2)
+#define AIR_25(x) (AIR_100(x)/4)
+#else
+#define AIR_100 (LARA_AIR_MAX)
+#define AIR_75 (AIR_100*3/4)
+#define AIR_50 (AIR_100/2)
+#define AIR_25 (AIR_100/4)
+#endif
+
+// Max values.
 #define MAX_OBJECT_TEXTURES 32768             // From 2000
 #define MAX_TEXTURE_PAGES 1024                // From 128
 #define MAX_EFFECTS 2048                      // From 100

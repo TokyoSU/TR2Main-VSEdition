@@ -178,18 +178,34 @@ void DrawAirBar(BOOL flashState) {
 
 	if (Lara.water_status != LWS_Underwater && Lara.water_status != LWS_Surface)
 		return;
+#if defined(FEATURE_MOD_CONFIG)
+	if (Mod.underwaterInfo.unlimitedAir)
+		return;
+#endif
 
 	air = Lara.air;
-	CLAMP(air, 0, 1800);
+#if defined(FEATURE_MOD_CONFIG)
+	CLAMP(air, 0, Mod.underwaterInfo.maxAir);
+#else
+	CLAMP(air, 0, LARA_AIR_MAX);
+#endif
 
+#if defined(FEATURE_MOD_CONFIG)
+	if (air <= AIR_25(Mod.underwaterInfo.maxAir) && flashState == 0) {
+#else
 	if (air <= 450 && flashState == 0) {
+#endif
 		S_DrawAirBar(0);
 	}
 	else {
 #ifdef FEATURE_HUD_IMPROVED
-		S_DrawAirBar(PHD_ONE * air / 1800);
+#if defined(FEATURE_MOD_CONFIG)
+		S_DrawAirBar(PHD_ONE * air / Mod.underwaterInfo.maxAir);
+#else
+		S_DrawAirBar(PHD_ONE * air / LARA_AIR_MAX);
+#endif
 #else // !FEATURE_HUD_IMPROVED
-		S_DrawAirBar(100 * air / 1800);
+		S_DrawAirBar(100 * air / LARA_AIR_MAX);
 #endif // FEATURE_HUD_IMPROVED
 	}
 }

@@ -1095,6 +1095,7 @@ void TrapObjects()
 	}
 
 	obj = &Objects[ID_ICICLE];
+	obj->initialise = InitialiseIcicle;
 	obj->control = IcicleControl;
 	obj->collision = TrapCollision;
 	obj->save_anim = TRUE;

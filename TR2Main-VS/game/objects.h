@@ -44,11 +44,11 @@ void SmashWindow(short itemNumber); // 0x00434EB0
 void WindowControl(short itemNumber); // 0x00434F80
 void OpenNearestDoor();
 #define SmashIceControl ((void(__cdecl*)(short)) 0x00435020)
-//0x00435100:		ShutThatDoor
-//0x00435150:		OpenThatDoor
+#define ShutThatDoor ((void(__cdecl*)(DOORPOS_DATA*)) 0x00435100)
+#define OpenThatDoor ((void(__cdecl*)(DOORPOS_DATA*)) 0x00435150)
 #define InitialiseDoor ((void(__cdecl*)(short)) 0x00435190)
 #define DoorControl ((void(__cdecl*)(short)) 0x00435570)
-//0x00435640:		OnDrawBridge
+#define OnDrawBridge ((int(__cdecl*)(ITEM_INFO*,int,int)) 0x00435640)
 #define DrawBridgeFloor ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00435700)
 #define DrawBridgeCeiling ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00435740)
 #define DrawBridgeCollision ((void(__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x00435780)
@@ -59,7 +59,7 @@ void LiftFloor(ITEM_INFO* item, int x, int y, int z, int* height); // 0x00435A50
 void LiftCeiling(ITEM_INFO* item, int x, int y, int z, int* height); // 0x00435A90
 #define BridgeFlatFloor ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00435AD0)
 #define BridgeFlatCeiling ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00435AF0)
-//0x00435B10:		GetOffset
+#define GetOffset ((int(__cdecl*)(ITEM_INFO*,int,int)) 0x00435B10)
 #define BridgeTilt1Floor ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00435B50)
 #define BridgeTilt1Ceiling ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00435B80)
 #define BridgeTilt2Floor ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00435BC0)

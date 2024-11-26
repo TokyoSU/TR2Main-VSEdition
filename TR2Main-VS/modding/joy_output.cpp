@@ -23,17 +23,16 @@
 #include "modding/joy_output.h"
 #include "global/vars.h"
 
+#if defined(FEATURE_MOD_CONFIG)
+#include "modding/mod_utils.h"
+#endif
+
 #ifdef FEATURE_INPUT_IMPROVED
 #define NUM_MOTORS (2)
 #define NUM_VIBS (16)
 
 #define HP_100 (1000)
 #define HP_50 (HP_100/2)
-
-#define AIR_100 (1800)
-#define AIR_75 (AIR_100*3/4)
-#define AIR_50 (AIR_100/2)
-#define AIR_25 (AIR_100/4)
 
 extern void SetJoystickOutput(WORD leftMotor, WORD rightMotor, DWORD ledColor);
 extern bool IsJoyVibrationEnabled();
@@ -172,6 +171,20 @@ void UpdateJoyOutput(bool isInGame) {
 		else {
 			if (Lara.water_status == LWS_Underwater) {
 				if (hitPoints > 0 && Lara.air > 0) {
+#if defined(FEATURE_MOD_CONFIG)
+					if (Lara.air > AIR_75(Mod.underwaterInfo.maxAir)) {
+						g = 255;
+						b = 128 + 127 * (AIR_100(Mod.underwaterInfo.maxAir) - Lara.air) / AIR_25(Mod.underwaterInfo.maxAir);
+					}
+					else if (Lara.air > AIR_25(Mod.underwaterInfo.maxAir)) {
+						g = 255 * (Lara.air - AIR_25(Mod.underwaterInfo.maxAir)) / AIR_50(Mod.underwaterInfo.maxAir);
+						b = 255;
+					}
+					else {
+						r = 127 * (AIR_25(Mod.underwaterInfo.maxAir) - Lara.air) / AIR_25(Mod.underwaterInfo.maxAir);
+						b = 255;
+					}
+#else
 					if (Lara.air > AIR_75) {
 						g = 255;
 						b = 128 + 127 * (AIR_100 - Lara.air) / AIR_25;
@@ -184,6 +197,7 @@ void UpdateJoyOutput(bool isInGame) {
 						r = 127 * (AIR_25 - Lara.air) / AIR_25;
 						b = 255;
 					}
+#endif
 				}
 				else {
 					r = 128 + 127 * (HP_100 - hitPoints) / HP_100;

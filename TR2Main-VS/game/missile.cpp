@@ -170,10 +170,10 @@ BOOL ExplodingDeath(short itemNumber, DWORD meshBits, short damage)
 	int* bone = &AnimBones[obj->boneIndex];
 	int meshIndex = 1;
 	short* extra_rotations = (short*)item->data;
-	if (MESHBITS(meshBits, meshIndex) && MESHBITS(item->meshBits, meshIndex))
+	if (MESHBITS_EXIST(meshBits, meshIndex) && MESHBITS_EXIST(item->meshBits, meshIndex))
 	{
 		CreateExplodingMesh(item, obj->meshIndex, damage);
-		REMOVE_MESHBITS(item->meshBits, meshIndex);
+		MESHBITS_REMOVE(item->meshBits, meshIndex);
 	}
 	if (obj->nMeshes > 1)
 	{
@@ -196,10 +196,10 @@ BOOL ExplodingDeath(short itemNumber, DWORD meshBits, short damage)
 					phd_RotY(*(extra_rotations)++);
 			}
 			meshIndex++;
-			if (MESHBITS(meshBits, meshIndex) && MESHBITS(item->meshBits, meshIndex))
+			if (MESHBITS_EXIST(meshBits, meshIndex) && MESHBITS_EXIST(item->meshBits, meshIndex))
 			{
 				CreateExplodingMesh(item, obj->meshIndex + meshIndex, damage);
-				REMOVE_MESHBITS(item->meshBits, meshIndex);
+				MESHBITS_REMOVE(item->meshBits, meshIndex);
 			}
 		}
 	}

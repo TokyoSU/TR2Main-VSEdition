@@ -325,13 +325,13 @@ static int searchMap(LPCSTR name, MAP* mapArray, DWORD mapCount) {
 static bool ParseSpriteInfo(Value& root, int id) {
 	PHD_SPRITE* info = &PhdSpriteInfo[BTN_SPR_IDX + id];
 
-	BYTE u = GetValueByNameInt<BYTE>(root, "u", 0);
-	BYTE v = GetValueByNameInt<BYTE>(root, "v", 0);
-	int x = GetValueByNameInt<int>(root, "x", 0);
-	int y = GetValueByNameInt<int>(root, "y", 0);
-	int width = GetValueByNameInt<int>(root, "width", 0);
-	int height = GetValueByNameInt<int>(root, "height", 0);
-	ButtonSpriteSpacing[id] = GetValueByNameInt<BYTE>(root, "spacing", 0);
+	BYTE u = GetValueByNameByte(root, "u", 0);
+	BYTE v = GetValueByNameByte(root, "v", 0);
+	int x = GetValueByNameInt(root, "x", 0);
+	int y = GetValueByNameInt(root, "y", 0);
+	int width = GetValueByNameInt(root, "width", 0);
+	int height = GetValueByNameInt(root, "height", 0);
+	ButtonSpriteSpacing[id] = GetValueByNameByte(root, "spacing", 0);
 
 	info->offset = (v << 8) | u;
 	info->width = ABS(width) * 256;
@@ -903,11 +903,11 @@ static bool ParseLevelTexPagesConfiguration(Value& root) {
 		for (SizeType i = 0; i < glyphsList.Size(); i++)
 		{
 			Value& glyph = glyphsList[i];
-			int id = GetValueByNameInt<int>(glyph, "id", 0);
+			int id = GetValueByNameInt(glyph, "id", 0);
 			if (id < 0 || id >= (int)ARRAY_SIZE(TexPagesConfig.glyphs)) continue;
-			TexPagesConfig.glyphs[id].spacing = GetValueByNameInt<int>(glyph, "spacing", 8);
-			TexPagesConfig.glyphs[id].xOffset = GetValueByNameInt<int>(glyph, "x_offset", 0);
-			TexPagesConfig.glyphs[id].yOffset = GetValueByNameInt<int>(glyph, "y_offset", 0);
+			TexPagesConfig.glyphs[id].spacing = GetValueByNameInt(glyph, "spacing", 8);
+			TexPagesConfig.glyphs[id].xOffset = GetValueByNameInt(glyph, "x_offset", 0);
+			TexPagesConfig.glyphs[id].yOffset = GetValueByNameInt(glyph, "y_offset", 0);
 			TexPagesConfig.glyphs[id].xStretch = GetValueByNameDouble(glyph, "x_stretch", 1.0);
 			TexPagesConfig.glyphs[id].yStretch = GetValueByNameDouble(glyph, "y_stretch", 1.0);
 		}

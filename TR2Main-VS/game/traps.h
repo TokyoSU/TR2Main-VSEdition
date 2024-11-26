@@ -34,6 +34,7 @@ void ControlCeilingSpikes(short itemNumber); // 0x00441300
 void HookControl(short itemNumber); // 0x00441420
 #define PropellerControl ((void(__cdecl*)(short)) 0x004414B0)
 void SpinningBlade(short itemNumber); // 0x00441640
+void InitialiseIcicle(short itemNumber);
 void IcicleControl(short itemNumber); // 0x004417C0
 void InitialiseBlade(short itemNumber); // 0x004418C0
 void BladeControl(short itemNumber); // 0x00441900

@@ -61,6 +61,7 @@ struct ModConfig
 
 	bool isUIColorLoaded = false;
 
+	CUST_UNDERWATER_INFO underwaterInfo;
 	D3DCOLOR waterColor;
 	CUST_INVENTORY_ITEM invItemList[MAX_ITEM_IN_INVENTORY];
 	LARA_BAR_CONFIG laraBar;

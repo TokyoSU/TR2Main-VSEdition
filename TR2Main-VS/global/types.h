@@ -118,8 +118,9 @@ typedef struct {
 #define	TRIGMULT2(a,b)		      (((a)*(b))>>W2V_SHIFT)
 #define	TRIGMULT3(a,b,c)	      (TRIGMULT2((TRIGMULT2(a,b)),c))
 #define	VBUF_VISIBLE(a,b,c)	      (((a).ys-(b).ys)*((c).xs-(b).xs)>=((c).ys-(b).ys)*((a).xs-(b).xs))
-#define MESHBITS(x, value)        (x & 1 << value)
-#define REMOVE_MESHBITS(x, value) (x &= ~(1 << value))
+#define MESHBITS_EXIST(x, value)  (x & 1 << value)
+#define MESHBITS_REMOVE(x, value) (x &= ~(1 << value))
+#define MESHBITS_GET(x)           (1 << x)
 
 // Distance values
 #define BLOCK(x)			((x)*1024)
@@ -1468,12 +1469,21 @@ typedef struct AppSettings_t {
 #endif // FEATURE_VIDEOFX_IMPROVED
 } APP_SETTINGS;
 
-struct TEXPAGE_DESC {
+typedef struct TexPageDesc_t {
 	LPDIRECT3DTEXTURE9 texture;
 	int width;
 	int height;
 	int status;
-};
+} TEXPAGE_DESC;
+
+typedef struct FloorInfo_t {
+	unsigned short index;
+	short box;
+	BYTE pitRoom;
+	char floor;
+	BYTE skyRoom;
+	char ceiling;
+} FLOOR_INFO;
 
 typedef struct PhdUV_t {
 	UINT16 u;
@@ -1811,17 +1821,6 @@ typedef struct Phd3dPos_t {
 	short rotZ;
 } PHD_3DPOS;
 
-typedef enum {
-	IFF_Active = 1 << 0,
-	IFF_Status = 1 << 1,
-	IFF_Gravity = 1 << 3,
-	IFF_HitStatus = 1 << 4,
-	IFF_Collidable = 1 << 5,
-	IFF_LookedAt = 1 << 6,
-	IFF_DynamicLight = 1 << 7,
-	IFF_ClearBody = 1 << 8
-} ItemInfoFlags2;
-
 typedef struct ItemInfo_t {
 	int floor;
 	DWORD touchBits;
@@ -1950,6 +1949,19 @@ typedef struct PhdMatrix_t {
 	int _20, _21, _22, _23;
 } PHD_MATRIX;
 
+typedef struct DoorPosData_t {
+	FLOOR_INFO* floor;
+	FLOOR_INFO data;
+	short block;
+} DOORPOS_DATA;
+
+typedef struct DoorData_t {
+	DOORPOS_DATA d1;
+	DOORPOS_DATA d1Flip;
+	DOORPOS_DATA d2;
+	DOORPOS_DATA d2Flip;
+} DOOR_DATA;
+
 typedef struct DoorInfo_t {
 	short room;
 	short x;
@@ -1962,15 +1974,6 @@ typedef struct DoorInfos_t {
 	short wCount;
 	DOOR_INFO door[];
 } DOOR_INFOS;
-
-typedef struct FloorInfo_t {
-	unsigned short index;
-	short box;
-	unsigned char pitRoom;
-	signed char floor;
-	unsigned char skyRoom;
-	signed char ceiling;
-} FLOOR_INFO;
 
 typedef struct LightInfo_t {
 	int x;
@@ -2433,10 +2436,9 @@ typedef struct WeaponInfo_t {
 	short sampleNum;
 } WEAPON_INFO;
 
-
 typedef struct { short idx; short num; } POLYINDEX;
 
-typedef struct {
+typedef struct TexPageConfig_t {
 	bool isLoaded;
 	bool isLegacyColors;
 	double adjustment;
@@ -2451,7 +2453,7 @@ typedef struct {
 #endif // FEATURE_HUD_IMPROVED
 } TEXPAGES_CONFIG;
 
-typedef struct {
+typedef struct Polyfilter_t {
 	short n_vtx, n_gt4, n_gt3, n_g4, n_g3;
 	POLYINDEX gt4[POLYFILTER_SIZE];
 	POLYINDEX gt3[POLYFILTER_SIZE];
@@ -2465,7 +2467,7 @@ typedef struct PolyfilterNode_t {
 	struct PolyfilterNode_t* next;
 } POLYFILTER_NODE;
 
-typedef struct {
+typedef struct BarConfig_t {
 	bool isCentered;
 	bool basedOnEnemyHealth;
 
@@ -2482,7 +2484,7 @@ typedef struct {
 	DWORD PSX_framecolor[6];
 } BAR_CONFIG;
 
-typedef struct {
+typedef struct SemiTransConfig_t {
 	bool isLoaded;
 	POLYINDEX* animtex;
 	POLYFILTER_NODE* rooms;
@@ -2490,18 +2492,18 @@ typedef struct {
 	POLYFILTER_NODE* objects[ID_NUMBER_OBJECTS];
 } SEMITRANS_CONFIG;
 
-typedef struct {
+typedef struct ReflectConfig_t {
 	bool isLoaded;
 	POLYFILTER_NODE* statics;
 	POLYFILTER_NODE* objects[ID_NUMBER_OBJECTS];
 } REFLECT_CONFIG;
 
-typedef struct {
+typedef struct LaraBarConfig_t {
 	BAR_CONFIG health;
 	BAR_CONFIG air;
 } LARA_BAR_CONFIG;
 
-typedef struct {
+typedef struct EnemyHealthInfo_t {
 	short dog;
 	short mouse;
 	short cult1;
@@ -2541,7 +2543,7 @@ typedef struct {
 	short dino;
 } ENEMY_HEALTH_INFO;
 
-typedef struct CustInventoryItem {
+typedef struct CustInventoryItem_t {
 	int objectID = -1;
 	std::string message;
 	int message_pos_x;
@@ -2555,6 +2557,13 @@ typedef struct CustInventoryItem {
 	bool canRotateManually = false; // Allow object to rotate when selected ?
 } CUST_INVENTORY_ITEM;
 
+typedef struct CustUnderwaterInfo_t {
+	short noAirDamagePerTick;
+	short restoreAirPerTick;
+	short maxAir;
+	bool unlimitedAir;
+} CUST_UNDERWATER_INFO;
+
 static inline FLOOR_INFO* GetFloorSector(int x, int z, ROOM_INFO* room) {
 	return &room->floor[((z - room->z) >> WALL_SHIFT) + ((x - room->x) >> WALL_SHIFT) * room->xSize];
 }
@@ -2563,15 +2572,20 @@ static inline FLOOR_INFO* GetFloorSector(ITEM_INFO* item, ROOM_INFO* room) {
 }
 
 static inline short GetSectorBoxXZ(ITEM_INFO* item, ROOM_INFO* room) {
-	FLOOR_INFO* floor = GetFloorSector(item, room);
-	if (floor == NULL)
-		return -1;
-	return floor->box;
+	auto* floor = GetFloorSector(item, room);
+	return floor == NULL ? -1 : floor->box;
 }
 
 typedef bool (*ENUM_POLYS_OBJECTS_CB) (short* ptrObj, int vtxCount, bool colored, LPVOID param);
 typedef bool (*ENUM_POLYS_FACE4_CB) (FACE4* ptrObj, int faceCount, bool colored, LPVOID param);
 typedef bool (*ENUM_POLYS_FACE3_CB) (FACE3* ptrObj, int faceCount, bool colored, LPVOID param);
+
+static std::string GetLowerString(const std::string& value) {
+	std::string result = value;
+	for (size_t i = 0; i < result.size(); i++)
+		result[i] = std::tolower(result[i]);
+	return result;
+}
 
 #pragma pack(pop)
 

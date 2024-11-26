@@ -36,7 +36,7 @@ void GetNewRoom(int x, int y, int z, short roomID); // 0x00413480
 #define UpdateLaraRoom ((void(__cdecl*)(ITEM_INFO*, int)) 0x00413520)
 #define GetTiltType ((short(__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00413580)
 #define LaraBaddieCollision ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00413620)
-//0x004137C0:		EffectSpaz
+#define EffectSpaz ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004137C0)
 #define CreatureCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x00413840)
 #define ObjectCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x004138C0)
 #define DoorCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x00413920)
@@ -46,6 +46,6 @@ void GetNewRoom(int x, int y, int z, short roomID); // 0x00413480
 #define TestLaraPosition ((int(__cdecl*)(short*,ITEM_INFO*,ITEM_INFO*)) 0x00413DF0)
 #define AlignLaraPosition ((void(__cdecl*)(PHD_VECTOR*,ITEM_INFO*,ITEM_INFO*)) 0x00413F30)
 #define MoveLaraPosition ((int(__cdecl*)(PHD_VECTOR*,ITEM_INFO*,ITEM_INFO*)) 0x00414070)
-//0x00414200:		Move3DPosTo3DPos
+#define Move3DPosTo3DPos ((int(__cdecl*)(PHD_3DPOS*,PHD_3DPOS*,int,short)) 0x00414200)
 
 #endif // COLLIDE_H_INCLUDED

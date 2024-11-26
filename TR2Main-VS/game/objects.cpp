@@ -133,15 +133,17 @@ void WindowControl(short itemNumber) {
 
 void OpenNearestDoor()
 {
-	for (short itemNumber = 0; itemNumber < LevelItemCount; itemNumber++) {
+	for (short itemNumber = 0; itemNumber < LevelItemCount; itemNumber++)
+	{
 		ITEM_INFO* item = &Items[itemNumber];
+		if (item->objectID < ID_DOOR_TYPE1 || item->objectID > ID_TRAPDOOR_TYPE3)
+			continue;
+
 		int dx = (item->pos.x - LaraItem->pos.x);
 		int dy = (item->pos.y - LaraItem->pos.y);
 		int dz = (item->pos.z - LaraItem->pos.z);
 		int dist = SQR(dx) + SQR(dy) + SQR(dz);
-		if (dist > SQR(WALL_SIZE * 2))
-			continue;
-		if (item->objectID < ID_DOOR_TYPE1 || item->objectID > ID_TRAPDOOR_TYPE3)
+		if (dist > SQR(BLOCK(2)))
 			continue;
 
 		if (!item->active) {
@@ -223,17 +225,19 @@ void LiftControl(short itemNumber) {
 		ItemNewRoom(itemNumber, roomID);
 }
 
+// TODO: Refactor it to work in all direction !
 void LiftFloorCeiling(ITEM_INFO* item, int x, int y, int z, int* floor, int* ceiling) {
 	int liftX, liftZ, laraX, laraZ;
 	BOOL inside;
-
 	liftX = item->pos.x >> WALL_SHIFT;
 	liftZ = item->pos.z >> WALL_SHIFT;
 	laraX = LaraItem->pos.x >> WALL_SHIFT;
 	laraZ = LaraItem->pos.z >> WALL_SHIFT;
-	inside = (x >> WALL_SHIFT == liftX || (x >> WALL_SHIFT) + 1 == liftX) && (z >> WALL_SHIFT == liftZ || (z >> WALL_SHIFT) - 1 == liftZ);
-	*floor = NO_HEIGHT;
-	*ceiling = NO_HEIGHT;
+	x >>= WALL_SHIFT;
+	z >>= WALL_SHIFT;
+	inside = (x == liftX || (x + 1 == liftX) && (z == liftZ || (z - 1 == liftZ)));
+	*floor = 0x7FFF;
+	*ceiling = -0x7FFF;
 	if ((laraX != liftX && laraX + 1 != liftX) || (laraZ != liftZ && laraZ - 1 != liftZ)) {
 		if (inside) {
 			if (y <= item->pos.y - 1280) {
@@ -243,7 +247,7 @@ void LiftFloorCeiling(ITEM_INFO* item, int x, int y, int z, int* floor, int* cei
 				if (y < item->pos.y + 256) {
 					if (!item->currentAnimState) {
 						*floor = NO_HEIGHT;
-						*ceiling = NO_HEIGHT;
+						*ceiling = 0x7FFF;
 					}
 					else {
 						*floor = item->pos.y;
@@ -263,8 +267,8 @@ void LiftFloorCeiling(ITEM_INFO* item, int x, int y, int z, int* floor, int* cei
 				*ceiling = item->pos.y - 1024;
 			}
 			else {
-				*floor = NO_HEIGHT;
-				*ceiling = NO_HEIGHT;
+				*floor = 0x7FFF;
+				*ceiling = 0x7FFF;
 			}
 		}
 		else {
@@ -289,7 +293,6 @@ void LiftFloorCeiling(ITEM_INFO* item, int x, int y, int z, int* floor, int* cei
 void LiftFloor(ITEM_INFO* item, int x, int y, int z, int* height) {
 	int floor, ceiling;
 	LiftFloorCeiling(item, x, y, z, &floor, &ceiling);
-	if (ceiling == NO_HEIGHT) return;
 	if (floor < *height)
 		*height = floor;
 }
@@ -297,7 +300,6 @@ void LiftFloor(ITEM_INFO* item, int x, int y, int z, int* height) {
 void LiftCeiling(ITEM_INFO* item, int x, int y, int z, int* height) {
 	int floor, ceiling;
 	LiftFloorCeiling(item, x, y, z, &floor, &ceiling);
-	if (ceiling == NO_HEIGHT) return;
 	if (ceiling > *height)
 		*height = ceiling;
 }

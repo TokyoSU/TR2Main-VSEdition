@@ -531,7 +531,7 @@ void S_PrintShadow(short radius, short* bPtr, ITEM_INFO* item) {
 	phd_PopMatrix();
 }
 
-void S_CalculateLight(int x, int y, int z, short roomNumber, bool isLara) {
+void S_CalculateLight(int x, int y, int z, short roomNumber) {
 	ROOM_INFO* room;
 	int xDist, yDist, zDist, distance, radius, depth;
 	int xBrightest = 0, yBrightest = 0, zBrightest = 0;
@@ -595,22 +595,23 @@ void S_CalculateLight(int x, int y, int z, short roomNumber, bool isLara) {
 	adder = brightest;
 
 	// Dynamic light calculation
+	brightest = 0;
 	for (DWORD i = 0; i < DynamicLightCount; ++i) {
-		xDist = x - DynamicLights[i].x;
-		yDist = y - DynamicLights[i].y;
-		zDist = z - DynamicLights[i].z;
-		falloff = DynamicLights[i].fallOff1;
-		intensity = DynamicLights[i].intensity1;
-
-		radius = 1 << falloff;
-
+		auto& dynLight = DynamicLights[i];
+		xDist = x - dynLight.x;
+		yDist = y - dynLight.y;
+		zDist = z - dynLight.z;
+		falloff1 = dynLight.fallOff1;
+		intensity1 = dynLight.intensity1;
+		radius = 1 << falloff1;
 		if ((xDist >= -radius && xDist <= radius) &&
 			(yDist >= -radius && yDist <= radius) &&
 			(zDist >= -radius && zDist <= radius))
 		{
-			distance = SQR(xDist) + SQR(yDist) + SQR(zDist);
-			if (distance <= SQR(radius)) {
-				shade = (1 << intensity) - (distance >> (2 * falloff - intensity));
+			distance = (SQR(xDist) + SQR(yDist) + SQR(zDist));
+			if (distance <= SQR(radius))
+			{
+				shade = (1 << intensity1) - (distance >> ((2 * falloff1) - intensity1));
 				if (shade > brightest) {
 					brightest = shade;
 					xBrightest = xDist;
@@ -623,7 +624,7 @@ void S_CalculateLight(int x, int y, int z, short roomNumber, bool isLara) {
 	}
 
 	// Light finalization
-	adder = adder / 2;
+	adder /= 2;
 	if (adder == 0) {
 		LsAdder = room->ambient1;
 		LsDivider = 0;
@@ -632,7 +633,7 @@ void S_CalculateLight(int x, int y, int z, short roomNumber, bool isLara) {
 		LsAdder = room->ambient1 - adder;
 		LsDivider = (1 << (W2V_SHIFT + 12)) / adder;
 		phd_GetVectorAngles(xBrightest, yBrightest, zBrightest, &angles);
-		phd_RotateLight(angles.rotY, angles.rotX);
+		phd_RotateLight(angles.rotX, angles.rotY);
 	}
 
 	// Fog calculation

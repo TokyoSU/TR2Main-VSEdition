@@ -154,6 +154,7 @@ void DrawRooms(short currentRoom) {
 	for (int i = 0; i < DrawRoomsCount; ++i) {
 		PrintObjects(DrawRoomsArray[i]);
 	}
+
 #ifdef FEATURE_VIEW_IMPROVED
 	for (int i = 0; i < DrawRoomsCount; ++i) {
 		RoomInfo[DrawRoomsArray[i]].boundActive = 0;
@@ -1021,7 +1022,7 @@ void CalculateObjectLighting(ITEM_INFO* item, short* frame) {
 		y = item->pos.y + (PhdMatrixPtr->_13 >> W2V_SHIFT);
 		z = item->pos.z + (PhdMatrixPtr->_23 >> W2V_SHIFT);
 		phd_PopMatrix();
-		S_CalculateLight(x, y, z, item->roomNumber, item->objectID == ID_LARA);
+		S_CalculateLight(x, y, z, item->roomNumber);
 	}
 	else {
 		S_CalculateStaticMeshLight(item->pos.x, item->pos.y, item->pos.z, item->shade1, item->shade2, &RoomInfo[item->roomNumber]);

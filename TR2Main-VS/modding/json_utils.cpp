@@ -21,33 +21,61 @@
 #include "precompiled.h"
 #include "json_utils.h"
 
-double GetValueByNameDouble(Value& data, LPCSTR name, double defaultValue)
+BYTE GetValueByNameByte(Value& data, const std::string& name, BYTE defaultValue)
 {
-    if (data.HasMember(name))
-        return data[name].GetDouble();
+    std::string result = GetLowerString(name);
+    if (data.HasMember(result.c_str()))
+        return (BYTE)data[result.c_str()].GetInt();
     return defaultValue;
 }
 
-D3DCOLOR GetColorRGBByName(Value& data, LPCSTR name, D3DCOLOR defaultValue)
+short GetValueByNameShort(Value& data, const std::string& name, short defaultValue)
 {
-    if (data.HasMember(name) && data[name].GetStringLength() == 6)
-        return strtol(data[name].GetString(), NULL, 16);
+    std::string result = GetLowerString(name);
+    if (data.HasMember(result.c_str()))
+        return (short)data[result.c_str()].GetInt();
     return defaultValue;
 }
 
-bool GetValueByNameBool(Value& data, LPCSTR name, bool defaultValue)
+int GetValueByNameInt(Value& data, const std::string& name, int defaultValue)
 {
-    if (data.HasMember(name))
-        return data[name].GetBool();
+    std::string result = GetLowerString(name);
+    if (data.HasMember(result.c_str()))
+        return data[result.c_str()].GetInt();
     return defaultValue;
 }
 
-std::string GetValueByNameString(Value& data, LPCSTR name, SizeType* destStringSize, std::string defaultValue)
+double GetValueByNameDouble(Value& data, const std::string& name, double defaultValue)
 {
-    if (data.HasMember(name))
+    std::string result = GetLowerString(name);
+    if (data.HasMember(result.c_str()))
+        return data[result.c_str()].GetDouble();
+    return defaultValue;
+}
+
+D3DCOLOR GetColorRGBByName(Value& data, const std::string& name, D3DCOLOR defaultValue)
+{
+    std::string result = GetLowerString(name);
+    if (data.HasMember(result.c_str()) && data[result.c_str()].GetStringLength() == 6)
+        return strtol(data[result.c_str()].GetString(), NULL, 16);
+    return defaultValue;
+}
+
+bool GetValueByNameBool(Value& data, const std::string& name, bool defaultValue)
+{
+    std::string result = GetLowerString(name);
+    if (data.HasMember(result.c_str()))
+        return data[result.c_str()].GetBool();
+    return defaultValue;
+}
+
+std::string GetValueByNameString(Value& data, const std::string& name, SizeType* destStringSize, std::string defaultValue)
+{
+    std::string result = GetLowerString(name);
+    if (data.HasMember(result.c_str()))
     {
-        *destStringSize = data[name].GetStringLength();
-        return data[name].GetString();
+        *destStringSize = data[result.c_str()].GetStringLength();
+        return data[result.c_str()].GetString();
     }
     *destStringSize = 0;
     return defaultValue;

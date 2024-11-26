@@ -1,13 +1,11 @@
 #pragma once
+#include "../global/types.h"
 
-template<typename T>
-static T GetValueByNameInt(Value& data, LPCSTR name, T defaultValue) {
-	if (data.HasMember(name))
-		return static_cast<T>(data[name].GetInt());
-	return defaultValue;
-}
-double GetValueByNameDouble(Value& data, LPCSTR name, double defaultValue);
-extern D3DCOLOR GetColorRGBByName(Value& data, LPCSTR name, D3DCOLOR defaultValue);
-extern bool GetValueByNameBool(Value& data, LPCSTR name, bool defaultValue);
-extern std::string GetValueByNameString(Value& data, LPCSTR name, SizeType* destStringSize, std::string defaultValue);
+extern BYTE GetValueByNameByte(Value& data, const std::string& name, BYTE defaultValue);
+extern short GetValueByNameShort(Value& data, const std::string& name, short defaultValue);
+extern int GetValueByNameInt(Value& data, const std::string& name, int defaultValue);
+extern double GetValueByNameDouble(Value& data, const std::string& name, double defaultValue);
+extern D3DCOLOR GetColorRGBByName(Value& data, const std::string& name, D3DCOLOR defaultValue);
+extern bool GetValueByNameBool(Value& data, const std::string& name, bool defaultValue);
+extern std::string GetValueByNameString(Value& data, const std::string& name, SizeType* destStringSize, std::string defaultValue);
 extern void ParseJsonError(LPCSTR filePath, size_t line, int parseCode);
