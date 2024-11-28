@@ -39,7 +39,7 @@ void InsertRoomGT3(FACE3* ptrObj, int number, SORTTYPE sortType)
 			continue;
 
 		if (clipOR >= 0) {
-			if (!VBUF_VISIBLE(*vtx0, *vtx1, *vtx2))
+			if (!CheckVisible(vtx0, vtx1, vtx2))
 				continue;
 
 			if (clipOR == 0) {
@@ -239,7 +239,7 @@ void InsertRoomGT4(FACE4* ptrObj, int number, SORTTYPE sortType)
 			continue;
 
 		if (clipOR >= 0) {
-			if (!VBUF_VISIBLE(*vtx0, *vtx1, *vtx2))
+			if (!CheckVisible(vtx0, vtx1, vtx2))
 				continue;
 
 			if (clipOR == 0) {

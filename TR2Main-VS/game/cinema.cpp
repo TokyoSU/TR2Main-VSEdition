@@ -107,7 +107,7 @@ void InitCinematicRooms() {
 		if (RoomInfo[i].flippedRoom >= 0) {
 			RoomInfo[RoomInfo[i].flippedRoom].boundActive = 1;
 		}
-		RoomInfo[i].flags |= ROOM_OUTSIDE;
+		RoomInfo[i].flags |= ROOM_HORIZON;
 	}
 	DrawRoomsCount = 0;
 	for (int i = 0; i < RoomCount; ++i) {

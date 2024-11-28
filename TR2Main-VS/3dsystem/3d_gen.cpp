@@ -29,6 +29,8 @@
 #include "specific/room.h"
 #include "global/vars.h"
 
+PHD_VECTOR CamPos;
+
  // related to POLYTYPE enum
 static void(__cdecl* PolyDrawRoutines[])(short*) = {
 	draw_poly_gtmap,		// gouraud shaded poly (texture)
@@ -326,6 +328,9 @@ void phd_LookAt(int xsrc, int ysrc, int zsrc, int xtar, int ytar, int ztar, shor
 	viewPos.rotY = angles.rotY;
 	viewPos.rotZ = roll;
 	phd_GenerateW2V(&viewPos);
+	CamPos.x = xsrc;
+	CamPos.y = ysrc;
+	CamPos.z = zsrc;
 }
 
 void phd_GetVectorAngles(int x, int y, int z, VECTOR_ANGLES* angles) {
@@ -884,8 +889,8 @@ void phd_InitWindow(short x, short y, int width, int height, int nearZ, int farZ
 
 	PhdWinCenterX = width / 2;
 	PhdWinCenterY = height / 2;
-	FltWinCenterX = (float)PhdWinCenterX;
-	FltWinCenterY = (float)PhdWinCenterY;
+	FltWinCenterX = (float)(PhdWinCenterX);
+	FltWinCenterY = (float)(PhdWinCenterY);
 
 	PhdWinLeft = 0;
 	PhdWinTop = 0;

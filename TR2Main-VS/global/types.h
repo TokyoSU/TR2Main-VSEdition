@@ -117,7 +117,7 @@ typedef struct {
 #define SWAP(a,b,c)			      {(c)=(a); (a)=(b); (b)=(c);}
 #define	TRIGMULT2(a,b)		      (((a)*(b))>>W2V_SHIFT)
 #define	TRIGMULT3(a,b,c)	      (TRIGMULT2((TRIGMULT2(a,b)),c))
-#define	VBUF_VISIBLE(a,b,c)	      (((a).ys-(b).ys)*((c).xs-(b).xs)>=((c).ys-(b).ys)*((a).xs-(b).xs))
+#define	VBUF_VISIBLE(a,b,c)	      ((c.xs - b.xs) * (a.ys - b.ys) - (a.xs - b.xs) * (c.ys - b.ys) > 0)
 #define MESHBITS_EXIST(x, value)  (x & 1 << value)
 #define MESHBITS_REMOVE(x, value) (x &= ~(1 << value))
 #define MESHBITS_GET(x)           (1 << x)
@@ -238,10 +238,14 @@ typedef struct {
 #define GF_ERROR			(-1)
 
 // Room flags
-#define NO_ROOM             (255)
-#define ROOM_UNDERWATER		(0x01)
-#define ROOM_OUTSIDE		(0x08)
-#define ROOM_INSIDE			(0x40)
+#define NO_ROOM							(255)
+#define ROOM_UNDERWATER					(0x01)
+#define ROOM_HORIZON					(0x08)
+#define ROOM_OUTSIDE					(0x20)
+#define ROOM_NOTNEAR_OUTSIDE_ROOM		(0x40)
+#define ROOM_QUICKSAND					(0x80)
+#define ROOM_EFFECT						(0x100) // Room glow and movement flags, Light mode should be 2 !
+#define ROOM_REFLECTION					(0x200) // Light mode should be 2 !
 
 // SFX flags
 #define SFX_UNDERWATER		(1)
@@ -565,7 +569,7 @@ typedef enum {
 	ID_BOAT_BITS,
 	ID_MINE,
 	ID_INV_BACKGROUND,
-	ID_FX_RESERVED,
+	ID_WEATHER_SPRITE,
 	ID_GONG_BONGER,
 	ID_DETONATOR1,
 	ID_DETONATOR2,
@@ -2276,6 +2280,7 @@ typedef struct LotInfo_t {
 
 typedef struct FxInfo_t {
 	PHD_3DPOS pos;
+	DWORD color;
 	short roomNumber;
 	short objectID;
 	short nextFx;
@@ -2285,6 +2290,7 @@ typedef struct FxInfo_t {
 	short frameNumber;
 	short counter;
 	short shade;
+	short scale;
 } FX_INFO;
 
 typedef struct CreatureInfo_t {
@@ -2572,8 +2578,10 @@ static inline FLOOR_INFO* GetFloorSector(ITEM_INFO* item, ROOM_INFO* room) {
 }
 
 static inline short GetSectorBoxXZ(ITEM_INFO* item, ROOM_INFO* room) {
-	auto* floor = GetFloorSector(item, room);
-	return floor == NULL ? -1 : floor->box;
+	FLOOR_INFO* floor = GetFloorSector(item, room);
+	if (floor == NULL)
+		return -1;
+	return floor->box;
 }
 
 typedef bool (*ENUM_POLYS_OBJECTS_CB) (short* ptrObj, int vtxCount, bool colored, LPVOID param);

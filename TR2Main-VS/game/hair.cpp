@@ -22,13 +22,17 @@
 #include "precompiled.h"
 #include "game/hair.h"
 #include "3dsystem/3d_gen.h"
+#include "3dsystem/math_tbls.h"
 #include "3dsystem/phd_math.h"
 #include "game/control.h"
 #include "game/draw.h"
 #include "specific/game.h"
 #include "global/vars.h"
 
-void InitialiseHair() {
+int SmokeWindX;
+int SmokeWindZ;
+
+void InitializeHair() {
 	PHD_3DPOS* hairpos = &HairPos[0];
 	PHD_VECTOR* hairvel = NULL;
 	int* bone = &AnimBones[Objects[ID_LARA_HAIR].boneIndex];
@@ -55,7 +59,9 @@ void HairControl(BOOL isCutscene) {
 	UINT16* rotation;
 	int* bone, x, y, z, i, j, water, height, random, dx, dy, dz, sum, distance;
 	short* frame, *mesh, roomID;
-	static int wind = 0;
+	static long wind = 0;
+	static long wind_angle = 2048;
+	static long dwind_angle = 2048;
 
 	if (Lara.hit_direction >= 0) {
 		switch (Lara.hit_direction) {
@@ -188,18 +194,22 @@ void HairControl(BOOL isCutscene) {
 		height = GetHeight(GetFloor(x, y, z, &roomID), x, y, z);
 		if (height < y)
 			height = LaraItem->floor;
-		if (CHK_ANY(RoomInfo[roomID].flags, 0x20)) {
-			random = GetRandomDraw() & 7;
-			if (random) {
-				wind += random - 4;
-				if (wind < 0) {
-					wind = 0;
-				}
-				else {
-					if (wind >= 8)
-						--wind;
-				}
-			}
+		if (CHK_ANY(RoomInfo[roomID].flags, ROOM_OUTSIDE)) {
+			wind += (GetRandomControl() & 7) - 3;
+			if (wind <= -2)
+				wind++;
+			else if (wind >= 9)
+				wind--;
+
+			dwind_angle = (dwind_angle + (((GetRandomControl() & 0x3F) - 32) << 1)) & 0x1FFE;
+			if (dwind_angle < 1024)
+				dwind_angle += (1024 - dwind_angle) << 1;
+			else if (dwind_angle > 3072)
+				dwind_angle -= (dwind_angle - 3072) << 1;
+
+			wind_angle = (wind_angle + ((dwind_angle - wind_angle) >> 3)) & 0x1FFE;
+			SmokeWindX = (wind * rcossin_tbl[wind_angle]) >> 12;
+			SmokeWindZ = (wind * rcossin_tbl[wind_angle + 1]) >> 12;
 		}
 		else {
 			wind = 0;
@@ -219,7 +229,10 @@ void HairControl(BOOL isCutscene) {
 				}
 				else {
 					if (HairPos[i].y <= height) {
-						HairPos[i].z += wind;
+						if (CHK_ANY(RoomInfo[roomID].flags, ROOM_OUTSIDE)) {
+							HairPos[i].x += SmokeWindX;
+							HairPos[i].z += SmokeWindZ;
+						}
 					}
 					else {
 						HairPos[i].y = height;
@@ -292,7 +305,7 @@ void DrawHair() {
   * Inject function
   */
 void Inject_Hair() {
-	INJECT(0x00420E80, InitialiseHair);
+	INJECT(0x00420E80, InitializeHair);
 	INJECT(0x00420F00, HairControl);
 	INJECT(0x00421900, DrawHair);
 }

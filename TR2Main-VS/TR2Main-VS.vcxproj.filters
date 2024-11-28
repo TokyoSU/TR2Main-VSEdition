@@ -311,6 +311,9 @@
     <ClCompile Include="specific\room.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="game\weather.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="specific\background.h">
@@ -722,6 +725,12 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="specific\room.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="game\weather.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="3dsystem\math_tbls.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

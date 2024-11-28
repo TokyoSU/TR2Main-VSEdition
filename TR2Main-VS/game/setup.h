@@ -35,5 +35,6 @@ void TrapObjects(); // 0x0043B570
 void ObjectObjects(); // 0x0043BB70
 void InitialiseObjects(); // 0x0043C7C0
 void GetCarriedItems(); // 0x0043C830
+void BuildOutsideTable();
 
 #endif // SETUP_H_INCLUDED

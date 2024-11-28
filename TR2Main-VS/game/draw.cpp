@@ -24,9 +24,14 @@
 #include "3dsystem/3d_gen.h"
 #include "3dsystem/scalespr.h"
 #include "game/hair.h"
+#include "game/weather.h"
 #include "specific/game.h"
 #include "specific/output.h"
 #include "global/vars.h"
+
+#if defined(FEATURE_MOD_CONFIG)
+#include "modding/mod_utils.h"
+#endif
 
 #ifdef FEATURE_EXTENDED_LIMITS
 LIGHT_INFO DynamicLights[64];
@@ -57,7 +62,7 @@ void DrawRooms(short currentRoom) {
 	BoundStart = 0;
 	BoundEnd = 1;
 	DrawRoomsCount = 0;
-	OutsideCamera = room->flags & ROOM_OUTSIDE;
+	OutsideCamera = room->flags & ROOM_HORIZON;
 
 	if (OutsideCamera) {
 		OutsideLeft = 0;
@@ -155,6 +160,13 @@ void DrawRooms(short currentRoom) {
 		PrintObjects(DrawRoomsArray[i]);
 	}
 
+#if defined(FEATURE_MOD_CONFIG)
+	if (Mod.rainEnabled) // Avoid title for now.
+		UpdateRain();
+	if (Mod.snowEnabled)
+		DoSnow();
+#endif
+
 #ifdef FEATURE_VIEW_IMPROVED
 	for (int i = 0; i < DrawRoomsCount; ++i) {
 		RoomInfo[DrawRoomsArray[i]].boundActive = 0;
@@ -178,17 +190,17 @@ void GetRoomBounds() {
 			if (!CHK_ANY(room->boundActive, 1)) {
 				DrawRoomsArray[DrawRoomsCount++] = roomNumber;
 				room->boundActive |= 1;
-				if (CHK_ANY(room->flags, ROOM_OUTSIDE)) {
-					OutsideCamera = ROOM_OUTSIDE;
+				if (CHK_ANY(room->flags, ROOM_HORIZON)) {
+					OutsideCamera = ROOM_HORIZON;
 				}
 			}
 
 		// NOTE: The original game checks just ROOM_INSIDE flag here
-		if (CHK_ANY(room->flags, ROOM_OUTSIDE) || !CHK_ANY(room->flags, ROOM_INSIDE)) {
+		if (CHK_ANY(room->flags, ROOM_HORIZON) || !CHK_ANY(room->flags, ROOM_NOTNEAR_OUTSIDE_ROOM)) {
 			CLAMPG(OutsideLeft, room->boundLeft)
-				CLAMPG(OutsideTop, room->boundTop)
-				CLAMPL(OutsideRight, room->boundRight)
-				CLAMPL(OutsideBottom, room->boundBottom)
+			CLAMPG(OutsideTop, room->boundTop)
+			CLAMPL(OutsideRight, room->boundRight)
+			CLAMPL(OutsideBottom, room->boundBottom)
 		}
 
 		if (!room->doors) continue;
@@ -299,7 +311,7 @@ void SetRoomBounds(short* ptrObj, int roomNumber, ROOM_INFO* parent) {
 		room->boundActive |= 2;
 #ifdef FEATURE_VIEW_IMPROVED
 		if (!CHK_ANY(room->boundActive, 1)) {
-			room->boundActive += MidSort << 8;
+			room->boundActive += (UINT16)(MidSort << 8);
 		}
 #else // FEATURE_VIEW_IMPROVED
 		room->boundActive += MidSort << 8;
@@ -410,7 +422,7 @@ void PrintRooms(short roomNumber) {
 	PhdWinTop = room->boundTop;
 	PhdWinBottom = room->boundBottom;
 	S_LightRoom(room);
-	if (OutsideCamera > 0 && !CHK_ANY(room->flags, ROOM_INSIDE)) {
+	if (OutsideCamera > 0 && !CHK_ANY(room->flags, ROOM_NOTNEAR_OUTSIDE_ROOM)) {
 		S_InsertRoom(room->data, TRUE);
 	}
 	else {
@@ -501,10 +513,9 @@ void DrawEffect(short fx_id) {
 			fx->shade, fx->frameNumber); // shade, scale
 	}
 	else if (obj->nMeshes < 0) {
-		S_DrawSprite(SPR_ABS | SPR_SHADE | (obj->semi_transparent ? SPR_SEMITRANS : 0), // flags
-			fx->pos.x, fx->pos.y, fx->pos.z, // coordinates
-			obj->meshIndex - fx->frameNumber, // sprite id
-			fx->shade, 0);  // shade, scale
+		DWORD flags = (fx->color != 0 ? (SPR_TINT | fx->color) : SPR_SHADE) | SPR_ABS | (obj->semi_transparent ? SPR_SEMITRANS : 0);
+		if (fx->scale != 0) flags |= SPR_SCALE;
+		S_DrawSprite(flags, fx->pos.x, fx->pos.y, fx->pos.z, obj->meshIndex - fx->frameNumber, fx->color != 0 ? 0 : fx->shade, fx->scale);
 	}
 	else {
 		phd_PushMatrix();

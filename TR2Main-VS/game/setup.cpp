@@ -26,6 +26,7 @@
 #include "game/box.h"
 #include "game/bird.h"
 #include "game/cinema.h"
+#include "game/control.h"
 #include "game/collide.h"
 #include "game/diver.h"
 #include "game/dog.h"
@@ -161,7 +162,7 @@ void InitialiseObjects() {
 	BaddyObjects();
 	TrapObjects();
 	ObjectObjects();
-	InitialiseHair();
+	InitializeHair();
 }
 
 void BaddyObjects() {
@@ -1646,6 +1647,115 @@ void GetCarriedItems()
 			pickup_number = pickup->nextItem;
 		}
 	}
+}
+
+void BuildOutsideTable()
+{
+	ROOM_INFO* r;
+	BYTE* pTable;
+	BYTE* oTable;
+	BYTE* cTable;
+	long max_slots, roomx, roomy, cont, offset, z, z2;
+	long x, y, i, rx, ry, lp;
+
+	max_slots = 0;
+	OutsideRoomTable = (char*)game_malloc(0xB640, GBUF_TempAlloc);
+	memset(OutsideRoomTable, 0xFF, 0xB640);
+
+	for (y = 0; y < 108; y += 4)
+	{
+		for (x = 0; x < 108; x += 4)
+		{
+			for (i = 0; i < RoomCount; i++)
+			{
+				r = &RoomInfo[i];
+
+				roomx = (r->z >> WALL_SHIFT) + 1;
+				roomy = (r->x >> WALL_SHIFT) + 1;
+				cont = 0;
+
+				for (ry = 0; ry < 4; ry++)
+				{
+					for (rx = 0; rx < 4; rx++)
+					{
+						if (x + rx >= roomx && x + rx < roomx + r->xSize - 2 && y + ry >= roomy && y + ry < roomy + r->ySize - 2)
+						{
+							cont = 1;
+							break;
+						}
+					}
+				}
+
+				if (!cont)
+					continue;
+
+				pTable = (BYTE*)&OutsideRoomTable[64 * ((x >> 2) + 27 * (y >> 2))];
+
+				for (lp = 0; lp < 64; lp++)
+				{
+					if (pTable[lp] == 255)
+					{
+						pTable[lp] = (BYTE)i;
+
+						if (lp > max_slots)
+							max_slots = lp;
+
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	oTable = (BYTE*)OutsideRoomTable;
+	for (y = 0; y < 27; y++)
+	{
+		for (x = 0; x < 27; x++)
+		{
+			z = 0;
+			offset = x + y * 27;
+			pTable = (BYTE*)&OutsideRoomTable[64 * (x + y * 27)];
+			while (pTable[z] != 255) z++;
+
+			if (!z)
+				OutsideRoomOffsets[offset] = -1;
+			else if (z == 1)
+				OutsideRoomOffsets[offset] = *pTable | 0x8000;
+			else
+			{
+				cTable = (BYTE*)OutsideRoomTable;
+				while (cTable < oTable)
+				{
+					if (!memcmp(cTable, pTable, z))
+					{
+						OutsideRoomOffsets[offset] = short((long)cTable - (long)OutsideRoomTable);
+						break;
+					}
+
+					z2 = 0;
+					while (cTable[z2] != 255) z2++;
+					cTable += z2 + 1;
+				}
+
+				if (cTable >= oTable)
+				{
+					OutsideRoomOffsets[offset] = short((long)oTable - (long)OutsideRoomTable);
+
+					do
+					{
+						*oTable++ = *pTable++;
+						z--;
+
+					} while (z);
+
+					*oTable++ = 255;
+				}
+			}
+		}
+	}
+
+	game_free(((long)OutsideRoomTable - (long)oTable + 0xB643) & ~3);	// free unused space (get rid of this asap btw)
+	LogDebug("Ouside room table = %d bytes, max_slots = %d\n", (long)oTable - (long)OutsideRoomTable, max_slots);
 }
 
 /*

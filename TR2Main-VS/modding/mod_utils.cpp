@@ -58,7 +58,6 @@ bool ModConfig::LoadJson(LPCSTR filePath) {
     CursorStreamWrapper<StringStream> csw(ss);
     Document doc;
     doc.ParseStream(csw);
-
     if (doc.HasParseError()) {
         size_t lineID = csw.GetLine();
         if (lineID > 0)
@@ -78,10 +77,8 @@ bool ModConfig::LoadJson(LPCSTR filePath) {
     for (size_t i = 0; i < strlen(levelName); i++)
         levelName[i] = std::toupper(levelName[i]);
 
-    if (doc.HasMember("default"))
-        ParseDefaultConfiguration(doc["default"]);
-    if (doc.HasMember("levels"))
-        ParseLevelConfiguration(doc["levels"], levelName);
+    if (doc.HasMember("default")) ParseDefaultConfiguration(doc["default"]);
+    if (doc.HasMember("levels")) ParseLevelConfiguration(doc["levels"], levelName);
     return Mod.isLoaded;
 }
 
@@ -191,20 +188,19 @@ void LoadCustomInventoryItems(Value& data)
         }
         newItemCust.objectID = objectID;
         newItemCust.message = GetValueByNameString(invItem, "text", &destStringSize, "");
-        LogDebug("Message: %s", newItemCust.message);
         newItemCust.message_pos_x = GetValueByNameInt(invItem, "text_x", 0);
         newItemCust.message_pos_y = GetValueByNameInt(invItem, "text_y", 0);
         if (invItem.HasMember("position"))
         {
             auto& offset = invItem["position"];
-            newItemCust.xRotPtSel = GetValueByNameInt(offset, "xRotPtSel", 0);
-            newItemCust.xRotSel = GetValueByNameInt(offset, "xRotSel", 0);
-            newItemCust.yRotSel = GetValueByNameInt(offset, "yRotSel", 0);
-            newItemCust.zTransSel = GetValueByNameInt(offset, "zTransSel", 0);
-            newItemCust.yTransSel = GetValueByNameInt(offset, "yTransSel", 0);
+            newItemCust.xRotPtSel = GetValueByNameInt(offset, "xrotptsel", 0);
+            newItemCust.xRotSel = GetValueByNameInt(offset, "xrotsel", 0);
+            newItemCust.yRotSel = GetValueByNameInt(offset, "yrotsel", 0);
+            newItemCust.zTransSel = GetValueByNameInt(offset, "ztranssel", 0);
+            newItemCust.yTransSel = GetValueByNameInt(offset, "ytranssel", 0);
         }
-        newItemCust.canExamine = GetValueByNameBool(invItem, "canExamine", false);
-        newItemCust.canRotateManually = GetValueByNameBool(invItem, "canRotateManually", false);
+        newItemCust.canExamine = GetValueByNameBool(invItem, "can_examine", false);
+        newItemCust.canRotateManually = GetValueByNameBool(invItem, "can_rotate_manually", false);
     }
 
     static bool wasItemInitialized = false;
@@ -280,6 +276,15 @@ void LoadLevelConfig(Value& data) {
     Mod.underwaterInfo.noAirDamagePerTick = GetValueByNameShort(data, "no_air_damage_per_tick", LARA_NO_AIR_DAMAGE_PER_TICK);
     Mod.underwaterInfo.restoreAirPerTick = GetValueByNameShort(data, "restore_air_per_tick", LARA_RESTORE_AIR_PER_TICK);
     Mod.underwaterInfo.unlimitedAir = GetValueByNameBool(data, "unlimited_air", false);
+
+    Mod.rainEnabled = GetValueByNameBool(data, "rain_enabled", false);
+    Mod.rainSplashEnabled = GetValueByNameBool(data, "rain_splash_enabled", true);
+    Mod.rainSplashColor = GetColorRGBByName(data, "rain_splash_color", RGB_MAKE(255, 255, 255));
+    Mod.rainSplashSize = GetValueByNameShort(data, "rain_splash_size", 128);
+    Mod.rainDensity = GetValueByNameShort(data, "rain_density", 128);
+    Mod.snowEnabled = GetValueByNameBool(data, "snow_enabled", false);
+    Mod.snowSemiTransparentEnabled = GetValueByNameBool(data, "snow_semi_transparent_enabled", true);
+    Mod.snowDensity = GetValueByNameShort(data, "snow_density", 128);
 
     Mod.disableGiantYetiNextLevelOnDeath = GetValueByNameBool(data, "disable_giant_yeti_next_level_on_death", false);
     Mod.laraIgnoreMonkIfNotAngry = GetValueByNameBool(data, "lara_ignore_monk_if_not_angry", true);
@@ -693,8 +698,8 @@ void ParseDefaultConfiguration(Value& data) {
     LoadAirBarConfig(data["lara_air_bar"], &Mod.laraBar.air);
     LoadHealthBarConfig(data["enemy_health_bar"], &Mod.enemyBar);
 
-    LoadSemitransConfig(data["semi_transparent"], &Mod.semitrans);
-    LoadReflectConfig(data["reflective"], &Mod.reflect);
+    if (data.HasMember("semi_transparent")) LoadSemitransConfig(data["semi_transparent"], &Mod.semitrans);
+    if (data.HasMember("reflective")) LoadReflectConfig(data["reflective"], &Mod.reflect);
 
     if (data.HasMember("ui_config")) LoadUIConfig(data["ui_config"], "ui_config");
     else if (!Mod.isUIColorLoaded) LoadUIConfigDefault();

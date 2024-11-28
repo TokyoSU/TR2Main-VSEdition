@@ -282,6 +282,23 @@ void CreateSplash(int x, int y, int z, short roomNumber)
 	}
 }
 
+void CreateRainSpash(DWORD color, int x, int y, int z, short scale, short roomNumber)
+{
+	short fxID = CreateEffect(roomNumber);
+	if (fxID != -1) {
+		auto* fx = &Effects[fxID];
+		fx->pos.x = x;
+		fx->pos.y = y;
+		fx->pos.z = z;
+		fx->pos.rotY = 0;
+		fx->frameNumber = 0;
+		fx->objectID = ID_SPLASH;
+		fx->speed = 0;
+		fx->color = color;
+		fx->scale = scale;
+	}
+}
+
 void WadeSplash(ITEM_INFO* item, int height) {
 	return; // NULL function
 }
@@ -706,7 +723,7 @@ void dynamic_light_off(ITEM_INFO* item) {
 }
 
 void reset_hair(ITEM_INFO* item) {
-	InitialiseHair();
+	InitializeHair();
 }
 
 void AssaultStart(ITEM_INFO* item) {

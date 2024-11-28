@@ -77,6 +77,10 @@
 #define MAX_TEXTURE_PAGES 1024                // From 128
 #define MAX_EFFECTS 2048                      // From 100
 #define MAX_ITEM_IN_INVENTORY 33
+#define MAX_WEATHER_RAIN 4096
+#define MAX_WEATHER_RAIN_ALIVE 1024
+#define MAX_WEATHER_SNOW 4096
+#define MAX_WEATHER_SNOW_ALIVE 1024
 
 /*
  * General Variables
@@ -814,5 +818,9 @@ extern TEXT_STR_INFO* CtrlTextB[ARRAY_SIZE(Layout->key)];
 #define PickUpPositionUW			VAR_U_(0x00466048, PHD_VECTOR)
 #define BaddiesSlots                VAR_U_(0x005206C0, CREATURE_INFO*)
 #define BaddiesSlotsCount           VAR_U_(0x004D7C40, int)
+
+extern PHD_VECTOR CamPos;
+extern int SmokeWindX;
+extern int SmokeWindZ;
 
 #endif // GLOBAL_VARS_H_INCLUDED

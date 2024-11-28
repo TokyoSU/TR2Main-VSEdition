@@ -76,14 +76,16 @@ bool WinSndMakeSample(DWORD sampleIdx, LPWAVEFORMATEX format, const LPVOID data,
 	desc.dwReserved = 0;
 	desc.lpwfxFormat = format;
 
-	if FAILED(DSound->CreateSoundBuffer(&desc, &SampleBuffers[sampleIdx], NULL))
+	HRESULT hr = DSound->CreateSoundBuffer(&desc, &SampleBuffers[sampleIdx], NULL);
+	if FAILED(hr)
+	{
+		LogWarn("Failed to create the sound buffer, HRESULT: 0x%08X", hr);
 		return false;
+	}
 
 	if FAILED(SampleBuffers[sampleIdx]->Lock(0, dataSize, &lpvAudioPtr, &dwAudioBytes, NULL, NULL, 0))
 		return false;
-
 	memcpy(lpvAudioPtr, data, dwAudioBytes);
-
 	if FAILED(SampleBuffers[sampleIdx]->Unlock(lpvAudioPtr, dwAudioBytes, NULL, 0))
 		return false;
 
@@ -107,24 +109,32 @@ bool WinSndIsChannelPlaying(DWORD channel) {
 }
 
 int WinSndPlaySample(DWORD sampleIdx, int volume, DWORD pitch, int pan, DWORD flags) {
-	LPDIRECTSOUNDBUFFER dsBuffer = NULL;
-	int channel = WinSndGetFreeChannelIndex();
+	LPDIRECTSOUNDBUFFER tempBuffer = NULL;
+	HRESULT hr;
 
+	int channel = WinSndGetFreeChannelIndex();
 	if (channel < 0)
 		return -1;
 
-	if (FAILED(DSound->DuplicateSoundBuffer(SampleBuffers[sampleIdx], &dsBuffer)) ||
-		FAILED(dsBuffer->SetVolume(volume)) ||
-		FAILED(dsBuffer->SetFrequency(SampleFreqs[sampleIdx] * pitch / PHD_ONE)) ||
-		FAILED(dsBuffer->SetPan(pan)) ||
-		FAILED(dsBuffer->SetCurrentPosition(0)) ||
-		FAILED(dsBuffer->Play(0, 0, flags)))
+	hr = DSound->DuplicateSoundBuffer(SampleBuffers[sampleIdx], &tempBuffer);
+	if (FAILED(hr))
 	{
+		LogWarn("Failed to duplicate sound buffer. HRESULT: 0x%08X", hr);
+		return -2;
+	}
+
+	if (FAILED(tempBuffer->SetVolume(volume)) ||
+		FAILED(tempBuffer->SetFrequency(SampleFreqs[sampleIdx] * pitch / PHD_ONE)) ||
+		FAILED(tempBuffer->SetPan(pan)) ||
+		FAILED(tempBuffer->SetCurrentPosition(0)) ||
+		FAILED(tempBuffer->Play(0, 0, flags)))
+	{
+		LogWarn("Failed to play sound buffer. HRESULT: 0x%08X", hr);
 		return -2;
 	}
 
 	ChannelSamples[channel] = sampleIdx;
-	ChannelBuffers[channel] = dsBuffer;
+	ChannelBuffers[channel] = tempBuffer;
 
 	return channel;
 }

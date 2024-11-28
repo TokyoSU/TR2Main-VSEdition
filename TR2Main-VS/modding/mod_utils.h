@@ -54,6 +54,19 @@ struct ModConfig
 	short smallMediAtStart = 1;
 	short bigMediAtStart = 1;
 
+	bool rainEnabled = false;
+	bool rainSplashEnabled = true;
+	DWORD rainSplashColor = 0xFFFFFF;
+	short rainDensity = 0;
+	short rainSplashSize = 128;
+	//short rainStrengh = 0;
+
+	bool snowEnabled = false;
+	bool snowSemiTransparentEnabled = true;
+	short snowDensity = 0;
+	//short snowStrengh = 0;
+
+
 	std::string levelLoadingPix;
 	std::string titleLoadingPixLanguage;
 	std::string titleLoadingPix;

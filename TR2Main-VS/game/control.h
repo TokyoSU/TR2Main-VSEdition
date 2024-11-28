@@ -24,6 +24,10 @@
 
 #include "global/types.h"
 
+extern short IsRoomOutsideNo;
+extern char* OutsideRoomTable;
+extern short OutsideRoomOffsets[729];
+
  /*
   * Function list
   */
@@ -50,5 +54,6 @@ int ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target, FLOOR_INFO* floor); // 0
 // 0x00416770:		AddRoomFlipItems
 void TriggerCDTrack(short value, UINT16 flags, short type); // 0x004167D0
 void TriggerNormalCDTrack(short value, UINT16 flags, short type); // 0x00416800;
+int IsRoomOutside(int x, int y, int z);
 
 #endif // CONTROL_H_INCLUDED

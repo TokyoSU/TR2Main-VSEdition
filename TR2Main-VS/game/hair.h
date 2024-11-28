@@ -27,7 +27,7 @@
  /*
   * Function list
   */
-void InitialiseHair(); // 0x00420E80
+void InitializeHair(); // 0x00420E80
 void HairControl(BOOL isCutscene); // 0x00420F00
 void DrawHair(); // 0x00421900
 

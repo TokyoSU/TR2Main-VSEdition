@@ -48,6 +48,10 @@
 #include "modding/joy_output.h"
 #endif // FEATURE_INPUT_IMPROVED
 
+short IsRoomOutsideNo;
+char* OutsideRoomTable;
+short OutsideRoomOffsets[729];
+
 int ControlPhase(int nTicks, BOOL demoMode) {
 	static int tickCount = 0;
 	ITEM_INFO* item = NULL;
@@ -839,6 +843,54 @@ void TriggerNormalCDTrack(short value, UINT16 flags, short type) {
 			S_CDPlay(value, FALSE);
 		}
 	}
+}
+
+int IsRoomOutside(int x, int y, int z)
+{
+	ROOM_INFO* r;
+	FLOOR_INFO* floor;
+	BYTE* p;
+	int h, c, offset;
+	short rn;
+
+	offset = (USHORT)OutsideRoomOffsets[27 * (x >> 12) + (z >> 12)];
+	if (offset == -1)
+		return -2;
+
+	p = (BYTE*)&OutsideRoomTable[offset];
+	while (*p != NO_ROOM)
+	{
+		rn = *p;
+		r = &RoomInfo[rn];
+
+		if (y > r->maxCeiling && y < r->minFloor &&
+			(z > r->z + WALL_SIZE && z < (r->xSize << WALL_SHIFT) + r->z - WALL_SIZE) &&
+			(x > r->x + WALL_SIZE && x < (r->ySize << WALL_SHIFT) + r->x - WALL_SIZE))
+		{
+			floor = GetFloor(x, y, z, &rn);
+
+			h = GetHeight(floor, x, y, z);
+			if (h == NO_HEIGHT || y > h)
+				return -2;
+
+			c = GetCeiling(floor, x, y, z);
+			if (y < c)
+				return -2;
+
+			if (CHK_ANY(r->flags, ROOM_UNDERWATER) || CHK_ANY(r->flags, ROOM_NOTNEAR_OUTSIDE_ROOM))
+				return -3;
+
+			if (CHK_ANY(r->flags, ROOM_HORIZON) || CHK_ANY(r->flags, ROOM_OUTSIDE))
+			{
+				IsRoomOutsideNo = *p;
+				return 1;
+			}
+		}
+
+		p++;
+	}
+
+	return -2;
 }
 
 /*

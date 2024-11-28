@@ -43,15 +43,15 @@ void InitialiseSlot(short itemNumber, int baddieSlotID)
     creature->maximumTurn = ANGLE(1);
     creature->flags = 0;
     creature->enemy = NULL;
-    creature->LOT.step = CLICK_SIZE;
-    creature->LOT.drop = -(CLICK_SIZE * 2);
+    creature->LOT.step = CLICK(1);
+    creature->LOT.drop = -CLICK(2);
     creature->LOT.blockMask = 0x4000;
     creature->LOT.fly = 0;
     switch (item->objectID)
     {
     case ID_LARA:
-        creature->LOT.step = WALL_SIZE * 20;
-        creature->LOT.drop = -(WALL_SIZE * 20);
+        creature->LOT.step = BLOCK(20);
+        creature->LOT.drop = -BLOCK(20);
         creature->LOT.fly = 256;
         break;
     case ID_SHARK:
@@ -60,8 +60,8 @@ void InitialiseSlot(short itemNumber, int baddieSlotID)
     case ID_JELLY:
     case ID_CROW:
     case ID_EAGLE:
-        creature->LOT.step = WALL_SIZE * 20;
-        creature->LOT.drop = -(WALL_SIZE * 20);
+        creature->LOT.step = BLOCK(20);
+        creature->LOT.drop = -BLOCK(20);
         creature->LOT.fly = 16;
         if (item->objectID == ID_SHARK)
             creature->LOT.blockMask = 0x8000;
@@ -69,31 +69,64 @@ void InitialiseSlot(short itemNumber, int baddieSlotID)
     case ID_WORKER3:
     case ID_WORKER4:
     case ID_YETI:
-        creature->LOT.step = WALL_SIZE * 4;
-        creature->LOT.drop = -(WALL_SIZE * 4);
+        creature->LOT.step = BLOCK(1);
+        creature->LOT.drop = -BLOCK(1);
         break;
     case ID_SPIDER_or_WOLF:
 #ifdef FEATURE_GOLD
         if (IsGold()) // NOTE: Wolf don't climb or drop 4 clicks !
             break;
 #endif
-        creature->LOT.step = CLICK_SIZE / 2;
-        creature->LOT.drop = -(WALL_SIZE * 4);
+        creature->LOT.step = CLICK(1) / 2;
+        creature->LOT.drop = -BLOCK(1);
         break;
     case ID_SKIDOO_ARMED:
-        creature->LOT.step = CLICK_SIZE / 2;
-        creature->LOT.drop = -(WALL_SIZE * 4);
+        creature->LOT.step = CLICK(1) / 2;
+        creature->LOT.drop = -BLOCK(1);
         break;
     case ID_DINO:
         creature->LOT.blockMask = 0x8000;
-        break;
-    default:
         break;
     }
     ClearLOT(&creature->LOT);
     if (itemNumber != Lara.item_number)
         CreateZone(item);
     ++BaddiesSlotsCount;
+}
+
+void CreateZone(ITEM_INFO* item)
+{
+    CREATURE_INFO* creature;
+    BOX_NODE* node;
+    DWORD i;
+    short* zone, zone_number;
+    short* flip, flip_number;
+
+    creature = GetCreatureInfo(item);
+    if (creature->LOT.fly != 0)
+    {
+        zone = FlyZones[0];
+        flip = FlyZones[1];
+    }
+    else
+    {
+        zone = GroundZones[(2 * creature->LOT.step >> 8) + 0];
+        flip = GroundZones[(2 * creature->LOT.step >> 8) + 1];
+    }
+
+    ROOM_INFO* r = &RoomInfo[item->roomNumber];
+    item->boxNumber = GetSectorBoxXZ(item, r);
+    zone_number = zone[item->boxNumber];
+    flip_number = flip[item->boxNumber];
+    for (i = 0, creature->LOT.zoneCount = 0, node = creature->LOT.node; i < BoxesCount; i++, zone++, flip++)
+    {
+        if (*zone == zone_number || *flip == flip_number)
+        {
+            node->boxNumber = (short)i;
+            node++;
+            creature->LOT.zoneCount++;
+        }
+    }
 }
 
  /*
@@ -104,6 +137,6 @@ void Inject_Lot() {
 	//INJECT(0x00432B70, DisableBaddieAI);
 	//INJECT(0x00432BC0, EnableBaddieAI);
 	INJECT(0x00432D70, InitialiseSlot);
-	//INJECT(0x00432F80, CreateZone);
+	INJECT(0x00432F80, CreateZone);
 	//INJECT(0x00433040, ClearLOT);
 }

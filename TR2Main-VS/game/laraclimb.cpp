@@ -236,7 +236,7 @@ void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)
 	item->pos.y += yshift - CLICK(1);
 	result_r = LaraTestClimbUpPos(item, coll->radius, coll->radius + CLIMB_RADIUSR, &shift_r, &ledge_r);
 	result_l = LaraTestClimbUpPos(item, coll->radius, -(coll->radius + CLIMB_RADIUSL), &shift_l, &ledge_l);
-	item->pos.y -= CLICK(1);
+	item->pos.y += CLICK(1);
 
 	if (!result_r || !result_l || !CHK_ANY(InputStatus, IN_FORWARD))
 	{

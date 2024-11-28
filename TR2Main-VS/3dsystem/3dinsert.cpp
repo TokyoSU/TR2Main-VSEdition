@@ -43,11 +43,12 @@ short*(*ins_objectG3)(short*, int, SORTTYPE); // 0x004BCB40
 #include "modding/texture_utils.h"
 #endif // defined(FEATURE_HUD_IMPROVED)
 
-#if defined(FEATURE_VIDEOFX_IMPROVED)
-#include "specific/texture.h"
 #if defined(FEATURE_MOD_CONFIG)
 #include "modding/mod_utils.h"
 #endif
+
+#if defined(FEATURE_VIDEOFX_IMPROVED)
+#include "specific/texture.h"
 
 extern DWORD ShadowMode;
 extern DWORD AlphaBlendMode;
@@ -62,6 +63,16 @@ D3DCOLOR GlobalTint = 0; // NOTE: not presented in the original code
 #ifdef FEATURE_VIEW_IMPROVED
 bool RoomSortEnabled = false;
 #endif
+
+bool CheckVisible(PHD_VBUF* v0, PHD_VBUF* v1, PHD_VBUF* v2)
+{
+	return (v2->xs - v1->xs) * (v0->ys - v1->ys) - (v0->xs - v1->xs) * (v2->ys - v1->ys) > 0;
+}
+
+bool CheckInvisible(PHD_VBUF* v0, PHD_VBUF* v1, PHD_VBUF* v2)
+{
+	return (v2->xs - v1->xs) * (v0->ys - v1->ys) - (v0->xs - v1->xs) * (v2->ys - v1->ys) < 0;
+}
 
 static D3DCOLOR GetShadeColor(DWORD red, DWORD green, DWORD blue, DWORD alpha, DWORD shade, bool isTextured) {
 	CLAMPG(shade, 0x1FFF);
@@ -404,7 +415,7 @@ short* InsertObjectGT4(short* ptrObj, int number, SORTTYPE sortType) {
 			continue;
 
 		if (clipOR >= 0) {
-			if (!VBUF_VISIBLE(*vtx0, *vtx1, *vtx2))
+			if (!CheckVisible(vtx0, vtx1, vtx2))
 				continue;
 
 			if (clipOR == 0) {
@@ -637,7 +648,7 @@ short* InsertObjectGT3(short* ptrObj, int number, SORTTYPE sortType) {
 			continue;
 
 		if (clipOR >= 0) {
-			if (!VBUF_VISIBLE(*vtx0, *vtx1, *vtx2))
+			if (!CheckVisible(vtx0, vtx1, vtx2))
 				continue;
 
 			if (clipOR == 0) {
@@ -940,7 +951,7 @@ short* InsertObjectG4(short* ptrObj, int number, SORTTYPE sortType) {
 			continue;
 
 		if (clipOR >= 0) {
-			if (!VBUF_VISIBLE(*vtx0, *vtx1, *vtx2))
+			if (!CheckVisible(vtx0, vtx1, vtx2))
 				continue;
 
 			VBuffer[0].x = vtx0->xs;
@@ -1053,7 +1064,7 @@ short* InsertObjectG3(short* ptrObj, int number, SORTTYPE sortType) {
 			continue;
 
 		if (clipOR >= 0) {
-			if (!VBUF_VISIBLE(*vtx0, *vtx1, *vtx2))
+			if (!CheckVisible(vtx0, vtx1, vtx2))
 				continue;
 
 			VBuffer[0].x = vtx0->xs;
@@ -1377,7 +1388,7 @@ void InsertGT3_ZBuffered(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_TEX
 		return;
 
 	if (clipOR >= 0) {
-		if (!VBUF_VISIBLE(*vtx0, *vtx1, *vtx2))
+		if (!CheckVisible(vtx0, vtx1, vtx2))
 			return;
 
 		if (clipOR == 0) {
@@ -1523,7 +1534,7 @@ void InsertGT4_ZBuffered(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_VBU
 	if (clipAND != 0)
 		return;
 
-	if (clipOR == 0 && VBUF_VISIBLE(*vtx0, *vtx1, *vtx2)) {
+	if (clipOR == 0 && CheckVisible(vtx0, vtx1, vtx2)) {
 		VBufferD3D[0].sx = vtx0->xs;
 		VBufferD3D[0].sy = vtx0->ys;
 		VBufferD3D[0].sz = FltResZBuf - FltResZORhw * vtx0->rhw;
@@ -1566,7 +1577,7 @@ void InsertGT4_ZBuffered(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_VBU
 		HWR_DrawPrimitive(D3DPT_TRIANGLEFAN, VBufferD3D, 4, true);
 	}
 	else if ((clipOR < 0 && visible_zclip(vtx0, vtx1, vtx2)) ||
-		(clipOR > 0 && VBUF_VISIBLE(*vtx0, *vtx1, *vtx2)))
+		(clipOR > 0 && CheckVisible(vtx0, vtx1, vtx2)))
 	{
 		InsertGT3_ZBuffered(vtx0, vtx1, vtx2, texture, texture->uv, &texture->uv[1], &texture->uv[2]);
 		InsertGT3_ZBuffered(vtx0, vtx2, vtx3, texture, texture->uv, &texture->uv[2], &texture->uv[3]);
@@ -1640,7 +1651,7 @@ short* InsertObjectG4_ZBuffered(short* ptrObj, int number, SORTTYPE sortType) {
 			continue;
 
 		if (clipOR >= 0) {
-			if (!VBUF_VISIBLE(*vtx0, *vtx1, *vtx2))
+			if (!CheckVisible(vtx0, vtx1, vtx2))
 				continue;
 
 			VBuffer[0].x = vtx0->xs;
@@ -1772,7 +1783,7 @@ short* InsertObjectG3_ZBuffered(short* ptrObj, int number, SORTTYPE sortType) {
 			continue;
 
 		if (clipOR >= 0) {
-			if (!VBUF_VISIBLE(*vtx0, *vtx1, *vtx2))
+			if (!CheckVisible(vtx0, vtx1, vtx2))
 				continue;
 
 			VBuffer[0].x = vtx0->xs;
@@ -1933,7 +1944,7 @@ void InsertGT3_Sorted(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_TEXTUR
 		return;
 
 	if (clipOR >= 0) {
-		if (!VBUF_VISIBLE(*vtx0, *vtx1, *vtx2))
+		if (!CheckVisible(vtx0, vtx1, vtx2))
 			return;
 
 		if (clipOR == 0) {
@@ -2084,26 +2095,21 @@ void InsertClippedPoly_Textured(int vtxCount, float z, short polyType, short tex
 }
 
 void InsertGT4_Sorted(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_VBUF* vtx3, PHD_TEXTURE* texture, SORTTYPE sortType) {
-	char clipOR, clipAND;
-	float zv;
-
-	clipOR = LOBYTE(vtx0->clip | vtx1->clip | vtx2->clip | vtx3->clip);
-	clipAND = LOBYTE(vtx0->clip & vtx1->clip & vtx2->clip & vtx3->clip);
-
+	char clipOR  = LOBYTE(vtx0->clip | vtx1->clip | vtx2->clip | vtx3->clip);
+	char clipAND = LOBYTE(vtx0->clip & vtx1->clip & vtx2->clip & vtx3->clip);
 	if (clipAND != 0)
 		return;
 
-	if (clipOR == 0 && VBUF_VISIBLE(*vtx0, *vtx1, *vtx2)) {
-		zv = CalculatePolyZ(sortType, vtx0->zv, vtx1->zv, vtx2->zv, vtx3->zv);
+	if (clipOR == 0 && CheckVisible(vtx0, vtx1, vtx2)) {
 		Sort3dPtr->_0 = (DWORD)Info3dPtr;
-		Sort3dPtr->_1 = MAKE_ZSORT(zv);
+		Sort3dPtr->_1 = MAKE_ZSORT(CalculatePolyZ(sortType, vtx0->zv, vtx1->zv, vtx2->zv, vtx3->zv));
 		++Sort3dPtr;
 #ifdef FEATURE_VIDEOFX_IMPROVED
-		* Info3dPtr++ = GetPolyType(texture->drawtype);
+		*Info3dPtr++ = GetPolyType(texture->drawtype);
 #else // FEATURE_VIDEOFX_IMPROVED
-		* Info3dPtr++ = (texture->drawtype == DRAW_Opaque) ? POLY_HWR_GTmap : POLY_HWR_WGTmap;
+		*Info3dPtr++ = (texture->drawtype == DRAW_Opaque) ? POLY_HWR_GTmap : POLY_HWR_WGTmap;
 #endif // FEATURE_VIDEOFX_IMPROVED
-		* Info3dPtr++ = texture->tpage;
+		*Info3dPtr++ = texture->tpage;
 		*Info3dPtr++ = 4;
 		*(D3DTLVERTEX**)Info3dPtr = HWR_VertexPtr;
 		Info3dPtr += sizeof(D3DTLVERTEX*) / sizeof(short);
@@ -2144,7 +2150,7 @@ void InsertGT4_Sorted(PHD_VBUF* vtx0, PHD_VBUF* vtx1, PHD_VBUF* vtx2, PHD_VBUF* 
 		++SurfaceCount;
 	}
 	else if ((clipOR < 0 && visible_zclip(vtx0, vtx1, vtx2)) ||
-		(clipOR > 0 && VBUF_VISIBLE(*vtx0, *vtx1, *vtx2)))
+		     (clipOR > 0 && CheckVisible(vtx0, vtx1, vtx2)))
 	{
 		InsertGT3_Sorted(vtx0, vtx1, vtx2, texture, texture->uv, &texture->uv[1], &texture->uv[2], sortType);
 		InsertGT3_Sorted(vtx0, vtx2, vtx3, texture, texture->uv, &texture->uv[2], &texture->uv[3], sortType);
@@ -2225,7 +2231,7 @@ short* InsertObjectG4_Sorted(short* ptrObj, int number, SORTTYPE sortType) {
 			continue;
 
 		if (clipOR >= 0) {
-			if (!VBUF_VISIBLE(*vtx0, *vtx1, *vtx2))
+			if (!CheckVisible(vtx0, vtx1, vtx2))
 				continue;
 
 			VBuffer[0].x = vtx0->xs;
@@ -2367,7 +2373,7 @@ short* InsertObjectG3_Sorted(short* ptrObj, int number, SORTTYPE sortType) {
 			continue;
 
 		if (clipOR >= 0) {
-			if (!VBUF_VISIBLE(*vtx0, *vtx1, *vtx2))
+			if (!CheckVisible(vtx0, vtx1, vtx2))
 				continue;
 
 			VBuffer[0].x = vtx0->xs;
@@ -2522,9 +2528,8 @@ void InsertSprite_Sorted(int z, int x0, int y0, int x1, int y1, int spriteIdx, s
 	IsShadeEffect = false;
 #if defined(FEATURE_VIDEOFX_IMPROVED)
 	short polyType = POLY_HWR_WGTmap;
-	if (CHK_ANY(flags, SPR_TINT)) {
+	if (CHK_ANY(flags, SPR_TINT))
 		GlobalTint = RGBA_SETALPHA(flags, 0xFF);
-	}
 	if (AlphaBlendMode && CHK_ANY(flags, SPR_SEMITRANS)) {
 		short blend[4] = {
 			POLY_HWR_WGTmapHalf,

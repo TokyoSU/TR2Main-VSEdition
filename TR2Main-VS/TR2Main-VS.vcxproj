@@ -178,6 +178,7 @@
     <ClCompile Include="game\spider.cpp" />
     <ClCompile Include="game\text.cpp" />
     <ClCompile Include="game\traps.cpp" />
+    <ClCompile Include="game\weather.cpp" />
     <ClCompile Include="game\wolf.cpp" />
     <ClCompile Include="game\yeti.cpp" />
     <ClCompile Include="global\md5.c">
@@ -238,6 +239,7 @@
     <ClInclude Include="3dsystem\3dinsert.h" />
     <ClInclude Include="3dsystem\3d_gen.h" />
     <ClInclude Include="3dsystem\3d_out.h" />
+    <ClInclude Include="3dsystem\math_tbls.h" />
     <ClInclude Include="3dsystem\phd_math.h" />
     <ClInclude Include="3dsystem\scalespr.h" />
     <ClInclude Include="game\bear.h" />
@@ -288,6 +290,7 @@
     <ClInclude Include="game\spider.h" />
     <ClInclude Include="game\text.h" />
     <ClInclude Include="game\traps.h" />
+    <ClInclude Include="game\weather.h" />
     <ClInclude Include="game\wolf.h" />
     <ClInclude Include="game\yeti.h" />
     <ClInclude Include="global\md5.h" />

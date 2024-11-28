@@ -63,6 +63,7 @@
 #include <stdio.h>
 #include <windows.h>
 #include <string>
+#include <algorithm>
 #include <shlobj.h>
 #include <shlwapi.h>
 #include <d3d9.h>

@@ -44,6 +44,7 @@ void Splash(ITEM_INFO* item); // 0x0041CA70
 // TODO: Change to 'Splash' when decompiled !
 // NOTE: Not exist in the original code, new argument.
 void Splash2(ITEM_INFO* item, int waterHeight);
+void CreateRainSpash(DWORD color, int x, int y, int z, short scale, short roomNumber);
 void CreateSplash(int x, int y, int z, short roomNumber);
 void WadeSplash(ITEM_INFO* item, int height);
 void ControlSplash1(short fxID); // 0x0041CB40

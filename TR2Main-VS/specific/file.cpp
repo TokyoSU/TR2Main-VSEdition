@@ -621,6 +621,8 @@ BOOL LoadRooms(HANDLE hFile) {
 		room->fxNumber = -1;
 	}
 
+	BuildOutsideTable();
+
 	// Read floor data
 	ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
 	FloorData = (short*)game_malloc(sizeof(short) * dwCount, GBUF_FloorData);
