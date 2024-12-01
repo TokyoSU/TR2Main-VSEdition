@@ -110,8 +110,8 @@ void CreateZone(ITEM_INFO* item)
     }
     else
     {
-        zone = GroundZones[(2 * creature->LOT.step >> 8) + 0];
-        flip = GroundZones[(2 * creature->LOT.step >> 8) + 1];
+        zone = GroundZones[2 * (creature->LOT.step >> 8) + 0];
+        flip = GroundZones[2 * (creature->LOT.step >> 8) + 1];
     }
 
     ROOM_INFO* r = &RoomInfo[item->roomNumber];

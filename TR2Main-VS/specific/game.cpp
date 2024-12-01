@@ -34,6 +34,7 @@
 #include "specific/file.h"
 #include "specific/frontend.h"
 #include "specific/init.h"
+#include "specific/init_sound_xaudio.h"
 #include "specific/input.h"
 #include "specific/output.h"
 #include "specific/sndpc.h"
@@ -66,8 +67,7 @@ extern void DisplayJoystickHintText(bool isSelect, bool isContinue, bool isDesel
 
 #ifdef FEATURE_SUBFOLDERS
 #include "modding/file_utils.h"
-
-static int GetSaveFileName(LPSTR destName, DWORD destSize, int slotNumber) {
+static int GetSaveFileNameBySlot(LPSTR destName, DWORD destSize, int slotNumber) {
 	if (destName == NULL || destSize == 0 || slotNumber < 0) {
 		return -1;
 	}
@@ -530,7 +530,7 @@ BOOL S_FrontEndCheck() {
 
 	for (DWORD i = 0; i < SavegameSlots; ++i) {
 #ifdef FEATURE_SUBFOLDERS
-		GetSaveFileName(fileName, sizeof(fileName), i);
+		GetSaveFileNameBySlot(fileName, sizeof(fileName), i);
 #else // !FEATURE_SUBFOLDERS
 		wsprintf(fileName, "savegame.%d", i);
 #endif // !FEATURE_SUBFOLDERS
@@ -551,7 +551,7 @@ BOOL S_FrontEndCheck() {
 
 		if (saveCounter > SaveCounter) {
 			SaveCounter = saveCounter;
-			LoadGameRequester.selected = i;
+			LoadGameRequester.selected = (UINT16)i;
 		}
 
 		SaveSlotFlags[i] = 1;
@@ -572,7 +572,7 @@ BOOL S_SaveGame(LPCVOID saveData, DWORD saveSize, int slotNumber) {
 
 #ifdef FEATURE_SUBFOLDERS
 	char fileName[256] = { 0 };
-	GetSaveFileName(fileName, sizeof(fileName), slotNumber);
+	GetSaveFileNameBySlot(fileName, sizeof(fileName), slotNumber);
 	if (CreateDirectories(fileName, true)) {
 		return FALSE;
 	}
@@ -616,7 +616,7 @@ BOOL S_LoadGame(LPVOID saveData, DWORD saveSize, int slotNumber) {
 
 #ifdef FEATURE_SUBFOLDERS
 	char fileName[256] = { 0 };
-	GetSaveFileName(fileName, sizeof(fileName), slotNumber);
+	GetSaveFileNameBySlot(fileName, sizeof(fileName), slotNumber);
 #else // !FEATURE_SUBFOLDERS
 	char fileName[16] = { 0 };
 	wsprintf(fileName, "savegame.%d", slotNumber);

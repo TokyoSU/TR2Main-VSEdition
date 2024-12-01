@@ -44,65 +44,8 @@ static bool isCDAudioEnabled = false;
 // NOTE: this variable is absent in the original game
 static DWORD CDVolume = 0;
 
-int S_SoundPlaySample(int channel, UINT16 volume, int pitch, int pan) {
-	if (!SoundIsActive)
-		return -3;
-
-	int calcPan = S_Sound_CalculateSamplePan(pan);
-	int calcVolume = S_Sound_CalculateSampleVolume(volume);
-	return WinSndPlaySample(channel, calcVolume, pitch, calcPan, 0);
-}
-
-int S_Sound_CalculateSampleVolume(DWORD volume) {
-	return (int)(((double)(S_MasterVolume * volume) / 0x200000.p0 - 1.0) * 5000.0);
-}
-
-int S_Sound_CalculateSamplePan(short pan) {
-	return pan / 16;
-}
-
-int S_SoundPlaySampleLooped(int channel, UINT16 volume, DWORD pitch, int pan) {
-	if (!SoundIsActive)
-		return -3;
-
-	int calcPan = S_Sound_CalculateSamplePan(pan);
-	int calcVolume = S_Sound_CalculateSampleVolume(volume);
-	return WinSndPlaySample(channel, calcVolume, pitch, calcPan, DSBPLAY_LOOPING);
-}
-
-void S_SoundSetPanAndVolume(int channel, int pan, UINT16 volume) {
-	if (SoundIsActive) {
-		int calcPan = S_Sound_CalculateSamplePan(pan);
-		int calcVolume = S_Sound_CalculateSampleVolume(volume);
-		WinSndAdjustVolumeAndPan(channel, calcVolume, calcPan);
-	}
-}
-
-void S_SoundSetPitch(int channel, DWORD pitch) {
-	if (SoundIsActive)
-		WinSndAdjustPitch(channel, pitch);
-}
-
 void S_SoundSetMasterVolume(DWORD volume) {
 	S_MasterVolume = volume;
-}
-
-void S_SoundStopSample(int channel) {
-	if (SoundIsActive)
-		WinSndStopSample(channel);
-}
-
-void S_SoundStopAllSamples() {
-	if (SoundIsActive)
-		for (DWORD i = 0; i < 32; ++i)
-			WinSndStopSample(i);
-}
-
-BOOL S_SoundSampleIsPlaying(int channel) {
-	if (!SoundIsActive)
-		return FALSE;
-
-	return WinSndIsChannelPlaying(channel);
 }
 
 bool CD_Init() {
@@ -306,16 +249,16 @@ DWORD S_GetCDVolume() {
  * Inject function
  */
 void Inject_SndPC() {
-	INJECT(0x004553B0, S_SoundPlaySample);
+	/*INJECT(0x004553B0, S_SoundPlaySample);
 	INJECT(0x00455400, S_Sound_CalculateSampleVolume);
 	INJECT(0x00455430, S_Sound_CalculateSamplePan);
 	INJECT(0x00455460, S_SoundPlaySampleLooped);
 	INJECT(0x004554B0, S_SoundSetPanAndVolume);
 	INJECT(0x004554F0, S_SoundSetPitch);
-	INJECT(0x00455510, S_SoundSetMasterVolume);
 	INJECT(0x00455520, S_SoundStopSample);
 	INJECT(0x00455540, S_SoundStopAllSamples);
-	INJECT(0x00455550, S_SoundSampleIsPlaying);
+	INJECT(0x00455550, S_SoundSampleIsPlaying);*/
+	INJECT(0x00455510, S_SoundSetMasterVolume);
 	INJECT(0x00455570, CD_Init);
 	INJECT(0x00455600, CD_Cleanup);
 	INJECT(0x00455640, S_CDLoop);

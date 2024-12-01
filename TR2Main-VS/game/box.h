@@ -43,7 +43,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* ai, BOOL isViolent); // 0x0040E9E0
 #define CreatureCreature ((int(__cdecl*)(short)) 0x0040F2B0)
 int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOT_INFO* LOT); // 0x0040F3B0
 void CreatureDie(short itemNumber, BOOL explode); // 0x0040F440
-#define CreatureAnimation ((int(__cdecl*)(short, short, short)) 0x0040F500)
+int CreatureAnimation(short itemNumber, short angle, short tilt); // 0x0040F500
 short CreatureTurn(ITEM_INFO* item, short maximumTurn); // 0x0040FDD0
 #define CreatureTilt ((void(__cdecl*)(ITEM_INFO*, short)) 0x0040FEB0)
 #define CreatureHead ((void(__cdecl*)(ITEM_INFO*, short)) 0x0040FEF0)

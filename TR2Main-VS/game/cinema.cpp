@@ -33,6 +33,7 @@
 #include "specific/frontend.h"
 #include "specific/input.h"
 #include "specific/output.h"
+#include "specific/init_sound_xaudio.h"
 #include "specific/sndpc.h"
 #include "global/vars.h"
 

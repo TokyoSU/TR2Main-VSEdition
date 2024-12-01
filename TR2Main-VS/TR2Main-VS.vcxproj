@@ -75,7 +75,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExceptionHandling>Async</ExceptionHandling>
-      <DisableSpecificWarnings>4200;6269</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4200;6269;6031</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -103,7 +103,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExceptionHandling>Async</ExceptionHandling>
-      <DisableSpecificWarnings>4200;6269</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4200;6269;6031</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -219,6 +219,7 @@
     <ClCompile Include="specific\init_display.cpp" />
     <ClCompile Include="specific\init_input.cpp" />
     <ClCompile Include="specific\init_sound.cpp" />
+    <ClCompile Include="specific\init_sound_xaudio.cpp" />
     <ClCompile Include="specific\input.cpp" />
     <ClCompile Include="specific\option.cpp" />
     <ClCompile Include="specific\output.cpp" />
@@ -361,6 +362,7 @@
     <ClInclude Include="specific\init_display.h" />
     <ClInclude Include="specific\init_input.h" />
     <ClInclude Include="specific\init_sound.h" />
+    <ClInclude Include="specific\init_sound_xaudio.h" />
     <ClInclude Include="specific\input.h" />
     <ClInclude Include="specific\option.h" />
     <ClInclude Include="specific\output.h" />

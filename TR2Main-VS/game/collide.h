@@ -34,7 +34,7 @@ void GetNearByRooms(int x, int y, int z, int r, int h, short roomID); // 0x00413
 void GetNewRoom(int x, int y, int z, short roomID); // 0x00413480
 #define ShiftItem ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004134E0)
 #define UpdateLaraRoom ((void(__cdecl*)(ITEM_INFO*, int)) 0x00413520)
-#define GetTiltType ((short(__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00413580)
+#define GetTiltType ((short(__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00413580) // floor, x, y, z
 #define LaraBaddieCollision ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00413620)
 #define EffectSpaz ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004137C0)
 #define CreatureCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x00413840)

@@ -31,6 +31,7 @@
 #include "specific/hwr.h"
 #include "specific/init.h"
 #include "specific/init_display.h"
+#include "specific/init_sound_xaudio.h"
 #include "specific/input.h"
 #include "specific/texture.h"
 #include "specific/utils.h"
@@ -1105,12 +1106,16 @@ void S_SetupBelowWater(BOOL underwater) {
 	IsWaterEffect = true;
 	IsShadeEffect = true;
 	IsWibbleEffect = !underwater;
+	if (underwater)
+		S_SetForceReverb(REVERB_UNDERWATER);
 }
 
 void S_SetupAboveWater(BOOL underwater) {
 	IsWaterEffect = false;
 	IsShadeEffect = underwater;
 	IsWibbleEffect = underwater;
+	if (!underwater)
+		S_ResetForceReverb();
 }
 
 void S_AnimateTextures(int nTicks) {

@@ -125,6 +125,7 @@ typedef struct {
 // Distance values
 #define BLOCK(x)			((x)*1024)
 #define CLICK(x)			((x)*256)
+#define HALF_CLICK(x)       ((x)*128)
 #define SQR_BLOCK(x)		SQR(BLOCK(x))
 #define SQR_CLICK(x)		SQR(CLICK(x))
 
@@ -241,11 +242,14 @@ typedef struct {
 #define NO_ROOM							(255)
 #define ROOM_UNDERWATER					(0x01)
 #define ROOM_HORIZON					(0x08)
+#define ROOM_DAMAGE						(0x10)
 #define ROOM_OUTSIDE					(0x20)
 #define ROOM_NOTNEAR_OUTSIDE_ROOM		(0x40)
 #define ROOM_QUICKSAND					(0x80)
 #define ROOM_EFFECT						(0x100) // Room glow and movement flags, Light mode should be 2 !
 #define ROOM_REFLECTION					(0x200) // Light mode should be 2 !
+#define ROOM_RAIN                       (0x400)
+#define ROOM_SNOW                       (0x800)
 
 // SFX flags
 #define SFX_UNDERWATER		(1)
@@ -2009,11 +2013,6 @@ typedef struct RoomVertex_t {
 	short lightAdder;
 } ROOM_VERTEX;
 
-typedef struct LiftData_t {
-	int oldY;
-	int timer;
-} LIFT_DATA;
-
 typedef struct Face4_t {
 	short vertices[4];
 	short texture;
@@ -2072,6 +2071,11 @@ typedef struct RoomInfo_t {
 	short flippedRoom;
 	UINT16 flags;
 } ROOM_INFO;
+
+typedef struct LiftData_t {
+	int oldY;
+	int timer;
+} LIFT_DATA;
 
 typedef struct PhdVBuf_t {
 	float xv;

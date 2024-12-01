@@ -314,6 +314,9 @@
     <ClCompile Include="game\weather.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="specific\init_sound_xaudio.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="specific\background.h">
@@ -731,6 +734,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="3dsystem\math_tbls.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="specific\init_sound_xaudio.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

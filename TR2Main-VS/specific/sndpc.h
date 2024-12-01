@@ -27,7 +27,7 @@
  /*
   * Function list
   */
-int S_SoundPlaySample(int channel, UINT16 volume, int pitch, int pan); // 0x004553B0
+/*int S_SoundPlaySample(int channel, UINT16 volume, int pitch, int pan); // 0x004553B0
 int S_Sound_CalculateSampleVolume(DWORD volume); // 0x00455400
 int S_Sound_CalculateSamplePan(short pan); // 0x00455430
 int S_SoundPlaySampleLooped(int channel, UINT16 volume, DWORD pitch, int pan); // 0x00455460
@@ -35,8 +35,9 @@ void S_SoundSetPanAndVolume(int channel, int pan, UINT16 volume); // 0x004554B0
 void S_SoundSetPitch(int channel, DWORD pitch); // 0x004554F0
 void S_SoundSetMasterVolume(DWORD volume); // 0x00455510
 void S_SoundStopSample(int channel); // 0x00455520
-void S_SoundStopAllSamples(); // 0x00455540
 BOOL S_SoundSampleIsPlaying(int channel); // 0x00455550
+void S_SoundStopAllSamples(); // 0x00455540*/
+void S_SoundSetMasterVolume(DWORD volume); // 0x00455510
 bool CD_Init(); // 0x00455570
 void CD_Cleanup(); // 0x00455600
 void S_CDLoop(); // 0x00455640
