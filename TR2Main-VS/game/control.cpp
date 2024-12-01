@@ -38,6 +38,7 @@
 #include "specific/input.h"
 #include "specific/smain.h"
 #include "specific/sndpc.h"
+#include "specific/winmain.h"
 #include "global/vars.h"
 
 #ifdef FEATURE_BACKGROUND_IMPROVED
@@ -47,10 +48,6 @@
 #ifdef FEATURE_INPUT_IMPROVED
 #include "modding/joy_output.h"
 #endif // FEATURE_INPUT_IMPROVED
-
-short IsRoomOutsideNo;
-char* OutsideRoomTable;
-short OutsideRoomOffsets[729];
 
 int ControlPhase(int nTicks, BOOL demoMode) {
 	static int tickCount = 0;
@@ -335,6 +332,238 @@ void AnimateItem(ITEM_INFO* item)
 
 	item->pos.x += item->speed * phd_sin(item->pos.rotY) >> W2V_SHIFT;
 	item->pos.z += item->speed * phd_cos(item->pos.rotY) >> W2V_SHIFT;
+}
+
+FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber)
+{
+	ROOM_INFO* r = &RoomInfo[*roomNumber];
+	FLOOR_INFO* floor = NULL;
+	short data = NO_ROOM;
+	do
+	{
+		int x_floor = (z - r->z) >> WALL_SHIFT;
+		int y_floor = (x - r->x) >> WALL_SHIFT;
+
+		if (x_floor <= 0)
+		{
+			x_floor = 0;
+			if (y_floor < 1)
+				y_floor = 1;
+			else if (y_floor > r->ySize - 2)
+				y_floor = r->ySize - 2;
+		}
+		else if (x_floor >= r->xSize - 1)
+		{
+			x_floor = r->xSize - 1;
+			if (y_floor < 1)
+				y_floor = 1;
+			else if (y_floor > r->ySize - 2)
+				y_floor = r->ySize - 2;
+		}
+		else if (y_floor < 0)
+			y_floor = 0;
+		else if (y_floor >= r->ySize)
+			y_floor = r->ySize - 1;
+
+		floor = &r->floor[x_floor + y_floor * r->xSize];
+		data = GetDoor(floor);
+		if (data != NO_ROOM)
+		{
+			*roomNumber = data;
+			r = &RoomInfo[data];
+		}
+	} while (data != NO_ROOM);
+
+	if (y >= ((int)floor->floor << 8))
+	{
+		do
+		{
+			if (floor->pitRoom == NO_ROOM)
+				return floor;
+			*roomNumber = floor->pitRoom;
+			r = &RoomInfo[floor->pitRoom];
+			floor = &r->floor[((z - r->z) >> WALL_SHIFT) + ((x - r->x) >> WALL_SHIFT) * r->xSize];
+		} while (y >= ((int)floor->floor << 8));
+	}
+	else if (y < ((int)floor->ceiling << 8))
+	{
+		do
+		{
+			if (floor->skyRoom == NO_ROOM)
+				return floor;
+			*roomNumber = floor->skyRoom;
+			r = &RoomInfo[floor->skyRoom];
+			floor = &r->floor[((z - r->z) >> WALL_SHIFT) + ((x - r->x) >> WALL_SHIFT) * r->xSize];
+		} while (y < ((int)floor->ceiling << 8));
+	}
+
+	return floor;
+}
+
+int GetWaterHeight(int x, int y, int z, short roomNumber)
+{
+	ROOM_INFO* r = &RoomInfo[roomNumber];
+	FLOOR_INFO* floor = NULL;
+	short data = NO_ROOM;
+
+	do
+	{
+		int x_floor = (z - r->z) >> WALL_SHIFT;
+		int y_floor = (x - r->x) >> WALL_SHIFT;
+
+		if (x_floor <= 0)
+		{
+			x_floor = 0;
+			if (y_floor < 1)
+				y_floor = 1;
+			else if (y_floor > r->ySize - 2)
+				y_floor = r->ySize - 2;
+		}
+		else if (x_floor >= r->xSize - 1)
+		{
+			x_floor = r->xSize - 1;
+			if (y_floor < 1)
+				y_floor = 1;
+			else if (y_floor > r->ySize - 2)
+				y_floor = r->ySize - 2;
+		}
+		else if (y_floor < 0)
+			y_floor = 0;
+		else if (y_floor >= r->ySize)
+			y_floor = r->ySize - 1;
+
+		floor = &r->floor[x_floor + y_floor * r->xSize];
+		data = GetDoor(floor);
+		if (data != NO_ROOM)
+		{
+			roomNumber = data;
+			r = &RoomInfo[data];
+		}
+	} while (data != NO_ROOM);
+
+	if (CHK_ANY(r->flags, ROOM_UNDERWATER|ROOM_QUICKSAND))
+	{
+		while (floor->skyRoom != NO_ROOM)
+		{
+			r = &RoomInfo[floor->skyRoom];
+			if (!CHK_ANY(r->flags, ROOM_UNDERWATER | ROOM_QUICKSAND))
+				return (r->minFloor);
+			floor = &r->floor[((z - r->z) >> WALL_SHIFT) + ((x - r->x) >> WALL_SHIFT) * r->xSize];
+		}
+		return r->maxCeiling;
+	}
+	else
+	{
+		while (floor->pitRoom != NO_ROOM)
+		{
+			r = &RoomInfo[floor->pitRoom];
+			if (CHK_ANY(r->flags, ROOM_UNDERWATER | ROOM_QUICKSAND))
+				return r->maxCeiling;
+			floor = &r->floor[((z - r->z) >> WALL_SHIFT) + ((x - r->x) >> WALL_SHIFT) * r->xSize];
+		}
+	}
+	return NO_HEIGHT;
+}
+
+int GetHeight(FLOOR_INFO* floor, int x, int y, int z)
+{
+	BYTE pitRoom; // al
+	int height; // eax
+	__int16* TrigPtr; // edx
+	int type; // ecx
+	__int16* data; // edi
+	int yoff; // edx
+	int xoff; // ecx
+	int v14; // esi
+	int v15; // esi
+	int v16; // esi
+	int v17; // esi
+	int v18; // eax
+	__int16 trigger; // si
+	void(__cdecl * floorFunc)(ITEM_INFO*, int, int, int, int*); // edx
+
+	HeightType = HT_WALL;
+	for (pitRoom = floor->pitRoom; pitRoom != 0xFF; pitRoom = floor->pitRoom)
+	{
+		auto* r = &RoomInfo[pitRoom];
+		floor = &r->floor[((z - r->z) >> WALL_SHIFT) + r->xSize * ((x - r->x) >> WALL_SHIFT)];
+	}
+
+	height = (int)floor->floor << 8;
+	if (GF_NoFloor && GF_NoFloor == height)
+		height = 0x4000;
+
+	TriggerPtr = 0;
+	if (floor->index)
+	{
+		data = &FloorData[floor->index];
+		while (true)
+		{
+			type = *data++;
+			switch (type & DATA_TYPE)
+			{
+			case FT_DOOR:
+			case FT_ROOF:
+				data++;
+				break;
+			case FT_TILT:
+				yoff = *(char*)data;
+				xoff = *data >> 8;
+				if (!IsChunkyCamera || ((ABS(xoff)) <= 2 && (ABS(yoff)) <= 2))
+				{
+					if ((ABS(xoff)) > 2 || (ABS(yoff)) > 2)
+						HeightType = HT_BIG_SLOPE;
+					else
+						HeightType = HT_SMALL_SLOPE;
+
+					if (xoff < 0)
+						height -= (z & (WALL_SIZE - 1)) * xoff >> 2;
+					else
+						height += ((WALL_SIZE - 1 - z) & (WALL_SIZE - 1)) * xoff >> 2;
+
+					if (yoff < 0)
+						height -= (x & (WALL_SIZE - 1)) * yoff >> 2;
+					else
+						height += ((WALL_SIZE - 1 - x) & (WALL_SIZE - 1)) * yoff >> 2;
+				}
+
+				data++;
+				break;
+			case FT_TRIGGER:
+				if (!TriggerPtr)
+					TriggerPtr = data - 1;
+				++data;
+				do
+				{
+					trigger = *data++;
+					if ((trigger & 0x3C00) != 0)
+					{
+						if ((trigger & 0x3C00) == 1024)
+							trigger = *data++;
+					}
+					else
+					{
+						floorFunc = Objects[Items[trigger & 0x3FF].objectID].floor;
+						if (floorFunc)
+							floorFunc(&Items[trigger & 0x3FF], x, y, z, &height);
+					}
+				} while ((trigger & 0x8000) == 0);
+				break;
+			case FT_LAVA:
+				TriggerPtr = data - 1;
+				break;
+			case FT_CLIMB:
+				if (!TriggerPtr)
+					TriggerPtr = data - 1;
+				break;
+			default:
+				S_ExitSystem("GetHeight(): Unknown type");
+			}
+			if ((type & 0x8000) != 0)
+				break;
+		}
+	}
+	return height;
 }
 
 void TestTriggers(short* data, BOOL isHeavy)
@@ -845,54 +1074,6 @@ void TriggerNormalCDTrack(short value, UINT16 flags, short type) {
 	}
 }
 
-int IsRoomOutside(int x, int y, int z)
-{
-	ROOM_INFO* r;
-	FLOOR_INFO* floor;
-	BYTE* p;
-	int h, c, offset;
-	short rn;
-
-	offset = (USHORT)OutsideRoomOffsets[27 * (x >> 12) + (z >> 12)];
-	if (offset == -1)
-		return -2;
-
-	p = (BYTE*)&OutsideRoomTable[offset];
-	while (*p != NO_ROOM)
-	{
-		rn = *p;
-		r = &RoomInfo[rn];
-
-		if (y > r->maxCeiling && y < r->minFloor &&
-			(z > r->z + WALL_SIZE && z < (r->xSize << WALL_SHIFT) + r->z - WALL_SIZE) &&
-			(x > r->x + WALL_SIZE && x < (r->ySize << WALL_SHIFT) + r->x - WALL_SIZE))
-		{
-			floor = GetFloor(x, y, z, &rn);
-
-			h = GetHeight(floor, x, y, z);
-			if (h == NO_HEIGHT || y > h)
-				return -2;
-
-			c = GetCeiling(floor, x, y, z);
-			if (y < c)
-				return -2;
-
-			if (CHK_ANY(r->flags, ROOM_UNDERWATER) || CHK_ANY(r->flags, ROOM_NOTNEAR_OUTSIDE_ROOM))
-				return -3;
-
-			if (CHK_ANY(r->flags, ROOM_HORIZON) || CHK_ANY(r->flags, ROOM_OUTSIDE))
-			{
-				IsRoomOutsideNo = *p;
-				return 1;
-			}
-		}
-
-		p++;
-	}
-
-	return -2;
-}
-
 /*
  * Inject function
  */
@@ -901,9 +1082,9 @@ void Inject_Control() {
 	INJECT(0x004146C0, AnimateItem);
 	//INJECT(0x00414A30, GetChange);
 	//INJECT(0x00414AE0, TranslateItem);
-	//INJECT(0x00414B40, GetFloor);
-	//INJECT(0x00414CE0, GetWaterHeight);
-	//INJECT(0x00414E50, GetHeight);
+	INJECT(0x00414B40, GetFloor);
+	INJECT(0x00414CE0, GetWaterHeight);
+	INJECT(0x00414E50, GetHeight);
 	//INJECT(0x004150D0, RefreshCamera);
 	INJECT(0x004151C0, TestTriggers);
 	//INJECT(0x004158A0, TriggerActive);

@@ -477,8 +477,8 @@ void RollingBallCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll
 	if (item->status == ITEM_ACTIVE) {
 		if (TestBoundsCollide(item, laraItem, coll->radius) && TestCollision(item, laraItem)) {
 			if (laraItem->gravity) {
-				if (coll->enableBaddiePush)
-					ItemPushLara(item, laraItem, coll, coll->enableSpaz, TRUE);
+				if (CHK_ANY(coll->flags, CF_ENABLE_BADDIE_PUSH))
+					ItemPushLara(item, laraItem, coll, CHK_ANY(coll->flags, CF_ENABLE_SPAZ), TRUE);
 				laraItem->hitPoints -= 100;
 				dx = laraItem->pos.x - item->pos.x;
 				dy = laraItem->pos.y - item->pos.y + 162;

@@ -36,14 +36,14 @@ int ControlPhase(int nTicks, BOOL demoMode); // 0x00414370
 void AnimateItem(ITEM_INFO* item); // 0x004146C0
 #define GetChange ((int(__cdecl*)(ITEM_INFO*,ANIM_STRUCT*)) 0x00414A30)
 #define TranslateItem ((void(__cdecl*)(ITEM_INFO*,int,int,int)) 0x00414AE0)
-#define GetFloor ((FLOOR_INFO*(__cdecl*)(int, int, int, short*)) 0x00414B40)
-#define GetWaterHeight ((int(__cdecl*)(int, int, int, short)) 0x00414CE0)
-#define GetHeight ((int(__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00414E50)
+FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber); // 0x00414B40
+int GetWaterHeight(int x, int y, int z, short roomNumber); // 0x00414CE0
+int GetHeight(FLOOR_INFO* floor, int x, int y, int z); // 0x00414E50
 #define RefreshCamera ((void(__cdecl*)(int,short*)) 0x004150D0)
 void TestTriggers(short* data, BOOL isHeavy); // 0x004151C0 (WIP)
 #define TriggerActive ((int(__cdecl*)(ITEM_INFO*)) 0x004158A0)
 #define GetCeiling ((int(__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00415900)
-// 0x00415B60:		GetDoor
+#define GetDoor ((short(__cdecl*)(FLOOR_INFO*)) 0x00415B60)
 int LOS(GAME_VECTOR* start, GAME_VECTOR* target); // 0x00415BB0
 int zLOS(GAME_VECTOR* start, GAME_VECTOR* target); // 0x00415C50
 int xLOS(GAME_VECTOR* start, GAME_VECTOR* target); // 0x00415F40
@@ -54,6 +54,5 @@ int ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target, FLOOR_INFO* floor); // 0
 // 0x00416770:		AddRoomFlipItems
 void TriggerCDTrack(short value, UINT16 flags, short type); // 0x004167D0
 void TriggerNormalCDTrack(short value, UINT16 flags, short type); // 0x00416800;
-int IsRoomOutside(int x, int y, int z);
 
 #endif // CONTROL_H_INCLUDED

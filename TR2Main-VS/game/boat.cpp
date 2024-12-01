@@ -130,7 +130,7 @@ void BoatCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
 	int onflag = BoatCheckGeton(itemNumber, coll);
 	if (onflag == BGF_NOTON)
 	{
-		coll->enableBaddiePush = TRUE;
+		coll->flags |= CF_ENABLE_BADDIE_PUSH;
 		ObjectCollision(itemNumber, laraitem, coll);
 		return;
 	}

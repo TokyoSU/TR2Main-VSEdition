@@ -298,7 +298,7 @@ typedef struct {
 #define END_BIT		(0x8000)
 #define VALUE_BITS	(0x03FF)
 #define DATA_TYPE	(0x00FF)
-#define TRIG_BITS(T) ((T >> WALL_SHIFT) & 0xF)
+#define TRIG_BITS(T) (T & 0x3C00)
 
 // Target types for CalculateTarget()
 #define NO_TARGET			(0x0000)
@@ -1896,6 +1896,15 @@ typedef struct CollSide_t {
 	int type;
 } COLL_SIDE;
 
+enum COLL_FLAGS
+{
+	CF_SLOPE_ARE_WALLS = 1 << 0,
+	CF_SLOPE_ARE_PITS = 1 << 1,
+	CF_LAVA_IS_PIT = 1 << 2,
+	CF_ENABLE_BADDIE_PUSH = 1 << 3,
+	CF_ENABLE_SPAZ = 1 << 4
+};
+
 typedef struct CollInfo_t {
 	COLL_SIDE sideMid;
 	COLL_SIDE sideFront;
@@ -1918,11 +1927,7 @@ typedef struct CollInfo_t {
 	char zTilt;
 	char hitByBaddie;
 	char hitStatic;
-	UINT16 slopesAreWalls : 2;
-	UINT16 slopesArePits : 1;
-	UINT16 lavaIsPit : 1;
-	UINT16 enableBaddiePush : 1;
-	UINT16 enableSpaz : 1;
+	UINT16 flags;
 } COLL_INFO;
 
 typedef struct ObjectInfo_t {
@@ -1949,6 +1954,7 @@ typedef struct ObjectInfo_t {
 	UINT16 save_anim : 1;
 	UINT16 semi_transparent : 1;
 	UINT16 water_creature : 1;
+	UINT16 pad : 8;
 } OBJECT_INFO;
 
 typedef struct PhdMatrix_t {

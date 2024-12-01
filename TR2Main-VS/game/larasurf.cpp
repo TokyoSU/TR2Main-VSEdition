@@ -41,11 +41,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	coll->old.z = item->pos.z;
 	coll->radius = 100;
 	coll->trigger = NULL;
-	coll->lavaIsPit = FALSE;
-	coll->slopesArePits = FALSE;
-	coll->slopesAreWalls = FALSE;
-	coll->enableSpaz = FALSE;
-	coll->enableBaddiePush = FALSE;
+	coll->flags &= ~(CF_ENABLE_SPAZ | CF_ENABLE_BADDIE_PUSH | CF_LAVA_IS_PIT | CF_SLOPE_ARE_PITS | CF_SLOPE_ARE_WALLS);
 
 	if (CHK_ANY(InputStatus, IN_LOOK) && Lara.extra_anim == 0 && Lara.look)
 		LookLeftRight();

@@ -43,11 +43,8 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->old.z = item->pos.z;
 	coll->radius = 300;
 	coll->trigger = NULL;
-	coll->lavaIsPit = FALSE;
-	coll->slopesArePits = FALSE;
-	coll->slopesAreWalls = FALSE;
-	coll->enableSpaz = FALSE;
-	coll->enableBaddiePush = TRUE;
+	coll->flags &= ~(CF_ENABLE_SPAZ | CF_LAVA_IS_PIT | CF_SLOPE_ARE_PITS | CF_SLOPE_ARE_WALLS);
+	coll->flags |= CF_ENABLE_BADDIE_PUSH;
 
 	if (CHK_ANY(InputStatus, IN_LOOK) && Lara.extra_anim == 0 && Lara.look)
 		LookLeftRight();

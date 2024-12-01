@@ -179,8 +179,6 @@ void DSAdjustPan(DWORD channel, int pan)
 		}
 
 		pan >>= 4;
-		LogDebug("Pan: %d", pan);
-
 		if (pan == 0)
 		{
 			matrix[0] = 1.0F;

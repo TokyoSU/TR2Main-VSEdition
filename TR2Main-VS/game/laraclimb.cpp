@@ -39,8 +39,7 @@
 
 void lara_as_climbleft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->enableSpaz = FALSE;
-	coll->enableBaddiePush = FALSE;
+	coll->flags &= ~(CF_ENABLE_SPAZ | CF_ENABLE_BADDIE_PUSH);
 
 	Camera.targetAngle = CLIMB_LEFT_TARGET_ANGLE;
 	Camera.targetElevation = CLIMB_LEFT_ELEVATION_ANGLE;
@@ -51,8 +50,7 @@ void lara_as_climbleft(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_climbright(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->enableSpaz = FALSE;
-	coll->enableBaddiePush = FALSE;
+	coll->flags &= ~(CF_ENABLE_SPAZ | CF_ENABLE_BADDIE_PUSH);
 
 	Camera.targetAngle = CLIMB_RIGHT_TARGET_ANGLE;
 	Camera.targetElevation = CLIMB_RIGHT_ELEVATION_ANGLE;
@@ -63,8 +61,7 @@ void lara_as_climbright(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->enableSpaz = FALSE;
-	coll->enableBaddiePush = FALSE;
+	coll->flags &= ~(CF_ENABLE_SPAZ | CF_ENABLE_BADDIE_PUSH);
 
 	Camera.targetElevation = CLIMB_STAND_ELEVATION_ANGLE;
 	if (CHK_ANY(InputStatus, IN_LOOK))
@@ -83,16 +80,14 @@ void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_climbing(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->enableSpaz = FALSE;
-	coll->enableBaddiePush = FALSE;
+	coll->flags &= ~(CF_ENABLE_SPAZ | CF_ENABLE_BADDIE_PUSH);
 
 	Camera.targetElevation = CLIMB_STAND_ELEVATION_ANGLE;
 }
 
 void lara_as_climbend(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->enableSpaz = FALSE;
-	coll->enableBaddiePush = FALSE;
+	coll->flags &= ~(CF_ENABLE_SPAZ | CF_ENABLE_BADDIE_PUSH);
 
 	Camera.flags = FOLLOW_CENTRE;
 	Camera.targetElevation = CLIMB_END_TARGET_ANGLE;
@@ -100,8 +95,7 @@ void lara_as_climbend(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_climbdown(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->enableSpaz = FALSE;
-	coll->enableBaddiePush = FALSE;
+	coll->flags &= ~(CF_ENABLE_SPAZ | CF_ENABLE_BADDIE_PUSH);
 
 	Camera.targetElevation = CLIMB_DOWN_ELEVATION_ANGLE;
 }

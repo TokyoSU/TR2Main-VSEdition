@@ -48,8 +48,8 @@ void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int he
 	coll->sideMid.ceiling = c;
 	coll->sideMid.type = HeightType;
 	coll->trigger = TriggerPtr;
-	// NOTE: It use LaraItem->pos.y as for the y argument, it should use y from this function instead, there is not only lara using this function !
-	tilt = GetTiltType(floor, x, y, z);
+	// NOTE: They added lara pos Y there instead of the argument y because it seem like lara could slide on bridge ?
+	tilt = GetTiltType(floor, x, LaraItem->pos.y, z);
 	coll->xTilt = (char)(tilt);
 	coll->zTilt = (char)(tilt >> 8);
 	switch (coll->quadrant) {
@@ -105,16 +105,13 @@ void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int he
 	coll->sideFront.floor = h;
 	coll->sideFront.ceiling = c;
 	coll->sideFront.type = HeightType;
-	if (coll->slopesAreWalls && coll->sideFront.type == HT_BIG_SLOPE && coll->sideFront.floor < 0) {
+	if (CHK_ANY(coll->flags, CF_SLOPE_ARE_WALLS) && coll->sideFront.type == HT_BIG_SLOPE && coll->sideFront.floor < 0) {
 		coll->sideFront.floor = -32767;
 	}
 	else {
-		if ((coll->slopesArePits &&
+		if ((CHK_ANY(coll->flags, CF_SLOPE_ARE_PITS) &&
 			coll->sideFront.type == HT_BIG_SLOPE &&
-			coll->sideFront.floor > 0) ||
-			(coll->lavaIsPit &&
-				coll->sideFront.floor > 0 &&
-				TriggerPtr && (*TriggerPtr & DATA_TYPE) == FT_LAVA))
+			coll->sideFront.floor > 0) || (CHK_ANY(coll->flags, CF_LAVA_IS_PIT) && coll->sideFront.floor > 0 && TriggerPtr != NULL && (TriggerPtr[0] & DATA_TYPE) == FT_LAVA))
 			coll->sideFront.floor = 512;
 	}
 	floor = GetFloor(x + leftX, top, z + leftZ, &roomID);
@@ -127,14 +124,14 @@ void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int he
 	coll->sideLeft.ceiling = c;
 	coll->sideLeft.floor = h;
 	coll->sideLeft.type = HeightType;
-	if (coll->slopesAreWalls && coll->sideLeft.type == HT_BIG_SLOPE && coll->sideLeft.floor < 0) {
+	if (CHK_ANY(coll->flags, CF_SLOPE_ARE_WALLS) && coll->sideLeft.type == HT_BIG_SLOPE && coll->sideLeft.floor < 0) {
 		coll->sideLeft.floor = -32767;
 	}
 	else {
-		if ((coll->slopesArePits &&
+		if ((CHK_ANY(coll->flags, CF_SLOPE_ARE_PITS) &&
 			coll->sideLeft.type == HT_BIG_SLOPE &&
 			coll->sideLeft.floor > 0) ||
-			(coll->lavaIsPit &&
+			(CHK_ANY(coll->flags, CF_LAVA_IS_PIT) &&
 				coll->sideLeft.floor > 0 &&
 				TriggerPtr &&
 				(*TriggerPtr & DATA_TYPE) == FT_LAVA))
@@ -150,14 +147,14 @@ void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int he
 	coll->sideRight.ceiling = c;
 	coll->sideRight.floor = h;
 	coll->sideRight.type = HeightType;
-	if (coll->slopesAreWalls && coll->sideRight.type == HT_BIG_SLOPE && coll->sideRight.floor < 0) {
+	if (CHK_ANY(coll->flags, CF_SLOPE_ARE_WALLS) && coll->sideRight.type == HT_BIG_SLOPE && coll->sideRight.floor < 0) {
 		coll->sideRight.floor = -32767;
 	}
 	else {
-		if ((coll->slopesArePits &&
+		if ((CHK_ANY(coll->flags, CF_SLOPE_ARE_PITS) &&
 			coll->sideRight.type == HT_BIG_SLOPE &&
 			coll->sideRight.floor > 0) ||
-			(coll->lavaIsPit &&
+			(CHK_ANY(coll->flags, CF_LAVA_IS_PIT) &&
 				coll->sideRight.floor > 0 &&
 				TriggerPtr &&
 				(*TriggerPtr & DATA_TYPE) == FT_LAVA))
@@ -443,6 +440,75 @@ void GetNewRoom(int x, int y, int z, short roomID) {
 	DrawRoomsArray[DrawRoomsCount++] = roomID;
 }
 
+short GetTiltType(FLOOR_INFO* floor, int x, int y, int z)
+{
+	while (floor->pitRoom != NO_ROOM)
+		floor = GetFloorSector(x, z, &RoomInfo[floor->pitRoom]);
+	unsigned short index = floor->index;
+	short* data = &FloorData[index];
+	if (y + 512 >= floor->floor << 8 && data[0] == 2) // TILT_TYPE
+		return data[1];
+	return 0;
+}
+
+void LaraBaddieCollision(ITEM_INFO* laraitem, COLL_INFO* coll)
+{
+	ITEM_INFO* targetItem;
+	OBJECT_INFO* obj;
+	int	i, x, y, z;
+	short roomList[20], roomCount;
+	short targetItemNumber;
+
+	Lara.hit_direction = -1;
+	laraitem->hitStatus = FALSE;
+	if (laraitem->hitPoints <= 0)
+		return;
+
+	memset(roomList, 0, sizeof(roomList));
+	roomList[0] = laraitem->roomNumber;
+	roomCount = 1;
+
+	ROOM_INFO* room = &RoomInfo[laraitem->roomNumber];
+	if (room->doors != NULL && room->doors->wCount > 0)
+	{
+		for (int i = 0; i < room->doors->wCount; ++i) {
+			DOOR_INFO* door = &room->doors->door[i];
+			if (door->room != NO_ROOM)
+				roomList[roomCount++] = door->room;
+		}
+	}
+
+	for (i = 0; i < roomCount; i++)
+	{
+		targetItemNumber = RoomInfo[roomList[i]].itemNumber;
+		while (targetItemNumber != -1)
+		{
+			targetItem = &Items[targetItemNumber];
+			if (targetItem->collidable && targetItem->status != ITEM_INVISIBLE)
+			{
+				obj = &Objects[targetItem->objectID];
+				if (obj->collision)
+				{
+					x = laraitem->pos.x - targetItem->pos.x;
+					y = laraitem->pos.y - targetItem->pos.y;
+					z = laraitem->pos.z - targetItem->pos.z;
+					if (x > -BLOCK(4) && x < BLOCK(4) &&
+						z > -BLOCK(4) && z < BLOCK(4) &&
+						y > -BLOCK(4) && y < BLOCK(4))
+						obj->collision(targetItemNumber, laraitem, coll);
+				}
+			}
+			targetItemNumber = targetItem->nextItem;
+		}
+	}
+
+	if (Lara.spaz_effect_count != 0)
+		EffectSpaz(laraitem, coll);
+	if (Lara.hit_direction == -1)
+		Lara.hit_frame = 0;
+	InventoryChosen = -1;
+}
+
 /*
  * Inject function
  */
@@ -454,8 +520,8 @@ void Inject_Collide() {
 	INJECT(0x00413480, GetNewRoom);
 	//INJECT(0x004134E0, ShiftItem);
 	//INJECT(0x00413520, UpdateLaraRoom);
-	//INJECT(0x00413580, GetTiltType);
-	//INJECT(0x00413620, LaraBaddieCollision);
+	INJECT(0x00413580, GetTiltType);
+	INJECT(0x00413620, LaraBaddieCollision);
 	//INJECT(0x004137C0, EffectSpaz);
 	//INJECT(0x00413840, CreatureCollision);
 	//INJECT(0x004138C0, ObjectCollision);
