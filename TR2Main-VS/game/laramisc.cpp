@@ -33,6 +33,7 @@
 #include "game/larafire.h"
 #include "game/sound.h"
 #include "specific/sndpc.h"
+#include "specific/init_sound_xaudio.h"
 #include "global/vars.h"
 
 #if defined(FEATURE_MOD_CONFIG)
@@ -261,6 +262,12 @@ void LaraControl(short itemNumber) {
 			break;
 		}
 	}
+
+	auto& curCamRoom = Rooms[Camera.pos.roomNumber];
+	if (curCamRoom.reverbType != REVERB_NONE)
+		S_SetReverbType((AUDIO_REVERB_TYPE)curCamRoom.reverbType);
+	else
+		S_SetReverbType(REVERB_NONE);
 
 	if (item->hitPoints > 0) {
 		if (GF_NoFloor && item->pos.y >= GF_NoFloor) {

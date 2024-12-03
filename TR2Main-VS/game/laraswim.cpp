@@ -203,7 +203,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 		while (floor->skyRoom != NO_ROOM)
 		{
 			r = &Rooms[floor->skyRoom];
-			if (CHK_ANY(r->flags, ROOM_UNDERWATER | ROOM_QUICKSAND))
+			if (!CHK_ANY(r->flags, ROOM_UNDERWATER | ROOM_QUICKSAND))
 			{
 				wh = ((int)floor->ceiling << 8);
 				floor = GetFloor(x, y, z, &roomNumber);

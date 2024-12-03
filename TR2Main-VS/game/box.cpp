@@ -287,6 +287,36 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* ai, BOOL isViolent)
 	CalculateTarget(&creature->target, item, LOT);
 }
 
+int CreatureCreature(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	int x = item->pos.x;
+	int y = item->pos.y;
+	int z = item->pos.z;
+	int radius = SQR(Objects[item->objectID].radius);
+
+	ROOM_INFO* r = &Rooms[item->roomNumber];
+	short link = r->itemNumber;
+	do
+	{
+		item = &Items[link];
+		if (link == itemNumber)
+			return 0;
+
+		if (item != LaraItem && item->status == ITEM_ACTIVE && item->speed != 0)
+		{
+			int distance = SQR(item->pos.x - x) + SQR(item->pos.y - y) + SQR(item->pos.z - z);
+			if (distance < radius)
+				return (1);
+		}
+
+		link = item->nextItem;
+	}
+	while (link != -1);
+
+	return 0;
+}
+
 int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOT_INFO* LOT)
 {
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
@@ -881,7 +911,7 @@ void Inject_Box() {
 	INJECT(0x0040E930, ValidBox);
 	INJECT(0x0040E9E0, CreatureMood);
 	//INJECT(0x0040EE50, CalculateTarget);
-	//INJECT(0x0040F2B0, CreatureCreature);
+	INJECT(0x0040F2B0, CreatureCreature);
 	INJECT(0x0040F3B0, BadFloor);
 	INJECT(0x0040F440, CreatureDie);
 	INJECT(0x0040F500, CreatureAnimation);

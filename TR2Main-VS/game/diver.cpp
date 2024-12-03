@@ -78,42 +78,34 @@ int GetWaterSurface(int x, int y, int z, short roomNum)
     ROOM_INFO* room = &Rooms[roomNum];
     FLOOR_INFO* floor = GetFloorSector(x, z, room);
 
-    if (CHK_ANY(room->flags, ROOM_UNDERWATER))
+    if (CHK_ANY(room->flags, ROOM_UNDERWATER|ROOM_QUICKSAND))
     {
-        BYTE skyRoom = floor->skyRoom;
-        if (skyRoom != NO_ROOM)
+        if (floor->skyRoom != NO_ROOM)
         {
-            while (skyRoom != NO_ROOM)
+            while (floor->skyRoom != NO_ROOM)
             {
-                ROOM_INFO* r1 = &Rooms[skyRoom];
-                if (!CHK_ANY(r1->flags, ROOM_UNDERWATER))
+                ROOM_INFO* r1 = &Rooms[floor->skyRoom];
+                if (!CHK_ANY(r1->flags, ROOM_UNDERWATER|ROOM_QUICKSAND))
                     break;
                 floor = GetFloorSector(x, z, r1);
-                if (floor->skyRoom == NO_ROOM)
-                    return NO_HEIGHT;
-                skyRoom = floor->skyRoom;
             }
-            return floor->ceiling << 8;
+            return ((int)floor->ceiling << 8);
         }
         return NO_HEIGHT;
     }
 
-    BYTE pitRoom = floor->pitRoom;
-    if (pitRoom == NO_ROOM)
+    if (floor->pitRoom == NO_ROOM)
         return NO_HEIGHT;
 
-    while (pitRoom != NO_ROOM)
+    while (floor->pitRoom != NO_ROOM)
     {
-        ROOM_INFO* r2 = &Rooms[pitRoom];
-        if (CHK_ANY(r2->flags, ROOM_UNDERWATER))
+        ROOM_INFO* r2 = &Rooms[floor->pitRoom];
+        if (CHK_ANY(r2->flags, ROOM_UNDERWATER|ROOM_QUICKSAND))
             break;
         floor = GetFloorSector(x, z, r2);
-        if (floor->pitRoom == NO_ROOM)
-            return NO_HEIGHT;
-        pitRoom = floor->pitRoom;
     }
 
-    return floor->floor << 8;
+    return ((int)floor->floor << 8);
 }
 
 void DiverControl(short itemNumber)

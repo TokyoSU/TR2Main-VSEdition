@@ -161,10 +161,8 @@ void DrawRooms(short currentRoom) {
 	}
 
 #if defined(FEATURE_MOD_CONFIG)
-	if (Mod.rainEnabled) // Avoid title for now.
-		UpdateRain();
-	if (Mod.snowEnabled)
-		DoSnow();
+	UpdateRain();
+	DoSnow();
 #endif
 
 #ifdef FEATURE_VIEW_IMPROVED

@@ -35,8 +35,51 @@
 #include "specific/output.h"
 #include "specific/sndpc.h"
 #include "global/vars.h"
+#include <init_sound_xaudio.h>
 
 FX_INFO Effects[MAX_EFFECTS];
+
+void GetPanVolume(SOUND_SLOT* slot)
+{
+	long dx, dy, dz, radius, distance, nPan, nVolume;
+
+	if (slot->pos.x || slot->pos.y || slot->pos.z)
+	{
+		dx = slot->pos.x - Camera.pos.x;
+		dy = slot->pos.y - Camera.pos.y;
+		dz = slot->pos.z - Camera.pos.z;
+		radius = SampleInfos[slot->nSampleInfo].radius << 10;
+
+		if (dx < -radius || dx > radius || dy < -radius || dy > radius || dz < -radius || dz > radius)
+		{
+			slot->distance = 0;
+			slot->nPan = 0;
+			slot->nVolume = 0;
+		}
+		else
+		{
+			distance = SQUARE(dx) + SQUARE(dy) + SQUARE(dz);
+
+			if (distance <= SQUARE(radius))
+			{
+				if (distance >= 0x100000)
+					distance = phd_sqrt(distance) - 1024;
+				else
+					distance = 0;
+
+				nPan = (CamRot.y << 4) + phd_atan(dz, dx);
+				nVolume = slot->nVolume;
+				if (distance)
+					nVolume = (nVolume * (4096 - (phd_sin((distance << 14) / radius) >> 2))) >> 12;
+			}
+			else
+			{
+				slot->nPan = 0;
+				slot->nVolume = 0;
+			}
+		}
+	}
+}
 
 int ItemNearLara(PHD_3DPOS* pos, int distance) {
 	int dx, dy, dz;
@@ -63,6 +106,38 @@ void SoundEffects() {
 	if (FlipEffect != -1)
 		(*SfxFunctions[FlipEffect])(NULL);
 	SOUND_EndScene();
+
+	for (int i = 0; i < 32; i++)
+	{
+		SOUND_SLOT* slot = &LaSlot[i];
+		if (slot->nSampleInfo < 0)
+			continue;
+
+		if ((SampleInfos[slot->nSampleInfo].flags & 3) != 3)
+		{
+			if (!S_SoundSampleIsPlaying(i))
+				slot->nSampleInfo = -1;
+			else
+			{
+				GetPanVolume(slot);
+				S_SoundSetPanAndVolume(i, slot->nPan, slot->nVolume);
+			}
+		}
+		else
+		{
+			if (!slot->nVolume)
+			{
+				S_SoundStopSample(i);
+				slot->nSampleInfo = -1;
+			}
+			else
+			{
+				S_SoundSetPanAndVolume(i, slot->nPan, slot->nVolume);
+				S_SoundSetPitch(i, slot->nPitch);
+				slot->nVolume = 0;
+			}
+		}
+	}
 }
 
 short DoBloodSplat(int x, int y, int z, short speed, short direction, short roomID) {

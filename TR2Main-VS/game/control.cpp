@@ -379,25 +379,25 @@ FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber)
 
 	if (y >= ((int)floor->floor << 8))
 	{
-		do
+		while (floor->pitRoom != NO_ROOM)
 		{
-			if (floor->pitRoom == NO_ROOM)
-				return floor;
 			*roomNumber = floor->pitRoom;
 			r = &Rooms[floor->pitRoom];
 			floor = GetFloorSector(x, z, r);
-		} while (y >= ((int)floor->floor << 8));
+			if (y < ((int)floor->floor << 8))
+				break;
+		}
 	}
 	else if (y < ((int)floor->ceiling << 8))
 	{
-		do
+		while (floor->skyRoom != NO_ROOM)
 		{
-			if (floor->skyRoom == NO_ROOM)
-				return floor;
 			*roomNumber = floor->skyRoom;
 			r = &Rooms[floor->skyRoom];
 			floor = GetFloorSector(x, z, r);
-		} while (y < ((int)floor->ceiling << 8));
+			if (y >= ((int)floor->ceiling << 8))
+				break;
+		}
 	}
 
 	return floor;
@@ -499,8 +499,8 @@ int GetHeight(FLOOR_INFO* floor, int x, int y, int z)
 				data++;
 				break;
 			case FT_TILT:
-				yoff = *(char*)data;
 				xoff = *data >> 8;
+				yoff = *(char*)data;
 				if (!IsChunkyCamera || ((ABS(xoff)) <= 2 && (ABS(yoff)) <= 2))
 				{
 					if ((ABS(xoff)) > 2 || (ABS(yoff)) > 2)

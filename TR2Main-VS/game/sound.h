@@ -29,7 +29,7 @@
   */
 int GetRealTrack(int trackID); // 0x0043F430
 int PlaySoundEffect(DWORD sampleIdx, PHD_3DPOS* pos, DWORD flags); // 0x0043F470
-#define StopSoundEffect ((void(__cdecl*)(int)) 0x0043F910)
+void StopSoundEffect(DWORD sampleIdx); // 0x0043F910
 #define SOUND_EndScene ((void(__cdecl*)(void)) 0x0043F970)
 #define SOUND_Stop ((void(__cdecl*)(void)) 0x0043FA00)
 void SOUND_Init(); // 0x0043FA30

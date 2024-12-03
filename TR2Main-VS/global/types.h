@@ -248,8 +248,8 @@ typedef struct {
 #define ROOM_QUICKSAND					(0x80)
 #define ROOM_EFFECT						(0x100) // Room glow and movement flags, Light mode should be 2 !
 #define ROOM_REFLECTION					(0x200) // Light mode should be 2 !
-#define ROOM_RAIN                       (0x400)
-#define ROOM_SNOW                       (0x800)
+#define ROOM_SNOW                       (0x400)
+#define ROOM_RAIN                       (0x800)
 
 // SFX flags
 #define SFX_UNDERWATER		(1)
@@ -299,7 +299,7 @@ typedef struct {
 // Trigger/floordata control bits
 #define END_BIT		(0x8000)
 #define VALUE_BITS	(0x03FF)
-#define DATA_TYPE	(0x00FF)
+#define DATA_TYPE	(0x1F)
 #define TRIG_BITS(T) ((T & 0x3FFF) >> 10)
 
 // Target types for CalculateTarget()
@@ -2078,6 +2078,11 @@ typedef struct RoomInfo_t {
 	short fxNumber;
 	short flippedRoom;
 	UINT16 flags;
+	BYTE reverbType;
+
+	int GetCenter() const {
+		return y - (maxCeiling - minFloor);
+	}
 } ROOM_INFO;
 
 typedef struct LiftData_t {

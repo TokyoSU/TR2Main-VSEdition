@@ -14,13 +14,21 @@ struct ReverbInfo
 	float Volume;
 };
 
+struct PlayInfo
+{
+	IXAudio2SourceVoice* Buffer;
+	DWORD SampleIdx;
+	bool IsLooping;
+};
+
 static IXAudio2* XA_Engine = NULL;
 static IXAudio2MasteringVoice* XA_AudioVoice = NULL;
 static IUnknown* XA_ReverbEffect = NULL;
-static IXAudio2SourceVoice* XA_Voices[32] = { NULL }; // Channels
+static PlayInfo XA_Voices[32] = {}; // Channels
 static IXAudio2SubmixVoice* XA_SoundFXVoice = NULL;
-static XAUDIO2_BUFFER XA_Buffers[256] = { NULL }; // Loaded samples.
+static XAUDIO2_BUFFER XA_Buffers[370] = { NULL }; // Loaded samples.
 static ReverbInfo XA_ReverbPreset[REVERB_MAX] = {
+	{XAUDIO2FX_I3DL2_PRESET_DEFAULT, 0.0F},
 	{XAUDIO2FX_I3DL2_PRESET_GENERIC, 5.0F},
 	{XAUDIO2FX_I3DL2_PRESET_ROOM, 5.0F},
 	{XAUDIO2FX_I3DL2_PRESET_BATHROOM, 3.0F},
@@ -89,9 +97,12 @@ void DSInitialize()
 
 	for (int i = 0; i < _countof(XA_Voices); i++)
 	{
-		if FAILED(XA_Engine->CreateSourceVoice(&XA_Voices[i], &XA_PCMFormat, 0, XAUDIO2_MAX_FREQ_RATIO, NULL, &sendList, 0))
+		auto& voice = XA_Voices[i];
+		if FAILED(XA_Engine->CreateSourceVoice(&voice.Buffer, &XA_PCMFormat, 0, XAUDIO2_MAX_FREQ_RATIO, NULL, &sendList, 0))
 			LogWarn("Failed to create the channel number: %d", i);
+		voice.SampleIdx = -1;
 	}
+
 	for (int i = 0; i < _countof(XA_ReverbPreset); i++)
 		ReverbConvertI3DL2ToNative(&XA_ReverbPreset[i].Parameters, &XA_ReverbType[i], FALSE);
 
@@ -106,10 +117,12 @@ void DSRelease()
 
 	for (int i = 0; i < _countof(XA_Voices); i++)
 	{
-		if (XA_Voices[i] != NULL)
+		auto& voice = XA_Voices[i];
+		if (voice.Buffer != NULL)
 		{
-			XA_Voices[i]->DestroyVoice();
-			XA_Voices[i] = NULL;
+			voice.Buffer->DestroyVoice();
+			voice.Buffer = NULL;
+			voice.SampleIdx = -1;
 		}
 	}
 
@@ -139,26 +152,26 @@ void DSRelease()
 
 void DSChangeVolume(DWORD channel, int volume)
 {
-	if (XA_Voices[channel] != NULL)
+	if (XA_Voices[channel].Buffer != NULL)
 	{
 		// Convert decibels to linear amplitude ratio
 		float fvolume = XAudio2DecibelsToAmplitudeRatio(volume / 150.0F);
 
 		// Apply the volume to the voice
-		XA_Voices[channel]->SetChannelVolumes(1, &fvolume, XAUDIO2_COMMIT_NOW);
+		XA_Voices[channel].Buffer->SetChannelVolumes(1, &fvolume, XAUDIO2_COMMIT_NOW);
 	}
 }
 
 void DSAdjustPitch(DWORD channel, int pitch)
 {
-	if (XA_Voices[channel] != NULL)
+	if (XA_Voices[channel].Buffer != NULL)
 	{
 		DWORD frequency = DWORD((float)pitch / 65536.0F * 11050.0F);
 		if (frequency < 100)
 			frequency = 100;
 		else if (frequency > 100000)
 			frequency = 100000;
-		XA_Voices[channel]->SetFrequencyRatio(frequency / 11050.0F, XAUDIO2_COMMIT_NOW);
+		XA_Voices[channel].Buffer->SetFrequencyRatio(frequency / 11050.0F, XAUDIO2_COMMIT_NOW);
 	}
 }
 
@@ -166,7 +179,7 @@ void DSAdjustPan(DWORD channel, int pan)
 {
 	float matrix[2] = {};
 
-	if (XA_Voices[channel])
+	if (XA_Voices[channel].Buffer != NULL)
 	{
 		if (pan < 0)
 		{
@@ -195,30 +208,43 @@ void DSAdjustPan(DWORD channel, int pan)
 			matrix[1] = 1.0F;
 		}
 
-		XA_Voices[channel]->SetOutputMatrix(NULL, 1, 2, matrix, XAUDIO2_COMMIT_NOW);
+		XA_Voices[channel].Buffer->SetOutputMatrix(NULL, 1, 2, matrix, XAUDIO2_COMMIT_NOW);
 	}
 }
 
-void DXStopSample(DWORD channel)
+void DXStopSample(DWORD channel, bool isLoop)
 {
-	if (channel >= 0 && XA_Voices[channel])
+	if (channel < 0 || channel >= _countof(XA_Voices))
+		return;
+	auto& voice = XA_Voices[channel];
+	if (voice.Buffer != NULL)
 	{
-		if FAILED(XA_Voices[channel]->Stop(0, XAUDIO2_COMMIT_NOW))
-			LogWarn("Failed to stop sample id: %d", channel);
-		if FAILED(XA_Voices[channel]->FlushSourceBuffers())
-			LogWarn("Failed to flush sample id: %d", channel);
+		voice.Buffer->DisableEffect(0, XAUDIO2_COMMIT_NOW);
+		if FAILED(voice.Buffer->Stop(0, XAUDIO2_COMMIT_NOW))
+			LogWarn("Failed to stop sample id: %d", voice.SampleIdx);
+		if FAILED(voice.Buffer->FlushSourceBuffers())
+			LogWarn("Failed to flush sample id: %d", voice.SampleIdx);
+		if (isLoop && FAILED(voice.Buffer->ExitLoop()))
+			LogWarn("Failed to stop looped sample id: %d", voice.SampleIdx);
+		voice.SampleIdx = -1;
+		voice.IsLooping = false;
 	}
 }
 
 bool DSIsChannelPlaying(DWORD channel)
 {
-	if (XA_Voices[channel] != NULL)
+	if (channel < 0 || channel >= _countof(XA_Voices))
+		return false;
+
+	auto& voice = XA_Voices[channel];
+	if (voice.Buffer != NULL && voice.SampleIdx != -1)
 	{
 		XAUDIO2_VOICE_STATE state;
-		XA_Voices[channel]->GetState(&state, XAUDIO2_VOICE_NOSAMPLESPLAYED);
+		voice.Buffer->GetState(&state, XAUDIO2_VOICE_NOSAMPLESPLAYED);
 		if (state.BuffersQueued)
 			return true;
 	}
+
 	return false;
 }
 
@@ -254,17 +280,31 @@ int DXStartSample(DWORD sampleIdx, int volume, int pitch, int pan, DWORD flags)
 	int channel = DSGetFreeChannel();
 	if (channel < 0)
 		return -1;
-	auto* voice = XA_Voices[channel];
+	auto& voice = XA_Voices[channel];
 	DSChangeVolume(channel, volume);
 	DSAdjustPitch(channel, pitch);
 	DSAdjustPan(channel, pan);
 	auto* buffer = &XA_Buffers[sampleIdx];
 	buffer->LoopCount = flags;
-	if FAILED(voice->SubmitSourceBuffer(buffer, 0))
+	if FAILED(voice.Buffer->SubmitSourceBuffer(buffer, 0))
 		LogWarn("Failed to submit source buffer for sampleID: %d", sampleIdx);
-	if FAILED(voice->Start(0, XAUDIO2_COMMIT_NOW))
+	if FAILED(voice.Buffer->Start(0, XAUDIO2_COMMIT_NOW))
 		LogWarn("Failed to play sampleID: %d", sampleIdx);
+	voice.SampleIdx = sampleIdx;
+	voice.IsLooping = buffer->LoopCount != 0;
 	return channel;
+}
+
+void DXSoundUpdate()
+{
+
+	float distance = sqrtf(powf(soundX - cameraX, 2) +
+		powf(soundY - cameraY, 2) +
+		powf(soundZ - cameraZ, 2));
+	float maxDistance = 100.0f; // Maximum distance for sound
+	float volume = 1.0f - (distance / maxDistance);
+	volume = max(0.0f, volume); // Clamp to non-negative values
+
 }
 
 int CalcVolume(int volume)
@@ -294,7 +334,14 @@ void S_SoundStopAllSamples()
 
 void S_SoundStopSample(DWORD sampleIdx)
 {
-	DXStopSample(sampleIdx);
+	for (int i = 0; i < _countof(XA_Voices); i++)
+	{
+		auto& voice = XA_Voices[i];
+		if (voice.Buffer == NULL)
+			continue;
+		if (voice.SampleIdx == sampleIdx)
+			DXStopSample(i, voice.IsLooping);
+	}
 }
 
 int S_SoundPlaySample(DWORD sampleIdx, int volume, int pitch, short pan)
@@ -321,44 +368,26 @@ void DXFreeSounds()
 	}
 }
 
-bool S_SoundSampleIsPlaying(DWORD sampleIdx)
+bool S_SoundSampleIsPlaying(DWORD channel)
 {
-	if (IsSoundEnabled && DSIsChannelPlaying(sampleIdx))
-		return true;
-	return false;
+	return DSIsChannelPlaying(channel);
 }
 
 void S_SoundSetPanAndVolume(DWORD sampleIdx, short pan, int volume)
 {
-	if (IsSoundEnabled)
-	{
-		DSChangeVolume(sampleIdx, CalcVolume(volume));
-		DSAdjustPan(sampleIdx, pan);
-	}
+	DSChangeVolume(sampleIdx, CalcVolume(volume));
+	DSAdjustPan(sampleIdx, pan);
 }
 
 void S_SoundSetPitch(DWORD sampleIdx, int pitch)
 {
-	if (IsSoundEnabled)
-		DSAdjustPitch(sampleIdx, pitch);
+	DSAdjustPitch(sampleIdx, pitch);
 }
 
 void S_DisableReverb()
 {
 	XA_SoundFXVoice->DisableEffect(0, XAUDIO2_COMMIT_NOW);
 	XA_SoundFXVoice->SetVolume(1.0F, XAUDIO2_COMMIT_NOW);
-}
-
-void S_SetForceReverb(AUDIO_REVERB_TYPE reverb)
-{
-	XA_ForcedReverb = reverb;
-	S_SetReverbType(reverb);
-}
-
-void S_ResetForceReverb()
-{
-	XA_ForcedReverb = REVERB_NONE;
-	S_SetReverbType(REVERB_NONE);
 }
 
 void S_SetReverbType(AUDIO_REVERB_TYPE reverb)
@@ -371,14 +400,16 @@ void S_SetReverbType(AUDIO_REVERB_TYPE reverb)
 
 	if (XA_CurrentReverb != reverb)
 	{
-		auto& reverbPreset = XA_ReverbPreset[reverb];
-		auto& reverbType = XA_ReverbType[reverb];
 		if (reverb != REVERB_NONE)
 		{
-			XA_SoundFXVoice->EnableEffect(0, XAUDIO2_COMMIT_NOW);
-			XA_SoundFXVoice->SetVolume(reverbPreset.Volume, XAUDIO2_COMMIT_NOW);
+			auto& reverbPreset = XA_ReverbPreset[reverb];
+			auto& reverbType = XA_ReverbType[reverb];
+			if (reverb == REVERB_GAMESTART)
+			{
+				XA_SoundFXVoice->EnableEffect(0, XAUDIO2_COMMIT_NOW);
+				XA_SoundFXVoice->SetVolume(4.0F, XAUDIO2_COMMIT_NOW);
+			}
 			XA_SoundFXVoice->SetEffectParameters(0, &reverbType, sizeof(XAUDIO2FX_REVERB_PARAMETERS), XAUDIO2_COMMIT_NOW);
-			
 		}
 		else
 		{

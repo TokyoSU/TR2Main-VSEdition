@@ -2,8 +2,8 @@
 
 enum AUDIO_REVERB_TYPE
 {
-	REVERB_GAMESTART = -2,
-	REVERB_NONE = -1,
+	REVERB_GAMESTART = -1,
+	REVERB_NONE = 0,
 	REVERB_GENERIC,
 	REVERB_ROOM,
 	REVERB_BATHROOM,
@@ -41,7 +41,7 @@ extern void DSChangeVolume(DWORD channel, int volume);
 extern void DSAdjustPitch(DWORD channel, int pitch);
 extern void DSAdjustPan(DWORD channel, int pan);
 extern bool DSIsChannelPlaying(DWORD channel);
-extern void DXStopSample(DWORD channel);
+extern void DXStopSample(DWORD channel, bool isLoop = false);
 extern int DSGetFreeChannel();
 extern bool DXCreateSample(DWORD sampleIdx, LPWAVEFORMATEX format, const LPVOID data, DWORD dataSize);
 extern int DXStartSample(DWORD sampleIdx, int volume, int pitch, int pan, DWORD flags);
@@ -52,7 +52,7 @@ extern void S_SoundStopAllSamples();
 extern void S_SoundStopSample(DWORD sampleIdx);
 extern int S_SoundPlaySample(DWORD sampleIdx, int volume, int pitch, short pan);
 extern int S_SoundPlaySampleLooped(DWORD sampleIdx, int volume, int pitch, short pan);
-extern bool S_SoundSampleIsPlaying(DWORD sampleIdx);
+extern bool S_SoundSampleIsPlaying(DWORD channel);
 extern void S_SoundSetPanAndVolume(DWORD sampleIdx, short pan, int volume);
 extern void S_SoundSetPitch(DWORD sampleIdx, int pitch);
 extern void S_DisableReverb();

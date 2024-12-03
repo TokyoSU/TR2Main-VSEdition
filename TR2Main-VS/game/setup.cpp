@@ -1625,12 +1625,12 @@ void GetCarriedItems()
 {
 	for (int i = 0; i < LevelItemCount; i++)
 	{
-		auto* item = &Items[i];
+		ITEM_INFO* item = &Items[i];
 		if (!Objects[item->objectID].intelligent)
 			continue;
 		item->carriedItem = -1;
 		
-		auto pickupNumber = Rooms[item->roomNumber].itemNumber;
+		short pickupNumber = Rooms[item->roomNumber].itemNumber;
 		while (pickupNumber != -1)
 		{
 			auto* pickup = &Items[pickupNumber];

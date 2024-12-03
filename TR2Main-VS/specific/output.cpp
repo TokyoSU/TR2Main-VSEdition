@@ -81,6 +81,7 @@ DWORD ShadowMode = 1;
 
 #ifdef FEATURE_BACKGROUND_IMPROVED
 #include "modding/background_new.h"
+#include <sound.h>
 
 extern DWORD BGND_PictureWidth;
 extern DWORD BGND_PictureHeight;
@@ -1106,16 +1107,12 @@ void S_SetupBelowWater(BOOL underwater) {
 	IsWaterEffect = true;
 	IsShadeEffect = true;
 	IsWibbleEffect = !underwater;
-	if (underwater)
-		S_SetForceReverb(REVERB_UNDERWATER);
 }
 
 void S_SetupAboveWater(BOOL underwater) {
 	IsWaterEffect = false;
 	IsShadeEffect = underwater;
 	IsWibbleEffect = underwater;
-	if (!underwater)
-		S_ResetForceReverb();
 }
 
 void S_AnimateTextures(int nTicks) {

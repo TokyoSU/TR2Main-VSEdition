@@ -239,6 +239,22 @@ int PlaySoundEffect(DWORD sampleIdx, PHD_3DPOS* pos, DWORD flags)
 	return 0;
 }
 
+void StopSoundEffect(DWORD sampleIdx)
+{
+	int nSlot;
+	int nStartSampleInfo, nEndSampleInfo;
+	if (!IsSoundEnabled)
+		return;
+	nStartSampleInfo = SampleLut[sampleIdx];
+	nEndSampleInfo = nStartSampleInfo + ((SampleInfos[nStartSampleInfo].flags >> 2) & 15);
+	for (nSlot = 0; nSlot < _countof(LaSlot); ++nSlot) {
+		if (LaSlot[nSlot].nSampleInfo >= nStartSampleInfo && LaSlot[nSlot].nSampleInfo < nEndSampleInfo) {
+			S_SoundStopSample(nSlot);
+			LaSlot[nSlot].nSampleInfo = -1;
+		}
+	}
+}
+
 void SOUND_Init() {
 	S_SoundSetMasterVolume(32); // 50% sfx volume
 
@@ -254,7 +270,7 @@ void SOUND_Init() {
 void Inject_Sound() {
 	INJECT(0x0043F430, GetRealTrack);
 	INJECT(0x0043F470, PlaySoundEffect);
-	//INJECT(0x0043F910, StopSoundEffect);
+	INJECT(0x0043F910, StopSoundEffect);
 	//INJECT(0x0043F970, SOUND_EndScene);
 	//INJECT(0x0043FA00, SOUND_Stop);
 	INJECT(0x0043FA30, SOUND_Init);

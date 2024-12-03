@@ -40,40 +40,47 @@ static SNOWFLAKE snowflakes[MAX_WEATHER_SNOW];
 static short NumRaindropAlive = 0;
 static short NumSnowflakeAlive = 0;
 
-// Initialize a new raindrop
-static void InitializeRaindrop(RAINDROP& rainDrop) {
-	short rad = GetRandomDraw() & 8191;
+static GAME_VECTOR GetRoomCeilingRandPos(short roomNumber)
+{
+	ROOM_INFO* r = &Rooms[roomNumber];
+	GAME_VECTOR vec = {0,0,0,0,FALSE};
+	short rad = GetRandomDraw() & 8190;
 	short angle = GetRandomDraw() & 8190;
-
-	int x = LaraItem->pos.x + (rad * rcossin_tbl[angle] >> 12);
-	int y = LaraItem->pos.y - BLOCK(1) - (GetRandomDraw() & 0x7FF);
-	int z = LaraItem->pos.z + (rad * rcossin_tbl[angle + 1] >> 12);
-	short roomNum = LaraItem->roomNumber;
-
+	int x = r->x + (rad * rcossin_tbl[angle] >> 12);
+	int y = r->GetCenter();
+	int z = r->z + (rad * rcossin_tbl[angle + 1] >> 12);
+	short roomNum = roomNumber;
 	auto* floor = GetFloor(x, y, z, &roomNum);
-	if (!floor) return;
-
-	int height = GetHeight(floor, x, y, z);
-	if (height == NO_HEIGHT || height <= y) return;
-
+	if (floor == NULL) return vec;
 	int ceiling = GetCeiling(floor, x, y, z);
-	if (ceiling == NO_HEIGHT || ceiling >= y) return;
+	if (ceiling == NO_HEIGHT || ceiling >= y) return vec;
+	vec.x = x;
+	vec.y = ceiling;
+	vec.z = z;
+	vec.roomNumber = roomNum;
+	vec.boxNumber = TRUE;
+	return vec;
+}
 
-	if (!CHK_ANY(Rooms[roomNum].flags, ROOM_OUTSIDE | ROOM_HORIZON)) return;
-
+static void InitializeRaindrop(RAINDROP& rainDrop, short roomNumber) {
+	GAME_VECTOR vec = GetRoomCeilingRandPos(roomNumber);
+	if (vec.boxNumber == FALSE)
+		return;
+	int x = vec.x;
+	int y = vec.y;
+	int z = vec.z;
 	rainDrop.x = x;
 	rainDrop.y = y;
 	rainDrop.z = z;
 	rainDrop.xv = (GetRandomDraw() & 7) - 4;
 	rainDrop.yv = (GetRandomDraw() & 14) + GetRenderScale(8);
 	rainDrop.zv = (GetRandomDraw() & 7) - 4;
-	rainDrop.life = 86 - (rainDrop.yv << 1);
-	rainDrop.currentRoom = roomNum;
+	rainDrop.life = 148 - (rainDrop.yv << 1);
+	rainDrop.currentRoom = vec.roomNumber;
 	rainDrop.on = true;
 	NumRaindropAlive++;
 }
 
-// Update an active raindrop
 static void UpdateRaindrop(RAINDROP& rainDrop) {
 	auto* floor = GetFloor(rainDrop.x, rainDrop.y, rainDrop.z, &rainDrop.currentRoom);
 	int height = GetHeight(floor, rainDrop.x, rainDrop.y, rainDrop.z);
@@ -117,7 +124,6 @@ static void UpdateRaindrop(RAINDROP& rainDrop) {
 	}
 }
 
-// Draw all active raindrops
 static void DrawRaindrops() {
 	OBJECT_INFO* obj = &Objects[ID_WEATHER_SPRITE];
 	for (int i = 0; i < MAX_WEATHER_RAIN; i++) {
@@ -128,17 +134,22 @@ static void DrawRaindrops() {
 	}
 }
 
-// Main function for managing rain behavior
 void UpdateRain()
 {
 	for (int i = 0; i < MAX_WEATHER_RAIN; i++) {
 		auto& rainDrop = raindrops[i];
+		for (int roomNum = 0; roomNum < RoomCount; roomNum++)
+		{
+			auto* r = &Rooms[roomNum];
+			if (CHK_ANY(r->flags, ROOM_RAIN)) {
 #if defined(FEATURE_MOD_CONFIG)
-		if (!rainDrop.on && NumRaindropAlive < Mod.rainDensity) {
+				if (!rainDrop.on && NumRaindropAlive < Mod.rainDensity) {
 #else
-		if (!rainDrop.on && NumRaindropAlive < MAX_WEATHER_RAIN_ALIVE) {
+				if (!rainDrop.on && NumRaindropAlive < MAX_WEATHER_RAIN_ALIVE) {
 #endif
-			InitializeRaindrop(rainDrop);
+					InitializeRaindrop(rainDrop, roomNum);
+				}
+			}
 		}
 
 		if (rainDrop.on) {
@@ -156,41 +167,48 @@ void DoSnow()
 	for (int i = 0; i < MAX_WEATHER_SNOW; i++)
 	{
 		auto& snow = snowflakes[i];
-#if defined(FEATURE_MOD_CONFIG)
-		if (!snow.on && NumSnowflakeAlive < Mod.snowDensity)
-#else
-		if (!rainDrop.on && NumSnowflakeAlive < MAX_WEATHER_SNOW_ALIVE)
-#endif
+
+		for (int roomNum = 0; roomNum < RoomCount; roomNum++)
 		{
-			short rad = GetRandomDraw() & 8190;
-			short angle = GetRandomDraw() & 8190;
-			int x = LaraItem->pos.x + (rad * rcossin_tbl[angle] >> 12);
-			int y = LaraItem->pos.y - BLOCK(1) - (GetRandomDraw() & 0x7FF);
-			int z = LaraItem->pos.z + (rad * rcossin_tbl[angle + 1] >> 12);
-			short roomNum = LaraItem->roomNumber;
-			auto* floor = GetFloor(x, y, z, &roomNum);
-			if (floor == NULL)
-				continue;
-			auto height = GetHeight(floor, x, y, z);
-			if (height == NO_HEIGHT || height <= y)
-				continue;
-			int ceiling = GetCeiling(floor, x, y, z);
-			if (ceiling == NO_HEIGHT || ceiling >= y)
-				continue;
+			auto* room = &Rooms[roomNum];
+			if (CHK_ANY(room->flags, ROOM_SNOW)) {
+#if defined(FEATURE_MOD_CONFIG)
+				if (!snow.on && NumSnowflakeAlive < Mod.snowDensity)
+#else
+				if (!rainDrop.on && NumSnowflakeAlive < MAX_WEATHER_SNOW_ALIVE)
+#endif
+				{
+					short rad = GetRandomDraw() & 8190;
+					short angle = GetRandomDraw() & 8190;
+					int x = LaraItem->pos.x + (rad * rcossin_tbl[angle] >> 12);
+					int y = LaraItem->pos.y - BLOCK(1) - (GetRandomDraw() & 0x7FF);
+					int z = LaraItem->pos.z + (rad * rcossin_tbl[angle + 1] >> 12);
+					short roomNumber = roomNum;
+					auto* floor = GetFloor(x, y, z, &roomNumber);
+					if (floor == NULL)
+						continue;
+					auto height = GetHeight(floor, x, y, z);
+					if (height == NO_HEIGHT || height <= y)
+						continue;
+					int ceiling = GetCeiling(floor, x, y, z);
+					if (ceiling == NO_HEIGHT || ceiling >= y)
+						continue;
 
-			if (!CHK_ANY(Rooms[roomNum].flags, ROOM_OUTSIDE | ROOM_HORIZON)) return;
+					if (!CHK_ANY(Rooms[roomNumber].flags, ROOM_OUTSIDE | ROOM_HORIZON)) return;
 
-			snow.x = x;
-			snow.y = y;
-			snow.z = z;
-			snow.xv = (GetRandomDraw() & 7) - 4;
-			snow.yv = (GetRandomDraw() & 38 + 8) << 3;
-			snow.zv = (GetRandomDraw() & 7) - 4;
-			snow.life = 128 - (snow.yv << 1);
-			snow.currentRoom = roomNum;
-			snow.on = true;
-			snow.stopped = false;
-			NumSnowflakeAlive++;
+					snow.x = x;
+					snow.y = y;
+					snow.z = z;
+					snow.xv = (GetRandomDraw() & 7) - 4;
+					snow.yv = (GetRandomDraw() & 38 + 8) << 3;
+					snow.zv = (GetRandomDraw() & 7) - 4;
+					snow.life = 128 - (snow.yv << 1);
+					snow.currentRoom = roomNumber;
+					snow.on = true;
+					snow.stopped = false;
+					NumSnowflakeAlive++;
+				}
+			}
 		}
 
 		int ox = snow.x;

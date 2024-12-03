@@ -610,6 +610,9 @@ BOOL LoadRooms(HANDLE hFile) {
 
 		// Room flags
 		ReadFileSync(hFile, &room->flags, sizeof(short), &bytesRead, NULL);
+		ReadFileSync(hFile, &room->reverbType, sizeof(BYTE), &bytesRead, NULL);
+		if (room->reverbType != 0)
+			LogDebug("ReverbType: %d", room->reverbType);
 
 		// Initialise some variables
 		room->boundActive = 0;
