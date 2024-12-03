@@ -85,10 +85,10 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 		enemy = LaraItem;
 
 	short* zone = creature->LOT.fly != 0 ? FlyZones[FlipStatus] : GroundZones[2 * (creature->LOT.step >> 8) + FlipStatus];
-	room = &RoomInfo[item->roomNumber];
+	room = &Rooms[item->roomNumber];
 	item->boxNumber = GetSectorBoxXZ(item, room);
 	AI->zoneNumber = zone[item->boxNumber];
-	room = &RoomInfo[enemy->roomNumber];
+	room = &Rooms[enemy->roomNumber];
 	enemy->boxNumber = GetSectorBoxXZ(enemy, room);
 	AI->enemyZone = zone[enemy->boxNumber];
 
@@ -593,7 +593,7 @@ int CreatureAnimation(short item_number, short angle, short tilt)
 	if (!Objects[item->objectID].water_creature)
 	{
 		GetFloor(item->pos.x, item->pos.y - CLICK(2), item->pos.z, &room_number);
-		if (CHK_ANY(RoomInfo[room_number].flags, ROOM_UNDERWATER))
+		if (CHK_ANY(Rooms[room_number].flags, ROOM_UNDERWATER))
 			item->hitPoints = 0;
 	}
 

@@ -30,7 +30,7 @@
 #define InitialiseSkidoo ((void(__cdecl*)(short)) 0x0043CEE0)
 //0x0043CF20:		SkidooCheckGeton
 #define SkidooCollision ((void(__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x0043D010)
-//0x0043D110:		SkidooBaddieCollision
+void SkidooBaddieCollision(ITEM_INFO* item); // 0x0043D110
 //0x0043D310:		TestHeight
 #define DoShift ((int(__cdecl*)(ITEM_INFO*,PHD_VECTOR*,PHD_VECTOR*)) 0x0043D3D0)
 //0x0043D650:		DoDynamics
@@ -48,7 +48,7 @@ void DrawSkidoo(ITEM_INFO* item);
 
 #define InitialiseSkidman ((void(__cdecl*)(short)) 0x0043EDF0)
 #define SkidManControl ((void(__cdecl*)(short)) 0x0043EE80)
-//0x0043F280:		SkidmanPush
+#define SkidmanPush ((void(__cdecl*)(ITEM_INFO*,ITEM_INFO*,int)) 0x0043F280)
 #define SkidmanCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x0043F3A0)
 
 #endif // SKIDOO_H_INCLUDED

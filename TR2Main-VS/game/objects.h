@@ -32,7 +32,7 @@
 #define InitialiseFinalLevel ((void(__cdecl*)(void)) 0x004343E0)
 #define FinalLevelCounter ((void(__cdecl*)(short)) 0x004344B0)
 #define MiniCopterControl ((void(__cdecl*)(short)) 0x004346C0)
-#define InitialiseDyingMonk ((void(__cdecl*)(short)) 0x004347A0)
+void InitialiseDyingMonk(short itemNumber); // 0x004347A0
 #define DyingMonk ((void(__cdecl*)(short)) 0x00434820)
 #define ControlGongBonger ((void(__cdecl*)(short)) 0x004348B0)
 #define DeathSlideCollision ((void(__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x00434970)
@@ -46,7 +46,7 @@ void OpenNearestDoor();
 #define SmashIceControl ((void(__cdecl*)(short)) 0x00435020)
 #define ShutThatDoor ((void(__cdecl*)(DOORPOS_DATA*)) 0x00435100)
 #define OpenThatDoor ((void(__cdecl*)(DOORPOS_DATA*)) 0x00435150)
-#define InitialiseDoor ((void(__cdecl*)(short)) 0x00435190)
+void InitialiseDoor(short itemNumber); // 0x00435190
 #define DoorControl ((void(__cdecl*)(short)) 0x00435570)
 #define OnDrawBridge ((int(__cdecl*)(ITEM_INFO*,int,int)) 0x00435640)
 #define DrawBridgeFloor ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00435700)

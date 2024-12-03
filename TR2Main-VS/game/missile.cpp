@@ -36,7 +36,7 @@
 void ControlMissile(short fxID) {
 	FX_INFO* fx = &Effects[fxID];
 
-	if (Effects[fxID].objectID == ID_MISSILE_HARPOON && !CHK_ANY(RoomInfo[fx->roomNumber].flags, ROOM_UNDERWATER) && fx->pos.rotX > -12288)
+	if (Effects[fxID].objectID == ID_MISSILE_HARPOON && !CHK_ANY(Rooms[fx->roomNumber].flags, ROOM_UNDERWATER) && fx->pos.rotX > -12288)
 		fx->pos.rotX -= ANGLE(1);
 
 	int speed = fx->speed * phd_cos(fx->pos.rotX) >> W2V_SHIFT;
@@ -100,7 +100,7 @@ void ControlMissile(short fxID) {
 		}
 	}
 
-	if (fx->objectID == ID_MISSILE_HARPOON && CHK_ANY(RoomInfo[fx->roomNumber].flags, ROOM_UNDERWATER)) {
+	if (fx->objectID == ID_MISSILE_HARPOON && CHK_ANY(Rooms[fx->roomNumber].flags, ROOM_UNDERWATER)) {
 		CreateBubble(&fx->pos, fx->roomNumber);
 	}
 	else if (fx->objectID == ID_MISSILE_FLAME && !fx->counter--) {
@@ -219,9 +219,9 @@ void ControlBodyPart(short fxNum)
 
 	short newRoom = fx->roomNumber;
 	FLOOR_INFO* floor = GetFloor(fx->pos.x, fx->pos.y, fx->pos.z, &newRoom);
-	if (!(RoomInfo[fx->roomNumber].flags & ROOM_UNDERWATER))
+	if (!(Rooms[fx->roomNumber].flags & ROOM_UNDERWATER))
 	{
-		if (RoomInfo[newRoom].flags & ROOM_UNDERWATER)
+		if (Rooms[newRoom].flags & ROOM_UNDERWATER)
 		{
 			short fxNum = CreateEffect(fx->roomNumber);
 			if (fxNum != -1)

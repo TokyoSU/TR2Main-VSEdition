@@ -218,7 +218,7 @@ void ControlHarpoonBolt(short itemNumber)
 	oldPos.y = item->pos.y;
 	oldPos.z = item->pos.z;
 	
-	if (!CHK_ANY(RoomInfo[item->roomNumber].flags, ROOM_UNDERWATER))
+	if (!CHK_ANY(Rooms[item->roomNumber].flags, ROOM_UNDERWATER))
 		item->fallSpeed += 3;
 
 	item->pos.x += item->speed * phd_sin(item->pos.rotY) >> W2V_SHIFT;
@@ -230,7 +230,7 @@ void ControlHarpoonBolt(short itemNumber)
 	item->floor = GetHeight(floor, item->pos.x, item->pos.y, item->pos.z);
 	if (item->roomNumber != roomNumber)
 		ItemNewRoom(itemNumber, roomNumber);
-	if (CHK_ANY(RoomInfo[item->roomNumber].flags, ROOM_UNDERWATER))
+	if (CHK_ANY(Rooms[item->roomNumber].flags, ROOM_UNDERWATER))
 		CreateBubble(&item->pos, item->roomNumber);
 
 	// Hit wall, ceiling or floor !
@@ -240,7 +240,7 @@ void ControlHarpoonBolt(short itemNumber)
 		return;
 	}
 
-	for (targetID = RoomInfo[item->roomNumber].itemNumber; targetID != -1; targetID = target->nextItem)
+	for (targetID = Rooms[item->roomNumber].itemNumber; targetID != -1; targetID = target->nextItem)
 	{
 		target = &Items[targetID];
 
@@ -274,7 +274,7 @@ void ControlHarpoonBolt(short itemNumber)
 			}
 			else {
 				if (Objects[target->objectID].intelligent) {
-					DoLotsOfBlood(item->pos.x, item->pos.y, item->pos.z, 0, 0, item->roomNumber, CHK_ANY(RoomInfo[item->roomNumber].flags, ROOM_UNDERWATER) ? 5 : 1);
+					DoLotsOfBlood(item->pos.x, item->pos.y, item->pos.z, 0, 0, item->roomNumber, CHK_ANY(Rooms[item->roomNumber].flags, ROOM_UNDERWATER) ? 5 : 1);
 					HitTarget(target, 0, Weapons[LGT_Harpoon].damage);
 					++SaveGame.statistics.hits;
 				}
@@ -351,7 +351,7 @@ void ControlRocket(short itemNumber) {
 		displacement = 512;
 		collision = TRUE;
 	}
-	for (linkID = RoomInfo[item->roomNumber].itemNumber; linkID != -1; linkID = link->nextItem) {
+	for (linkID = Rooms[item->roomNumber].itemNumber; linkID != -1; linkID = link->nextItem) {
 		link = &Items[linkID];
 		if (link != LaraItem && link->collidable && ((link->objectID == ID_WINDOW1 || link->objectID == ID_WINDOW3) || (Objects[link->objectID].intelligent && link->status != ITEM_INVISIBLE && Objects[link->objectID].collision)))
 		{

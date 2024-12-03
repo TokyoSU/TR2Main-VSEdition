@@ -23,7 +23,8 @@
 #include "game/items.h"
 #include "global/vars.h"
 
-void InitialiseItemArray(int itemCount) {
+void InitialiseItemArray(int itemCount)
+{
 	int i;
 
 	NextItemFree = LevelItemCount;
@@ -37,12 +38,79 @@ void InitialiseItemArray(int itemCount) {
 	Items[i].nextItem = -1;
 }
 
-void InitialiseItem(short itemIndex) {
+void KillItem(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	item->active = FALSE;
+
+	short oldActive = NextItemActive;
+	if (oldActive == itemNumber)
+	{
+		NextItemActive = item->nextActive;
+	}
+	else
+	{
+		for (; oldActive != -1; oldActive = Items[oldActive].nextActive)
+		{
+			if (Items[oldActive].nextActive == itemNumber)
+			{
+				Items[oldActive].nextActive = item->nextActive;
+				break;
+			}
+		}
+	}
+
+	if (item->roomNumber != NO_ROOM)
+	{
+		oldActive = Rooms[item->roomNumber].itemNumber;
+		if (oldActive == itemNumber)
+		{
+			Rooms[item->roomNumber].itemNumber = item->nextItem;
+		}
+		else
+		{
+			for (; oldActive != -1; oldActive = Items[oldActive].nextItem)
+			{
+				if (Items[oldActive].nextItem == itemNumber)
+				{
+					Items[oldActive].nextItem = item->nextItem;
+					break;
+				}
+			}
+		}
+	}
+
+	if (item == Lara.target)
+		Lara.target = NULL;
+
+	if (itemNumber < LevelItemCount)
+	{
+		item->flags |= IFL_KILLED;
+	}
+	else
+	{
+		item->nextItem = NextItemFree;
+		NextItemFree = itemNumber;
+	}
+}
+
+short CreateItem()
+{
+	short itemNumber = NextItemFree;
+	if (itemNumber == -1)
+		return itemNumber;
+	Items[itemNumber].flags = NULL;
+	NextItemFree = Items[itemNumber].nextItem;
+	return itemNumber;
+}
+
+void InitialiseItem(short itemNumber)
+{
 	ITEM_INFO* item;
 	ROOM_INFO* room;
 	FLOOR_INFO* floor;
 
-	item = &Items[itemIndex];
+	item = &Items[itemNumber];
 	item->animNumber = Objects[item->objectID].animIndex;
 	item->frameNumber = Anims[item->animNumber].frameBase;
 	item->goalAnimState = Anims[item->animNumber].currentAnimState;
@@ -82,26 +150,72 @@ void InitialiseItem(short itemIndex) {
 	if (CHK_ALL(item->flags, IFL_CODEBITS)) {
 		item->flags &= ~IFL_CODEBITS;
 		item->flags |= IFL_REVERSE;
-		AddActiveItem(itemIndex);
+		AddActiveItem(itemNumber);
 		item->status = ITEM_ACTIVE;
 	}
 
-	room = &RoomInfo[item->roomNumber];
+	room = &Rooms[item->roomNumber];
 	item->nextItem = room->itemNumber;
-	room->itemNumber = itemIndex;
+	room->itemNumber = itemNumber;
 
-	floor = &room->floor[((item->pos.z - room->z) >> WALL_SHIFT) + room->xSize * ((item->pos.x - room->x) >> WALL_SHIFT)];
-	item->floor = floor->floor << 8;
+	floor = GetFloorSector(item->pos.x, item->pos.z, room);
+	item->floor = ((int)floor->floor << 8);
 
 	if (SaveGame.bonusFlag && !IsDemoLevelType)
 		item->hitPoints *= 2;
 
 	if (Objects[item->objectID].initialise != NULL)
-		Objects[item->objectID].initialise(itemIndex);
+		Objects[item->objectID].initialise(itemNumber);
 }
 
-void AddActiveItem(short itemIndex) {
-	ITEM_INFO* item = &Items[itemIndex];
+void RemoveActiveItem(short itemNumber)
+{
+	if (Items[itemNumber].active == FALSE)
+		return;
+
+	Items[itemNumber].active = 0;
+	short linknum = NextItemActive;
+	if (linknum == itemNumber)
+	{
+		NextItemActive = Items[itemNumber].nextActive;
+		return;
+	}
+
+	for (; linknum != -1; linknum = Items[linknum].nextActive)
+	{
+		if (Items[linknum].nextActive == itemNumber)
+		{
+			Items[linknum].nextActive = Items[itemNumber].nextActive;
+			return;
+		}
+	}
+}
+
+void RemoveDrawnItem(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	ROOM_INFO* room = &Rooms[item->roomNumber];
+
+	short oldItem = room->itemNumber;
+	if (oldItem == itemNumber)
+	{
+		room->itemNumber = item->nextItem;
+	}
+	else
+	{
+		for (; oldItem != -1; oldItem = Items[oldItem].nextItem)
+		{
+			if (Items[oldItem].nextItem == itemNumber)
+			{
+				Items[oldItem].nextItem = item->nextItem;
+				return;
+			}
+		}
+	}
+}
+
+void AddActiveItem(short itemNumber) {
+	ITEM_INFO* item = &Items[itemNumber];
 
 	if (Objects[item->objectID].control == NULL) {
 		item->status = ITEM_INACTIVE;
@@ -109,8 +223,38 @@ void AddActiveItem(short itemIndex) {
 	else if (item->active == 0) {
 		item->active = 1;
 		item->nextActive = NextItemActive;
-		NextItemActive = itemIndex;
+		NextItemActive = itemNumber;
 	}
+}
+
+void ItemNewRoom(short itemNumber, short roomNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	if (item->roomNumber != NO_ROOM)
+	{
+		ROOM_INFO* r = &Rooms[item->roomNumber];
+		short linknum = r->itemNumber;
+		if (linknum == itemNumber)
+		{
+			r->itemNumber = item->nextItem;
+		}
+		else
+		{
+			for (; linknum != -1; linknum = Items[linknum].nextItem)
+			{
+				if (Items[linknum].nextItem == itemNumber)
+				{
+					Items[linknum].nextItem = item->nextItem;
+					break;
+				}
+			}
+		}
+	}
+
+	item->roomNumber = roomNumber;
+	ROOM_INFO* r = &Rooms[roomNumber];
+	item->nextItem = r->itemNumber;
+	r->itemNumber = itemNumber;
 }
 
 int GlobalItemReplace(int oldItemID, int newItemID) {
@@ -118,7 +262,7 @@ int GlobalItemReplace(int oldItemID, int newItemID) {
 	int result = 0;
 
 	for (i = 0; i < RoomCount; ++i) {
-		for (j = RoomInfo[i].itemNumber; j != -1; j = Items[j].nextItem) {
+		for (j = Rooms[i].itemNumber; j != -1; j = Items[j].nextItem) {
 			if (Items[j].objectID == oldItemID) {
 				Items[j].objectID = newItemID;
 				++result;
@@ -147,7 +291,7 @@ short CreateEffect(short roomNum)
 		FX_INFO* fx = &Effects[NextEffectFree];
 		NextEffectFree = fx->nextFx;
 		fx->roomNumber = roomNum;
-		ROOM_INFO* r = &RoomInfo[roomNum];
+		ROOM_INFO* r = &Rooms[roomNum];
 		fx->nextFx = r->fxNumber;
 		r->fxNumber = result;
 		fx->nextActive = NextEffectActive;
@@ -160,10 +304,9 @@ short CreateEffect(short roomNum)
 void KillEffect(short fxNum)
 {
 	FX_INFO* fx = &Effects[fxNum];
-	ROOM_INFO* room = &RoomInfo[fx->roomNumber];
+	ROOM_INFO* room = &Rooms[fx->roomNumber];
 	FX_INFO* fxNext;
 
-	short nextActive;
 	short oldActive = NextEffectActive;
 	bool doAssignNext = true;
 	if (NextEffectActive == fxNum)
@@ -225,7 +368,7 @@ void KillEffect(short fxNum)
 void EffectNewRoom(short fxNum, short newRoomNum)
 {
 	FX_INFO* fx = &Effects[fxNum];
-	ROOM_INFO* room = &RoomInfo[fx->roomNumber];
+	ROOM_INFO* room = &Rooms[fx->roomNumber];
 	FX_INFO* fxNext;
 	short oldFx = room->fxNumber;
 	bool doAssignNext = true;
@@ -256,7 +399,7 @@ void EffectNewRoom(short fxNum, short newRoomNum)
 	}
 
 	fx->roomNumber = newRoomNum;
-	ROOM_INFO* newRoom = &RoomInfo[newRoomNum];
+	ROOM_INFO* newRoom = &Rooms[newRoomNum];
 	fx->nextFx = newRoom->fxNumber;
 	newRoom->fxNumber = fxNum;
 }
@@ -266,13 +409,13 @@ void EffectNewRoom(short fxNum, short newRoomNum)
  */
 void Inject_Items() {
 	INJECT(0x00426CD0, InitialiseItemArray);
-	//INJECT(0x00426D30, KillItem);
-	//INJECT(0x00426E50, CreateItem);
+	INJECT(0x00426D30, KillItem);
+	INJECT(0x00426E50, CreateItem);
 	INJECT(0x00426E90, InitialiseItem);
-	//INJECT(0x00427050, RemoveActiveItem);
-	//INJECT(0x004270E0, RemoveDrawnItem);
+	INJECT(0x00427050, RemoveActiveItem);
+	INJECT(0x004270E0, RemoveDrawnItem);
 	INJECT(0x00427150, AddActiveItem);
-	//INJECT(0x004271B0, ItemNewRoom);
+	INJECT(0x004271B0, ItemNewRoom);
 	INJECT(0x00427250, GlobalItemReplace);
 	INJECT(0x004272D0, InitialiseFXArray);
 	INJECT(0x00427300, CreateEffect);

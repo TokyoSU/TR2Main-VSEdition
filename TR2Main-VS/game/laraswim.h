@@ -38,7 +38,7 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll); // 0x004322C0
 //0x004324C0:		lara_as_waterroll
 #define lara_col_swim ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004324D0)
 #define lara_col_uwdeath ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004324F0)
-#define GetWaterDepth ((int(__cdecl*)(int, int, int, short)) 0x00432550)
+int GetWaterDepth(int x, int y, int z, short roomNumber); // 0x00432550
 //0x004326F0:		LaraTestWaterDepth
 //0x004327C0:		LaraSwimCollision
 void LaraWaterCurrent(COLL_INFO* coll); // 0x00432920

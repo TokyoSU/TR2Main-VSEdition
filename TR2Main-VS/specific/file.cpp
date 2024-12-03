@@ -129,7 +129,7 @@ static void MarkSemitransObjects() {
 		}
 		for (node = Mod.semitrans.rooms; node != NULL; node = node->next) {
 			if (node->id >= 0 && node->id < RoomCount) {
-				ROOM_INFO* room = &RoomInfo[node->id];
+				ROOM_INFO* room = &Rooms[node->id];
 				EnumeratePolysRoomFace4(room->data->gt4, room->data->gt4Size, MarkSemitransPolyFace4, &node->filter, NULL);
 				EnumeratePolysRoomFace3(room->data->gt3, room->data->gt3Size, MarkSemitransPolyFace3, &node->filter, NULL);
 			}
@@ -491,15 +491,15 @@ BOOL LoadRooms(HANDLE hFile) {
 	}
 
 	// Allocate memory for room info
-	RoomInfo = (ROOM_INFO*)game_malloc(sizeof(ROOM_INFO) * RoomCount, GBUF_RoomInfos);
-	if (RoomInfo == NULL) {
+	Rooms = (ROOM_INFO*)game_malloc(sizeof(ROOM_INFO) * RoomCount, GBUF_RoomInfos);
+	if (Rooms == NULL) {
 		lstrcpy(StringToShow, "LoadRoom(): Could not allocate memory for rooms");
 		return FALSE;
 	}
 
 	// For every room read info
 	for (int i = 0; i < RoomCount; ++i) {
-		ROOM_INFO* room = &RoomInfo[i];
+		ROOM_INFO* room = &Rooms[i];
 
 		// Room position
 		ReadFileSync(hFile, &room->x, sizeof(int), &bytesRead, NULL);

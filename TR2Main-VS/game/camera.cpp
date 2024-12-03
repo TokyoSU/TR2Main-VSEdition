@@ -214,13 +214,13 @@ void SmartShift(GAME_VECTOR* goal, CB_SMARTCAM shift) {
 	BOOL clear, first;
 
 	LOS(&Camera.target, goal);
-	room = &RoomInfo[Camera.target.roomNumber];
+	room = &Rooms[Camera.target.roomNumber];
 	box = &Boxes[room->floor[((Camera.target.x - room->x) >> WALL_SHIFT) * room->xSize + ((Camera.target.z - room->z) >> WALL_SHIFT)].box];
 	left = box->left << WALL_SHIFT;
 	right = (box->right << WALL_SHIFT) - 1;
 	top = box->top << WALL_SHIFT;
 	bottom = (box->bottom << WALL_SHIFT) - 1;
-	room = &RoomInfo[goal->roomNumber];
+	room = &Rooms[goal->roomNumber];
 	boxID = room->floor[((goal->x - room->x) >> WALL_SHIFT) * room->xSize + ((goal->z - room->z) >> WALL_SHIFT)].box;
 	if (boxID != -1 && (goal->z < left || goal->z > right || goal->x < top || goal->x > bottom)) {
 		box = &Boxes[boxID];
@@ -517,7 +517,7 @@ void CalculateCamera() {
 	int y, shift, fixedCamera;
 	short angle, tilt, rot;
 
-	if (CHK_ANY(RoomInfo[Camera.pos.roomNumber].flags, ROOM_UNDERWATER)) {
+	if (CHK_ANY(Rooms[Camera.pos.roomNumber].flags, ROOM_UNDERWATER)) {
 		PlaySoundEffect(60, 0, SFX_ALWAYS);
 		if (!Camera.underwater) {
 #ifdef FEATURE_AUDIO_IMPROVED

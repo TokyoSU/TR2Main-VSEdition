@@ -24,7 +24,9 @@
 #include "3dsystem/3d_gen.h"
 #include "3dsystem/phd_math.h"
 #include "game/box.h"
+#include "game/collide.h"
 #include "game/draw.h"
+#include "game/effects.h"
 #include "game/items.h"
 #include "game/larafire.h"
 #include "game/missile.h"
@@ -40,6 +42,69 @@
 
 static BITE_INFO SkidooLeftGun = { 219, -71, 550, 0 };
 static BITE_INFO SkidooRightGun = { -235, -71, 550, 0 };
+
+void SkidooBaddieCollision(ITEM_INFO* skidoo)
+{
+	short roomList[20], roomCount;
+	memset(roomList, 0, sizeof(roomList));
+	roomList[0] = skidoo->roomNumber;
+	roomCount = 1;
+
+	ROOM_INFO* room = &Rooms[skidoo->roomNumber];
+	if (room->doors != NULL && room->doors->wCount > 0)
+	{
+		for (int i = 0; i < room->doors->wCount; ++i) {
+			DOOR_INFO* door = &room->doors->door[i];
+			if (door->room != NO_ROOM)
+				roomList[roomCount++] = door->room;
+		}
+	}
+
+	for (int i = 0; i < roomCount; i++)
+	{
+		short targetItemNumber = Rooms[roomList[i]].itemNumber;
+		while (targetItemNumber != -1)
+		{
+			ITEM_INFO* targetItem = &Items[targetItemNumber];
+			if (targetItem->collidable && targetItem->status != ITEM_INVISIBLE && targetItem != LaraItem && targetItem != skidoo)
+			{
+				OBJECT_INFO* obj = &Objects[targetItem->objectID];
+				if (obj->collision && (obj->intelligent || targetItem->objectID == ID_ROLLING_BALL2))
+				{
+					int x = skidoo->pos.x - targetItem->pos.x;
+					int y = skidoo->pos.y - targetItem->pos.y;
+					int z = skidoo->pos.z - targetItem->pos.z;
+					if (x > -BLOCK(2) && x < BLOCK(2) &&
+						z > -BLOCK(2) && z < BLOCK(2) &&
+						y > -BLOCK(2) && y < BLOCK(2))
+					{
+						if (TestBoundsCollide(targetItem, skidoo, 500))
+						{
+							if (targetItem->objectID == ID_SKIDOO_ARMED)
+							{
+								SkidmanPush(targetItem, skidoo, 500);
+							}
+							else if (targetItem->objectID == ID_ROLLING_BALL2)
+							{
+								if (targetItem->currentAnimState == 1)
+								{
+									LaraItem->hitPoints -= 100;
+									LaraItem->hitStatus = TRUE;
+								}
+							}
+							else
+							{
+								DoLotsOfBlood(targetItem->pos.x, targetItem->pos.y - CLICK(1), targetItem->pos.z, skidoo->speed, skidoo->pos.rotY, targetItem->roomNumber, 3);
+								targetItem->hitPoints = 0;
+							}
+						}
+					}
+				}
+			}
+			targetItemNumber = targetItem->nextItem;
+		}
+	}
+}
 
 void DoSnowEffect(ITEM_INFO* item) {
 	short fxID;
@@ -254,29 +319,21 @@ void Inject_Skidoo() {
 	//INJECT(0x0043CEE0, InitialiseSkidoo);
 	//INJECT(0x0043CF20, SkidooCheckGeton);
 	//INJECT(0x0043D010, SkidooCollision);
-	//INJECT(0x0043D110, SkidooBaddieCollision);
+	INJECT(0x0043D110, SkidooBaddieCollision);
 	//INJECT(0x0043D310, TestHeight);
 	//INJECT(0x0043D3D0, DoShift);
 	//INJECT(0x0043D650, DoDynamics);
 	//INJECT(0x0043D6B0, GetCollisionAnim);
-
 	INJECT(0x0043D740, DoSnowEffect);
-
 	//INJECT(0x0043D880, SkidooDynamics);
 	//INJECT(0x0043DD20, SkidooUserControl);
 	//INJECT(0x0043DEE0, SkidooCheckGetOffOK);
 	//INJECT(0x0043DFF0, SkidooAnimation);
-
 	INJECT(0x0043E2D0, SkidooExplode);
-
 	//INJECT(0x0043E350, SkidooCheckGetOff);
-
 	INJECT(0x0043E590, SkidooGuns);
-
 	//INJECT(0x0043E6B0, SkidooControl);
-
 	INJECT(0x0043EB10, DrawSkidoo);
-
 	//INJECT(0x0043EDF0, InitialiseSkidman);
 	//INJECT(0x0043EE80, SkidManControl);
 	//INJECT(0x0043F280, SkidmanPush);

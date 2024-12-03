@@ -25,6 +25,7 @@
 #include "game/camera.h"
 #include "game/demo.h"
 #include "game/effects.h"
+#include "game/draw.h"
 #include "game/hair.h"
 #include "game/items.h"
 #include "game/inventory.h"
@@ -294,7 +295,7 @@ void AnimateItem(ITEM_INFO* item)
 							else
 								PlaySoundEffect(num, &item->pos, NULL);
 						}
-						else if (CHK_ANY(RoomInfo[item->roomNumber].flags, ROOM_UNDERWATER))
+						else if (CHK_ANY(Rooms[item->roomNumber].flags, ROOM_UNDERWATER))
 						{
 							if (type == SFX_LANDANDWATER || type == SFX_WATERONLY)
 								PlaySoundEffect(num, &item->pos, NULL);
@@ -336,13 +337,15 @@ void AnimateItem(ITEM_INFO* item)
 
 FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber)
 {
-	ROOM_INFO* r = &RoomInfo[*roomNumber];
+	ROOM_INFO* r = &Rooms[*roomNumber];
 	FLOOR_INFO* floor = NULL;
-	short data = NO_ROOM;
+	int x_floor, y_floor;
+	short data;
+
 	do
 	{
-		int x_floor = (z - r->z) >> WALL_SHIFT;
-		int y_floor = (x - r->x) >> WALL_SHIFT;
+		x_floor = (z - r->z) >> WALL_SHIFT;
+		y_floor = (x - r->x) >> WALL_SHIFT;
 
 		if (x_floor <= 0)
 		{
@@ -370,7 +373,7 @@ FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber)
 		if (data != NO_ROOM)
 		{
 			*roomNumber = data;
-			r = &RoomInfo[data];
+			r = &Rooms[data];
 		}
 	} while (data != NO_ROOM);
 
@@ -381,8 +384,8 @@ FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber)
 			if (floor->pitRoom == NO_ROOM)
 				return floor;
 			*roomNumber = floor->pitRoom;
-			r = &RoomInfo[floor->pitRoom];
-			floor = &r->floor[((z - r->z) >> WALL_SHIFT) + ((x - r->x) >> WALL_SHIFT) * r->xSize];
+			r = &Rooms[floor->pitRoom];
+			floor = GetFloorSector(x, z, r);
 		} while (y >= ((int)floor->floor << 8));
 	}
 	else if (y < ((int)floor->ceiling << 8))
@@ -392,8 +395,8 @@ FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber)
 			if (floor->skyRoom == NO_ROOM)
 				return floor;
 			*roomNumber = floor->skyRoom;
-			r = &RoomInfo[floor->skyRoom];
-			floor = &r->floor[((z - r->z) >> WALL_SHIFT) + ((x - r->x) >> WALL_SHIFT) * r->xSize];
+			r = &Rooms[floor->skyRoom];
+			floor = GetFloorSector(x, z, r);
 		} while (y < ((int)floor->ceiling << 8));
 	}
 
@@ -402,14 +405,15 @@ FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber)
 
 int GetWaterHeight(int x, int y, int z, short roomNumber)
 {
-	ROOM_INFO* r = &RoomInfo[roomNumber];
+	ROOM_INFO* r = &Rooms[roomNumber];
 	FLOOR_INFO* floor = NULL;
-	short data = NO_ROOM;
+	int x_floor, y_floor;
+	short data;
 
 	do
 	{
-		int x_floor = (z - r->z) >> WALL_SHIFT;
-		int y_floor = (x - r->x) >> WALL_SHIFT;
+		x_floor = (z - r->z) >> WALL_SHIFT;
+		y_floor = (x - r->x) >> WALL_SHIFT;
 
 		if (x_floor <= 0)
 		{
@@ -437,18 +441,18 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 		if (data != NO_ROOM)
 		{
 			roomNumber = data;
-			r = &RoomInfo[data];
+			r = &Rooms[data];
 		}
 	} while (data != NO_ROOM);
 
-	if (CHK_ANY(r->flags, ROOM_UNDERWATER|ROOM_QUICKSAND))
+	if (CHK_ANY(r->flags, ROOM_UNDERWATER | ROOM_QUICKSAND))
 	{
 		while (floor->skyRoom != NO_ROOM)
 		{
-			r = &RoomInfo[floor->skyRoom];
+			r = &Rooms[floor->skyRoom];
 			if (!CHK_ANY(r->flags, ROOM_UNDERWATER | ROOM_QUICKSAND))
-				return (r->minFloor);
-			floor = &r->floor[((z - r->z) >> WALL_SHIFT) + ((x - r->x) >> WALL_SHIFT) * r->xSize];
+				return r->minFloor;
+			floor = GetFloorSector(x, z, r);
 		}
 		return r->maxCeiling;
 	}
@@ -456,10 +460,10 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	{
 		while (floor->pitRoom != NO_ROOM)
 		{
-			r = &RoomInfo[floor->pitRoom];
+			r = &Rooms[floor->pitRoom];
 			if (CHK_ANY(r->flags, ROOM_UNDERWATER | ROOM_QUICKSAND))
 				return r->maxCeiling;
-			floor = &r->floor[((z - r->z) >> WALL_SHIFT) + ((x - r->x) >> WALL_SHIFT) * r->xSize];
+			floor = GetFloorSector(x, z, r);
 		}
 	}
 	return NO_HEIGHT;
@@ -467,37 +471,25 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 
 int GetHeight(FLOOR_INFO* floor, int x, int y, int z)
 {
-	BYTE pitRoom; // al
-	int height; // eax
-	__int16* TrigPtr; // edx
-	int type; // ecx
-	__int16* data; // edi
-	int yoff; // edx
-	int xoff; // ecx
-	int v14; // esi
-	int v15; // esi
-	int v16; // esi
-	int v17; // esi
-	int v18; // eax
-	__int16 trigger; // si
-	void(__cdecl * floorFunc)(ITEM_INFO*, int, int, int, int*); // edx
-
 	HeightType = HT_WALL;
-	for (pitRoom = floor->pitRoom; pitRoom != 0xFF; pitRoom = floor->pitRoom)
+
+	while (floor->pitRoom != NO_ROOM)
 	{
-		auto* r = &RoomInfo[pitRoom];
-		floor = &r->floor[((z - r->z) >> WALL_SHIFT) + r->xSize * ((x - r->x) >> WALL_SHIFT)];
+		auto* r = &Rooms[floor->pitRoom];
+		floor = GetFloorSector(x, z, r);
 	}
 
-	height = (int)floor->floor << 8;
+	int height = ((int)floor->floor << 8);
 	if (GF_NoFloor && GF_NoFloor == height)
 		height = 0x4000;
 
-	TriggerPtr = 0;
+	TriggerPtr = NULL;
 	if (floor->index)
 	{
-		data = &FloorData[floor->index];
-		while (true)
+		short* data = &FloorData[floor->index];
+		short trigger = 0, type = 0;
+		char yoff, xoff;
+		do
 		{
 			type = *data++;
 			switch (type & DATA_TYPE)
@@ -540,14 +532,15 @@ int GetHeight(FLOOR_INFO* floor, int x, int y, int z)
 					{
 						if ((trigger & 0x3C00) == 1024)
 							trigger = *data++;
+						continue;
 					}
 					else
 					{
-						floorFunc = Objects[Items[trigger & 0x3FF].objectID].floor;
-						if (floorFunc)
-							floorFunc(&Items[trigger & 0x3FF], x, y, z, &height);
+						ITEM_INFO* item = &Items[trigger & 0x3FF];
+						if (Objects[item->objectID].floor != NULL)
+							Objects[item->objectID].floor(item, x, y, z, &height);
 					}
-				} while ((trigger & 0x8000) == 0);
+				} while (!CHK_ANY(trigger, 0x8000));
 				break;
 			case FT_LAVA:
 				TriggerPtr = data - 1;
@@ -559,9 +552,8 @@ int GetHeight(FLOOR_INFO* floor, int x, int y, int z)
 			default:
 				S_ExitSystem("GetHeight(): Unknown type");
 			}
-			if ((type & 0x8000) != 0)
-				break;
 		}
+		while (!CHK_ANY(type, END_BIT));
 	}
 	return height;
 }
@@ -657,7 +649,6 @@ void TestTriggers(short* data, BOOL isHeavy)
 	{
 		trigger = *(data++);
 		value = trigger & VALUE_BITS;
-
 		switch (TRIG_BITS(trigger))
 		{
 		case TO_OBJECT:
@@ -836,6 +827,97 @@ void TestTriggers(short* data, BOOL isHeavy)
 		FlipEffect = effect;
 		FlipTimer = 0;
 	}
+}
+
+int GetCeiling(FLOOR_INFO* floor, int x, int y, int z)
+{
+	while (floor->skyRoom != NO_ROOM)
+	{
+		auto* r = &Rooms[floor->skyRoom];
+		floor = GetFloorSector(x, z, r);
+	}
+
+	int height = ((int)floor->ceiling << 8);
+	if (floor->index)
+	{
+		short* data = &FloorData[floor->index];
+		short type = *data++ & DATA_TYPE;
+		if (type == FT_TILT)
+		{
+			data++;
+			type = *(data++) & DATA_TYPE;
+		}
+
+		if (type == FT_ROOF)
+		{
+			char yoff = *(char*)data;
+			char xoff = *data >> 8;
+			if (!IsChunkyCamera || ((ABS(xoff)) <= 2 && (ABS(yoff)) <= 2))
+			{
+				if (xoff < 0)
+					height += (z & (WALL_SIZE - 1)) * xoff >> 2;
+				else
+					height -= ((WALL_SIZE - 1 - z) & (WALL_SIZE - 1)) * xoff >> 2;
+
+				if (yoff >= 0)
+					height -= (x & (WALL_SIZE - 1)) * yoff >> 2;
+				else
+					height += ((WALL_SIZE - 1 - x) & (WALL_SIZE - 1)) * yoff >> 2;
+			}
+		}
+	}
+
+	while (floor->pitRoom != NO_ROOM)
+	{
+		auto* r = &Rooms[floor->pitRoom];
+		floor = GetFloorSector(x, z, r);
+	}
+	if (!floor->index)
+		return height;
+
+	short* data = &FloorData[floor->index];
+	short trigger = 0, type = 0;
+	do
+	{
+		type = *data++;
+		switch (type & DATA_TYPE)
+		{
+		case FT_DOOR:
+		case FT_ROOF:
+		case FT_TILT:
+			data++;
+			break;
+		case FT_TRIGGER:
+			++data;
+			do
+			{
+				trigger = *data++;
+				if ((trigger & 0x3C00) != 0)
+				{
+					if ((trigger & 0x3C00) == 1024)
+						trigger = *data++;
+					continue;
+				}
+				else
+				{
+					ITEM_INFO* item = &Items[trigger & 0x3FF];
+					if (Objects[item->objectID].ceiling != NULL)
+						Objects[item->objectID].ceiling(item, x, y, z, &height);
+				}
+			}
+			while (!CHK_ANY(trigger, 0x8000));
+
+			break;
+		case FT_LAVA:
+		case FT_CLIMB:
+			break;
+		default:
+			S_ExitSystem("GetCeiling(): Unknown type");
+			break;
+		}
+	} while (!CHK_ANY(type, END_BIT));
+
+	return height;
 }
 
 int LOS(GAME_VECTOR* start, GAME_VECTOR* target) {
@@ -1035,6 +1117,119 @@ int ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target, FLOOR_INFO* floor) {
 	return 1;
 }
 
+short ObjectOnLOS(GAME_VECTOR* start, GAME_VECTOR* target)
+{
+	int dx = target->x - start->x;
+	int dy = target->y - start->y;
+	int dz = target->z - start->z;
+
+	for (int i = 0; i < LosRoomsCount; i++)
+	{
+		for (short itemNumber = Rooms[LosRooms[i]].itemNumber; itemNumber != -1; itemNumber = Items[itemNumber].nextItem)
+		{
+			ITEM_INFO* item = &Items[itemNumber];
+			if (item->status == ITEM_DISABLED)
+				continue;
+
+			if (item->objectID != ID_WINDOW1 && item->objectID != ID_WINDOW3 && item->objectID != ID_BELL)
+				continue;
+
+			int direction = (USHORT)(item->pos.rotY + PHD_45) / PHD_90;
+			int failure = 0, distance = 0;
+			short* bounds = GetBoundsAccurate(item);
+			short* xextent, *zextent;
+
+			if (direction & 1)
+			{
+				zextent = &bounds[0];
+				xextent = &bounds[4];
+			}
+			else
+			{
+				zextent = &bounds[4];
+				xextent = &bounds[0];
+			}
+
+			if (ABS(dz) > ABS(dx))
+			{
+				distance = item->pos.z + zextent[0] - start->z;
+				for (int j = 0; j < 2; j++)
+				{
+					if ((distance & 0x80000000) == (dz & 0x80000000))
+					{
+						int y = dy * distance / dz;
+						if (y > item->pos.y + bounds[2] - start->y && y < item->pos.y + bounds[3] - start->y)
+						{
+							int x = dx * distance / dz;
+							if (x < item->pos.x + xextent[0] - start->x)
+								failure |= 1;
+							else if (x > item->pos.x + xextent[1] - start->x)
+								failure |= 2;
+							else
+								return itemNumber;
+						}
+					}
+					distance = item->pos.z + zextent[1] - start->z;
+				}
+			}
+			else
+			{
+				distance = item->pos.x + xextent[0] - start->x;
+				for (int j = 0; j < 2; j++)
+				{
+					if ((distance & 0x80000000) == (dx & 0x80000000))
+					{
+						int y = dy * distance / dx;
+						if (y > item->pos.y + bounds[2] - start->y && y < item->pos.y + bounds[3] - start->y)
+						{
+							int z = dz * distance / dx;
+							if (z < item->pos.z + xextent[0] - start->z)
+								failure |= 1;
+							else if (z > item->pos.z + xextent[1] - start->z)
+								failure |= 2;
+							else
+								return itemNumber;
+						}
+					}
+					distance = item->pos.z + zextent[1] - start->z;
+				}
+			}
+
+			if (failure == 3)
+				return itemNumber;
+		}
+	}
+
+	return -1;
+}
+
+void FlipMap()
+{
+	int i;
+	ROOM_INFO* r, *flipped, temp;
+	for (i = 0, r = Rooms; i < RoomCount; i++, r++)
+	{
+		if (r->flippedRoom < 0)
+			continue;
+
+		RemoveRoomFlipItems(r);
+		flipped = &Rooms[r->flippedRoom];
+
+		memcpy(&temp, r, sizeof(ROOM_INFO));
+		memcpy(r, flipped, sizeof(ROOM_INFO));
+		memcpy(flipped, &temp, sizeof(ROOM_INFO));
+
+		r->flippedRoom = flipped->flippedRoom;
+		flipped->flippedRoom = -1;
+
+		r->itemNumber = flipped->itemNumber;
+		r->fxNumber = flipped->fxNumber;
+		AddRoomFlipItems(r);
+	}
+
+	FlipStatus = !FlipStatus;
+}
+
 void TriggerCDTrack(short value, UINT16 flags, short type) {
 	if (value > 1 && value < 64) {
 		TriggerNormalCDTrack(value, flags, type);
@@ -1088,14 +1283,14 @@ void Inject_Control() {
 	//INJECT(0x004150D0, RefreshCamera);
 	INJECT(0x004151C0, TestTriggers);
 	//INJECT(0x004158A0, TriggerActive);
-	//INJECT(0x00415900, GetCeiling);
+	INJECT(0x00415900, GetCeiling);
 	//INJECT(0x00415B60, GetDoor);
 	INJECT(0x00415BB0, LOS);
 	INJECT(0x00415C50, zLOS);
 	INJECT(0x00415F40, xLOS);
 	INJECT(0x00416230, ClipTarget);
-	//INJECT(0x00416310, ObjectOnLOS);
-	//INJECT(0x00416610, FlipMap);
+	INJECT(0x00416310, ObjectOnLOS);
+	INJECT(0x00416610, FlipMap);
 	//INJECT(0x004166D0, RemoveRoomFlipItems);
 	//INJECT(0x00416770, AddRoomFlipItems);
 	INJECT(0x004167D0, TriggerCDTrack);

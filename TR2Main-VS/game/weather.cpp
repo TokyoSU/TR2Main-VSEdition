@@ -59,7 +59,7 @@ static void InitializeRaindrop(RAINDROP& rainDrop) {
 	int ceiling = GetCeiling(floor, x, y, z);
 	if (ceiling == NO_HEIGHT || ceiling >= y) return;
 
-	if (!CHK_ANY(RoomInfo[roomNum].flags, ROOM_OUTSIDE | ROOM_HORIZON)) return;
+	if (!CHK_ANY(Rooms[roomNum].flags, ROOM_OUTSIDE | ROOM_HORIZON)) return;
 
 	rainDrop.x = x;
 	rainDrop.y = y;
@@ -78,7 +78,7 @@ static void UpdateRaindrop(RAINDROP& rainDrop) {
 	auto* floor = GetFloor(rainDrop.x, rainDrop.y, rainDrop.z, &rainDrop.currentRoom);
 	int height = GetHeight(floor, rainDrop.x, rainDrop.y, rainDrop.z);
 
-	if ((height == NO_HEIGHT || height <= rainDrop.y) || CHK_ANY(RoomInfo[rainDrop.currentRoom].flags, ROOM_UNDERWATER)) {
+	if ((height == NO_HEIGHT || height <= rainDrop.y) || CHK_ANY(Rooms[rainDrop.currentRoom].flags, ROOM_UNDERWATER)) {
 		int ceiling = GetCeiling(floor, rainDrop.x, rainDrop.y, rainDrop.z);
 		if (ceiling != NO_HEIGHT && ceiling < rainDrop.y) // Avoid splash spawning on the ceiling !
 		{
@@ -178,7 +178,7 @@ void DoSnow()
 			if (ceiling == NO_HEIGHT || ceiling >= y)
 				continue;
 
-			if (!CHK_ANY(RoomInfo[roomNum].flags, ROOM_OUTSIDE | ROOM_HORIZON)) return;
+			if (!CHK_ANY(Rooms[roomNum].flags, ROOM_OUTSIDE | ROOM_HORIZON)) return;
 
 			snow.x = x;
 			snow.y = y;
@@ -201,7 +201,7 @@ void DoSnow()
 		{
 			auto* floor = GetFloor(snow.x, snow.y, snow.z, &snow.currentRoom); // Update room number if it has changed rooms.
 			auto height = GetHeight(floor, snow.x, snow.y, snow.z);
-			if (height == NO_HEIGHT || CHK_ANY(RoomInfo[snow.currentRoom].flags, ROOM_UNDERWATER))
+			if (height == NO_HEIGHT || CHK_ANY(Rooms[snow.currentRoom].flags, ROOM_UNDERWATER))
 			{
 				snow.on = false;
 				NumSnowflakeAlive--;

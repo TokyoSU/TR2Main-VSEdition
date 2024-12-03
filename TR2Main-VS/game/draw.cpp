@@ -50,7 +50,7 @@ void ResetGoldenLaraAlpha() {
 #endif // FEATURE_VIDEOFX_IMPROVED
 
 void DrawRooms(short currentRoom) {
-	ROOM_INFO* room = &RoomInfo[currentRoom];
+	ROOM_INFO* room = &Rooms[currentRoom];
 
 	PhdWinLeft = room->left = 0;
 	PhdWinTop = room->top = 0;
@@ -117,13 +117,13 @@ void DrawRooms(short currentRoom) {
 
 	// Draw Lara
 	if (Objects[ID_LARA].loaded && !(LaraItem->flags & IFL_ONESHOT)) {
-		if (RoomInfo[LaraItem->roomNumber].flags & ROOM_UNDERWATER) {
+		if (Rooms[LaraItem->roomNumber].flags & ROOM_UNDERWATER) {
 			S_SetupBelowWater(UnderwaterCamera);
 		}
 		else {
 			S_SetupAboveWater(UnderwaterCamera);
 		}
-		MidSort = RoomInfo[LaraItem->roomNumber].boundActive >> 8;
+		MidSort = Rooms[LaraItem->roomNumber].boundActive >> 8;
 		if (MidSort) --MidSort;
 #if defined(FEATURE_VIDEOFX_IMPROVED)
 		if (Lara.mesh_effects) {
@@ -169,7 +169,7 @@ void DrawRooms(short currentRoom) {
 
 #ifdef FEATURE_VIEW_IMPROVED
 	for (int i = 0; i < DrawRoomsCount; ++i) {
-		RoomInfo[DrawRoomsArray[i]].boundActive = 0;
+		Rooms[DrawRoomsArray[i]].boundActive = 0;
 	}
 	MidSort = 0;
 #endif // FEATURE_VIEW_IMPROVED
@@ -178,7 +178,7 @@ void DrawRooms(short currentRoom) {
 void GetRoomBounds() {
 	while (BoundStart != BoundEnd) {
 		int roomNumber = BoundRooms[BoundStart++ % ARRAY_SIZE(BoundRooms)];
-		ROOM_INFO* room = &RoomInfo[roomNumber];
+		ROOM_INFO* room = &Rooms[roomNumber];
 		room->boundActive &= ~2;
 		MidSort = (room->boundActive >> 8) + 1;
 
@@ -221,7 +221,7 @@ void GetRoomBounds() {
 }
 
 void SetRoomBounds(short* ptrObj, int roomNumber, ROOM_INFO* parent) {
-	ROOM_INFO* room = &RoomInfo[roomNumber];
+	ROOM_INFO* room = &Rooms[roomNumber];
 	if (room->boundLeft <= parent->left
 		&& room->boundRight >= parent->right
 		&& room->boundTop <= parent->top
@@ -403,7 +403,7 @@ void ClipRoom(ROOM_INFO* room) {
 }
 
 void PrintRooms(short roomNumber) {
-	ROOM_INFO* room = &RoomInfo[roomNumber];
+	ROOM_INFO* room = &Rooms[roomNumber];
 #if defined(FEATURE_VIEW_IMPROVED)
 	if (CHK_ANY(room->boundActive, 4)) {
 		return;
@@ -437,7 +437,7 @@ void PrintRooms(short roomNumber) {
 }
 
 void PrintObjects(short roomNumber) {
-	ROOM_INFO* room = &RoomInfo[roomNumber];
+	ROOM_INFO* room = &Rooms[roomNumber];
 	if (CHK_ANY(room->flags, ROOM_UNDERWATER)) {
 		S_SetupBelowWater(UnderwaterCamera);
 	}
@@ -540,7 +540,7 @@ void DrawSpriteItem(ITEM_INFO* item) {
 	OBJECT_INFO* obj;
 
 	phd_PushUnitMatrix(); // NOTE: this push is workaround for sprites with no matrix
-	S_CalculateStaticMeshLight(item->pos.x, item->pos.y, item->pos.z, item->shade1, item->shade2, &RoomInfo[item->roomNumber]);
+	S_CalculateStaticMeshLight(item->pos.x, item->pos.y, item->pos.z, item->shade1, item->shade2, &Rooms[item->roomNumber]);
 	phd_PopMatrix(); // NOTE: this pop is workaround for sprites with no matrix
 
 	obj = &Objects[item->objectID];
@@ -1036,7 +1036,7 @@ void CalculateObjectLighting(ITEM_INFO* item, short* frame) {
 		S_CalculateLight(x, y, z, item->roomNumber);
 	}
 	else {
-		S_CalculateStaticMeshLight(item->pos.x, item->pos.y, item->pos.z, item->shade1, item->shade2, &RoomInfo[item->roomNumber]);
+		S_CalculateStaticMeshLight(item->pos.x, item->pos.y, item->pos.z, item->shade1, item->shade2, &Rooms[item->roomNumber]);
 	}
 }
 

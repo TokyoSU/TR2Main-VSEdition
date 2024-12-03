@@ -194,7 +194,7 @@ void HairControl(BOOL isCutscene) {
 		height = GetHeight(GetFloor(x, y, z, &roomID), x, y, z);
 		if (height < y)
 			height = LaraItem->floor;
-		if (CHK_ANY(RoomInfo[roomID].flags, ROOM_OUTSIDE)) {
+		if (CHK_ANY(Rooms[roomID].flags, ROOM_OUTSIDE)) {
 			wind += (GetRandomControl() & 7) - 3;
 			if (wind <= -2)
 				wind++;
@@ -229,7 +229,7 @@ void HairControl(BOOL isCutscene) {
 				}
 				else {
 					if (HairPos[i].y <= height) {
-						if (CHK_ANY(RoomInfo[roomID].flags, ROOM_OUTSIDE)) {
+						if (CHK_ANY(Rooms[roomID].flags, ROOM_OUTSIDE)) {
 							HairPos[i].x += SmokeWindX;
 							HairPos[i].z += SmokeWindZ;
 						}

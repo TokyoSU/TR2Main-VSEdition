@@ -208,7 +208,7 @@ void DoBoatShift(int itemNumber) {
 	int x, z, dx, dz;
 
 	item = &Items[itemNumber];
-	for (linkID = RoomInfo[item->roomNumber].itemNumber; linkID != -1; linkID = link->nextItem) {
+	for (linkID = Rooms[item->roomNumber].itemNumber; linkID != -1; linkID = link->nextItem) {
 		link = &Items[linkID];
 		if (link->objectID == ID_BOAT && linkID != itemNumber && Lara.skidoo != linkID) {
 			dz = link->pos.z - item->pos.z;

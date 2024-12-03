@@ -254,6 +254,7 @@ typedef struct {
 // SFX flags
 #define SFX_UNDERWATER		(1)
 #define SFX_ALWAYS			(2)
+#define SFX_PITCH           (4)
 
 // SFX flags for animation command.
 #define SFX_LANDANDWATER    (0x0000)
@@ -278,6 +279,7 @@ typedef struct {
 #define IFL_ONESHOT     (0x0100)
 #define IFL_CODEBITS	(0x3E00)
 #define IFL_REVERSE		(0x4000)
+#define IFL_KILLED      (0x8000)
 #define IFL_CLEARBODY	-(0x8000)
 
 // Glow tint colors
@@ -298,7 +300,7 @@ typedef struct {
 #define END_BIT		(0x8000)
 #define VALUE_BITS	(0x03FF)
 #define DATA_TYPE	(0x00FF)
-#define TRIG_BITS(T) (T & 0x3C00)
+#define TRIG_BITS(T) ((T & 0x3FFF) >> 10)
 
 // Target types for CalculateTarget()
 #define NO_TARGET			(0x0000)
@@ -421,10 +423,10 @@ typedef enum {
 	ID_MOVABLE_BLOCK3,
 	ID_MOVABLE_BLOCK4,
 	ID_BIG_BOWL,
-	ID_WINDOW1,
-	ID_WINDOW2,
-	ID_WINDOW3,
-	ID_WINDOW4,
+	ID_WINDOW1, // Smashable (weapon)
+	ID_WINDOW2, // Smashable (jump)
+	ID_WINDOW3, // Smashable (weapon)
+	ID_WINDOW4, // Smashable (jump)
 	ID_PROPELLER1,
 	ID_PROPELLER2,
 	ID_HOOK,
@@ -437,7 +439,7 @@ typedef enum {
 	ID_SPIKE_WALL,
 	ID_SPRING_BOARD,
 	ID_CEILING_SPIKES,
-	ID_BELL,
+	ID_BELL, // Smashable (weapon)
 	ID_WATER_SPRITE,
 	ID_SNOW_SPRITE,
 	ID_SKIDOO_LARA,
@@ -2438,6 +2440,13 @@ typedef struct Sphere_t {
 	int radius;
 } SPHERE_INFO;
 
+typedef struct SoundSlot_t {
+	int nVolume;
+	int nPan;
+	int nSampleInfo;
+	int nPitch;
+} SOUND_SLOT;
+
 typedef struct WeaponInfo_t {
 	short lockAngles[4];
 	short leftAngles[4];
@@ -2580,15 +2589,95 @@ typedef struct CustUnderwaterInfo_t {
 	bool unlimitedAir;
 } CUST_UNDERWATER_INFO;
 
+typedef enum OrientAxis_e
+{
+	NORTH = 0,
+	EAST,
+	SOUTH,
+	WEST
+} ORIENT_AXIS;
+
+static inline ORIENT_AXIS GetOrientAxis(short rotY)
+{
+	return static_cast<ORIENT_AXIS>((USHORT)(rotY + PHD_45) / PHD_90);
+}
+static inline ORIENT_AXIS GetOrientAxisInverted(short rotY)
+{
+	return static_cast<ORIENT_AXIS>((USHORT)((rotY + PHD_180) + PHD_45) / PHD_90);
+}
+static inline PHD_VECTOR GetOrientAxisDirection(short rotY, int radius = 1) {
+	ORIENT_AXIS axis = GetOrientAxis(rotY);
+	PHD_VECTOR pos = {};
+	switch (axis)
+	{
+	case NORTH:
+		pos.z += radius;
+		break;
+	case EAST:
+		pos.x += radius;
+		break;
+	case SOUTH:
+		pos.z -= radius;
+		break;
+	case WEST:
+		pos.x -= radius;
+		break;
+	default:
+		LogWarn("Axis not valid, found: %d", (int)axis);
+		pos.x = 0;
+		pos.z = 0;
+		break;
+	}
+	return pos;
+}
+static inline PHD_VECTOR GetOrientAxisDirectionInverted(short rotY, int radius = 1) {
+	ORIENT_AXIS axis = GetOrientAxisInverted(rotY);
+	PHD_VECTOR pos = {};
+	switch (axis)
+	{
+	case NORTH:
+		pos.z += radius;
+		break;
+	case EAST:
+		pos.x += radius;
+		break;
+	case SOUTH:
+		pos.z -= radius;
+		break;
+	case WEST:
+		pos.x -= radius;
+		break;
+	default:
+		LogWarn("Axis not valid, found: %d", (int)axis);
+		pos.x = 0;
+		pos.z = 0;
+		break;
+	}
+	return pos;
+}
+
 static inline FLOOR_INFO* GetFloorSector(int x, int z, ROOM_INFO* room) {
 	return &room->floor[((z - room->z) >> WALL_SHIFT) + ((x - room->x) >> WALL_SHIFT) * room->xSize];
 }
 static inline FLOOR_INFO* GetFloorSector(ITEM_INFO* item, ROOM_INFO* room) {
 	return &room->floor[((item->pos.z - room->z) >> WALL_SHIFT) + ((item->pos.x - room->x) >> WALL_SHIFT) * room->xSize];
 }
+static inline FLOOR_INFO* GetFloorSector(int x, int z, ROOM_INFO* room, int dx, int dz) {
+	return &room->floor[(((z - room->z) >> WALL_SHIFT) + dz) + (((x - room->x) >> WALL_SHIFT) + dx) * room->xSize];
+}
+static inline FLOOR_INFO* GetFloorSector(ITEM_INFO* item, ROOM_INFO* room, int dx, int dz) {
+	return &room->floor[(((item->pos.z - room->z) >> WALL_SHIFT) + dz) + (((item->pos.x - room->x) >> WALL_SHIFT) + dx) * room->xSize];
+}
 
 static inline short GetSectorBoxXZ(ITEM_INFO* item, ROOM_INFO* room) {
 	FLOOR_INFO* floor = GetFloorSector(item, room);
+	if (floor == NULL)
+		return -1;
+	return floor->box;
+}
+
+static inline short GetSectorBoxXZ(ITEM_INFO* item, ROOM_INFO* room, int dx, int dz) {
+	FLOOR_INFO* floor = GetFloorSector(item, room, dx, dz);
 	if (floor == NULL)
 		return -1;
 	return floor->box;

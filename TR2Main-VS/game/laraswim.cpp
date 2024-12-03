@@ -156,9 +156,83 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll) {
 	}
 }
 
+int GetWaterDepth(int x, int y, int z, short roomNumber)
+{
+	ROOM_INFO* r;
+	FLOOR_INFO* floor;
+	int wh, x_floor, y_floor;
+	short data;
+
+	r = &Rooms[roomNumber];
+	do
+	{
+		x_floor = (z - r->z) >> WALL_SHIFT;
+		y_floor = (x - r->x) >> WALL_SHIFT;
+		if (x_floor <= 0)
+		{
+			x_floor = 0;
+			if (y_floor < 1)
+				y_floor = 1;
+			else if (y_floor > r->ySize - 2)
+				y_floor = r->ySize - 2;
+		}
+		else if (x_floor >= r->xSize - 1)
+		{
+			x_floor = r->xSize - 1;
+			if (y_floor < 1)
+				y_floor = 1;
+			else if (y_floor > r->ySize - 2)
+				y_floor = r->ySize - 2;
+		}
+		else if (y_floor < 0)
+			y_floor = 0;
+		else if (y_floor >= r->ySize)
+			y_floor = r->ySize - 1;
+
+		floor = &r->floor[x_floor + y_floor * r->xSize];
+		data = GetDoor(floor);
+		if (data != NO_ROOM)
+		{
+			roomNumber = data;
+			r = &Rooms[data];
+		}
+	} while (data != NO_ROOM);
+
+	if (CHK_ANY(r->flags, ROOM_UNDERWATER | ROOM_QUICKSAND))
+	{
+		while (floor->skyRoom != NO_ROOM)
+		{
+			r = &Rooms[floor->skyRoom];
+			if (CHK_ANY(r->flags, ROOM_UNDERWATER | ROOM_QUICKSAND))
+			{
+				wh = ((int)floor->ceiling << 8);
+				floor = GetFloor(x, y, z, &roomNumber);
+				return GetHeight(floor, x, y, z) - wh;
+			}
+			floor = GetFloorSector(x, z, r);
+		}
+		return 0x7FFF;
+	}
+	else
+	{
+		while (floor->pitRoom != NO_ROOM)
+		{
+			r = &Rooms[floor->pitRoom];
+			if (CHK_ANY(r->flags, ROOM_UNDERWATER | ROOM_QUICKSAND))
+			{
+				wh = ((int)floor->floor << 8);
+				floor = GetFloor(x, y, z, &roomNumber);
+				return GetHeight(floor, x, y, z) - wh;
+			}
+			floor = GetFloorSector(x, z, r);
+		}
+		return NO_HEIGHT;
+	}
+}
+
 void LaraWaterCurrent(COLL_INFO* coll)
 {
-	auto* room = &RoomInfo[LaraItem->roomNumber];
+	auto* room = &Rooms[LaraItem->roomNumber];
 	LaraItem->boxNumber = room->floor[((LaraItem->pos.z - room->z) >> WALL_SHIFT) + ((LaraItem->pos.x - room->x) >> WALL_SHIFT) * room->xSize].box;
 
 	// Exit if creature is not set !
@@ -255,7 +329,7 @@ void Inject_LaraSwim() {
 	//INJECT(----------, lara_col_dive);
 	//INJECT(0x004324F0, lara_col_uwdeath);
 	//INJECT(----------, lara_col_waterroll);
-	//INJECT(0x00432550, GetWaterDepth);
+	INJECT(0x00432550, GetWaterDepth);
 	//INJECT(0x004326F0, LaraTestWaterDepth);
 	//INJECT(0x004327C0, LaraSwimCollision);
 	INJECT(0x00432920, LaraWaterCurrent);

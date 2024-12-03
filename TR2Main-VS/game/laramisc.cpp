@@ -97,7 +97,7 @@ void LaraControl(short itemNumber) {
 	}
 #endif // FEATURE_CHEAT
 
-	BOOL isRoomUnderwater = CHK_ANY(RoomInfo[item->roomNumber].flags, ROOM_UNDERWATER);
+	BOOL isRoomUnderwater = CHK_ANY(Rooms[item->roomNumber].flags, ROOM_UNDERWATER);
 	int depth = GetWaterDepth(item->pos.x, item->pos.y, item->pos.z, item->roomNumber);
 	int height = GetWaterHeight(item->pos.x, item->pos.y, item->pos.z, item->roomNumber);
 	int water_surface_dist = (height == NO_HEIGHT) ? NO_HEIGHT : item->pos.y - height;
@@ -665,6 +665,101 @@ void InitialiseLaraLoad(short itemNumber) {
 	LaraItem = &Items[itemNumber];
 }
 
+void InitialiseLara(GF_LEVEL_TYPE levelType)
+{
+	ITEM_INFO* item = LaraItem;
+	item->data = &Lara;
+	item->collidable = FALSE;
+	item->hitPoints = 1000;
+
+	Lara.calc_fallspeed = 0;
+	Lara.climb_status = 0;
+	Lara.pose_count = 0;
+	Lara.hit_frame = 0;
+	Lara.hit_direction = -1;
+#if defined(FEATURE_MOD_CONFIG)
+	Lara.air = Mod.underwaterInfo.maxAir;
+#else
+	Lara.air = LARA_AIR_MAX;
+#endif
+	Lara.dive_count = 0;
+	Lara.death_count = 0;
+	Lara.current_active = 0;
+	Lara.spaz_effect_count = 0;
+	Lara.flare_age = 0;
+	Lara.skidoo = -1;
+	Lara.weapon_item = -1;
+	Lara.back_gun = 0;
+	Lara.flare_frame = 0;
+	Lara.flare_control_left = Lara.flare_control_right = 0;
+	Lara.extra_anim = 0;
+	Lara.look = 1;
+	Lara.burn = 0;
+	Lara.water_surface_dist = 100;
+	Lara.last_pos.x = item->pos.x;
+	Lara.last_pos.y = item->pos.y;
+	Lara.last_pos.z = item->pos.z;
+	Lara.spaz_effect = NULL;
+	Lara.mesh_effects = 0;
+	Lara.target = NULL;
+	Lara.turn_rate = 0;
+	Lara.move_angle = 0;
+	Lara.head_x_rot = Lara.head_y_rot = Lara.head_z_rot = 0;
+	Lara.torso_x_rot = Lara.torso_y_rot = Lara.torso_z_rot = 0;
+	Lara.left_arm.flash_gun = Lara.right_arm.flash_gun = 0;
+	Lara.left_arm.lock = Lara.right_arm.lock = FALSE;
+	Lara.creature = NULL;
+
+	if (levelType == GFL_NORMAL && GF_LaraStartAnim)
+	{
+		Lara.water_status = LWS_AboveWater;
+		Lara.gun_status = LGS_HandBusy;
+		item->animNumber = Objects[ID_LARA_EXTRA].animIndex;
+		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->currentAnimState = EXTRA_BREATH;
+		item->goalAnimState = (short)GF_LaraStartAnim;
+		AnimateLara(item);
+		Lara.extra_anim = 1;
+
+		Camera.type = CAM_Cinematic;
+		CineFrameIdx = 0;
+		memcpy(&CinematicPos, &item->pos, sizeof(PHD_3DPOS));
+	}
+	else if (CHK_ANY(Rooms[item->roomNumber].flags, ROOM_UNDERWATER))
+	{
+		Lara.water_status = LWS_Underwater;
+		item->fallSpeed = 0;
+		item->goalAnimState = AS_TREAD;
+		item->currentAnimState = AS_TREAD;
+		item->animNumber = 108;
+		item->frameNumber = Anims[item->animNumber].frameBase;
+
+	}
+	else
+	{
+		Lara.water_status = LWS_AboveWater;
+		item->goalAnimState = AS_STOP;
+		item->currentAnimState = AS_STOP;
+		item->animNumber = 103;
+		item->frameNumber = Anims[item->animNumber].frameBase;
+	}
+
+	if (levelType == GFL_CUTSCENE)
+	{
+		for (int i = 0; i < 15; i++)
+			Lara.mesh_ptrs[i] = &Meshes[Objects[ID_LARA].meshIndex + i];
+		Lara.mesh_ptrs[LM_ThighL] = &Meshes[Objects[ID_LARA_PISTOLS].meshIndex + LM_ThighL];
+		Lara.mesh_ptrs[LM_ThighR] = &Meshes[Objects[ID_LARA_PISTOLS].meshIndex + LM_ThighR];
+		Lara.gun_status = LGS_Armless;
+	}
+	else
+	{
+		InitialiseLaraInventory(CurrentLevel);
+	}
+
+	DashTimer = 0;
+}
+
 void InitialiseLaraInventory(int levelID) {
 	int i;
 	START_INFO* start = &SaveGame.start[levelID];
@@ -936,7 +1031,7 @@ void Inject_LaraMisc() {
 	INJECT(0x00430ED0, LaraCheatGetStuff);
 	INJECT(0x00430F90, ControlLaraExtra);
 	INJECT(0x00430FB0, InitialiseLaraLoad);
-	//INJECT(0x00430FE0, InitialiseLara);
+	INJECT(0x00430FE0, InitialiseLara);
 	INJECT(0x004312A0, InitialiseLaraInventory);
 	INJECT(0x00431610, LaraInitialiseMeshes);
 }

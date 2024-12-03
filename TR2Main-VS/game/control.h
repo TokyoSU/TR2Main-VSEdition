@@ -24,10 +24,6 @@
 
 #include "global/types.h"
 
-extern short IsRoomOutsideNo;
-extern char* OutsideRoomTable;
-extern short OutsideRoomOffsets[729];
-
  /*
   * Function list
   */
@@ -40,18 +36,18 @@ FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber); // 0x00414B40
 int GetWaterHeight(int x, int y, int z, short roomNumber); // 0x00414CE0
 int GetHeight(FLOOR_INFO* floor, int x, int y, int z); // 0x00414E50
 #define RefreshCamera ((void(__cdecl*)(int,short*)) 0x004150D0)
-void TestTriggers(short* data, BOOL isHeavy); // 0x004151C0 (WIP)
+void TestTriggers(short* data, BOOL isHeavy); // 0x004151C0
 #define TriggerActive ((int(__cdecl*)(ITEM_INFO*)) 0x004158A0)
-#define GetCeiling ((int(__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00415900)
+int GetCeiling(FLOOR_INFO* floor, int x, int y, int z); // 0x00415900
 #define GetDoor ((short(__cdecl*)(FLOOR_INFO*)) 0x00415B60)
 int LOS(GAME_VECTOR* start, GAME_VECTOR* target); // 0x00415BB0
 int zLOS(GAME_VECTOR* start, GAME_VECTOR* target); // 0x00415C50
 int xLOS(GAME_VECTOR* start, GAME_VECTOR* target); // 0x00415F40
 int ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target, FLOOR_INFO* floor); // 0x00416230
-#define ObjectOnLOS ((short(__cdecl*)(GAME_VECTOR*,GAME_VECTOR*)) 0x00416310)
-#define FlipMap ((void(__cdecl*)(void)) 0x00416610)
-// 0x004166D0:		RemoveRoomFlipItems
-// 0x00416770:		AddRoomFlipItems
+short ObjectOnLOS(GAME_VECTOR* start, GAME_VECTOR* target); // 0x00416310
+void FlipMap(); // 0x00416610
+#define RemoveRoomFlipItems ((void(__cdecl*)(ROOM_INFO* room)) 0x004166D0)
+#define AddRoomFlipItems ((void(__cdecl*)(ROOM_INFO* room)) 0x00416770)
 void TriggerCDTrack(short value, UINT16 flags, short type); // 0x004167D0
 void TriggerNormalCDTrack(short value, UINT16 flags, short type); // 0x00416800;
 

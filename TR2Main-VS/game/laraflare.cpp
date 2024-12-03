@@ -45,7 +45,7 @@ static bool IsFlareLeftHandUnderwater(PHD_VECTOR* pos, short* roomNumber)
 {
 	*roomNumber = LaraItem->roomNumber;
 	GetFloor(pos->x, pos->y, pos->z, roomNumber);
-	return CHK_ANY(RoomInfo[*roomNumber].flags, ROOM_UNDERWATER);
+	return CHK_ANY(Rooms[*roomNumber].flags, ROOM_UNDERWATER);
 }
 #endif
 
@@ -120,12 +120,15 @@ void DoFlareInHand(int flare_age)
 	}
 }
 
+// NOTE: This avoid the mesh being below the floor.
+constexpr auto FLARE_Y_OFFSET = 14;
+
 void DrawFlareInAir(ITEM_INFO* item) {
 	int rate;
 	short* frames[2];
 	GetFrames(item, frames, &rate);
 	phd_PushMatrix();
-	phd_TranslateAbs(item->pos.x, item->pos.y, item->pos.z);
+	phd_TranslateAbs(item->pos.x, item->pos.y - FLARE_Y_OFFSET, item->pos.z);
 	phd_RotYXZ(item->pos.rotY, item->pos.rotX, item->pos.rotZ);
 	int clip = S_GetObjectBounds(frames[0]);
 	if (clip) {
@@ -227,7 +230,7 @@ void draw_flare() {
 			else {
 				if (frame >= 72 && frame <= 93) {
 					if (frame == 72) {
-						PlaySoundEffect(11, &LaraItem->pos, CHK_ANY(RoomInfo[LaraItem->roomNumber].flags, ROOM_UNDERWATER) ? SFX_UNDERWATER : 0);
+						PlaySoundEffect(11, &LaraItem->pos, CHK_ANY(Rooms[LaraItem->roomNumber].flags, ROOM_UNDERWATER) ? SFX_UNDERWATER : 0);
 						Lara.flare_age = 0;
 					}
 					DoFlareInHand(Lara.flare_age);
@@ -366,8 +369,8 @@ void FlareControl(short itemNumber) {
 
 	item = &Items[itemNumber];
 	if (item->fallSpeed) {
-		item->pos.rotX += 3 * PHD_DEGREE;
-		item->pos.rotZ += 5 * PHD_DEGREE;
+		item->pos.rotX += ANGLE(3);
+		item->pos.rotZ += ANGLE(5);
 	}
 	else {
 		item->pos.rotX = 0;
@@ -378,7 +381,7 @@ void FlareControl(short itemNumber) {
 	y = item->pos.y;
 	item->pos.z += phd_cos(item->pos.rotY) * item->speed >> W2V_SHIFT;
 	item->pos.x += phd_sin(item->pos.rotY) * item->speed >> W2V_SHIFT;
-	if (CHK_ANY(RoomInfo[item->roomNumber].flags, ROOM_UNDERWATER)) {
+	if (CHK_ANY(Rooms[item->roomNumber].flags, ROOM_UNDERWATER)) {
 		item->fallSpeed += (5 - item->fallSpeed) / 2;
 		item->speed += (5 - item->speed) / 2;
 	}
@@ -426,7 +429,7 @@ void FlareControl(short itemNumber) {
 			++age;
 		if (DoFlareLight((PHD_VECTOR*)&item->pos, age)) {
 			age |= 0x8000;
-			if (CHK_ANY(RoomInfo[item->roomNumber].flags, ROOM_UNDERWATER)) {
+			if (CHK_ANY(Rooms[item->roomNumber].flags, ROOM_UNDERWATER)) {
 				PlaySoundEffect(12, &item->pos, SFX_UNDERWATER);
 				if (GetRandomDraw() < 16384)
 					CreateBubble(&item->pos, item->roomNumber);

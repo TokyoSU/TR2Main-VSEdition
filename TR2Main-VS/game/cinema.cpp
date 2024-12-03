@@ -105,14 +105,14 @@ int StartCinematic(int levelID) {
 
 void InitCinematicRooms() {
 	for (int i = 0; i < RoomCount; ++i) {
-		if (RoomInfo[i].flippedRoom >= 0) {
-			RoomInfo[RoomInfo[i].flippedRoom].boundActive = 1;
+		if (Rooms[i].flippedRoom >= 0) {
+			Rooms[Rooms[i].flippedRoom].boundActive = 1;
 		}
-		RoomInfo[i].flags |= ROOM_HORIZON;
+		Rooms[i].flags |= ROOM_HORIZON;
 	}
 	DrawRoomsCount = 0;
 	for (int i = 0; i < RoomCount; ++i) {
-		if (!RoomInfo[i].boundActive) {
+		if (!Rooms[i].boundActive) {
 			DrawRoomsArray[DrawRoomsCount++] = i;
 		}
 	}
@@ -193,7 +193,7 @@ int GetCinematicRoom(int x, int y, int z) {
 
 	roomID = -1;
 	for (i = 0; i < RoomCount; ++i) {
-		room = &RoomInfo[i];
+		room = &Rooms[i];
 		if (x >= room->x + 1024 &&
 			x < room->x + (room->ySize << WALL_SHIFT) - 1024 &&
 			y >= room->maxCeiling &&

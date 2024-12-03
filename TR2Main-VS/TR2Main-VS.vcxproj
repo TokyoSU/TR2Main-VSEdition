@@ -195,6 +195,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_DX9|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release_DX9|Win32'">precompiled.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="global\vars.cpp" />
     <ClCompile Include="modding\background_new.cpp" />
     <ClCompile Include="modding\cd_pauld.cpp" />
     <ClCompile Include="modding\file_utils.cpp" />

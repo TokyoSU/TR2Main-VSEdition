@@ -273,7 +273,7 @@ int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomID, int
 
 	// outer loop
 	for (int i = 0; i < DrawRoomsCount; ++i) {
-		ROOM_INFO* room = &RoomInfo[DrawRoomsArray[i]];
+		ROOM_INFO* room = &Rooms[DrawRoomsArray[i]];
 		for (int j = 0; j < room->numMeshes; ++j) {
 			MESH_INFO* mesh = &room->mesh[j];
 			if (CHK_ANY(StaticObjects[mesh->staticNumber].flags, 1)) {
@@ -443,7 +443,7 @@ void GetNewRoom(int x, int y, int z, short roomID) {
 short GetTiltType(FLOOR_INFO* floor, int x, int y, int z)
 {
 	while (floor->pitRoom != NO_ROOM)
-		floor = GetFloorSector(x, z, &RoomInfo[floor->pitRoom]);
+		floor = GetFloorSector(x, z, &Rooms[floor->pitRoom]);
 	unsigned short index = floor->index;
 	short* data = &FloorData[index];
 	if (y + 512 >= floor->floor << 8 && data[0] == 2) // TILT_TYPE
@@ -468,7 +468,7 @@ void LaraBaddieCollision(ITEM_INFO* laraitem, COLL_INFO* coll)
 	roomList[0] = laraitem->roomNumber;
 	roomCount = 1;
 
-	ROOM_INFO* room = &RoomInfo[laraitem->roomNumber];
+	ROOM_INFO* room = &Rooms[laraitem->roomNumber];
 	if (room->doors != NULL && room->doors->wCount > 0)
 	{
 		for (int i = 0; i < room->doors->wCount; ++i) {
@@ -480,7 +480,7 @@ void LaraBaddieCollision(ITEM_INFO* laraitem, COLL_INFO* coll)
 
 	for (i = 0; i < roomCount; i++)
 	{
-		targetItemNumber = RoomInfo[roomList[i]].itemNumber;
+		targetItemNumber = Rooms[roomList[i]].itemNumber;
 		while (targetItemNumber != -1)
 		{
 			targetItem = &Items[targetItemNumber];

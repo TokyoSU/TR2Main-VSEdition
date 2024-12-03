@@ -223,7 +223,7 @@ void ControlBubble1(short fxID) {
 	z = fx->pos.z + (8 * phd_cos(fx->pos.rotX) >> W2V_SHIFT);
 	roomID = fx->roomNumber;
 	floor = GetFloor(x, y, z, &roomID);
-	if (floor && CHK_ANY(RoomInfo[roomID].flags, ROOM_UNDERWATER)) {
+	if (floor && CHK_ANY(Rooms[roomID].flags, ROOM_UNDERWATER)) {
 		ceiling = GetCeiling(floor, x, y, z);
 		if (ceiling != -32512 && y > ceiling) {
 			if (fx->roomNumber != roomID)
@@ -267,7 +267,7 @@ void CreateSplash(int x, int y, int z, short roomNumber)
 	int waterHeight = GetWaterHeight(x, y, z, roomNumber);
 	short roomID = roomNumber;
 	GetFloor(x, y, z, &roomID);
-	if (!(RoomInfo[roomID].flags & ROOM_UNDERWATER))
+	if (!(Rooms[roomID].flags & ROOM_UNDERWATER))
 		return;
 	short fxID = CreateEffect(roomID);
 	if (fxID != -1) {
@@ -584,7 +584,7 @@ void SphereOfDoomCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* col
 	ITEM_INFO* item;
 	int dx, dz, distance, angle;
 
-	if (!CHK_ANY(RoomInfo[laraItem->roomNumber].flags, ROOM_UNDERWATER)) {
+	if (!CHK_ANY(Rooms[laraItem->roomNumber].flags, ROOM_UNDERWATER)) {
 		item = &Items[itemNumber];
 		dx = laraItem->pos.x - item->pos.x;
 		dz = laraItem->pos.z - item->pos.z;

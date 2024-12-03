@@ -317,6 +317,9 @@
     <ClCompile Include="specific\init_sound_xaudio.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="global\vars.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="specific\background.h">

@@ -114,7 +114,7 @@ void CreateZone(ITEM_INFO* item)
         flip = GroundZones[2 * (creature->LOT.step >> 8) + 1];
     }
 
-    ROOM_INFO* r = &RoomInfo[item->roomNumber];
+    ROOM_INFO* r = &Rooms[item->roomNumber];
     item->boxNumber = GetSectorBoxXZ(item, r);
     zone_number = zone[item->boxNumber];
     flip_number = flip[item->boxNumber];

@@ -401,14 +401,14 @@ extern FX_INFO Effects[MAX_EFFECTS]; // 0x005207C0
 #define OutsideLeft					VAR_U_(0x00526178, int)
 #define AnimChanges					VAR_U_(0x0052617C, CHANGE_STRUCT*)
 #define RoomCount					VAR_U_(0x00526180, short)
-#define RoomInfo					VAR_U_(0x0052618C, ROOM_INFO*)
+extern ROOM_INFO* Rooms; // 0x0052618C
 #define UnderwaterCamera			VAR_U_(0x00526190, BOOL)
 #define SunsetTimer					VAR_U_(0x00526194, DWORD)
 #define OutsideRight				VAR_U_(0x00526198, int)
 #define OutsideTop					VAR_U_(0x005261AC, int)
 #define DemoPtr						VAR_U_(0x005261B0, LPVOID)
 #define DemoCount					VAR_U_(0x005261B4, int)
-#define FlipStatus					VAR_U_(0x00526240, int)
+#define FlipStatus					VAR_U_(0x00526240, BOOL)
 #define TriggerPtr					VAR_U_(0x00526288, short*)
 #define Items						VAR_U_(0x005262F0, ITEM_INFO*)
 #define IsCinematicLoaded			VAR_U_(0x005262F4, short)
@@ -818,6 +818,8 @@ extern TEXT_STR_INFO* CtrlTextB[ARRAY_SIZE(Layout->key)];
 #define PickUpPositionUW			VAR_U_(0x00466048, PHD_VECTOR)
 #define BaddiesSlots                VAR_U_(0x005206C0, CREATURE_INFO*)
 #define BaddiesSlotsCount           VAR_U_(0x004D7C40, int)
+#define LaSlot                      ARRAY_(0x004D7C70, SOUND_SLOT, [32])
+#define DashTimer                   VAR_U_(0x005206E2, short)
 
 extern PHD_VECTOR CamPos;
 extern int SmokeWindX;

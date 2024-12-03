@@ -33,6 +33,29 @@
 #include "specific/init.h"
 #include "global/vars.h"
 
+constexpr auto LIFT_FLOOR = 16;
+constexpr auto LIFT_FLOOR_NEXT = (BLOCK(5) + CLICK(2)) - LIFT_FLOOR;
+constexpr auto LIFT_SPEED = 16;
+constexpr auto LIFT_TIMER = 90; // Before the door close.
+constexpr auto LIFT_CLOSE = 0; // State
+constexpr auto LIFT_OPEN = 1;
+
+void InitialiseDyingMonk(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	item->data = game_malloc(sizeof(int) * 2, GBUF_TempAlloc);
+	int* data = (int*)item->data;
+
+	short roomItemNumber = Rooms[item->roomNumber].itemNumber;
+	while (roomItemNumber != -1)
+	{
+		ITEM_INFO* roomItem = &Items[roomItemNumber];
+		if (Objects[roomItem->objectID].intelligent)
+			*(data++) = roomItemNumber;
+		roomItemNumber = roomItem->nextItem;
+	}
+}
+
 void BigBowlControl(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
@@ -76,32 +99,26 @@ void BellControl(short itemNumber) {
 	}
 }
 
-void InitialiseWindow(short itemNumber) {
-	ITEM_INFO* item;
-	ROOM_INFO* room;
-	BOX_INFO* box;
-
-	item = &Items[itemNumber];
-	item->flags = 0;
+void InitialiseWindow(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	item->flags = NULL;
 	item->meshBits = 1;
-	room = &RoomInfo[item->roomNumber];
-	box = &Boxes[room->floor[((item->pos.x - room->x) >> WALL_SHIFT) * room->xSize + ((item->pos.z - room->z) >> WALL_SHIFT)].box];
+	ROOM_INFO* room = &Rooms[item->roomNumber];
+	BOX_INFO* box = &Boxes[GetSectorBoxXZ(item, room)];
 	if (CHK_ANY(box->overlapIndex, 0x8000))
 		box->overlapIndex |= 0x4000;
 }
 
-void SmashWindow(short itemNumber) {
-	ITEM_INFO* item;
-	ROOM_INFO* room;
-	BOX_INFO* box;
-
-	item = &Items[itemNumber];
-	room = &RoomInfo[item->roomNumber];
-	box = &Boxes[room->floor[((item->pos.x - room->x) >> WALL_SHIFT) * room->xSize + ((item->pos.z - room->z) >> WALL_SHIFT)].box];
+void SmashWindow(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	ROOM_INFO* room = &Rooms[item->roomNumber];
+	BOX_INFO* box = &Boxes[GetSectorBoxXZ(item, room)];
 	if (CHK_ANY(box->overlapIndex, 0x8000))
 		box->overlapIndex &= ~0x4000;
 	PlaySoundEffect(58, &item->pos, 0);
-	item->collidable = 0;
+	item->collidable = FALSE;
 	item->meshBits = 0xFFFE;
 	ExplodingDeath(itemNumber, 0xFEFE, 0);
 	item->flags |= IFL_ONESHOT;
@@ -110,16 +127,17 @@ void SmashWindow(short itemNumber) {
 	item->status = ITEM_DISABLED;
 }
 
-void WindowControl(short itemNumber) {
-	ITEM_INFO* item;
-	int val;
-
-	item = &Items[itemNumber];
-	if (!CHK_ANY(item->flags, IFL_ONESHOT)) {
-		if (Lara.skidoo == -1) {
-			if (item->touchBits) {
-				item->touchBits = 0;
-				val = phd_cos(LaraItem->pos.rotY - item->pos.rotY) * LaraItem->speed >> W2V_SHIFT;
+void WindowControl(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	if (!CHK_ANY(item->flags, IFL_ONESHOT))
+	{
+		if (Lara.skidoo == -1)
+		{
+			if (item->touchBits)
+			{
+				item->touchBits = NULL;
+				int val = phd_cos(LaraItem->pos.rotY - item->pos.rotY) * LaraItem->speed >> W2V_SHIFT;
 				if (ABS(val) >= 50)
 					SmashWindow(itemNumber);
 			}
@@ -161,12 +179,105 @@ void OpenNearestDoor()
 	}
 }
 
-constexpr auto LIFT_FLOOR = 16;
-constexpr auto LIFT_FLOOR_NEXT = (BLOCK(5) + CLICK(2)) - LIFT_FLOOR;
-constexpr auto LIFT_SPEED = 16;
-constexpr auto LIFT_TIMER = 90; // Before the door close.
-constexpr auto LIFT_CLOSE = 0; // State
-constexpr auto LIFT_OPEN = 1;
+static DOOR_DATA* GetDoorData(ITEM_INFO* item)
+{
+	return (DOOR_DATA*)item->data;
+}
+
+static void InitDoorData(ITEM_INFO* item, DOORPOS_DATA* door, short doorRoomNumber, int dx, int dz, bool useDirection, bool isFlipped)
+{
+	ROOM_INFO* b;
+	short roomNumber, boxNumber;
+
+	ROOM_INFO* r = &Rooms[doorRoomNumber];
+	if (isFlipped)
+	{
+		if (r->flippedRoom != -1)
+		{
+			r = &Rooms[r->flippedRoom];
+			if (useDirection)
+				door->floor = GetFloorSector(item, r, dx, dz);
+			else
+				door->floor = GetFloorSector(item, r);
+
+			roomNumber = GetDoor(door->floor);
+			if (roomNumber == NO_ROOM)
+			{
+				boxNumber = door->floor->box;
+			}
+			else
+			{
+				b = &Rooms[roomNumber];
+				if (useDirection)
+					boxNumber = GetSectorBoxXZ(item, b, dx, dz);
+				else
+					boxNumber = GetSectorBoxXZ(item, b);
+			}
+
+			door->block = (Boxes[boxNumber].overlapIndex & 0x8000) ? boxNumber : -1;
+			memcpy(&door->data, door->floor, sizeof(FLOOR_INFO));
+		}
+		else
+		{
+			door->floor = NULL;
+		}
+	}
+	else
+	{
+		if (useDirection)
+			door->floor = GetFloorSector(item, r, dx, dz);
+		else
+			door->floor = GetFloorSector(item, r);
+
+		roomNumber = GetDoor(door->floor);
+		if (roomNumber == NO_ROOM)
+		{
+			boxNumber = door->floor->box;
+		}
+		else
+		{
+			ROOM_INFO* b = &Rooms[roomNumber];
+			if (useDirection)
+				boxNumber = GetSectorBoxXZ(item, b, dx, dz);
+			else
+				boxNumber = GetSectorBoxXZ(item, b);
+		}
+
+		door->block = (Boxes[boxNumber].overlapIndex & 0x8000) ? boxNumber : -1;
+		memcpy(&door->data, door->floor, sizeof(FLOOR_INFO));
+	}
+}
+
+void InitialiseDoor(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	item->data = game_malloc(sizeof(DOOR_DATA), GBUF_ExtraDoorstuff);
+
+	DOOR_DATA* door = GetDoorData(item);
+	PHD_VECTOR direction = GetOrientAxisDirectionInverted(item->pos.rotY);
+
+	InitDoorData(item, &door->d1, item->roomNumber, direction.x, direction.z, true, false);
+	InitDoorData(item, &door->d1Flip, item->roomNumber, direction.x, direction.z, true, true);
+	ShutThatDoor(&door->d1);
+	ShutThatDoor(&door->d1Flip);
+
+	short two_room = GetDoor(door->d1.floor);
+	if (two_room == NO_ROOM)
+	{
+		door->d2.floor = NULL;
+		door->d2Flip.floor = NULL;
+	}
+	else
+	{
+		InitDoorData(item, &door->d2, two_room, 0, 0, false, false);
+		InitDoorData(item, &door->d2Flip, two_room, 0, 0, false, true);
+		ShutThatDoor(&door->d2);
+		ShutThatDoor(&door->d2Flip);
+		short room_number = item->roomNumber;
+		ItemNewRoom(itemNumber, two_room);
+		item->roomNumber = room_number;
+	}
+}
 
 static LIFT_DATA* GetLiftData(ITEM_INFO* item)
 {
@@ -345,7 +456,7 @@ void Inject_Objects() {
 	//INJECT(0x004343E0, InitialiseFinalLevel);
 	//INJECT(0x004344B0, FinalLevelCounter); // TODO: Decompile it for savegame !
 	//INJECT(0x004346C0, MiniCopterControl);
-	//INJECT(0x004347A0, InitialiseDyingMonk);
+	INJECT(0x004347A0, InitialiseDyingMonk);
 	//INJECT(0x00434820, DyingMonk);
 	//INJECT(0x004348B0, ControlGongBonger);
 	//INJECT(0x00434970, DeathSlideCollision);
@@ -358,7 +469,7 @@ void Inject_Objects() {
 	//INJECT(0x00435020, SmashIceControl);
 	//INJECT(0x00435100, ShutThatDoor);
 	//INJECT(0x00435150, OpenThatDoor);
-	//INJECT(0x00435190, InitialiseDoor);
+	INJECT(0x00435190, InitialiseDoor);
 	//INJECT(0x00435570, DoorControl);
 	//INJECT(0x00435640, OnDrawBridge);
 	//INJECT(0x00435700, DrawBridgeFloor);

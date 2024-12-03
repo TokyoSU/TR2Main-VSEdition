@@ -1630,21 +1630,21 @@ void GetCarriedItems()
 			continue;
 		item->carriedItem = -1;
 		
-		auto pickup_number = RoomInfo[item->roomNumber].itemNumber;
-		while (pickup_number != -1)
+		auto pickupNumber = Rooms[item->roomNumber].itemNumber;
+		while (pickupNumber != -1)
 		{
-			auto* pickup = &Items[pickup_number];
+			auto* pickup = &Items[pickupNumber];
 			if (pickup->pos.x == item->pos.x &&
 				pickup->pos.y == item->pos.y &&
 				pickup->pos.z == item->pos.z &&
 				Objects[pickup->objectID].collision == PickUpCollision)
 			{
 				pickup->carriedItem = item->carriedItem;
-				item->carriedItem = pickup_number;
-				RemoveDrawnItem(pickup_number);
+				item->carriedItem = pickupNumber;
+				RemoveDrawnItem(pickupNumber);
 				pickup->roomNumber = NO_ROOM;
 			}
-			pickup_number = pickup->nextItem;
+			pickupNumber = pickup->nextItem;
 		}
 	}
 }

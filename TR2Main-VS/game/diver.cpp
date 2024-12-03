@@ -48,7 +48,7 @@ constexpr auto DIVER_DEATH_ANIM = 16;
 
 short Harpoon(int x, int y, int z, short speed, short rotY, short roomNum)
 {
-    bool isUnderwater = CHK_ANY(RoomInfo[roomNum].flags, ROOM_UNDERWATER);
+    bool isUnderwater = CHK_ANY(Rooms[roomNum].flags, ROOM_UNDERWATER);
     short fxNum = CreateEffect(roomNum);
     if (fxNum != -1)
     {
@@ -75,7 +75,7 @@ short Harpoon(int x, int y, int z, short speed, short rotY, short roomNum)
 
 int GetWaterSurface(int x, int y, int z, short roomNum)
 {
-    ROOM_INFO* room = &RoomInfo[roomNum];
+    ROOM_INFO* room = &Rooms[roomNum];
     FLOOR_INFO* floor = GetFloorSector(x, z, room);
 
     if (CHK_ANY(room->flags, ROOM_UNDERWATER))
@@ -85,7 +85,7 @@ int GetWaterSurface(int x, int y, int z, short roomNum)
         {
             while (skyRoom != NO_ROOM)
             {
-                ROOM_INFO* r1 = &RoomInfo[skyRoom];
+                ROOM_INFO* r1 = &Rooms[skyRoom];
                 if (!CHK_ANY(r1->flags, ROOM_UNDERWATER))
                     break;
                 floor = GetFloorSector(x, z, r1);
@@ -104,7 +104,7 @@ int GetWaterSurface(int x, int y, int z, short roomNum)
 
     while (pitRoom != NO_ROOM)
     {
-        ROOM_INFO* r2 = &RoomInfo[pitRoom];
+        ROOM_INFO* r2 = &Rooms[pitRoom];
         if (CHK_ANY(r2->flags, ROOM_UNDERWATER))
             break;
         floor = GetFloorSector(x, z, r2);

@@ -543,7 +543,7 @@ void S_CalculateLight(int x, int y, int z, short roomNumber) {
 	int lightShade;
 	VECTOR_ANGLES angles;
 
-	room = &RoomInfo[roomNumber];
+	room = &Rooms[roomNumber];
 	brightest = 0;
 
 	// Static light calculation

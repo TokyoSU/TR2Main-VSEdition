@@ -50,7 +50,7 @@ void MineControl(short mineID) {
 		GetFloor(mine->pos.x, mine->pos.y - 0x800, mine->pos.z, &roomNumber);
 
 		ITEM_INFO* item = NULL;
-		short itemNumber = RoomInfo[roomNumber].itemNumber;
+		short itemNumber = Rooms[roomNumber].itemNumber;
 		for (; itemNumber >= 0; itemNumber = item->nextItem) {
 			item = &Items[itemNumber];
 			if (item->objectID == ID_BOAT) {
@@ -456,8 +456,8 @@ void RollingBallControl(short itemNumber) {
 		item->pos.z = oldPos->z;
 		if (item->roomNumber != oldPos->roomNumber) {
 			RemoveDrawnItem(itemNumber);
-			item->nextItem = RoomInfo[oldPos->roomNumber].itemNumber;
-			RoomInfo[oldPos->roomNumber].itemNumber = itemNumber;
+			item->nextItem = Rooms[oldPos->roomNumber].itemNumber;
+			Rooms[oldPos->roomNumber].itemNumber = itemNumber;
 			item->roomNumber = oldPos->roomNumber;
 		}
 		item->animNumber = Objects[item->objectID].animIndex;
@@ -484,10 +484,10 @@ void RollingBallCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll
 				dy = laraItem->pos.y - item->pos.y + 162;
 				dz = laraItem->pos.z - item->pos.z;
 				distance = phd_sqrt(SQR(dx) + SQR(dy) + SQR(dz));
-				if (distance < 512)
-					distance = 512;
+				if (distance < CLICK(2))
+					distance = CLICK(2);
 				DoBloodSplat(item->pos.x + (dx << WALL_SHIFT) / 2 / distance,
-					item->pos.y + (dy << WALL_SHIFT) / 2 / distance - 512,
+					item->pos.y + (dy << WALL_SHIFT) / 2 / distance - CLICK(2),
 					item->pos.z + (dz << WALL_SHIFT) / 2 / distance,
 					item->speed,
 					item->pos.rotY,
