@@ -498,6 +498,47 @@ DWORD __fastcall phd_sqrt(DWORD n) {
 	return result;
 }
 
+DWORD __fastcall mGetAngle(long x, long z, long x1, long z1)
+{
+	long dx, dz, octant, swap, angle;
+	dx = x1 - x;
+	dz = z1 - z;
+	if (!dx && !dz)
+		return 0;
+
+	octant = 0;
+	if (dx < 0)
+	{
+		octant = 4;
+		dx = -dx;
+	}
+
+	if (dz < 0)
+	{
+		octant += 2;
+		dz = -dz;
+	}
+
+	if (dz > dx)
+	{
+		octant++;
+		swap = dx;
+		dx = dz;
+		dz = swap;
+	}
+
+	while (short(dz) != dz)
+	{
+		dx >>= 1;
+		dz >>= 1;
+	}
+
+	angle = AtanBaseTable[octant] + AtanAngleTable[(dz << 11) / dx];
+	if (angle < 0)
+		angle = -angle;
+	return -angle & 0xFFFF;
+}
+
 /*
  * Inject function
  */

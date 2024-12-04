@@ -62,6 +62,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <windows.h>
+#include <vector>
 #include <string>
 #include <algorithm>
 #include <shlobj.h>

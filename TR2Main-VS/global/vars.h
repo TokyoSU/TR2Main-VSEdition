@@ -371,9 +371,9 @@ extern APP_SETTINGS SavedAppSettings;
 #define HKey						VAR_U_(0x0051C290, HKEY)
 #define RegKeyDisposition			VAR_U_(0x0051C294, DWORD)
 #define TextStringCount				VAR_U_(0x0051D6A0, short)
-#define SampleInfoCount				VAR_U_(0x0051E6C0, DWORD)
 #define SoundIsActive				VAR_U_(0x0051E6C4, BOOL)
-#define SampleInfos					VAR_U_(0x0051E9C4, SAMPLE_INFO*)
+//extern DWORD SampleInfoCount; // 0x0051E6C0
+extern std::vector<SAMPLE_INFO> SampleInfos; // 0x0051E9C4
 extern SAVEGAME_INFO SaveGame; // 0x0051E9E0: SAVEGAME_INFO struct
 extern BYTE* SG_Point; // 0x0051E9C8: BYTE*
 extern DWORD SG_Count; // 0x005206A4: DWORD
@@ -647,7 +647,6 @@ extern bool ConflictLayout[ARRAY_SIZE(Layout->key)];
 #define StringToShow				ARRAY_(0x0051BD10, char, [128])
 #define TextInfoTable				ARRAY_(0x0051C820, TEXT_STR_INFO, [64])
 #define TheStrings					ARRAY_(0x0051D6C0, STRING_FIXED64, [64])
-#define SampleLut					ARRAY_(0x0051E6E0, short, [370])
 #define SaveGameStrings1			ARRAY_(0x005207E0, STRING_FIXED50, [24])
 #define RequesterItemFlags2			ARRAY_(0x00520CA0, DWORD, [24])
 #define RequesterItemFlags1			ARRAY_(0x00520D00, DWORD, [24])
@@ -818,9 +817,11 @@ extern TEXT_STR_INFO* CtrlTextB[ARRAY_SIZE(Layout->key)];
 #define PickUpPositionUW			VAR_U_(0x00466048, PHD_VECTOR)
 #define BaddiesSlots                VAR_U_(0x005206C0, CREATURE_INFO*)
 #define BaddiesSlotsCount           VAR_U_(0x004D7C40, int)
-#define LaSlot                      ARRAY_(0x004D7C70, SOUND_SLOT, [32])
+extern short* SampleLut; // 0x0051E6E0
+extern SOUND_SLOT LaSlot[32]; // 0x004D7C70
 #define DashTimer                   VAR_U_(0x005206E2, short)
 
+extern DWORD SampleLutCount;
 extern PHD_VECTOR CamPos;
 extern int SmokeWindX;
 extern int SmokeWindZ;

@@ -291,7 +291,7 @@ static void LoadBareFootSFX(int* sampleIndexes, int sampleCount) {
 		}
 	}
 	for (i = 0; i < 4; ++i) { // there are no more than 4 barefoot step samples
-		if (SampleInfos[i].sfxID >= 4) break;
+		if (SampleInfos[i].sampleIdx >= 4) break;
 		// SFX parameters are taken from the PlayStation version
 		SampleInfos[i].volume = 0x3332;
 		SampleInfos[i].randomness = 0;
@@ -1063,10 +1063,10 @@ BOOL LoadSamples(HANDLE hFile) {
 	LPCTSTR sfxFileName;
 	DWORD dataSize;
 	LPVOID waveData;
-	int sampleCount;
-	WAVEPCM_HEADER waveHeader;
+	int sampleCount = 0;
+	WAVEPCM_HEADER waveHeader = {};
 	LPWAVEFORMATEX waveFormat;
-	int sampleIndexes[500];
+	int sampleIndexes[500] = {};
 
 	SoundIsActive = FALSE;
 	if (!WinSndIsSoundEnabled()) {
@@ -1075,17 +1075,31 @@ BOOL LoadSamples(HANDLE hFile) {
 	WinSndFreeAllSamples();
 
 	// Load Sample Lut
-	ReadFileSync(hFile, SampleLut, sizeof(SampleLut), &bytesRead, NULL);
+	ReadFileSync(hFile, &SampleLutCount, sizeof(DWORD), &bytesRead, NULL);
+	SampleLut = (short*)game_malloc(sizeof(short) * SampleLutCount, GBUF_SampleInfos);
+	ReadFileSync(hFile, SampleLut, sizeof(short) * SampleLutCount, &bytesRead, NULL);
 
 	// Load Sample Infos
-	ReadFileSync(hFile, &SampleInfoCount, sizeof(DWORD), &bytesRead, NULL);
-	if (SampleInfoCount == 0) {
+	int sampleInfoCount = 0;
+	ReadFileSync(hFile, &sampleInfoCount, sizeof(DWORD), &bytesRead, NULL);
+	if (sampleInfoCount == 0) {
 		return FALSE;
 	}
-	SampleInfos = (SAMPLE_INFO*)game_malloc(sizeof(SAMPLE_INFO) * SampleInfoCount, GBUF_SampleInfos);
-	ReadFileSync(hFile, SampleInfos, sizeof(SAMPLE_INFO) * SampleInfoCount, &bytesRead, NULL);
 
-	// Load Samples Count
+	SampleInfos.resize(sampleInfoCount);
+	for (int i = 0; i < sampleInfoCount; i++)
+	{
+		SAMPLE_INFO& sample = SampleInfos.at(i);
+		ReadFileSync(hFile, &sample.sampleIdx, sizeof(UINT16), &bytesRead, NULL);
+		ReadFileSync(hFile, &sample.volume, sizeof(BYTE), &bytesRead, NULL);
+		ReadFileSync(hFile, &sample.randomness, sizeof(BYTE), &bytesRead, NULL);
+		ReadFileSync(hFile, &sample.radius, sizeof(BYTE), &bytesRead, NULL);
+		ReadFileSync(hFile, &sample.pitch, sizeof(BYTE), &bytesRead, NULL);
+		ReadFileSync(hFile, &sample.lutCount, sizeof(BYTE), &bytesRead, NULL);
+		ReadFileSync(hFile, &sample.flags, sizeof(UINT16), &bytesRead, NULL);
+	}
+
+	// Load Samples Indexes Count
 	ReadFileSync(hFile, &sampleCount, sizeof(int), &bytesRead, NULL);
 	if (sampleCount == 0) {
 		return FALSE;
@@ -1138,6 +1152,7 @@ BOOL LoadSamples(HANDLE hFile) {
 			SetFilePointer(hSfxFile, dataSize, NULL, FILE_CURRENT);
 		}
 	}
+
 	CloseHandle(hSfxFile);
 	SoundIsActive = TRUE;
 #if defined(FEATURE_MOD_CONFIG)

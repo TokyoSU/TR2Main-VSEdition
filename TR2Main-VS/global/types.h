@@ -1627,9 +1627,22 @@ typedef struct WavePcmHeader_t {
 } WAVEPCM_HEADER;
 
 typedef struct SampleInfo_t {
-	short sfxID;
-	short volume;
-	short randomness;
+	UINT16 sampleIdx;
+	BYTE volume;
+	BYTE randomness;
+	BYTE radius;
+	BYTE pitch;
+	BYTE lutCount;
+	/// <summary>
+	/// 0x0000 NOTHING
+	/// 0x0080 RANDOM_SAMPLE
+	/// 0x0200 ONE_SHOT_WAIT
+	/// 0x0400 ONE_SHOT_REWOUND
+	/// 0x0800 LOOPED
+	/// 0x1000 NO_PAN
+	/// 0x2000 RANDOM_PITCH
+	/// 0x4000 RANDOM_VOLUME
+	/// </summary>
 	UINT16 flags;
 } SAMPLE_INFO;
 
@@ -2446,10 +2459,13 @@ typedef struct Sphere_t {
 } SPHERE_INFO;
 
 typedef struct SoundSlot_t {
+	PHD_VECTOR nPos;
 	int nVolume;
+	int nOrigVolume;
 	int nPan;
-	int nSampleInfo;
+	int sampleIdx;
 	int nPitch;
+	int nRange;
 } SOUND_SLOT;
 
 typedef struct WeaponInfo_t {

@@ -66,7 +66,7 @@ int WinSndGetFreeChannelIndex() {
 }
 
 void WinSndAdjustVolumeAndPan(int channel, int volume, int pan) {
-	DSChangeVolume(channel, volume);
+	DSAdjustVolume(channel, volume);
 	DSAdjustPan(channel, pan);
 }
 
