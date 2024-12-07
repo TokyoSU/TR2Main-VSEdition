@@ -240,16 +240,17 @@ typedef struct {
 
 // Room flags
 #define NO_ROOM							(255)
-#define ROOM_UNDERWATER					(0x001)
-#define ROOM_HORIZON					(0x008)
-#define ROOM_DAMAGE						(0x010)
-#define ROOM_OUTSIDE					(0x020)
-#define ROOM_NOTNEAR_OUTSIDE_ROOM		(0x040)
-#define ROOM_QUICKSAND					(0x080)
-#define ROOM_EFFECT						(0x100) // Room glow and movement flags, Light mode should be 2 !
-#define ROOM_REFLECTION					(0x200) // Light mode should be 2 !
-#define ROOM_SNOW                       (0x400)
-#define ROOM_RAIN                       (0x800)
+#define ROOM_UNDERWATER					(0x0001)
+#define ROOM_HORIZON					(0x0008)
+#define ROOM_DAMAGE						(0x0010)
+#define ROOM_OUTSIDE					(0x0020)
+#define ROOM_INSIDE						(0x0040)
+#define ROOM_QUICKSAND					(0x0080)
+#define ROOM_EFFECT						(0x0100) // Room glow and movement flags, Light mode should be 2 !
+#define ROOM_REFLECTION					(0x0200) // Light mode should be 2 !
+#define ROOM_SNOW                       (0x0400)
+#define ROOM_RAIN                       (0x0800)
+#define ROOM_FLIP                       (0x1000) // Does this room is a flipped one ?
 
 // SFX flags
 #define SFX_UNDERWATER		(1)
@@ -2067,6 +2068,7 @@ typedef struct RoomInfo_t {
 	FLOOR_INFO* floor;
 	LIGHT_INFO* light;
 	MESH_INFO* mesh;
+	DWORD flags;
 	int x;
 	int y;
 	int z;
@@ -2091,7 +2093,6 @@ typedef struct RoomInfo_t {
 	short itemNumber;
 	short fxNumber;
 	short flippedRoom;
-	UINT16 flags;
 	BYTE reverbType;
 
 	int GetCenter() const {

@@ -23,7 +23,7 @@ struct WEATHER_INFO
 static WEATHER_INFO SnowList[MAX_WEATHER_SNOW], RainList[MAX_WEATHER_RAIN];
 static int SnowCount = 0, RainCount = 0;
 
-static GAME_VECTOR WEATHER_GetRoomCeilingRandomPos(short roomNumber)
+static GAME_VECTOR WEATHER_GetRoomCeilingRandomPos(short roomNumber, short roomFlags)
 {
 	GAME_VECTOR vec = { 0, 0, 0, 0 };
 	short rad = GetRandomDrawWithNeg();
@@ -34,6 +34,10 @@ static GAME_VECTOR WEATHER_GetRoomCeilingRandomPos(short roomNumber)
 	short roomNum = roomNumber;
 	vec.y = GetCeiling(GetFloor(vec.x, vec.y, vec.z, &roomNum), vec.x, vec.y, vec.z); // Avoid rain splash to spawn on the ceiling !
 	vec.roomNumber = roomNum;
+	r = &Rooms[roomNum];
+	if (!CHK_ANY(r->flags, roomFlags))
+		return vec;
+	vec.boxNumber = TRUE;
 	return vec;
 }
 
@@ -45,19 +49,24 @@ void WEATHER_UpdateAndDrawRain()
 		for (short i = 0; i < RoomCount; i++) {
 			auto* r = &Rooms[i];
 			if (CHK_ANY(r->flags, ROOM_RAIN)) {
+				if (!FlipStatus && CHK_ANY(r->flags, ROOM_FLIP))
+					continue;
 				if (!rainDrop.on && RainCount < Mod.rainDensity) {
-					GAME_VECTOR vec = WEATHER_GetRoomCeilingRandomPos(r->index);
-					rainDrop.x = vec.x;
-					rainDrop.y = vec.y;
-					rainDrop.z = vec.z;
-					rainDrop.xv = (GetRandomDraw() & 7) - 4;
-					rainDrop.yv = (GetRandomDraw() & 14) + GetRenderScale(8);
-					rainDrop.zv = (GetRandomDraw() & 7) - 4;
-					rainDrop.life = 255;
-					rainDrop.room = vec.roomNumber;
-					rainDrop.on = true;
-					rainDrop.stopped = false;
-					RainCount++;
+					GAME_VECTOR vec = WEATHER_GetRoomCeilingRandomPos(r->index, ROOM_RAIN);
+					if (vec.boxNumber == TRUE)
+					{
+						rainDrop.x = vec.x;
+						rainDrop.y = vec.y;
+						rainDrop.z = vec.z;
+						rainDrop.xv = (GetRandomDraw() & 7) - 4;
+						rainDrop.yv = (GetRandomDraw() & 14) + GetRenderScale(8);
+						rainDrop.zv = (GetRandomDraw() & 7) - 4;
+						rainDrop.life = 255;
+						rainDrop.room = vec.roomNumber;
+						rainDrop.on = true;
+						rainDrop.stopped = false;
+						RainCount++;
+					}
 				}
 			}
 		}
@@ -131,19 +140,24 @@ void WEATHER_UpdateAndDrawSnow()
 		{
 			auto* r = &Rooms[i];
 			if (CHK_ANY(r->flags, ROOM_SNOW)) {
+				if (!FlipStatus && CHK_ANY(r->flags, ROOM_FLIP))
+					continue;
 				if (!snowDrop.on && SnowCount < Mod.snowDensity) {
-					GAME_VECTOR pos = WEATHER_GetRoomCeilingRandomPos(r->index);
-					snowDrop.x = pos.x;
-					snowDrop.y = pos.y;
-					snowDrop.z = pos.z;
-					snowDrop.xv = (GetRandomDraw() & 7) - 4;
-					snowDrop.yv = (GetRandomDraw() % 24 + 8) << 3;
-					snowDrop.zv = (GetRandomDraw() & 7) - 4;
-					snowDrop.life = 255;
-					snowDrop.room = pos.roomNumber;
-					snowDrop.on = true;
-					snowDrop.stopped = false;
-					SnowCount++;
+					GAME_VECTOR vec = WEATHER_GetRoomCeilingRandomPos(r->index, ROOM_SNOW);
+					if (vec.boxNumber == TRUE)
+					{
+						snowDrop.x = vec.x;
+						snowDrop.y = vec.y;
+						snowDrop.z = vec.z;
+						snowDrop.xv = (GetRandomDraw() & 7) - 4;
+						snowDrop.yv = (GetRandomDraw() % 24 + 8) << 3;
+						snowDrop.zv = (GetRandomDraw() & 7) - 4;
+						snowDrop.life = 255;
+						snowDrop.room = vec.roomNumber;
+						snowDrop.on = true;
+						snowDrop.stopped = false;
+						SnowCount++;
+					}
 				}
 			}
 		}
@@ -193,12 +207,10 @@ void WEATHER_UpdateAndDrawSnow()
 					snowDrop.xv++;
 				else if (snowDrop.xv > SmokeWindX << 1)
 					snowDrop.xv--;
-
 				if (snowDrop.zv < SmokeWindZ << 1)
 					snowDrop.zv++;
 				else if (snowDrop.zv > SmokeWindZ << 1)
 					snowDrop.zv--;
-
 				if ((snowDrop.yv & 7) != 7)
 					snowDrop.yv++;
 			}

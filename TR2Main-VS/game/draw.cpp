@@ -194,7 +194,7 @@ void GetRoomBounds() {
 			}
 
 		// NOTE: The original game checks just ROOM_INSIDE flag here
-		if (CHK_ANY(room->flags, ROOM_HORIZON) || !CHK_ANY(room->flags, ROOM_NOTNEAR_OUTSIDE_ROOM)) {
+		if (CHK_ANY(room->flags, ROOM_HORIZON) || !CHK_ANY(room->flags, ROOM_INSIDE)) {
 			CLAMPG(OutsideLeft, room->boundLeft)
 			CLAMPG(OutsideTop, room->boundTop)
 			CLAMPL(OutsideRight, room->boundRight)
@@ -419,7 +419,7 @@ void PrintRooms(short roomNumber) {
 	PhdWinTop = room->boundTop;
 	PhdWinBottom = room->boundBottom;
 	S_LightRoom(room);
-	if (OutsideCamera > 0 && !CHK_ANY(room->flags, ROOM_NOTNEAR_OUTSIDE_ROOM)) {
+	if (OutsideCamera > 0 && !CHK_ANY(room->flags, ROOM_INSIDE)) {
 		S_InsertRoom(room->data, TRUE);
 	}
 	else {
