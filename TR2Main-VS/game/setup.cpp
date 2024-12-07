@@ -171,14 +171,14 @@ void BaddyObjects() {
 	// Lara object is mandatory
 	obj = &Objects[ID_LARA];
 	obj->initialise = InitialiseLaraLoad;
+	obj->control = ControlLaraExtra;
+	obj->drawRoutine = DrawDummyItem;
 	obj->shadowSize = 160;
 	obj->hitPoints = 1000;
-	obj->drawRoutine = DrawDummyItem;
 	obj->save_position = 1;
 	obj->save_hitpoints = 1;
 	obj->save_flags = 1;
 	obj->save_anim = 1;
-	obj->control = ControlLaraExtra;
 
 	// Other objects are optional
 	obj = &Objects[ID_DOG];

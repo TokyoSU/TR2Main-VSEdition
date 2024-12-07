@@ -218,7 +218,7 @@ int GF_InterpretSequence(short* seq, GF_LEVEL_TYPE levelType, int seqType) {
 		switch (*seq) {
 		case GFE_STARTLEVEL:
 			if (seq[1] > GF_GameFlow.num_Levels) {
-				sprintf(str, "INVALID LEVEL %d", seq[1]);
+				LogDebug(str, "INVALID LEVEL %d", seq[1]);
 				result = GF_EXIT_TO_TITLE;
 			}
 			else if (levelType != GFL_STORY) {
@@ -257,7 +257,7 @@ int GF_InterpretSequence(short* seq, GF_LEVEL_TYPE levelType, int seqType) {
 
 		case GFE_CUTSCENE:
 			if (levelType != GFL_SAVED) {
-				sprintf(str, "CUTSCENE %d %s", seq[1], GF_CutsFilesStringTable[seq[1]]);
+				LogDebug(str, "CUTSCENE %d %s", seq[1], GF_CutsFilesStringTable[seq[1]]);
 				short storedLevel = CurrentLevel;
 				int cine_ret = StartCinematic(seq[1]);
 				CurrentLevel = storedLevel;
@@ -309,7 +309,7 @@ int GF_InterpretSequence(short* seq, GF_LEVEL_TYPE levelType, int seqType) {
 
 		case GFE_PICTURE:
 			if (levelType != GFL_SAVED) {
-				sprintf(str, "PICTURE %s", GF_PictureFilesStringTable[seq[1]]);
+				LogDebug(str, "PICTURE %s", GF_PictureFilesStringTable[seq[1]]);
 			}
 #ifdef FEATURE_BACKGROUND_IMPROVED
 			if (LoadingScreensEnabled && seq[1] < GF_GameFlow.num_Pictures && (levelType == GFL_NORMAL || levelType == GFL_SAVED)) {
@@ -326,7 +326,7 @@ int GF_InterpretSequence(short* seq, GF_LEVEL_TYPE levelType, int seqType) {
 			break;
 
 		case GFE_JUMPTO_SEQ:
-			sprintf(str, "JUMPSEQ %d", seq[1]);
+			LogDebug(str, "JUMPSEQ %d", seq[1]);
 			seq += 2;
 			break;
 

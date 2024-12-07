@@ -31,6 +31,7 @@
 #include "specific/output.h"
 #include "specific/texture.h"
 #include "specific/winvid.h"
+#include "specific/winmain.h"
 #include "modding/mod_utils.h"
 #include "global/vars.h"
 
@@ -759,11 +760,13 @@ BOOL LoadObjects(HANDLE hFile) {
 		ReadFileSync(hFile, &animOffset, sizeof(DWORD), &bytesRead, NULL);
 		ReadFileSync(hFile, &Objects[objNumber].animIndex, sizeof(short), &bytesRead, NULL);
 		Objects[objNumber].frameBase = (short*)((DWORD)AnimFrames + animOffset);
-		Objects[objNumber].loaded = 1;
+		Objects[objNumber].loaded = TRUE;
 	}
 
 	// Initialise animated objects
 	InitialiseObjects();
+	if (!Objects[ID_LARA].loaded)
+		S_ExitSystem("Failed to load the level, LARA object is missing !");
 
 	// Load static objects
 	ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
@@ -871,6 +874,7 @@ BOOL LoadItems(HANDLE hFile) {
 		}
 		InitialiseItem((short)i);
 	}
+
 	return TRUE;
 }
 
@@ -1296,10 +1300,10 @@ BOOL S_LoadLevelFile(LPCTSTR fileName, int levelID, GF_LEVEL_TYPE levelType) {
 	Mod.LoadJson(fileName);
 	BOOL result = LoadLevel(fileName, levelID);
 #if defined(FEATURE_BACKGROUND_IMPROVED)
-	if (LoadingScreensEnabled && Mod.levelLoadingPix.size() > 0 && (levelType == GFL_NORMAL || levelType == GFL_SAVED)) {
+	if (LoadingScreensEnabled && Mod.picturePix.size() > 0 && (levelType == GFL_NORMAL || levelType == GFL_SAVED)) {
 		RGB888 palette[256];
 		memcpy(palette, GamePalette8, sizeof(GamePalette8));
-		if (!BGND2_LoadPicture(Mod.levelLoadingPix.c_str(), FALSE, FALSE)) {
+		if (!BGND2_LoadPicture(("pix\\" + Mod.picturePix + ".bmp").c_str(), FALSE, FALSE)) {
 			BGND2_ShowPicture(30, 90, 10, 2, TRUE);
 			S_DontDisplayPicture();
 			InputStatus = 0;

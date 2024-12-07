@@ -228,7 +228,7 @@ void LoadCustomInventoryItems(Value& data)
 void LoadLevelConfig(Value& data) {
     SizeType size = 0;
 
-    Mod.levelLoadingPix = GetValueByNameString(data, "picture", &size, "");
+    Mod.picturePix = GetValueByNameString(data, "picture", &size, "");
     Mod.waterColor = GetColorRGBByName(data, "watercolor", RGB_MAKE(255, 255, 255));
     Mod.isBarefoot = GetValueByNameBool(data, "barefoot", false);
 
@@ -707,7 +707,6 @@ void ParseDefaultConfiguration(Value& data) {
 
     if (data.HasMember("semi_transparent")) LoadSemitransConfig(data["semi_transparent"], &Mod.semitrans);
     if (data.HasMember("reflective")) LoadReflectConfig(data["reflective"], &Mod.reflect);
-
     if (data.HasMember("ui_config")) LoadUIConfig(data["ui_config"], "ui_config");
     else if (!Mod.isUIColorLoaded) LoadUIConfigDefault();
 }

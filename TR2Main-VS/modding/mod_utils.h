@@ -69,7 +69,7 @@ struct ModConfig
 	short snowDensity = 0;
 	bool snowEnabled = false;
 
-	std::string levelLoadingPix;
+	std::string picturePix;
 	std::string titleLoadingPixLanguage;
 	std::string titleLoadingPix;
 	std::string titleLoadingPixGold;
