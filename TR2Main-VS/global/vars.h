@@ -75,12 +75,12 @@
 // Max values.
 #define MAX_OBJECT_TEXTURES 32768             // From 2000
 #define MAX_TEXTURE_PAGES 1024                // From 128
-#define MAX_EFFECTS 2048                      // From 100
+#define MAX_EFFECTS 8192                      // From 100 (Double of weather size, else other effects won't appear)
 #define MAX_ITEM_IN_INVENTORY 33
 #define MAX_WEATHER_RAIN 4096
-#define MAX_WEATHER_RAIN_ALIVE 1024
+#define MAX_WEATHER_RAIN_ALIVE 2048
 #define MAX_WEATHER_SNOW 4096
-#define MAX_WEATHER_SNOW_ALIVE 1024
+#define MAX_WEATHER_SNOW_ALIVE 2048
 
 /*
  * General Variables

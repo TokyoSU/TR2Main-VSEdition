@@ -428,7 +428,7 @@ void draw_shotgun(int weaponType)
 		item->goalAnimState = 1;
 		item->currentAnimState = 1;
 		item->status = ITEM_ACTIVE;
-		item->roomNumber = 255;
+		item->roomNumber = NO_ROOM;
 		Lara.right_arm.frame_base = Objects[item->objectID].frameBase;
 		Lara.left_arm.frame_base = Lara.right_arm.frame_base;
 	}

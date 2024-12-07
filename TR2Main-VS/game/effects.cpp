@@ -81,6 +81,7 @@ short DoBloodSplat(int x, int y, int z, short speed, short direction, short room
 		fx->frameNumber = 0;
 		fx->objectID = ID_BLOOD;
 		fx->counter = 0;
+		fx->scale = 256;
 	}
 	return fxID;
 }

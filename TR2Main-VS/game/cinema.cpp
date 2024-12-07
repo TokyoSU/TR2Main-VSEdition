@@ -223,7 +223,7 @@ void ControlCinematicPlayer(short itemNumber) {
 	pos.z = 0;
 	GetJointAbsPosition(item, &pos, 0);
 	roomID = GetCinematicRoom(pos.x, pos.y, pos.z);
-	if (roomID != -1 && item->roomNumber != roomID)
+	if (roomID != NO_ROOM && item->roomNumber != roomID)
 		ItemNewRoom(itemNumber, roomID);
 	if (item->dynamic_light && item->status != ITEM_INVISIBLE) {
 		pos.x = 0;
@@ -250,7 +250,7 @@ void LaraControlCinematic(short itemNumber) {
 	pos.z = 0;
 	GetJointAbsPosition(item, &pos, 0);
 	roomID = GetCinematicRoom(pos.x, pos.y, pos.z);
-	if (roomID != -1 && item->roomNumber != roomID)
+	if (roomID != NO_ROOM && item->roomNumber != roomID)
 		ItemNewRoom(itemNumber, roomID);
 	AnimateLara(item);
 }

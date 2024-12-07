@@ -91,54 +91,48 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	_set_se_translator(SEH_TR);
 #endif // _MSC_VER
 
-	try {
-		isSetupRequested = (UT_FindArg("setup") != NULL);
+	isSetupRequested = (UT_FindArg("setup") != NULL);
 #ifdef FEATURE_GOLD
-		SetGold(UT_FindArg("gold") != NULL);
+	SetGold(UT_FindArg("gold") != NULL);
 #endif
 
-		initStatus = Init(isSetupRequested);
-		if (initStatus == 0) {
-			char msg[256] = { 0 };
-			snprintf(msg, sizeof(msg), "Tomb Raider II requires Microsoft DirectX %d to be installed.", DIRECT3D_VERSION / 0x100);
-			UT_MessageBox(msg, NULL);
-		}
-		if (initStatus != 1)
+	initStatus = Init(isSetupRequested);
+	if (initStatus == 0) {
+		char msg[256] = { 0 };
+		snprintf(msg, sizeof(msg), "Tomb Raider II requires Microsoft DirectX %d to be installed.", DIRECT3D_VERSION / 0x100);
+		UT_MessageBox(msg, NULL);
+	}
+	if (initStatus != 1)
+		goto EXIT;
+
+	appSettingsStatus = SE_ReadAppSettings(&SavedAppSettings);
+	if (appSettingsStatus == 0)
+		goto EXIT;
+
+	if (isSetupRequested || appSettingsStatus == 2) {
+		if (!SE_ShowSetupDialog(NULL, appSettingsStatus == 2))
 			goto EXIT;
-
-		appSettingsStatus = SE_ReadAppSettings(&SavedAppSettings);
-		if (appSettingsStatus == 0)
+		SE_WriteAppSettings(&SavedAppSettings);
+		if (isSetupRequested)
 			goto EXIT;
+	}
 
-		if (isSetupRequested || appSettingsStatus == 2) {
-			if (!SE_ShowSetupDialog(NULL, appSettingsStatus == 2))
-				goto EXIT;
-			SE_WriteAppSettings(&SavedAppSettings);
-			if (isSetupRequested)
-				goto EXIT;
-		}
-
-		while (0 != (rc = WinGameStart())) {
-			WinGameFinish();
-			RenderErrorBox(rc);
-
-			if (!SE_ShowSetupDialog(NULL, false))
-				goto EXIT;
-			SE_WriteAppSettings(&SavedAppSettings);
-		}
-
-		StopInventory = false;
-		IsGameToExit = false;
-		GameMain();
-
+	while (0 != (rc = WinGameStart())) {
 		WinGameFinish();
+		RenderErrorBox(rc);
+
+		if (!SE_ShowSetupDialog(NULL, false))
+			goto EXIT;
 		SE_WriteAppSettings(&SavedAppSettings);
 	}
-	catch (...) {
-		WinGameFinish();
-		WinCleanup();
-		abort();
-	}
+
+	StopInventory = false;
+	IsGameToExit = false;
+	GameMain();
+
+	WinGameFinish();
+	SE_WriteAppSettings(&SavedAppSettings);
+
 EXIT:
 	WinCleanup();
 	exit(AppResultCode); // NOTE: there may be bugs on some systems if we just return here

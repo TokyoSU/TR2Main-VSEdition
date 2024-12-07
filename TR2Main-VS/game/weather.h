@@ -1,5 +1,4 @@
 #pragma once
 
-extern void InitializeRain();
-extern void UpdateRain();
-extern void DoSnow();
+extern void WEATHER_UpdateAndDrawRain();
+extern void WEATHER_UpdateAndDrawSnow();

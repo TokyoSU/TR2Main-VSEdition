@@ -144,7 +144,7 @@ void DSAdjustVolume(DWORD channel, int volume)
 	if (XA_Voices[channel] != NULL)
 	{
 		// Convert decibels to linear amplitude ratio
-		float fvolume = XAudio2DecibelsToAmplitudeRatio(volume / 150.0F);
+		float fvolume = XAudio2DecibelsToAmplitudeRatio(volume / 100.0F);
 
 		// Apply the volume to the voice
 		XA_Voices[channel]->SetChannelVolumes(1, &fvolume, XAUDIO2_COMMIT_NOW);
@@ -189,11 +189,11 @@ void DSAdjustPan(DWORD channel, int pan)
 		else if (pan < 0)
 		{
 			matrix[0] = 1.0F;
-			matrix[1] = XAudio2DecibelsToAmplitudeRatio(pan / 150.0F);
+			matrix[1] = XAudio2DecibelsToAmplitudeRatio(pan / 100.0F);
 		}
 		else
 		{
-			matrix[0] = XAudio2DecibelsToAmplitudeRatio(-pan / 150.0F);
+			matrix[0] = XAudio2DecibelsToAmplitudeRatio(-pan / 100.0F);
 			matrix[1] = 1.0F;
 		}
 
@@ -271,21 +271,7 @@ int DXStartSample(DWORD sampleIdx, int volume, int pitch, int pan, DWORD flags)
 
 int CalcVolume(int volume)
 {
-	// Adjust the volume to a decibel range
-	int result = 8000 - int(float(0x7FFF - volume) * 0.30518511F);
-
-	// Clamp the result to valid decibel range [-10000, 0]
-	if (result > 0) result = 0;
-	else if (result < -10000) result = -10000;
-
-	// Apply master volume scaling
-	result -= (100 - S_MasterVolume) * 50;
-
-	// Clamp again after scaling
-	if (result > 0) result = 0;
-	if (result < -10000) result = -10000;
-
-	return result;
+	return int((float(S_MasterVolume * volume) * 0.00019074068F - 400.0F) * 6.0F);
 }
 
 void S_SoundStopAllSamples()

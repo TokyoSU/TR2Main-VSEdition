@@ -354,6 +354,11 @@ int GetRandomDraw() {
 	// it left "as is" to save consistency with the original game.
 }
 
+int GetRandomDrawWithNeg() {
+	RandomDraw = RandomDraw * 1103515245 + 12345;
+	return (RandomDraw >> 10);
+}
+
 void SeedRandomDraw(int seed) {
 	RandomDraw = seed;
 }

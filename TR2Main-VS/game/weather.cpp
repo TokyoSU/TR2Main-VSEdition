@@ -1,292 +1,219 @@
 #include "precompiled.h"
 #include "weather.h"
-#include "3dsystem/math_tbls.h"
+#include "3dsystem/phd_math.h"
 #include "3dsystem/scalespr.h"
 #include "game/control.h"
+#include "game/collide.h"
 #include "game/effects.h"
+#include "specific/init.h"
 #include "specific/game.h"
 #include "specific/output.h"
-#include "global/types.h"
-#include "global/vars.h"
-#if defined(FEATURE_MOD_CONFIG)
 #include "modding/mod_utils.h"
-#endif
 
-struct RAINDROP {
-	int x, y, z;        // Position of the raindrop
-	int xv, yv, zv;     // Velocity of the raindrop
-	short currentRoom;  // Room the raindrop is currently in
-	bool on;            // Whether the raindrop is active
-	BYTE life;          // Remaining life of the raindrop
-};
-
-struct SNOWFLAKE
+struct WEATHER_INFO
 {
-	int x;
-	int y;
-	int z;
-	int xv;
-	int yv;
-	int zv;
-	short currentRoom;
+	int x, y, z;
+	int xv, yv, zv;
+	short room;
+	BYTE life;
 	bool on;
 	bool stopped;
-	BYTE life;
-	BYTE pad;
 };
 
-static RAINDROP raindrops[MAX_WEATHER_RAIN];
-static SNOWFLAKE snowflakes[MAX_WEATHER_SNOW];
-static short NumRaindropAlive = 0;
-static short NumSnowflakeAlive = 0;
+static WEATHER_INFO SnowList[MAX_WEATHER_SNOW], RainList[MAX_WEATHER_RAIN];
+static int SnowCount = 0, RainCount = 0;
 
-static GAME_VECTOR GetRoomCeilingRandPos(short roomNumber)
+static GAME_VECTOR WEATHER_GetRoomCeilingRandomPos(short roomNumber)
 {
+	GAME_VECTOR vec = { 0, 0, 0, 0 };
+	short rad = GetRandomDrawWithNeg();
+	short angle = GetRandomDraw() & 32766;
 	ROOM_INFO* r = &Rooms[roomNumber];
-	GAME_VECTOR vec = {0,0,0,0,FALSE};
-	short rad = GetRandomDraw() & 8190;
-	short angle = GetRandomDraw() & 8190;
-	int x = r->x + (rad * rcossin_tbl[angle] >> 12);
-	int y = r->GetCenter();
-	int z = r->z + (rad * rcossin_tbl[angle + 1] >> 12);
+	vec.x = r->x + (rad * phd_sin(angle) >> W2V_SHIFT);
+	vec.z = r->z + (rad * phd_cos(angle) >> W2V_SHIFT);
 	short roomNum = roomNumber;
-	auto* floor = GetFloor(x, y, z, &roomNum);
-	if (floor == NULL) return vec;
-	int ceiling = GetCeiling(floor, x, y, z);
-	if (ceiling == NO_HEIGHT || ceiling >= y) return vec;
-	vec.x = x;
-	vec.y = ceiling;
-	vec.z = z;
+	vec.y = GetCeiling(GetFloor(vec.x, vec.y, vec.z, &roomNum), vec.x, vec.y, vec.z); // Avoid rain splash to spawn on the ceiling !
 	vec.roomNumber = roomNum;
-	vec.boxNumber = TRUE;
 	return vec;
 }
 
-static void InitializeRaindrop(RAINDROP& rainDrop, short roomNumber) {
-	GAME_VECTOR vec = GetRoomCeilingRandPos(roomNumber);
-	if (vec.boxNumber == FALSE)
-		return;
-	int x = vec.x;
-	int y = vec.y;
-	int z = vec.z;
-	rainDrop.x = x;
-	rainDrop.y = y;
-	rainDrop.z = z;
-	rainDrop.xv = (GetRandomDraw() & 7) - 4;
-	rainDrop.yv = (GetRandomDraw() & 14) + GetRenderScale(8);
-	rainDrop.zv = (GetRandomDraw() & 7) - 4;
-	rainDrop.life = 148 - (rainDrop.yv << 1);
-	rainDrop.currentRoom = vec.roomNumber;
-	rainDrop.on = true;
-	NumRaindropAlive++;
-}
-
-static void UpdateRaindrop(RAINDROP& rainDrop) {
-	auto* floor = GetFloor(rainDrop.x, rainDrop.y, rainDrop.z, &rainDrop.currentRoom);
-	int height = GetHeight(floor, rainDrop.x, rainDrop.y, rainDrop.z);
-
-	if ((height == NO_HEIGHT || height <= rainDrop.y) || CHK_ANY(Rooms[rainDrop.currentRoom].flags, ROOM_UNDERWATER)) {
-		int ceiling = GetCeiling(floor, rainDrop.x, rainDrop.y, rainDrop.z);
-		if (ceiling != NO_HEIGHT && ceiling < rainDrop.y) // Avoid splash spawning on the ceiling !
-		{
-#if defined(FEATURE_MOD_CONFIG)
-			if (Mod.rainSplashEnabled)
-				CreateRainSpash(RGB_MAKE(255, 0, 0), rainDrop.x, rainDrop.y, rainDrop.z, Mod.rainSplashSize, rainDrop.currentRoom);
-#else
-			CreateRainSpash(rainDrop.x, rainDrop.y, rainDrop.z, 128, rainDrop.currentRoom);
-#endif
-		}
-		rainDrop.on = false;
-		NumRaindropAlive--;
-		return;
-	}
-
-	rainDrop.x += rainDrop.xv + 4 * SmokeWindX;
-	rainDrop.y += rainDrop.yv << 3;
-	rainDrop.z += rainDrop.zv + 4 * SmokeWindZ;
-
-	int rnd = GetRandomDraw();
-	if ((rnd & 3) != 3) {
-		rainDrop.xv += (rnd & 3) - 1;
-		rainDrop.xv = std::clamp(rainDrop.xv, -4, 4);
-	}
-
-	rnd = (rnd >> 2) & 3;
-	if (rnd != 3) {
-		rainDrop.zv += rnd - 1;
-		rainDrop.zv = std::clamp(rainDrop.zv, -4, 4);
-	}
-
-	rainDrop.life -= 2;
-	if (rainDrop.life <= 0) {
-		rainDrop.on = false;
-		NumRaindropAlive--;
-	}
-}
-
-static void DrawRaindrops() {
-	OBJECT_INFO* obj = &Objects[ID_WEATHER_SPRITE];
-	for (int i = 0; i < MAX_WEATHER_RAIN; i++) {
-		auto& rainDrop = raindrops[i];
-		if (rainDrop.on) {
-			S_DrawSprite(SPR_ABS | SPR_SEMITRANS | SPR_SCALE, rainDrop.x, rainDrop.y, rainDrop.z, obj->meshIndex, 0, 512);
-		}
-	}
-}
-
-void UpdateRain()
+void WEATHER_UpdateAndDrawRain()
 {
 	for (int i = 0; i < MAX_WEATHER_RAIN; i++) {
-		auto& rainDrop = raindrops[i];
-		for (int roomNum = 0; roomNum < RoomCount; roomNum++)
-		{
-			auto* r = &Rooms[roomNum];
+		auto& rainDrop = RainList[i];
+
+		for (short i = 0; i < RoomCount; i++) {
+			auto* r = &Rooms[i];
 			if (CHK_ANY(r->flags, ROOM_RAIN)) {
-#if defined(FEATURE_MOD_CONFIG)
-				if (!rainDrop.on && NumRaindropAlive < Mod.rainDensity) {
-#else
-				if (!rainDrop.on && NumRaindropAlive < MAX_WEATHER_RAIN_ALIVE) {
-#endif
-					InitializeRaindrop(rainDrop, roomNum);
+				if (!rainDrop.on && RainCount < Mod.rainDensity) {
+					GAME_VECTOR vec = WEATHER_GetRoomCeilingRandomPos(r->index);
+					rainDrop.x = vec.x;
+					rainDrop.y = vec.y;
+					rainDrop.z = vec.z;
+					rainDrop.xv = (GetRandomDraw() & 7) - 4;
+					rainDrop.yv = (GetRandomDraw() & 14) + GetRenderScale(8);
+					rainDrop.zv = (GetRandomDraw() & 7) - 4;
+					rainDrop.life = 255;
+					rainDrop.room = vec.roomNumber;
+					rainDrop.on = true;
+					rainDrop.stopped = false;
+					RainCount++;
 				}
 			}
 		}
 
-		if (rainDrop.on) {
-			UpdateRaindrop(rainDrop);
+		if (rainDrop.on)
+		{
+			auto* floor = GetFloor(rainDrop.x, rainDrop.y, rainDrop.z, &rainDrop.room);
+			int height = GetHeight(floor, rainDrop.x, rainDrop.y, rainDrop.z);
+			if ((height == NO_HEIGHT || height <= rainDrop.y) || CHK_ANY(Rooms[rainDrop.room].flags, ROOM_UNDERWATER)) {
+				int ceiling = GetCeiling(floor, rainDrop.x, rainDrop.y, rainDrop.z);
+				if (ceiling != NO_HEIGHT && ceiling <= rainDrop.y)
+				{
+					if (Mod.rainSplashEnabled)
+						CreateRainSpash(Mod.rainSplashColor, rainDrop.x, rainDrop.y - 64, rainDrop.z, Mod.rainSplashSize, rainDrop.room);
+				}
+				rainDrop.on = false;
+				RainCount--;
+				continue;
+			}
+			
+			if (Mod.rainDoDamageOnHit)
+			{
+				PHD_3DPOS effectPos = {};
+				effectPos.x = rainDrop.x;
+				effectPos.y = rainDrop.y;
+				effectPos.z = rainDrop.z;
+				if (ItemNearLara(&effectPos, Mod.rainDamageRange))
+				{
+					DoBloodSplat(rainDrop.x, rainDrop.y, rainDrop.z, 5, LaraItem->pos.rotY + ANGLE(180), rainDrop.room);
+					LaraItem->hitPoints -= Mod.rainDamage;
+					LaraItem->hitStatus = TRUE;
+					rainDrop.on = false;
+					RainCount--;
+					continue;
+				}
+			}
+
+			rainDrop.x += rainDrop.xv + 4 * SmokeWindX;
+			rainDrop.y += rainDrop.yv << 3;
+			rainDrop.z += rainDrop.zv + 4 * SmokeWindZ;
+
+			int rnd = GetRandomDraw();
+			if ((rnd & 3) != 3) {
+				rainDrop.xv += (rnd & 3) - 1;
+				rainDrop.xv = std::clamp(rainDrop.xv, -4, 4);
+			}
+
+			rnd = (rnd >> 2) & 3;
+			if (rnd != 3) {
+				rainDrop.zv += rnd - 1;
+				rainDrop.zv = std::clamp(rainDrop.zv, -4, 4);
+			}
+
+			rainDrop.life -= 2;
+			if (rainDrop.life <= 0) {
+				rainDrop.on = false;
+				RainCount--;
+			}
+
+			S_DrawSprite(SPR_ABS | (Mod.isRainOpaque ? 0 : SPR_SEMITRANS) | SPR_SCALE, rainDrop.x, rainDrop.y, rainDrop.z, Objects[ID_WEATHER_SPRITE].meshIndex, 0, 1024);
 		}
 	}
-
-	DrawRaindrops();
 }
 
-void DoSnow()
+void WEATHER_UpdateAndDrawSnow()
 {
-	// UPDATE
-	OBJECT_INFO* obj = &Objects[ID_WEATHER_SPRITE];
-	for (int i = 0; i < MAX_WEATHER_SNOW; i++)
-	{
-		auto& snow = snowflakes[i];
+	for (int i = 0; i < MAX_WEATHER_SNOW; i++) {
+		auto& snowDrop = SnowList[i];
 
-		for (int roomNum = 0; roomNum < RoomCount; roomNum++)
+		for (short i = 0; i < RoomCount; i++)
 		{
-			auto* room = &Rooms[roomNum];
-			if (CHK_ANY(room->flags, ROOM_SNOW)) {
-#if defined(FEATURE_MOD_CONFIG)
-				if (!snow.on && NumSnowflakeAlive < Mod.snowDensity)
-#else
-				if (!rainDrop.on && NumSnowflakeAlive < MAX_WEATHER_SNOW_ALIVE)
-#endif
-				{
-					short rad = GetRandomDraw() & 8190;
-					short angle = GetRandomDraw() & 8190;
-					int x = LaraItem->pos.x + (rad * rcossin_tbl[angle] >> 12);
-					int y = LaraItem->pos.y - BLOCK(1) - (GetRandomDraw() & 0x7FF);
-					int z = LaraItem->pos.z + (rad * rcossin_tbl[angle + 1] >> 12);
-					short roomNumber = roomNum;
-					auto* floor = GetFloor(x, y, z, &roomNumber);
-					if (floor == NULL)
-						continue;
-					auto height = GetHeight(floor, x, y, z);
-					if (height == NO_HEIGHT || height <= y)
-						continue;
-					int ceiling = GetCeiling(floor, x, y, z);
-					if (ceiling == NO_HEIGHT || ceiling >= y)
-						continue;
-
-					if (!CHK_ANY(Rooms[roomNumber].flags, ROOM_OUTSIDE | ROOM_HORIZON)) return;
-
-					snow.x = x;
-					snow.y = y;
-					snow.z = z;
-					snow.xv = (GetRandomDraw() & 7) - 4;
-					snow.yv = (GetRandomDraw() & 38 + 8) << 3;
-					snow.zv = (GetRandomDraw() & 7) - 4;
-					snow.life = 128 - (snow.yv << 1);
-					snow.currentRoom = roomNumber;
-					snow.on = true;
-					snow.stopped = false;
-					NumSnowflakeAlive++;
+			auto* r = &Rooms[i];
+			if (CHK_ANY(r->flags, ROOM_SNOW)) {
+				if (!snowDrop.on && SnowCount < Mod.snowDensity) {
+					GAME_VECTOR pos = WEATHER_GetRoomCeilingRandomPos(r->index);
+					snowDrop.x = pos.x;
+					snowDrop.y = pos.y;
+					snowDrop.z = pos.z;
+					snowDrop.xv = (GetRandomDraw() & 7) - 4;
+					snowDrop.yv = (GetRandomDraw() % 24 + 8) << 3;
+					snowDrop.zv = (GetRandomDraw() & 7) - 4;
+					snowDrop.life = 255;
+					snowDrop.room = pos.roomNumber;
+					snowDrop.on = true;
+					snowDrop.stopped = false;
+					SnowCount++;
 				}
 			}
 		}
 
-		int ox = snow.x;
-		int oy = snow.y;
-		int oz = snow.z;
-
-		if (snow.on)
+		if (snowDrop.on)
 		{
-			auto* floor = GetFloor(snow.x, snow.y, snow.z, &snow.currentRoom); // Update room number if it has changed rooms.
-			auto height = GetHeight(floor, snow.x, snow.y, snow.z);
-			if (height == NO_HEIGHT || CHK_ANY(Rooms[snow.currentRoom].flags, ROOM_UNDERWATER))
+			if (CHK_ANY(Rooms[snowDrop.room].flags, ROOM_UNDERWATER))
 			{
-				snow.on = false;
-				NumSnowflakeAlive--;
+				snowDrop.on = false;
+				SnowCount--;
 				continue;
 			}
 
-			if (!snow.stopped)
+			if (!snowDrop.stopped)
 			{
-				if (height <= snow.y)
+				auto* floor = GetFloor(snowDrop.x, snowDrop.y, snowDrop.z, &snowDrop.room); // Update room number if it has changed rooms.
+				auto height = GetHeight(floor, snowDrop.x, snowDrop.y, snowDrop.z);
+				if (height == NO_HEIGHT || height <= snowDrop.y)
 				{
-					snow.x = ox;
-					snow.y = height;
-					snow.z = oz;
-					snow.stopped = true;
-					if (snow.life > 16)
-						snow.life = 16;
+					snowDrop.xv = 0;
+					snowDrop.yv = 0;
+					snowDrop.zv = 0;
+					snowDrop.y = height;
+					snowDrop.stopped = true;
+					if (snowDrop.life > 16)
+						snowDrop.life = 16;
 				}
 				else
 				{
-					snow.x += snow.xv;
-					snow.y += (snow.yv & 0xF8) >> 2;
-					snow.z += snow.zv;
+					snowDrop.x += snowDrop.xv;
+					snowDrop.y += (snowDrop.yv & 0xF8) >> 2;
+					snowDrop.z += snowDrop.zv;
 				}
 			}
-			
-			if (snow.life <= 0)
+
+			if (snowDrop.life <= 0)
 			{
-				snow.on = false;
-				NumSnowflakeAlive--;
+				snowDrop.on = false;
+				SnowCount--;
 				continue;
 			}
 
-			snow.life -= 2;
-
-			if (!snow.stopped)
+			snowDrop.life--;
+			if (!snowDrop.stopped)
 			{
-				if (snow.xv < SmokeWindX << 1)
-					snow.xv++;
-				else if (snow.xv > SmokeWindX << 1)
-					snow.xv--;
+				if (snowDrop.xv < SmokeWindX << 1)
+					snowDrop.xv++;
+				else if (snowDrop.xv > SmokeWindX << 1)
+					snowDrop.xv--;
 
-				if (snow.zv < SmokeWindZ << 1)
-					snow.zv++;
-				else if (snow.zv > SmokeWindZ << 1)
-					snow.zv--;
+				if (snowDrop.zv < SmokeWindZ << 1)
+					snowDrop.zv++;
+				else if (snowDrop.zv > SmokeWindZ << 1)
+					snowDrop.zv--;
 
-				if ((snow.yv & 7) != 7)
-					snow.yv++;
+				if ((snowDrop.yv & 7) != 7)
+					snowDrop.yv++;
 			}
-		}
-	}
 
-	// DRAW
-	for (int i = 0; i < MAX_WEATHER_SNOW; i++)
-	{
-		auto& snow = snowflakes[i];
-		if (snow.on)
-		{
+			// Draw the sprite on the scene.
 			BYTE c;
-			if ((snow.yv & 7) < 7)
-				c = snow.yv & 7;
-			else if (snow.life > 18)
-				c = 15;
+			if ((snowDrop.yv & 7) < 7)
+				c = snowDrop.yv & 7;
+			else if (snowDrop.life > 18.0f)
+				c = 16;
 			else
-				c = snow.life;
-			c <<= 3;
-			S_DrawSprite(RGB_MAKE(c, c, c) | SPR_TINT | SPR_ABS | SPR_SCALE, snow.x, snow.y, snow.z, obj->meshIndex + 1, 0, 512);
+				c = snowDrop.life; // Below 255, use life directly
+			c <<= 3; // Adjust brightness scaling
+			S_DrawSprite(RGB_MAKE(c, c, c) | SPR_TINT | SPR_ABS | (Mod.isSnowOpaque ? 0 : SPR_SEMITRANS) | SPR_SCALE, snowDrop.x, snowDrop.y, snowDrop.z, Objects[ID_WEATHER_SPRITE].meshIndex + 1, 0, 1024);
 		}
 	}
 }
+

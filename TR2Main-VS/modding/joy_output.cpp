@@ -172,16 +172,16 @@ void UpdateJoyOutput(bool isInGame) {
 			if (Lara.water_status == LWS_Underwater) {
 				if (hitPoints > 0 && Lara.air > 0) {
 #if defined(FEATURE_MOD_CONFIG)
-					if (Lara.air > AIR_75(Mod.underwaterInfo.maxAir)) {
+					if (Lara.air > AIR_75(Mod.underwater.maxAir)) {
 						g = 255;
-						b = 128 + 127 * (AIR_100(Mod.underwaterInfo.maxAir) - Lara.air) / AIR_25(Mod.underwaterInfo.maxAir);
+						b = 128 + 127 * (AIR_100(Mod.underwater.maxAir) - Lara.air) / AIR_25(Mod.underwater.maxAir);
 					}
-					else if (Lara.air > AIR_25(Mod.underwaterInfo.maxAir)) {
-						g = 255 * (Lara.air - AIR_25(Mod.underwaterInfo.maxAir)) / AIR_50(Mod.underwaterInfo.maxAir);
+					else if (Lara.air > AIR_25(Mod.underwater.maxAir)) {
+						g = 255 * (Lara.air - AIR_25(Mod.underwater.maxAir)) / AIR_50(Mod.underwater.maxAir);
 						b = 255;
 					}
 					else {
-						r = 127 * (AIR_25(Mod.underwaterInfo.maxAir) - Lara.air) / AIR_25(Mod.underwaterInfo.maxAir);
+						r = 127 * (AIR_25(Mod.underwater.maxAir) - Lara.air) / AIR_25(Mod.underwater.maxAir);
 						b = 255;
 					}
 #else

@@ -35,6 +35,7 @@ int GameStats(int levelID); // 0x0044C920
 int GetRandomControl(); // 0x0044CA40
 void SeedRandomControl(int seed); // 0x0044CA60
 int GetRandomDraw(); // 0x0044CA70
+int GetRandomDrawWithNeg();
 void SeedRandomDraw(int seed); // 0x0044CA90
 void GetValidLevelsList(REQUEST_INFO* req); // 0x0044CAA0
 void GetSavedGamesList(REQUEST_INFO* req); // 0x0044CAF0

@@ -161,8 +161,8 @@ void DrawRooms(short currentRoom) {
 	}
 
 #if defined(FEATURE_MOD_CONFIG)
-	UpdateRain();
-	DoSnow();
+	WEATHER_UpdateAndDrawRain();
+	WEATHER_UpdateAndDrawSnow();
 #endif
 
 #ifdef FEATURE_VIEW_IMPROVED
@@ -204,12 +204,11 @@ void GetRoomBounds() {
 		if (!room->doors) continue;
 		phd_PushMatrix();
 		phd_TranslateAbs(room->x, room->y, room->z);
-
 		for (int i = 0; i < room->doors->wCount; ++i) {
 			DOOR_INFO* door = &room->doors->door[i];
 			if (door->x * (room->x + door->vertex[0].x - MatrixW2V._03)
-				+ door->y * (room->y + door->vertex[0].y - MatrixW2V._13)
-				+ door->z * (room->z + door->vertex[0].z - MatrixW2V._23) < 0)
+			  + door->y * (room->y + door->vertex[0].y - MatrixW2V._13)
+			  + door->z * (room->z + door->vertex[0].z - MatrixW2V._23) < 0)
 			{
 				SetRoomBounds((short*)&door->x, door->room, room);
 			}
@@ -509,13 +508,25 @@ void DrawEffect(short fx_id) {
 			fx->pos.x, fx->pos.y, fx->pos.z, // coordinates
 			Objects[ID_GLOW].meshIndex, // sprite id
 			fx->shade, fx->frameNumber); // shade, scale
-	}
-	else if (obj->nMeshes < 0) {
-		DWORD flags = (fx->color != 0 ? (SPR_TINT | fx->color) : SPR_SHADE) | SPR_ABS | (obj->semi_transparent ? SPR_SEMITRANS : 0);
-		if (fx->scale != 0) flags |= SPR_SCALE;
+	} else if (fx->objectID == ID_WEATHER_SPRITE || fx->objectID == ID_SPLASH) {
+		DWORD flags = SPR_ABS | (obj->semi_transparent ? SPR_SEMITRANS : NULL);
+		if (fx->color != 0) {
+			flags |= SPR_TINT | fx->color;
+		}
+		else {
+			flags |= SPR_SHADE;
+		}
+		if (fx->scale != 0) {
+			flags |= SPR_SCALE;
+		}
 		S_DrawSprite(flags, fx->pos.x, fx->pos.y, fx->pos.z, obj->meshIndex - fx->frameNumber, fx->color != 0 ? 0 : fx->shade, fx->scale);
-	}
-	else {
+	} else if (obj->nMeshes < 0) {
+		DWORD flags = SPR_SHADE | SPR_ABS | (obj->semi_transparent ? SPR_SEMITRANS : NULL);
+		if (fx->scale != 0) {
+			flags |= SPR_SCALE;
+		}
+		S_DrawSprite(flags, fx->pos.x, fx->pos.y, fx->pos.z, obj->meshIndex - fx->frameNumber, fx->shade, fx->scale);
+	} else {
 		phd_PushMatrix();
 		phd_TranslateAbs(fx->pos.x, fx->pos.y, fx->pos.z);
 		if (PhdMatrixPtr->_23 > PhdNearZ && PhdMatrixPtr->_23 < PhdFarZ) {

@@ -88,7 +88,7 @@ void LaraControl(short itemNumber) {
 			Lara.hit_frame = 0;
 			Lara.hit_direction = -1;
 #if defined(FEATURE_MOD_CONFIG)
-			Lara.air = Mod.underwaterInfo.maxAir;
+			Lara.air = Mod.underwater.maxAir;
 #else
 			Lara.air = LARA_AIR_MAX;
 #endif
@@ -120,7 +120,7 @@ void LaraControl(short itemNumber) {
 				}
 				else if (isRoomUnderwater) {
 #if defined(FEATURE_MOD_CONFIG)
-					Lara.air = Mod.underwaterInfo.maxAir;
+					Lara.air = Mod.underwater.maxAir;
 #else
 					Lara.air = LARA_AIR_MAX;
 #endif
@@ -291,7 +291,7 @@ void LaraControl(short itemNumber) {
 	case LWS_AboveWater:
 	case LWS_Wade:
 #if defined(FEATURE_MOD_CONFIG)
-		Lara.air = Mod.underwaterInfo.maxAir;
+		Lara.air = Mod.underwater.maxAir;
 #else
 		Lara.air = LARA_AIR_MAX;
 #endif
@@ -299,7 +299,7 @@ void LaraControl(short itemNumber) {
 		break;
 	case LWS_Underwater:
 #if defined(FEATURE_MOD_CONFIG)
-		if (!Mod.underwaterInfo.unlimitedAir)
+		if (!Mod.underwater.unlimitedAir)
 			Lara.air--;
 #else
 		Lara.air--;
@@ -307,7 +307,7 @@ void LaraControl(short itemNumber) {
 		if (item->hitPoints >= 0 && Lara.air < 0) {
 			Lara.air = NO_AIR;
 #if defined(FEATURE_MOD_CONFIG)
-			item->hitPoints -= Mod.underwaterInfo.noAirDamagePerTick;
+			item->hitPoints -= Mod.underwater.noAirDamagePerTick;
 #else
 			item->hitPoints -= LARA_NO_AIR_DAMAGE_PER_TICK;
 #endif
@@ -317,8 +317,8 @@ void LaraControl(short itemNumber) {
 	case LWS_Surface:
 		if (item->hitPoints >= 0) {
 #if defined(FEATURE_MOD_CONFIG)
-			Lara.air += Mod.underwaterInfo.restoreAirPerTick;
-			CLAMPG(Lara.air, Mod.underwaterInfo.maxAir)
+			Lara.air += Mod.underwater.restoreAirPerTick;
+			CLAMPG(Lara.air, Mod.underwater.maxAir)
 #else
 			Lara.air += LARA_SURFACE_AIR_REGEN_COUNT;
 			CLAMPG(Lara.air, LARA_AIR_MAX)
@@ -685,7 +685,7 @@ void InitialiseLara(GF_LEVEL_TYPE levelType)
 	Lara.hit_frame = 0;
 	Lara.hit_direction = -1;
 #if defined(FEATURE_MOD_CONFIG)
-	Lara.air = Mod.underwaterInfo.maxAir;
+	Lara.air = Mod.underwater.maxAir;
 #else
 	Lara.air = LARA_AIR_MAX;
 #endif

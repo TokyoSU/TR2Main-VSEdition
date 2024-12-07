@@ -27,60 +27,63 @@
 #include "specific/game.h"
 #include "global/vars.h"
 
-enum SOUND_FLAGS
+static void S_SoundUpdatePanVolume(SOUND_SLOT* slot)
 {
-	NORMAL_SOUND,
-	WAIT_SOUND,
-	RESTART_SOUND,
-	LOOPED_SOUND
-};
-/*
-static void GetPanVolume(SOUND_SLOT* slot)
-{
-	int dx, dy, dz, nDistance, nPan, nVolume;
-	dx = slot->nPos.x - Camera.micPos.x;
-	dy = slot->nPos.y - Camera.micPos.y;
-	dz = slot->nPos.z - Camera.micPos.z;
-
-	if (ABS(dx) <= SOUND_RADIUS &&
-		ABS(dy) <= SOUND_RADIUS &&
-		ABS(dz) <= SOUND_RADIUS)
+	int dx, dy, dz, radius, distance, nPan, nVolume;
+	if (slot->distance || slot->pos.x || slot->pos.y || slot->pos.z)
 	{
-		nDistance = SQR(dx) + SQR(dy) + SQR(dz);
-		if (nDistance < SOUND_MAXVOL_RADIUS_SQRD)
-			nDistance = 0;
-		else
-			nDistance = phd_sqrt(nDistance) - BLOCK(1);
+		auto& sampleInfo = SampleInfos.at(slot->sampleIdx);
+		dx = slot->pos.x - Camera.pos.x;
+		dy = slot->pos.y - Camera.pos.y;
+		dz = slot->pos.z - Camera.pos.z;
+		radius = sampleInfo.radius << WALL_SHIFT;
 
-		nPan = phd_atan(dz, dx) - Camera.actualAngle;
-		nVolume = slot->nOrigVolume;
-
-		int nAttenuation = nDistance * nDistance / (SOUND_RADIUS_SQRD / 0x10000);
-		nVolume = ((65536 - nAttenuation) * nVolume) >> 16;
-		if (nVolume > 0x7FFF) nVolume = 0x7FFF;
-		if (nVolume > 0)
+		if (ABS(dx) <= radius &&
+			ABS(dy) <= radius &&
+			ABS(dz) <= radius)
 		{
-			if (nVolume > 0x7FFF)
-				nVolume = 0x7FFF;
-			slot->nVolume = nVolume;
-			slot->nPan = nPan;
-			slot->nRange = nDistance;
+			distance = SQR(dx) + SQR(dy) + SQR(dz);
+			if (distance <= SQR(radius))
+			{
+				if (distance >= 0x100000)
+					distance = phd_sqrt(distance) - WALL_SIZE;
+				else
+					distance = 0;
+				nPan = phd_atan(dz, dx) - Camera.actualAngle;
+				nVolume = slot->originalVolume;
+				int nAttenuation = SQR(distance) / (SQR(radius) / 0x10000);
+				nVolume = (nVolume * (0x10000 - nAttenuation)) >> 16;
+				if (nVolume > 0)
+				{
+					if (nVolume > 0x7FFF)
+						nVolume = 0x7FFF;
+					slot->volume = nVolume;
+					slot->pan = nPan;
+					slot->distance = distance;
+				}
+				else
+				{
+					slot->distance = 0;
+					slot->pan = 0;
+					slot->volume = 0;
+				}
+			}
+			else
+			{
+				slot->distance = 0;
+				slot->pan = 0;
+				slot->volume = 0;
+			}
 		}
 		else
 		{
-			slot->nRange = 0;
-			slot->nPan = 0;
-			slot->nVolume = 0;
+			slot->distance = 0;
+			slot->pan = 0;
+			slot->volume = 0;
 		}
-	}
-	else
-	{
-		slot->nRange = 0;
-		slot->nPan = 0;
-		slot->nVolume = 0;
 	}
 }
-*/
+
 int GetRealTrack(int trackID) {
 	static char vtracks[] = { 2, 19, 20, 26, -1 };
 	int idx = 0;
@@ -113,26 +116,21 @@ int PlaySoundEffect(DWORD sampleIdx, PHD_3DPOS* pos, DWORD flags)
 		return 0;
 
 	SAMPLE_INFO& info = SampleInfos.at(lut);
-	if (info.randomness)
-	{
-		if ((GetRandomDraw() & 0xFF) > info.randomness)
-			return 0;
-	}
+	if (info.randomness && (GetRandomDraw() & 0xFF) > info.randomness)
+		return 0;
 
 	int nDistance = 0;
 	int nRadius = info.radius << WALL_SHIFT;
 	int pan = 0;
 	if (pos)
 	{
-		int x = (pos->x - Camera.micPos.x);
-		int y = (pos->y - Camera.micPos.y);
-		int z = (pos->z - Camera.micPos.z);
-
-		if ((x < -nRadius) || (x > nRadius) ||
-			(y < -nRadius) || (y > nRadius) ||
-			(z < -nRadius) || (z > nRadius))
+		int x = (pos->x - Camera.pos.x);
+		int y = (pos->y - Camera.pos.y);
+		int z = (pos->z - Camera.pos.z);
+		if (ABS(x) > nRadius &&
+			ABS(y) > nRadius &&
+			ABS(z) > nRadius)
 			return 0;
-
 		nDistance = SQR(x) + SQR(y) + SQR(z);
 		if (nDistance > SQR(nRadius))
 			return 0;
@@ -140,31 +138,37 @@ int PlaySoundEffect(DWORD sampleIdx, PHD_3DPOS* pos, DWORD flags)
 			nDistance = 0;
 		else
 			nDistance = phd_sqrt(nDistance) - WALL_SIZE;
-
 		if (!(info.flags & 0x1000)) // NO_PAN
 			pan = phd_atan(z, x) - Camera.actualAngle;
 	}
 	else
 	{
+		PHD_3DPOS pos2 = {};
 		nDistance = 0;
+		pos2.x = 0;
+		pos2.y = 0;
+		pos2.z = 0;
+		pos = &pos2;
 	}
 
-	int nVolume = info.volume;
+	int nVolume = info.volume << 7;
 	if ((info.flags & 0x4000))
-		nVolume -= ((GetRandomDraw() * 0x1000) >> 15);
+		nVolume -= (0x1000 * GetRandomDraw()) >> 15;
 	int origVolume = nVolume;
 	int nAttenuation = SQR(nDistance) / (SQR(nRadius) / 0x10000);
-	int pitch = 0;
 	nVolume = (nVolume * (0x10000 - nAttenuation)) >> 16;
 	if (nVolume <= 0) return 0;
 	if (nVolume > 0x7FFF) nVolume = 0x7FFF;
+
+	int pitch = 0;
 	if (flags & SFX_PITCH)
 		pitch = (flags >> 8) & 0xffffff;
 	else
 		pitch = 0x10000;
 
 	if (info.flags & 0x2000) // RANDOM_PITCH
-		pitch += ((GetRandomDraw() * 0x10000) >> 14) - 0x10000;
+		pitch += ((6000 * GetRandomDraw()) >> 14) - 6000;
+
 	if (info.sampleIdx < 0)
 		return 0;
 
@@ -183,6 +187,7 @@ int PlaySoundEffect(DWORD sampleIdx, PHD_3DPOS* pos, DWORD flags)
 			{
 				if (S_SoundSampleIsPlaying(nSlot))
 					return 0;
+				slot.originalVolume = origVolume;
 				slot.sampleIdx = -1;
 			}
 		}
@@ -195,6 +200,7 @@ int PlaySoundEffect(DWORD sampleIdx, PHD_3DPOS* pos, DWORD flags)
 			if (slot.sampleIdx == lut)
 			{
 				S_SoundStopSample(nSlot);
+				slot.originalVolume = origVolume;
 				slot.sampleIdx = -1;
 				break;
 			}
@@ -207,18 +213,18 @@ int PlaySoundEffect(DWORD sampleIdx, PHD_3DPOS* pos, DWORD flags)
 			auto& slot = LaSlot[nSlot];
 			if (slot.sampleIdx == lut)
 			{
-				if (nVolume > slot.nVolume)
+				if (nVolume > slot.volume)
 				{
-					slot.nVolume = nVolume;
-					slot.nOrigVolume = origVolume;
-					slot.nPan = pan;
-					slot.nPitch = pitch;
-					slot.nRange = nRadius;
+					slot.volume = nVolume;
+					slot.originalVolume = origVolume;
+					slot.pan = pan;
+					slot.pitch = pitch;
+					slot.distance = nDistance;
 					if (pos)
 					{
-						slot.nPos.x = pos->x;
-						slot.nPos.y = pos->y;
-						slot.nPos.z = pos->z;
+						slot.pos.x = pos->x;
+						slot.pos.y = pos->y;
+						slot.pos.z = pos->z;
 					}
 					return 1;
 				}
@@ -236,16 +242,17 @@ int PlaySoundEffect(DWORD sampleIdx, PHD_3DPOS* pos, DWORD flags)
 	if (nHandle >= 0)
 	{
 		auto& slot = LaSlot[nHandle];
-		slot.nVolume = nVolume;
-		slot.nPan = pan;
-		slot.nPitch = pitch;
+		slot.volume = nVolume;
+		slot.originalVolume = origVolume;
+		slot.pan = pan;
+		slot.pitch = pitch;
 		slot.sampleIdx = lut;
-		slot.nRange = nRadius;
+		slot.distance = nDistance;
 		if (pos)
 		{
-			slot.nPos.x = pos->x;
-			slot.nPos.y = pos->y;
-			slot.nPos.z = pos->z;
+			slot.pos.x = pos->x;
+			slot.pos.y = pos->y;
+			slot.pos.z = pos->z;
 		}
 		return 1;
 	}
@@ -263,9 +270,9 @@ int PlaySoundEffect(DWORD sampleIdx, PHD_3DPOS* pos, DWORD flags)
 	for (int nSlot = 1; nSlot < _countof(LaSlot); ++nSlot)
 	{
 		auto& slot = LaSlot[nSlot];
-		if ((slot.sampleIdx >= 0) && (slot.nVolume < nMinVolume))
+		if ((slot.sampleIdx >= 0) && (slot.volume < nMinVolume))
 		{
-			nMinVolume = slot.nVolume;
+			nMinVolume = slot.volume;
 			nMinSlot = nSlot;
 		}
 	}
@@ -290,14 +297,15 @@ int PlaySoundEffect(DWORD sampleIdx, PHD_3DPOS* pos, DWORD flags)
 	if (nHandle >= 0)
 	{
 		auto& slot = LaSlot[nHandle];
-		slot.nVolume = nVolume;
-		slot.nPan = pan;
-		slot.nPitch = pitch;
+		slot.volume = nVolume;
+		slot.originalVolume = origVolume;
+		slot.pan = pan;
+		slot.pitch = pitch;
 		slot.sampleIdx = lut;
-		slot.nRange = nRadius;
-		slot.nPos.x = pos->x;
-		slot.nPos.y = pos->y;
-		slot.nPos.z = pos->z;
+		slot.distance = nDistance;
+		slot.pos.x = pos->x;
+		slot.pos.y = pos->y;
+		slot.pos.z = pos->z;
 		return 1;
 	}
 
@@ -313,6 +321,7 @@ void StopSoundEffect(DWORD sampleIdx)
 	auto lut = SampleLut[sampleIdx];
 	auto& sampleInfo = SampleInfos.at(lut);
 	auto lut_end = lut + sampleInfo.lutCount;
+
 	for (int i = 0; i < _countof(LaSlot); ++i)
 	{
 		auto& slot = LaSlot[i];
@@ -329,23 +338,23 @@ void SOUND_EndScene()
 	for (int i = 0; i < _countof(LaSlot); i++)
 	{
 		SOUND_SLOT* slot = &LaSlot[i];
-		SAMPLE_INFO& sampleInfo = SampleInfos.at(slot->sampleIdx);
 		if (slot->sampleIdx < 0)
 			continue;
 
+		SAMPLE_INFO& sampleInfo = SampleInfos.at(slot->sampleIdx);
 		if (sampleInfo.flags & 0x0800) // Looped ?
 		{
-			if (!slot->nVolume)
+			if (!slot->volume)
 			{
 				S_SoundStopSample(i);
 				slot->sampleIdx = -1;
 				continue;
 			}
 
-			//GetPanVolume(slot);
-			S_SoundSetPanAndVolume(i, slot->nPan, slot->nVolume);
-			S_SoundSetPitch(i, slot->nPitch);
-			slot->nVolume = 0;
+			S_SoundUpdatePanVolume(slot);
+			S_SoundSetPanAndVolume(i, slot->pan, slot->volume);
+			S_SoundSetPitch(i, slot->pitch);
+			slot->volume = 0;
 		}
 		else if (!S_SoundSampleIsPlaying(i))
 			slot->sampleIdx = -1;
@@ -363,7 +372,7 @@ void SOUND_Stop()
 }
 
 void SOUND_Init() {
-	S_SoundSetMasterVolume(50); // 50% sfx volume
+	S_SoundSetMasterVolume(32); // 50% sfx volume
 	for (int i = 0; i < _countof(LaSlot); ++i)
 		SfxInfos[i].sampleIdx = -1;
 	SoundIsActive = TRUE;

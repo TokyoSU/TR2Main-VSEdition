@@ -573,7 +573,7 @@ void ExtractSaveGameInfo() {
 		ReadSG(&item->currentAnimState, sizeof(item->currentAnimState));
 		ReadSG(&item->goalAnimState, sizeof(item->goalAnimState));
 		item->status = ITEM_ACTIVE;
-		item->roomNumber = 0xFF;
+		item->roomNumber = NO_ROOM;
 	}
 
 	if (Lara.burn) {

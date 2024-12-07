@@ -2,7 +2,6 @@
 #include "global/types.h"
 #include "global/vars.h"
 
-#if defined(FEATURE_MOD_CONFIG)
 struct ModConfig
 {
 	ModConfig() {
@@ -42,6 +41,8 @@ struct ModConfig
 	bool isSplashOpaque = false;
 	bool isWaterSpriteOpaque = false;
 	bool isHotLiquidOpaque = false;
+	bool isRainOpaque = false;
+	bool isSnowOpaque = true;
 
 	short shotgunAmmoAtStart = 2;
 	short uzisAmmoAtStart = 0;
@@ -54,18 +55,19 @@ struct ModConfig
 	short smallMediAtStart = 1;
 	short bigMediAtStart = 1;
 
-	bool rainEnabled = false;
-	bool rainSplashEnabled = true;
-	DWORD rainSplashColor = 0xFFFFFF;
+	DWORD rainSplashColor = RGB_MAKE(255, 255, 255);
+	short rainSpriteScale = 1024;
 	short rainDensity = 0;
 	short rainSplashSize = 128;
-	//short rainStrengh = 0;
+	short rainDamageRange = CLICK(1);
+	BYTE rainDamage = 20;
+	bool rainEnabled = false;
+	bool rainSplashEnabled = true;
+	bool rainDoDamageOnHit = false;
 
-	bool snowEnabled = false;
-	bool snowSemiTransparentEnabled = true;
+	short snowSpriteScale = 1024;
 	short snowDensity = 0;
-	//short snowStrengh = 0;
-
+	bool snowEnabled = false;
 
 	std::string levelLoadingPix;
 	std::string titleLoadingPixLanguage;
@@ -74,7 +76,7 @@ struct ModConfig
 
 	bool isUIColorLoaded = false;
 
-	CUST_UNDERWATER_INFO underwaterInfo;
+	CUST_UNDERWATER_INFO underwater;
 	D3DCOLOR waterColor;
 	CUST_INVENTORY_ITEM invItemList[MAX_ITEM_IN_INVENTORY];
 	LARA_BAR_CONFIG laraBar;
@@ -116,4 +118,3 @@ extern int ParsePolyString(LPCSTR str, POLYINDEX* lst, DWORD lstLen);
 extern int ParsePolyValue(std::string value, POLYINDEX* lst, DWORD lstLen);
 
 extern ModConfig Mod;
-#endif

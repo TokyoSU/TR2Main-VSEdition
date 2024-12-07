@@ -240,12 +240,12 @@ typedef struct {
 
 // Room flags
 #define NO_ROOM							(255)
-#define ROOM_UNDERWATER					(0x01)
-#define ROOM_HORIZON					(0x08)
-#define ROOM_DAMAGE						(0x10)
-#define ROOM_OUTSIDE					(0x20)
-#define ROOM_NOTNEAR_OUTSIDE_ROOM		(0x40)
-#define ROOM_QUICKSAND					(0x80)
+#define ROOM_UNDERWATER					(0x001)
+#define ROOM_HORIZON					(0x008)
+#define ROOM_DAMAGE						(0x010)
+#define ROOM_OUTSIDE					(0x020)
+#define ROOM_NOTNEAR_OUTSIDE_ROOM		(0x040)
+#define ROOM_QUICKSAND					(0x080)
 #define ROOM_EFFECT						(0x100) // Room glow and movement flags, Light mode should be 2 !
 #define ROOM_REFLECTION					(0x200) // Light mode should be 2 !
 #define ROOM_SNOW                       (0x400)
@@ -2061,6 +2061,7 @@ typedef struct RoomData_t {
 } ROOM_DATA;
 
 typedef struct RoomInfo_t {
+	short index;
 	ROOM_DATA* data;
 	DOOR_INFOS* doors;
 	FLOOR_INFO* floor;
@@ -2459,13 +2460,13 @@ typedef struct Sphere_t {
 } SPHERE_INFO;
 
 typedef struct SoundSlot_t {
-	PHD_VECTOR nPos;
-	int nVolume;
-	int nOrigVolume;
-	int nPan;
+	PHD_VECTOR pos;
+	int volume;
+	int originalVolume;
+	int pan;
 	int sampleIdx;
-	int nPitch;
-	int nRange;
+	int pitch;
+	int distance;
 } SOUND_SLOT;
 
 typedef struct WeaponInfo_t {

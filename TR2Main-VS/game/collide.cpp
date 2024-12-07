@@ -444,9 +444,17 @@ short GetTiltType(FLOOR_INFO* floor, int x, int y, int z)
 {
 	while (floor->pitRoom != NO_ROOM)
 		floor = GetFloorSector(x, z, &Rooms[floor->pitRoom]);
-	short* data = &FloorData[floor->index];
-	if (y + CLICK(2) >= ((int)floor->floor << 8) && data[0] == FT_TILT)
-		return data[1];
+
+	if (y + 512 < (floor->floor << 8))
+		return 0;
+
+	if (floor->index)
+	{
+		short* data = &FloorData[floor->index];
+		if ((data[0] & 0xFF) == FT_TILT)
+			return data[1];
+	}
+
 	return 0;
 }
 

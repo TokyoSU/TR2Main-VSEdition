@@ -485,7 +485,7 @@ BOOL LoadRooms(HANDLE hFile) {
 
 	// Get number of rooms
 	ReadFileSync(hFile, &RoomCount, sizeof(short), &bytesRead, NULL);
-	if (RoomCount < 0 || RoomCount > 0x400) {
+	if (RoomCount < 0 || RoomCount > 1024) {
 		lstrcpy(StringToShow, "LoadRoom(): Too many rooms");
 		return FALSE;
 	}
@@ -502,6 +502,7 @@ BOOL LoadRooms(HANDLE hFile) {
 		ROOM_INFO* room = &Rooms[i];
 
 		// Room position
+		room->index = i;
 		ReadFileSync(hFile, &room->x, sizeof(int), &bytesRead, NULL);
 		ReadFileSync(hFile, &room->z, sizeof(int), &bytesRead, NULL);
 		room->y = 0;

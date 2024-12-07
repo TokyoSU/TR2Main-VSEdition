@@ -20,10 +20,9 @@
  */
 #include "precompiled.h"
 #include "modding/json_utils.h"
+#include "modding/mod_utils.h"
 #include "game/invfunc.h"
 
-#if defined(FEATURE_MOD_CONFIG)
-#include "modding/mod_utils.h"
 #define MOD_CONFIG_NAME "TR2Main.json"
 
 ModConfig Mod;
@@ -170,7 +169,8 @@ void LoadCustomInventoryItems(Value& data)
     if (inventoryItemList.Size() <= 0) {
         LogWarn("Failed to load inventory_item_list, there no value in the array !");
         return;
-    } else if (inventoryItemList.Size() > MAX_ITEM_IN_INVENTORY) {
+    }
+    else if (inventoryItemList.Size() > MAX_ITEM_IN_INVENTORY) {
         LogWarn("Failed to load inventory_item_list, array size out of bounds, you can't have more than 23 objects in inventory !");
         return;
     }
@@ -272,18 +272,23 @@ void LoadLevelConfig(Value& data) {
     Mod.enemyHealth.giantYeti = GetValueByNameShort(data, "giant_yeti_health", 200);
     Mod.enemyHealth.dino = GetValueByNameShort(data, "dino_health", 100);
 
-    Mod.underwaterInfo.maxAir = GetValueByNameShort(data, "max_lara_air", LARA_AIR_MAX);
-    Mod.underwaterInfo.noAirDamagePerTick = GetValueByNameShort(data, "no_air_damage_per_tick", LARA_NO_AIR_DAMAGE_PER_TICK);
-    Mod.underwaterInfo.restoreAirPerTick = GetValueByNameShort(data, "restore_air_per_tick", LARA_RESTORE_AIR_PER_TICK);
-    Mod.underwaterInfo.unlimitedAir = GetValueByNameBool(data, "unlimited_air", false);
+    Mod.underwater.maxAir = GetValueByNameShort(data, "max_lara_air", LARA_AIR_MAX);
+    Mod.underwater.noAirDamagePerTick = GetValueByNameShort(data, "no_air_damage_per_tick", LARA_NO_AIR_DAMAGE_PER_TICK);
+    Mod.underwater.restoreAirPerTick = GetValueByNameShort(data, "restore_air_per_tick", LARA_RESTORE_AIR_PER_TICK);
+    Mod.underwater.unlimitedAir = GetValueByNameBool(data, "unlimited_air", false);
 
     Mod.rainEnabled = GetValueByNameBool(data, "rain_enabled", false);
     Mod.rainSplashEnabled = GetValueByNameBool(data, "rain_splash_enabled", true);
     Mod.rainSplashColor = GetColorRGBByName(data, "rain_splash_color", RGB_MAKE(255, 255, 255));
     Mod.rainSplashSize = GetValueByNameShort(data, "rain_splash_size", 128);
+    Mod.rainSpriteScale = GetValueByNameShort(data, "rain_sprite_scale", 1024);
     Mod.rainDensity = GetValueByNameShort(data, "rain_density", 128);
+    Mod.rainDoDamageOnHit = GetValueByNameBool(data, "is_rain_damage_on_hit", false);
+    Mod.rainDamage = GetValueByNameByte(data, "rain_damage_on_hit", 20);
+    Mod.rainDamageRange = GetValueByNameShort(data, "rain_check_damage_range", CLICK(1));
+
     Mod.snowEnabled = GetValueByNameBool(data, "snow_enabled", false);
-    Mod.snowSemiTransparentEnabled = GetValueByNameBool(data, "snow_semi_transparent_enabled", true);
+    Mod.snowSpriteScale = GetValueByNameShort(data, "snow_sprite_scale", 1024);
     Mod.snowDensity = GetValueByNameShort(data, "snow_density", 128);
 
     Mod.disableGiantYetiNextLevelOnDeath = GetValueByNameBool(data, "disable_giant_yeti_next_level_on_death", false);
@@ -305,6 +310,8 @@ void LoadLevelConfig(Value& data) {
     Mod.isSplashOpaque = GetValueByNameBool(data, "is_splash_opaque", false);
     Mod.isWaterSpriteOpaque = GetValueByNameBool(data, "is_water_sprite_opaque", false);
     Mod.isHotLiquidOpaque = GetValueByNameBool(data, "is_hot_liquid_opaque", false);
+    Mod.isRainOpaque = GetValueByNameBool(data, "is_rain_opaque", false);
+    Mod.isSnowOpaque = GetValueByNameBool(data, "is_snow_opaque", true);
 }
 
 void LoadSemitransConfig(Value& data, SEMITRANS_CONFIG* semitrans) {
@@ -998,4 +1005,3 @@ int ParsePolyValue(std::string value, POLYINDEX* lst, DWORD lstLen) {
     }
     return ParsePolyString(str, lst, lstLen);
 }
-#endif
