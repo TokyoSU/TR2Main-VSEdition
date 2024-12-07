@@ -35,7 +35,11 @@ static GAME_VECTOR WEATHER_GetRoomCeilingRandomPos(short roomNumber, short roomF
 	vec.y = GetCeiling(GetFloor(vec.x, vec.y, vec.z, &roomNum), vec.x, vec.y, vec.z); // Avoid rain splash to spawn on the ceiling !
 	vec.roomNumber = roomNum;
 	r = &Rooms[roomNum];
-	if (!CHK_ANY(r->flags, roomFlags))
+	if (FlipStatus && !CHK_ANY(r->flags, ROOM_FLIP))
+		return vec;
+	else if (!FlipStatus && CHK_ANY(r->flags, ROOM_FLIP))
+		return vec;
+	else if (!CHK_ANY(r->flags, roomFlags))
 		return vec;
 	vec.boxNumber = TRUE;
 	return vec;
@@ -46,11 +50,9 @@ void WEATHER_UpdateAndDrawRain()
 	for (int i = 0; i < MAX_WEATHER_RAIN; i++) {
 		auto& rainDrop = RainList[i];
 
-		for (short i = 0; i < RoomCount; i++) {
-			auto* r = &Rooms[i];
+		for (short j = 0; j < RoomCount; j++) {
+			auto* r = &Rooms[j];
 			if (CHK_ANY(r->flags, ROOM_RAIN)) {
-				if (!FlipStatus && CHK_ANY(r->flags, ROOM_FLIP))
-					continue;
 				if (!rainDrop.on && RainCount < Mod.rainDensity) {
 					GAME_VECTOR vec = WEATHER_GetRoomCeilingRandomPos(r->index, ROOM_RAIN);
 					if (vec.boxNumber == TRUE)
@@ -136,12 +138,10 @@ void WEATHER_UpdateAndDrawSnow()
 	for (int i = 0; i < MAX_WEATHER_SNOW; i++) {
 		auto& snowDrop = SnowList[i];
 
-		for (short i = 0; i < RoomCount; i++)
+		for (short j = 0; j < RoomCount; j++)
 		{
-			auto* r = &Rooms[i];
+			auto* r = &Rooms[j];
 			if (CHK_ANY(r->flags, ROOM_SNOW)) {
-				if (!FlipStatus && CHK_ANY(r->flags, ROOM_FLIP))
-					continue;
 				if (!snowDrop.on && SnowCount < Mod.snowDensity) {
 					GAME_VECTOR vec = WEATHER_GetRoomCeilingRandomPos(r->index, ROOM_SNOW);
 					if (vec.boxNumber == TRUE)
