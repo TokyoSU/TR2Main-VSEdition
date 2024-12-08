@@ -250,10 +250,11 @@ void Splash2(ITEM_INFO* item, int waterHeight)
 			fx->pos.x = item->pos.x;
 			fx->pos.y = waterHeight;
 			fx->pos.z = item->pos.z;
-			fx->pos.rotY = 2 * GetRandomDraw() - 0x8000;
+			fx->pos.rotY = (2 * GetRandomDraw()) - ANGLE(180);
 			fx->frameNumber = 0;
 			fx->objectID = ID_SPLASH;
 			fx->speed = GetRandomDraw() / 256;
+			fx->scale = 256;
 		}
 	}
 	PlaySoundEffect(247, &item->pos, SFX_ALWAYS);
@@ -281,6 +282,7 @@ void CreateSplash(int x, int y, int z, short roomNumber)
 		fx->frameNumber = 0;
 		fx->objectID = ID_SPLASH;
 		fx->speed = 0;
+		fx->scale = 256;
 	}
 }
 

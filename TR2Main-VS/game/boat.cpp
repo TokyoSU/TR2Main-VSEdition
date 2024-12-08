@@ -59,7 +59,6 @@ void InitialiseBoat(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	item->data = (BOAT_INFO*)game_malloc(sizeof(BOAT_INFO), GBUF_TempAlloc);
-
 	BOAT_INFO* boat = GetBoatData(item);
 	boat->turn = 0;
 	boat->rightFallspeed = 0;
@@ -70,7 +69,7 @@ void InitialiseBoat(short itemNumber)
 	boat->pitch = 0;
 }
 
-int BoatCheckGeton(short itemNumber, COLL_INFO* coll)
+BOAT_GETON_TYPE BoatCheckGeton(short itemNumber, COLL_INFO* coll)
 {
 	if (Lara.gun_status != LGS_Armless)
 		return BGF_NOTON;
@@ -81,7 +80,7 @@ int BoatCheckGeton(short itemNumber, COLL_INFO* coll)
 		return BGF_NOTON;
 
 	short rotation = item->pos.rotY - LaraItem->pos.rotY;
-	int geton = BGF_NOTON;
+	BOAT_GETON_TYPE geton = BGF_NOTON;
 
 	if (Lara.water_status == LWS_Surface || Lara.water_status == LWS_Wade)
 	{

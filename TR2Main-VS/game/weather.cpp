@@ -89,20 +89,23 @@ void WEATHER_UpdateAndDrawRain()
 				continue;
 			}
 			
-			if (Mod.rainDoDamageOnHit)
+			if (Lara.water_status != LWS_Cheat)
 			{
-				PHD_3DPOS effectPos = {};
-				effectPos.x = rainDrop.x;
-				effectPos.y = rainDrop.y;
-				effectPos.z = rainDrop.z;
-				if (ItemNearLara(&effectPos, Mod.rainDamageRange))
+				if (Mod.rainDoDamageOnHit)
 				{
-					DoBloodSplat(rainDrop.x, rainDrop.y, rainDrop.z, 5, LaraItem->pos.rotY + ANGLE(180), rainDrop.room);
-					LaraItem->hitPoints -= Mod.rainDamage;
-					LaraItem->hitStatus = TRUE;
-					rainDrop.on = false;
-					RainCount--;
-					continue;
+					PHD_3DPOS effectPos = {};
+					effectPos.x = rainDrop.x;
+					effectPos.y = rainDrop.y;
+					effectPos.z = rainDrop.z;
+					if (ItemNearLara(&effectPos, Mod.rainDamageRange))
+					{
+						DoBloodSplat(rainDrop.x, rainDrop.y, rainDrop.z, 5, LaraItem->pos.rotY + ANGLE(180), rainDrop.room);
+						LaraItem->hitPoints -= Mod.rainDamage;
+						LaraItem->hitStatus = TRUE;
+						rainDrop.on = false;
+						RainCount--;
+						continue;
+					}
 				}
 			}
 

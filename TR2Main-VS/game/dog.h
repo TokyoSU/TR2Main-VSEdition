@@ -27,7 +27,8 @@
  /*
   * Function list
   */
-#define DogControl ((void(__cdecl*)(short)) 0x00417130)
-#define TigerControl ((void(__cdecl*)(short)) 0x004174E0)
+
+void DogControl(short itemNumber); // 0x00417130
+void TigerControl(short itemNumber); // 0x004174E0
 
 #endif // DOG_H_INCLUDED

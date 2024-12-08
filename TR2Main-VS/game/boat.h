@@ -34,10 +34,10 @@ typedef enum {
 	BGF_GETLEFT,
 	BGF_JUMPON,
 	BGF_SAMESPOT
-} BOAT_GETON_FLAGS; // used for BoatCheckGeton return value.
+} BOAT_GETON_TYPE; // used for BoatCheckGeton return value.
 
 void InitialiseBoat(short itemNumber); // 0x0040CB10
-int BoatCheckGeton(short itemNumber, COLL_INFO* coll); // 0x0040CB50
+BOAT_GETON_TYPE BoatCheckGeton(short itemNumber, COLL_INFO* coll); // 0x0040CB50
 void BoatCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll); // 0x0040CCC0
 int TestWaterHeight(ITEM_INFO* item, int zoff, int xoff, PHD_VECTOR* pos); // 0x0040CE20
 void DoBoatShift(int itemNumber); // 0x0040CF20
