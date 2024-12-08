@@ -44,7 +44,7 @@ void SpringBoardControl(short itemNumber); // 0x00441B00
 void InitialiseRollingBall(short itemNumber); // 0x00441BE0
 void RollingBallControl(short itemNumber); // 0x00441C20
 void RollingBallCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll); // 0x00441F70
-#define SpikeCollision ((void(__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x004421C0)
+void SpikeCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll); // 0x004421C0
 #define TrapDoorControl ((void(__cdecl*)(short)) 0x00442320)
 #define TrapDoorFloor ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00442370)
 #define TrapDoorCeiling ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x004423B0)

@@ -163,21 +163,19 @@ bool S_UpdateInput() {
 	// Key combinations and alternatives
 #if defined(FEATURE_HUD_IMPROVED)
 	if (Key(KM_Step)) {
-		if (CHK_ANY(input, IN_LEFT)) {
+		input |= IN_SLOW;
+		if (CHK_ANY(input, IN_LEFT) && !CHK_ANY(input, IN_FORWARD | IN_BACK)) {
 			input &= ~(IN_LEFT | IN_FORWARD | IN_BACK);
 			input |= IN_STEPL;
 		}
-		else if (CHK_ANY(input, IN_RIGHT)) {
+		else if (CHK_ANY(input, IN_RIGHT) && !CHK_ANY(input, IN_FORWARD | IN_BACK)) {
 			input &= ~(IN_RIGHT | IN_FORWARD | IN_BACK);
 			input |= IN_STEPR;
-		}
-		else {
-			input |= IN_SLOW;
 		}
 	}
 #endif // FEATURE_HUD_IMPROVED
 #if defined(FEATURE_INPUT_IMPROVED)
-	if (WalkToSidestep && CHK_ANY(input, IN_SLOW) && !CHK_ANY(input, IN_FORWARD | IN_BACK | IN_STEPL | IN_STEPR)) {
+	if (WalkToSidestep && CHK_ANY(input, IN_SLOW) && !CHK_ANY(input, IN_FORWARD | IN_BACK | IN_STEPR | IN_STEPL)) {
 		if (CHK_ANY(input, IN_LEFT)) {
 			input &= ~IN_LEFT;
 			input |= IN_STEPL;

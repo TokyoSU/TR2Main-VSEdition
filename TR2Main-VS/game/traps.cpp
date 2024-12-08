@@ -39,6 +39,8 @@
 #include "modding/joy_output.h"
 #endif // FEATURE_INPUT_IMPROVED
 
+constexpr auto SPIKE_DAMAGE = 15;
+
 void MineControl(short mineID) {
 	ITEM_INFO* mine = &Items[mineID];
 	if (CHK_ANY(mine->flags, IFL_ONESHOT)) {
@@ -524,6 +526,51 @@ void RollingBallCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll
 	}
 }
 
+void SpikeCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	if (laraItem->hitPoints < 0)
+		return;
+
+	if (!TestBoundsCollide(item, laraItem, coll->radius))
+		return;
+	if (!TestCollision(item, laraItem))
+		return;
+
+	int num = GetRandomControl() / 24576;
+	if (laraItem->gravity)
+	{
+		if (laraItem->fallSpeed > 6)
+		{
+			laraItem->hitPoints = -1;
+			num = 20;
+		}
+	}
+	else if (laraItem->speed < 30)
+	{
+		return;
+	}
+
+	laraItem->hitPoints -= SPIKE_DAMAGE;
+	for (; num > 0; num--)
+	{
+		int x = laraItem->pos.x + (GetRandomControl() - 16384) / 256;
+		int y = laraItem->pos.y - GetRandomControl() / 64;
+		int z = laraItem->pos.z + (GetRandomControl() - 16384) / 256;
+		DoBloodSplat(x, y, z, 20, GetRandomControl() & (ANGLE(360) - 1), item->roomNumber);
+	}
+
+	if (laraItem->hitPoints <= 0)
+	{
+		laraItem->animNumber = 149; // Spike death animation.
+		laraItem->frameNumber = Anims[laraItem->animNumber].frameBase;
+		laraItem->currentAnimState = AS_DEATH;
+		laraItem->goalAnimState = AS_DEATH;
+		laraItem->pos.y = item->pos.y;
+		laraItem->gravity = FALSE;
+	}
+}
+
 void Pendulum(short itemNumber) {
 	ITEM_INFO* item = &Items[itemNumber];
 	if (TriggerActive(item))
@@ -984,7 +1031,7 @@ void Inject_Traps() {
 	INJECT(0x00441BE0, InitialiseRollingBall);
 	INJECT(0x00441C20, RollingBallControl);
 	INJECT(0x00441F70, RollingBallCollision);
-	//INJECT(0x004421C0, SpikeCollision);
+	INJECT(0x004421C0, SpikeCollision);
 	//INJECT(0x00442320, TrapDoorControl);
 	//INJECT(0x00442370, TrapDoorFloor);
 	//INJECT(0x004423B0, TrapDoorCeiling);
