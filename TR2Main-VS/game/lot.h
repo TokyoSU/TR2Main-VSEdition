@@ -33,7 +33,6 @@
 #define InitialiseLOTarray ((void(__cdecl*)(void)) 0x00432B10)
 #define DisableBaddieAI ((void(__cdecl*)(short)) 0x00432B70)
 #define EnableBaddieAI ((BOOL(__cdecl*)(short,BOOL)) 0x00432BC0)
-//#define InitialiseSlot ((void(__cdecl*)(short,int)) 0x00432D70)
 void InitialiseSlot(short itemNumber, int baddieSlotID); // 0x00432D70
 void CreateZone(ITEM_INFO* item); // 0x00432F80
 #define ClearLOT ((void(__cdecl*)(LOT_INFO*)) 0x00433040)

@@ -102,14 +102,14 @@ void DoFlareInHand(int flare_age)
 		if (IsFlareLeftHandUnderwater(&pos, &roomNumber))
 		{
 			PlaySoundEffect(12, &LaraItem->pos, SFX_UNDERWATER);
-			if (GetRandomDraw() < 0x4000)
+			if (GetRandomDraw() < 8192)
 				CreateBubbleVec(&pos, roomNumber);
 		}
 #else
 		if (CHK_ANY(RoomInfo[LaraItem->roomNumber].flags, ROOM_UNDERWATER))
 		{
 			PlaySoundEffect(12, &LaraItem->pos, SFX_UNDERWATER);
-			if (GetRandomDraw() < 0x4000)
+			if (GetRandomDraw() < 8192)
 				CreateBubbleVec(&pos, LaraItem->roomNumber);
 		}
 #endif
@@ -432,7 +432,7 @@ void FlareControl(short itemNumber) {
 			age |= 0x8000;
 			if (CHK_ANY(Rooms[item->roomNumber].flags, ROOM_UNDERWATER)) {
 				PlaySoundEffect(12, &item->pos, SFX_UNDERWATER);
-				if (GetRandomDraw() < 16384)
+				if (GetRandomDraw() < 8192)
 					CreateBubble(&item->pos, item->roomNumber);
 			}
 			else {

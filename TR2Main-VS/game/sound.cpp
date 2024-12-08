@@ -159,6 +159,8 @@ int PlaySoundEffect(DWORD sampleIdx, PHD_3DPOS* pos, DWORD flags)
 	nVolume = (nVolume * (0x10000 - nAttenuation)) >> 16;
 	if (nVolume <= 0) return 0;
 	if (nVolume > 0x7FFF) nVolume = 0x7FFF;
+	if (CHK_ANY(flags, SFX_UNDERWATER)) // Sound underwater has lower volume.
+		nVolume /= 2;
 
 	int pitch = 0;
 	if (flags & SFX_PITCH)

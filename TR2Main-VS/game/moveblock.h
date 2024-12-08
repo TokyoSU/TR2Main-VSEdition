@@ -30,9 +30,9 @@
 #define InitialiseMovingBlock ((void(__cdecl*)(short)) 0x004339A0)
 #define MovableBlock ((void(__cdecl*)(short)) 0x004339D0)
 #define MovableBlockCollision ((void(__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x00433B20)
-//0x00433D80:		TestBlockMovable
-//0x00433DD0:		TestBlockPush
-//0x00433F20:		TestBlockPull
+#define TestBlockMovable ((int(__cdecl*)(ITEM_INFO*,int)) 0x00433D80)
+#define TestBlockPush ((int(__cdecl*)(ITEM_INFO*,int,UINT16)) 0x00433DD0)
+#define TestBlockPull ((int(__cdecl*)(ITEM_INFO*,int,UINT16)) 0x00433F20)
 #define AlterFloorHeight ((void(__cdecl*)(ITEM_INFO*, int)) 0x00434160)
 #define DrawMovableBlock ((void(__cdecl*)(ITEM_INFO*)) 0x00434220)
 #define DrawUnclippedItem ((void(__cdecl*)(ITEM_INFO*)) 0x00434250)

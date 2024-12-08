@@ -27,6 +27,6 @@
  /*
   * Function list
   */
-#define MouseControl ((void(__cdecl*)(short)) 0x00438FA0)
+void MouseControl(short itemNumber); // 0x00438FA0
 
 #endif // RAT_H_INCLUDED
