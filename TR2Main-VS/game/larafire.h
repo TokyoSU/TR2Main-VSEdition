@@ -30,15 +30,15 @@ extern bool IsMonkAngry;
   * Function list
   */
 void LaraGun(); // 0x0042E740
-#define CheckForHoldingState ((int(__cdecl*)(int)) 0x0042ECB0)
-#define InitialiseNewWeapon ((void(__cdecl*)(void)) 0x0042ECF0)
-#define LaraTargetInfo ((void(__cdecl*)(WEAPON_INFO*)) 0x0042EE30)
+int CheckForHoldingState(int state); // 0x0042ECB0
+void InitialiseNewWeapon(); // 0x0042ECF0
+void LaraTargetInfo(WEAPON_INFO* weapon); // 0x0042EE30
 void LaraGetNewTarget(WEAPON_INFO* weapon); // 0x0042EFD0
-#define find_target_point ((void(__cdecl*)(ITEM_INFO*,GAME_VECTOR*)) 0x0042F1F0)
-#define AimWeapon ((void(__cdecl*)(WEAPON_INFO*,LARA_ARM*)) 0x0042F2A0)
+void find_target_point(ITEM_INFO* item, GAME_VECTOR* target); // 0x0042F1F0
+void AimWeapon(WEAPON_INFO* weapon, LARA_ARM* arm); // 0x0042F2A0
 int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles); // 0x0042F370
 void HitTarget(ITEM_INFO* item, GAME_VECTOR* dest, int damage); // 0x0042F6E0
 void SmashItem(short itemNumber, int weaponType); // 0x0042F780
-#define WeaponObject ((int(__cdecl*)(int)) 0x0042F7E0)
+int WeaponObject(int weaponType); // 0x0042F7E0
 
 #endif // LARA_FIRE_H_INCLUDED

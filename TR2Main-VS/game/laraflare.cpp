@@ -115,7 +115,7 @@ void DoFlareInHand(int flare_age)
 #endif
 		else
 		{
-			PlaySoundEffect(12, &LaraItem->pos, 0);
+			PlaySoundEffect(12, &LaraItem->pos, NULL);
 		}
 	}
 }
@@ -164,7 +164,7 @@ void CreateFlare(BOOL isFlying) {
 		pos.x = -16;
 		pos.y = 32;
 		pos.z = 42;
-		GetLaraJointAbsPosition(&pos, 13);
+		GetLaraJointAbsPosition(&pos, LM_HandL);
 		if (GetHeight(GetFloor(pos.x, pos.y, pos.z, &item->roomNumber), pos.x, pos.y, pos.z) < pos.y) {
 			item->pos.x = LaraItem->pos.x;
 			item->pos.y = pos.y;
@@ -202,16 +202,17 @@ void CreateFlare(BOOL isFlying) {
 }
 
 void set_flare_arm(int frame) {
+	OBJECT_INFO* obj = &Objects[ID_LARA_FLARE];
 	if (frame < 1)
-		Lara.left_arm.anim_number = Objects[ID_LARA_FLARE].animIndex;
+		Lara.left_arm.anim_number = obj->animIndex;
 	else if (frame < 33)
-		Lara.left_arm.anim_number = Objects[ID_LARA_FLARE].animIndex + 1;
+		Lara.left_arm.anim_number = obj->animIndex + 1;
 	else if (frame < 72)
-		Lara.left_arm.anim_number = Objects[ID_LARA_FLARE].animIndex + 2;
+		Lara.left_arm.anim_number = obj->animIndex + 2;
 	else if (frame < 95)
-		Lara.left_arm.anim_number = Objects[ID_LARA_FLARE].animIndex + 3;
+		Lara.left_arm.anim_number = obj->animIndex + 3;
 	else
-		Lara.left_arm.anim_number = Objects[ID_LARA_FLARE].animIndex + 4;
+		Lara.left_arm.anim_number = obj->animIndex + 4;
 	Lara.left_arm.frame_base = Anims[Lara.left_arm.anim_number].framePtr;
 }
 

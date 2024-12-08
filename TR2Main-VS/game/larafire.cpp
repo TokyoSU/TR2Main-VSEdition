@@ -22,7 +22,9 @@
 #include "precompiled.h"
 #include "game/larafire.h"
 #include "3dsystem/3d_gen.h"
+#include "3dsystem/phd_math.h"
 #include "game/control.h"
+#include "game/draw.h"
 #include "game/effects.h"
 #include "game/invfunc.h"
 #include "game/items.h"
@@ -35,7 +37,6 @@
 #include "game/sphere.h"
 #include "specific/game.h"
 #include "global/vars.h"
-
 #if defined(FEATURE_MOD_CONFIG)
 #include "modding/mod_utils.h"
 #endif
@@ -249,6 +250,119 @@ void LaraGun() {
 	}
 }
 
+BOOL CheckForHoldingState(int state)
+{
+	short* holds = HoldStates;
+	if (Lara.extra_anim != 0)
+		return FALSE;
+	while (*holds >= 0)
+	{
+		if (state == *holds)
+			return TRUE;
+		holds++;
+	}
+	return FALSE;
+}
+
+void InitialiseNewWeapon()
+{
+	Lara.left_arm.frame_number = Lara.right_arm.frame_number = 0;
+	Lara.left_arm.x_rot = Lara.left_arm.y_rot = Lara.left_arm.z_rot = 0;
+	Lara.right_arm.x_rot = Lara.right_arm.y_rot = Lara.right_arm.z_rot = 0;
+	Lara.target = NULL;
+	Lara.left_arm.lock = Lara.right_arm.lock = FALSE;
+	Lara.left_arm.flash_gun = Lara.right_arm.flash_gun = 0;
+
+	switch (Lara.gun_type)
+	{
+	case LGT_Pistols:
+	case LGT_Magnums:
+	case LGT_Uzis:
+		Lara.left_arm.frame_base = Lara.right_arm.frame_base = Objects[ID_LARA_PISTOLS].frameBase;
+		if (Lara.gun_status != LGS_Armless)
+			draw_pistol_meshes(Lara.gun_type);
+		break;
+
+	case LGT_Shotgun:
+	case LGT_Harpoon:
+	case LGT_M16:
+	case LGT_Grenade:
+		Lara.left_arm.frame_base = Lara.right_arm.frame_base = Objects[WeaponObject(Lara.gun_type)].frameBase;
+		if (Lara.gun_status != LGS_Armless)
+			draw_shotgun_meshes(Lara.gun_type);
+		break;
+
+	case LGT_Flare:
+		Lara.left_arm.frame_base = Lara.right_arm.frame_base = Objects[ID_LARA_FLARE].frameBase;
+		if (Lara.gun_status != LGS_Armless)
+			draw_flare_meshes();
+		break;
+
+	default:
+		Lara.left_arm.frame_base = Lara.right_arm.frame_base = Anims[LaraItem->animNumber].framePtr;
+		break;
+	}
+}
+
+void LaraTargetInfo(WEAPON_INFO* weapon)
+{
+	if (Lara.target == NULL)
+	{
+		Lara.left_arm.lock = Lara.right_arm.lock = FALSE;
+		Lara.target_angles[0] = Lara.target_angles[1] = 0;
+		return;
+	}
+
+	GAME_VECTOR	src = {}, target = {};
+	src.x = LaraItem->pos.x;
+	src.y = LaraItem->pos.y - 650;
+	src.z = LaraItem->pos.z;
+	src.roomNumber = LaraItem->roomNumber;
+	find_target_point(Lara.target, &target);
+
+	VECTOR_ANGLES ang;
+	phd_GetVectorAngles(target.x - src.x, target.y - src.y, target.z - src.z, &ang);
+	ang.rotY -= LaraItem->pos.rotY;
+	ang.rotX -= LaraItem->pos.rotX;
+
+	if (LOS(&src, &target))
+	{
+		if ((ang.rotY >= weapon->lockAngles[0])
+		&&  (ang.rotY <= weapon->lockAngles[1])
+		&&  (ang.rotX >= weapon->lockAngles[2])
+		&&  (ang.rotX <= weapon->lockAngles[3]))
+		{
+			Lara.left_arm.lock = Lara.right_arm.lock = TRUE;
+		}
+		else
+		{
+			if (Lara.left_arm.lock)
+			{
+				if ((ang.rotY < weapon->leftAngles[0])
+				||  (ang.rotY > weapon->leftAngles[1])
+				||  (ang.rotX < weapon->leftAngles[2])
+				||  (ang.rotX > weapon->leftAngles[3]))
+					Lara.left_arm.lock = FALSE;
+			}
+			if (Lara.right_arm.lock)
+			{
+				if ((ang.rotY < weapon->rightAngles[0])
+				||  (ang.rotY > weapon->rightAngles[1])
+				||  (ang.rotX < weapon->rightAngles[2])
+				||  (ang.rotX > weapon->rightAngles[3]))
+					Lara.right_arm.lock = FALSE;
+			}
+		}
+	}
+	else
+	{
+		Lara.left_arm.lock = Lara.right_arm.lock = FALSE;
+	}
+
+	Lara.target_angles[0] = ang.rotY;
+	Lara.target_angles[1] = ang.rotX;
+}
+
 void LaraGetNewTarget(WEAPON_INFO* weapon)
 {
 	CREATURE_INFO* creature = NULL;
@@ -300,8 +414,7 @@ void LaraGetNewTarget(WEAPON_INFO* weapon)
 				&&  (angle.rotX <= weapon->lockAngles[3]))
 				{
 					angleY = ABS(angle.rotY);
-					if ((angleY < (bestAngle + 0xAAA))
-					&&  (distance < bestDistance))
+					if ((angleY < (bestAngle + 0xAAA)) &&  (distance < bestDistance))
 					{
 						bestDistance = distance;
 						bestAngle = angleY;
@@ -315,6 +428,55 @@ void LaraGetNewTarget(WEAPON_INFO* weapon)
 
 	Lara.target = bestTarget;
 	LaraTargetInfo(weapon);
+}
+
+void find_target_point(ITEM_INFO* item, GAME_VECTOR* target)
+{
+	short* bounds = GetBestFrame(item);
+	int x = (int)((bounds[0] + bounds[1]) / 2);
+	int y = (int)(bounds[2] + (bounds[3] - bounds[2]) / 3);
+	int z = (int)((bounds[4] + bounds[5]) / 2);
+	int c = phd_cos(item->pos.rotY);
+	int s = phd_sin(item->pos.rotY);
+	target->x = item->pos.x + ((c * x + s * z) >> W2V_SHIFT);
+	target->y = item->pos.y + y;
+	target->z = item->pos.z + ((c * z - s * x) >> W2V_SHIFT);
+	target->roomNumber = item->roomNumber;
+}
+
+void AimWeapon(WEAPON_INFO* weapon, LARA_ARM* arm)
+{
+	short angleX, angleY;
+	short speed = weapon->aimSpeed;
+	if (arm->lock)
+	{
+		angleY = Lara.target_angles[0];
+		angleX = Lara.target_angles[1];
+	}
+	else
+	{
+		angleY = angleX = 0;
+	}
+
+	short curr = arm->y_rot;
+	if (curr >= angleY - speed && curr <= angleY + speed)
+		curr = angleY;
+	else if (curr < angleY)
+		curr += speed;
+	else
+		curr -= speed;
+	arm->y_rot = curr;
+
+	curr = arm->x_rot;
+	if (curr >= angleX - speed && curr <= angleX + speed)
+		curr = angleX;
+	else if (curr < angleX)
+		curr += speed;
+	else
+		curr -= speed;
+
+	arm->x_rot = curr;
+	arm->z_rot = 0;
 }
 
 int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles) {
@@ -461,19 +623,39 @@ void SmashItem(short itemNumber, int weaponType) {
 	}
 }
 
+int WeaponObject(int weaponType)
+{
+	switch (weaponType)
+	{
+	case LGT_Magnums:
+		return ID_LARA_MAGNUMS;
+	case LGT_Uzis:
+		return ID_LARA_UZIS;
+	case LGT_Shotgun:
+		return ID_LARA_SHOTGUN;
+	case LGT_Grenade:
+		return ID_LARA_GRENADE;
+	case LGT_Harpoon:
+		return ID_LARA_HARPOON;
+	case LGT_M16:
+		return ID_LARA_M16;
+	}
+	return ID_LARA_PISTOLS;
+}
+
  /*
   * Inject function
   */
 void Inject_LaraFire() {
 	INJECT(0x0042E740, LaraGun);
-	//INJECT(0x0042ECB0, CheckForHoldingState);
-	//INJECT(0x0042ECF0, InitialiseNewWeapon);
-	//INJECT(0x0042EE30, LaraTargetInfo);
+	INJECT(0x0042ECB0, CheckForHoldingState);
+	INJECT(0x0042ECF0, InitialiseNewWeapon);
+	INJECT(0x0042EE30, LaraTargetInfo);
 	INJECT(0x0042EFD0, LaraGetNewTarget);
-	//INJECT(0x0042F1F0, find_target_point);
-	//INJECT(0x0042F2A0, AimWeapon);
+	INJECT(0x0042F1F0, find_target_point);
+	INJECT(0x0042F2A0, AimWeapon);
 	INJECT(0x0042F370, FireWeapon);
 	INJECT(0x0042F6E0, HitTarget);
 	INJECT(0x0042F780, SmashItem);
-	//INJECT(0x0042F7E0, WeaponObject);
+	INJECT(0x0042F7E0, WeaponObject);
 }
