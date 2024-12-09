@@ -30,11 +30,11 @@
 short Knife(int x, int y, int z, short speed, short rotY, short roomNum); // 0x0041DB30
 void Cult2Control(short itemNumber); // 0x0041DBB0
 void MonkControl(short itemNumber); // 0x0041DFE0
-#define Worker3Control ((void(__cdecl*)(short)) 0x0041E4B0)
+void Worker3Control(short itemNumber); // 0x0041E4B0
 void DrawXianLord(ITEM_INFO* item); // 0x0041EAC0
-void XianDamage(ITEM_INFO* item, CREATURE_INFO* creature, int damage); // 0x0041EEC0
+void XianDamage(ITEM_INFO* item, CREATURE_INFO* creature, int damage, int damageOther); // 0x0041EEC0
 void InitialiseXianLord(short itemNumber); // 0x0041EF70
-#define XianLordControl ((void(__cdecl*)(short)) 0x0041EFD0)
+void XianLordControl(short itemNumber); // 0x0041EFD0
 void WarriorSparkleTrail(ITEM_INFO* item); // 0x0041F5B0
 void WarriorControl(short itemNumber); // 0x0041F650
 
