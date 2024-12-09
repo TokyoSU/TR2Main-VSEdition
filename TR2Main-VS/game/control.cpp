@@ -1388,29 +1388,29 @@ void TriggerCDTrack(short value, UINT16 flags, short type) {
 void TriggerNormalCDTrack(short value, UINT16 flags, short type) {
 	if (type != 2) {
 		UINT16 codebits = flags & IFL_CODEBITS;
-		if (CHK_ANY(codebits, CD_Flags[value])) {
+		if (CHK_ANY(codebits, CDFlags[value])) {
 			return;
 		}
 		if (CHK_ANY(flags, IFL_ONESHOT)) {
-			CD_Flags[value] |= codebits;
+			CDFlags[value] |= codebits;
 		}
 	}
 
 	if (value == CD_TrackID) {
-		UINT8 timer = CD_Flags[value] & 0xFF;
+		UINT8 timer = CDFlags[value] & 0xFF;
 		if (timer) {
 			if (!--timer) {
 				CD_TrackID = -1;
 				S_CDPlay(value, FALSE);
 			}
-			CD_Flags[value] = (CD_Flags[value] & ~0xFF) | timer;
+			CDFlags[value] = (CDFlags[value] & ~0xFF) | timer;
 		}
 	}
 	else {
 		UINT8 timer = flags & 0xFF;
 		if (timer) {
 			CD_TrackID = value;
-			CD_Flags[value] = (CD_Flags[value] & ~0xFF) | ((timer * 30) & 0xFF);
+			CDFlags[value] = (CDFlags[value] & ~0xFF) | ((timer * 30) & 0xFF);
 		}
 		else {
 			S_CDPlay(value, FALSE);

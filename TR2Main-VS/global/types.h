@@ -88,7 +88,7 @@ typedef struct {
 #define NO_HEIGHT			(-0x7F00)
 
 // AI values
-#define HP_DONT_TARGET		(-0x4000) // -16384 (using 0xC000 don't work since it's outside the short range !)
+#define HP_DONT_TARGET		(-0x4000) // Lara wont target creature with this values in hitPoints.
 #define RANDOM_SEED			(0xD371F947)
 #define SUNSET_TIMEOUT		(TICKS_PER_SECOND*60*20) // sunset sets in 20 minutes
 

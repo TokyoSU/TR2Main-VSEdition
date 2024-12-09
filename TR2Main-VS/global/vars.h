@@ -82,6 +82,8 @@
 #define MAX_WEATHER_SNOW 4096
 #define MAX_WEATHER_SNOW_ALIVE 2048
 #define MAX_CREATURES 5
+#define MAX_FLIPMAPS 10
+#define MAX_CD 64
 
 /*
  * General Variables
@@ -670,8 +672,8 @@ extern STATIC_INFO StaticObjects[256];
 #define DrawRoomsArray				ARRAY_(0x00525B20, short, [100])
 #define StaticObjects				ARRAY_(0x00525C00, STATIC_INFO, [50])
 #endif // FEATURE_EXTENDED_LIMITS
-#define CD_Flags					ARRAY_(0x005261C0, short, [64])
-#define FlipMaps					ARRAY_(0x00526260, int, [10])
+#define CDFlags						ARRAY_(0x005261C0, short, [MAX_CD])
+#define FlipMaps					ARRAY_(0x00526260, int, [MAX_FLIPMAPS])
 #define LosRooms					ARRAY_(0x005262A0, int, [20])
 #define GroundZones					ARRAY_(0x005263A0, short*, [8])
 #define FlyZones					ARRAY_(0x005263C0, short*, [2])

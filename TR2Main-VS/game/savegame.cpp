@@ -278,7 +278,7 @@ void CreateSaveGameInfo() {
 		WriteSG(&flip, sizeof(flip));
 	}
 
-	WriteSG(CD_Flags, sizeof(CD_Flags));
+	WriteSG(CDFlags, sizeof(CDFlags));
 
 	for (DWORD i = 0; i < CameraCount; ++i) {
 		WriteSG(&Camera.fixed[i].flags, sizeof(Camera.fixed[i].flags));
@@ -420,7 +420,7 @@ void ExtractSaveGameInfo() {
 		FlipMaps[i] = flip << 8;
 	}
 
-	ReadSG(CD_Flags, sizeof(CD_Flags));
+	ReadSG(CDFlags, sizeof(CDFlags));
 
 	for (DWORD i = 0; i < CameraCount; ++i) {
 		ReadSG(&Camera.fixed[i].flags, sizeof(Camera.fixed[i].flags));

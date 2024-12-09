@@ -75,6 +75,8 @@
 extern bool IsGold();
 #endif
 
+extern bool IsMonkAngry;
+
 BOOL InitialiseLevel(int levelIndex, GF_LEVEL_TYPE type)
 {
 	if (type != GFL_TITLE && type != GFL_CUTSCENE)
@@ -133,6 +135,21 @@ BOOL InitialiseLevel(int levelIndex, GF_LEVEL_TYPE type)
 		result = TRUE;
 	}
 	return result;
+}
+
+void InitialiseGameFlags()
+{
+	FlipStatus = FALSE;
+	memset(FlipMaps, 0, sizeof(FlipMaps));
+	memset(CDFlags, 0, sizeof(CDFlags));
+	for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
+		Objects[i].loaded = FALSE;
+	SunsetTimer = 0;
+	AmmoTextInfo = NULL;
+	IsLevelComplete = FALSE;
+	FlipEffect = -1;
+	MinesDetonated = FALSE;
+	IsMonkAngry = false;
 }
 
 void InitialiseLevelFlags() {
@@ -1654,7 +1671,7 @@ void GetCarriedItems()
  */
 void Inject_Setup() {
 	INJECT(0x0043A330, InitialiseLevel);
-	//INJECT(0x0043A490, InitialiseGameFlags);
+	INJECT(0x0043A490, InitialiseGameFlags);
 	INJECT(0x0043A500, InitialiseLevelFlags);
 	INJECT(0x0043A530, BaddyObjects);
 	INJECT(0x0043B570, TrapObjects);
