@@ -40,7 +40,7 @@
 #include "modding/mod_utils.h"
 #endif
 
-void LaraControl(short itemNumber) {
+void LaraControl() {
 	COLL_INFO coll;
 	ITEM_INFO* item = LaraItem;
 

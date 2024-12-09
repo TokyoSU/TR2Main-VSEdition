@@ -759,7 +759,7 @@ void DrawLara(ITEM_INFO* item)
 	if (Lara.skidoo == -1)
 		S_PrintShadow(obj->shadowSize, frame, item);
 
-	PHD_MATRIX hairPos = {};
+	PHD_MATRIX hairPos = {}, gunPos = {};
 	memcpy(&hairPos, PhdMatrixPtr, sizeof(PHD_MATRIX));
 
 	phd_PushMatrix();
@@ -912,13 +912,15 @@ void DrawLara(ITEM_INFO* item)
 		phd_TranslateRel(bone[49], bone[50], bone[51]);
 		phd_RotYXZsuperpack(&rotation, 0);
 		phd_PutPolygons(Lara.mesh_ptrs[LM_HandL], clip);
+
+		if (Lara.gun_type == LGT_Flare && Lara.left_arm.flash_gun != 0)
+			DrawGunFlash(LGT_Flare, clip);
 		break;
 
 	case LGT_Pistols:
 	case LGT_Magnums:
 	case LGT_Uzis:
 		phd_PushMatrix(); // Start right arm.
-
 		phd_TranslateRel(bone[29], bone[30], bone[31]);
 		PhdMatrixPtr->_00 = PhdMatrixPtr[-2]._00;
 		PhdMatrixPtr->_01 = PhdMatrixPtr[-2]._01;
@@ -942,9 +944,11 @@ void DrawLara(ITEM_INFO* item)
 		phd_RotYXZsuperpack(&rotation, 0);
 		phd_PutPolygons(Lara.mesh_ptrs[LM_HandR], clip);
 
+		if (Lara.right_arm.flash_gun != 0)
+			memcpy(&gunPos, PhdMatrixPtr, sizeof(PHD_MATRIX));
 		phd_PopMatrix();
-		phd_PushMatrix(); // Start left arm.
 
+		phd_PushMatrix(); // Start left arm.
 		phd_TranslateRel(bone[41], bone[42], bone[43]);
 		PhdMatrixPtr->_00 = PhdMatrixPtr[-2]._00;
 		PhdMatrixPtr->_01 = PhdMatrixPtr[-2]._01;
@@ -967,6 +971,17 @@ void DrawLara(ITEM_INFO* item)
 		phd_TranslateRel(bone[49], bone[50], bone[51]);
 		phd_RotYXZsuperpack(&rotation, 0);
 		phd_PutPolygons(Lara.mesh_ptrs[LM_HandL], clip);
+
+		if (Lara.left_arm.flash_gun != 0)
+		{
+			DrawGunFlash(fire_arms, clip);
+		}
+
+		if (Lara.right_arm.flash_gun != 0)
+		{
+			memcpy(PhdMatrixPtr, &gunPos, sizeof(PHD_MATRIX));
+			DrawGunFlash(fire_arms, clip);
+		}
 		break;
 
 	case LGT_Shotgun:
@@ -986,6 +1001,8 @@ void DrawLara(ITEM_INFO* item)
 		phd_TranslateRel(bone[37], bone[38], bone[39]);
 		phd_RotYXZsuperpack(&rotation, 0);
 		phd_PutPolygons(Lara.mesh_ptrs[LM_HandR], clip);
+		if (Lara.right_arm.flash_gun != 0)
+			memcpy(&gunPos, PhdMatrixPtr, sizeof(PHD_MATRIX));
 		phd_PopMatrix();
 
 		phd_PushMatrix(); // Start left arm.
@@ -1000,6 +1017,12 @@ void DrawLara(ITEM_INFO* item)
 		phd_TranslateRel(bone[49], bone[50], bone[51]);
 		phd_RotYXZsuperpack(&rotation, 0);
 		phd_PutPolygons(Lara.mesh_ptrs[LM_HandL], clip);
+
+		if (Lara.right_arm.flash_gun != 0)
+		{
+			memcpy(PhdMatrixPtr, &gunPos, sizeof(PHD_MATRIX));
+			DrawGunFlash(fire_arms, clip);
+		}
 		break;
 	}
 

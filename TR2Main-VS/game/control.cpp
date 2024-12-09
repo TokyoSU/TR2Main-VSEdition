@@ -177,8 +177,8 @@ int ControlPhase(int nTicks, BOOL demoMode) {
 			next = fx->nextActive;
 		}
 
-		LaraControl(0);
-		HairControl(0);
+		LaraControl();
+		HairControl(FALSE);
 		CalculateCamera();
 		SoundEffects();
 		--HealthBarTimer;

@@ -27,7 +27,7 @@
  /*
   * Function list
   */
-void LaraControl(short itemNumber);
+void LaraControl();
 void AnimateLara(ITEM_INFO* item); // 0x00430A10
 void UseItem(short itemNumber); // 0x00430D10
 void LaraCheatGetStuff(); // 0x00430ED0
