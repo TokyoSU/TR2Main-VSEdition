@@ -162,7 +162,7 @@ int ControlPhase(int nTicks, BOOL demoMode) {
 		for (id = NextItemActive; id >= 0; id = next) {
 			item = &Items[id];
 			// NOTE: there is no IFL_CLEARBODY check in the original code
-			if (Objects[item->objectID].control && !CHK_ANY(item->flags, IFL_CLEARBODY)) {
+			if (Objects[item->objectID].control != NULL && !CHK_ANY(item->flags, IFL_CLEARBODY)) {
 				Objects[item->objectID].control(id);
 			}
 			next = item->nextActive;
@@ -170,7 +170,7 @@ int ControlPhase(int nTicks, BOOL demoMode) {
 
 		for (id = NextEffectActive; id >= 0; id = next) {
 			fx = &Effects[id];
-			if (Objects[fx->objectID].control) {
+			if (Objects[fx->objectID].control != NULL) {
 				Objects[fx->objectID].control(id);
 			}
 			next = fx->nextActive;

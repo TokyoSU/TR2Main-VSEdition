@@ -32,21 +32,21 @@ int FindGridShift(int src, int dest); // 0x00412F90
 int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomID, int hite); // 0x00412FC0
 void GetNearByRooms(int x, int y, int z, int r, int h, short roomID); // 0x004133B0
 void GetNewRoom(int x, int y, int z, short roomID); // 0x00413480
-#define ShiftItem ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004134E0)
-#define UpdateLaraRoom ((void(__cdecl*)(ITEM_INFO*, int)) 0x00413520)
+void ShiftItem(ITEM_INFO* item, COLL_INFO* coll); // 0x004134E0
+void UpdateLaraRoom(ITEM_INFO* item, int height); // 0x00413520
 short GetTiltType(FLOOR_INFO* floor, int x, int y, int z); // 0x00413580
 void LaraBaddieCollision(ITEM_INFO* item, COLL_INFO* coll); // 0x00413620
-#define EffectSpaz ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004137C0)
-#define CreatureCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x00413840)
-#define ObjectCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x004138C0)
-#define DoorCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x00413920)
-#define TrapCollision ((void(__cdecl*)(short, ITEM_INFO *, COLL_INFO *)) 0x004139A0)
-#define ItemPushLara ((void(__cdecl*)(ITEM_INFO*, ITEM_INFO*, COLL_INFO*, BOOL, BOOL)) 0x00413A10)
-#define TestBoundsCollide ((int(__cdecl*)(ITEM_INFO*, ITEM_INFO*, int)) 0x00413D20)
-#define TestLaraPosition ((int(__cdecl*)(short*,ITEM_INFO*,ITEM_INFO*)) 0x00413DF0)
-#define AlignLaraPosition ((void(__cdecl*)(PHD_VECTOR*,ITEM_INFO*,ITEM_INFO*)) 0x00413F30)
-#define MoveLaraPosition ((int(__cdecl*)(PHD_VECTOR*,ITEM_INFO*,ITEM_INFO*)) 0x00414070)
-#define Move3DPosTo3DPos ((int(__cdecl*)(PHD_3DPOS*,PHD_3DPOS*,int,short)) 0x00414200)
+void EffectSpaz(ITEM_INFO* item, COLL_INFO* coll); // 0x004137C0
+void CreatureCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll); // 0x00413840
+void ObjectCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll); // 0x004138C0
+void DoorCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll); // 0x00413920
+void TrapCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll); // 0x004139A0
+void ItemPushLara(ITEM_INFO* item, ITEM_INFO* laraItem, COLL_INFO* coll, BOOL isSpazEnabled, BOOL isPushEnabled); // 0x00413A10
+BOOL TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* laraItem, int radius); // 0x00413D20
+BOOL TestLaraPosition(short* bounds, ITEM_INFO* item, ITEM_INFO* laraitem); // 0x00413DF0
+void AlignLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* laraitem); // 0x00413F30
+BOOL MoveLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* laraItem); // 0x00414070
+BOOL Move3DPosTo3DPos(PHD_3DPOS* srcpos, PHD_3DPOS* destpos, int velocity, short angadd); // 0x00414200
 bool IsCollidingOnFloorLift(int x, int z, int ix, int iz, short itemAngle);
 
 #endif // COLLIDE_H_INCLUDED

@@ -21,8 +21,13 @@
 
 #include "precompiled.h"
 #include "game/collide.h"
+#include "3dsystem/3d_gen.h"
 #include "3dsystem/phd_math.h"
+#include "game/draw.h"
+#include "game/items.h"
 #include "game/control.h"
+#include "game/sphere.h"
+#include "game/sound.h"
 #include "global/vars.h"
 
 void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int height) {
@@ -441,12 +446,33 @@ void GetNewRoom(int x, int y, int z, short roomID) {
 	DrawRoomsArray[DrawRoomsCount++] = roomID;
 }
 
+void ShiftItem(ITEM_INFO* item, COLL_INFO* coll)
+{
+	item->pos.x += coll->shift.x;
+	item->pos.y += coll->shift.y;
+	item->pos.z += coll->shift.z;
+	coll->shift.x = 0;
+	coll->shift.y = 0;
+	coll->shift.z = 0;
+}
+
+void UpdateLaraRoom(ITEM_INFO* item, int height)
+{
+	int x = item->pos.x;
+	int y = item->pos.y + height;
+	int z = item->pos.z;
+	short roomNumber = item->roomNumber;
+	item->floor = GetHeight(GetFloor(x, y, z, &roomNumber), x, y, z);
+	if (item->roomNumber != roomNumber)
+		ItemNewRoom(Lara.item_number, roomNumber);
+}
+
 short GetTiltType(FLOOR_INFO* floor, int x, int y, int z)
 {
 	while (floor->pitRoom != NO_ROOM)
 		floor = GetFloorSector(x, z, &Rooms[floor->pitRoom]);
 
-	if (y + 512 < (floor->floor << 8))
+	if (y + CLICK(1) < (floor->floor << 8))
 		return 0;
 
 	if (floor->index)
@@ -515,6 +541,322 @@ void LaraBaddieCollision(ITEM_INFO* laraitem, COLL_INFO* coll)
 	if (Lara.hit_direction == -1)
 		Lara.hit_frame = 0;
 	InventoryChosen = -1;
+}
+
+void EffectSpaz(ITEM_INFO* item, COLL_INFO* coll)
+{
+	int x = Lara.spaz_effect->pos.x - LaraItem->pos.x;
+	int z = Lara.spaz_effect->pos.z - LaraItem->pos.z;
+	Lara.hit_direction = (short)GetOrientAxis(LaraItem->pos.rotY - (ANGLE(180) + phd_atan(z, x)));
+	if (!Lara.hit_frame)
+		PlaySoundEffect(31, &LaraItem->pos, NULL);
+	Lara.hit_frame++;
+	if (Lara.hit_frame > 34)
+		Lara.hit_frame = 34;
+	Lara.spaz_effect_count--;
+}
+
+void CreatureCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	if (!TestBoundsCollide(item, laraItem, coll->radius))
+		return;
+	if (!TestCollision(item, laraItem))
+		return;
+	if (CHK_ANY(coll->flags, CF_ENABLE_BADDIE_PUSH) && Lara.water_status != LWS_Underwater && Lara.water_status != LWS_Surface)
+		ItemPushLara(item, laraItem, coll, CHK_ANY(coll->flags, CF_ENABLE_SPAZ), FALSE);
+}
+
+void ObjectCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	if (!TestBoundsCollide(item, laraItem, coll->radius))
+		return;
+	if (!TestCollision(item, laraItem))
+		return;
+	if (CHK_ANY(coll->flags, CF_ENABLE_BADDIE_PUSH))
+		ItemPushLara(item, laraItem, coll, FALSE, TRUE);
+}
+
+void DoorCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	if (!TestBoundsCollide(item, laraItem, coll->radius))
+		return;
+	if (!TestCollision(item, laraItem))
+		return;
+	if (CHK_ANY(coll->flags, CF_ENABLE_BADDIE_PUSH))
+	{
+		if (item->currentAnimState != item->goalAnimState)
+			ItemPushLara(item, laraItem, coll, CHK_ANY(coll->flags, CF_ENABLE_SPAZ), TRUE);
+		else
+			ItemPushLara(item, laraItem, coll, FALSE, TRUE);
+	}
+}
+
+void TrapCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	if (item->status == ITEM_ACTIVE)
+	{
+		if (!TestBoundsCollide(item, laraItem, coll->radius))
+			return;
+		TestCollision(item, laraItem);
+	}
+	else if (item->status != ITEM_INVISIBLE)
+	{
+		ObjectCollision(itemNumber, laraItem, coll);
+	}
+}
+
+void ItemPushLara(ITEM_INFO* item, ITEM_INFO* laraItem, COLL_INFO* coll, BOOL isSpazEnabled, BOOL isPushEnabled)
+{
+	OBJECT_INFO* obj = &Objects[item->objectID];
+	int x = laraItem->pos.x - item->pos.x;
+	int z = laraItem->pos.z - item->pos.z;
+	int c = phd_cos(item->pos.rotY);
+	int s = phd_sin(item->pos.rotY);
+	int rx = (c * x - s * z) >> W2V_SHIFT;
+	int rz = (c * z + s * x) >> W2V_SHIFT;
+
+	short* bounds = GetBestFrame(item);
+	short minx = bounds[0];
+	short maxx = bounds[1];
+	short minz = bounds[4];
+	short maxz = bounds[5];
+
+	if (isPushEnabled)
+	{
+		minx -= coll->radius;
+		maxx += coll->radius;
+		minz -= coll->radius;
+		maxz += coll->radius;
+	}
+
+	if (rx >= minx && rx <= maxx && rz >= minz && rz <= maxz)
+	{
+		int l = rx - minx;
+		int r = maxx - rx;
+		int t = maxz - rz;
+		int b = rz - minz;
+
+		if (l <= r && l <= t && l <= b)
+			rx -= l;
+		else if (r <= l && r <= t && r <= b)
+			rx += r;
+		else if (t <= l && t <= r && t <= b)
+			rz += t;
+		else
+			rz -= b;
+
+		int ax = (c * rx + s * rz) >> W2V_SHIFT;
+		int az = (c * rz - s * rx) >> W2V_SHIFT;
+		laraItem->pos.x = item->pos.x + ax;
+		laraItem->pos.z = item->pos.z + az;
+
+		rx = (*(bounds + 0) + *(bounds + 1)) / 2;
+		rz = (*(bounds + 4) + *(bounds + 5)) / 2;
+		x -= (c * rx + s * rz) >> W2V_SHIFT;
+		z -= (c * rz - s * rx) >> W2V_SHIFT;
+		if (isSpazEnabled && (bounds[3] - bounds[2]) > CLICK(1))
+		{
+			Lara.hit_direction = (short)GetOrientAxis(laraItem->pos.rotY - (ANGLE(180) + phd_atan(z, x)));
+			if (!Lara.hit_frame)
+				PlaySoundEffect(31, &laraItem->pos, 0);
+			Lara.hit_frame++;
+			if (Lara.hit_frame > 34)
+				Lara.hit_frame = 34;
+		}
+
+		coll->badPos = -NO_HEIGHT;
+		coll->badNeg = -384;
+		coll->badCeiling = 0;
+
+		short oldfacing = coll->facing;
+		coll->facing = phd_atan((laraItem->pos.z - coll->old.z), (laraItem->pos.x - coll->old.x));
+		GetCollisionInfo(coll, laraItem->pos.x, laraItem->pos.y, laraItem->pos.z, laraItem->roomNumber, CLICK(3));
+		coll->facing = oldfacing;
+
+		if (coll->collType != 0)
+		{
+			laraItem->pos.x = coll->old.x;
+			laraItem->pos.z = coll->old.z;
+		}
+		else
+		{
+			coll->old.x = laraItem->pos.x;
+			coll->old.y = laraItem->pos.y;
+			coll->old.z = laraItem->pos.z;
+			UpdateLaraRoom(laraItem, -10);
+		}
+	}
+}
+
+BOOL TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* laraItem, int radius)
+{
+	OBJECT_INFO* obj = &Objects[item->objectID];
+	OBJECT_INFO* objLara = &Objects[laraItem->objectID];
+	short* bounds = GetBestFrame(item);
+	short* larabounds = GetBestFrame(laraItem);
+	if (item->pos.y + bounds[3] <= laraItem->pos.y + larabounds[2] || item->pos.y + bounds[2] >= laraItem->pos.y + larabounds[3])
+		return FALSE;
+	int c = phd_cos(item->pos.rotY);
+	int s = phd_sin(item->pos.rotY);
+	int x = laraItem->pos.x - item->pos.x;
+	int z = laraItem->pos.z - item->pos.z;
+	int rx = (c * x - s * z) >> W2V_SHIFT;
+	int rz = (c * z + s * x) >> W2V_SHIFT;
+	int minx = bounds[0] - radius;
+	int maxx = bounds[1] + radius;
+	int minz = bounds[4] - radius;
+	int maxz = bounds[5] + radius;
+	return rx >= minx && rx <= maxx && rz >= minz && rz <= maxz;
+}
+
+BOOL TestLaraPosition(short* bounds, ITEM_INFO* item, ITEM_INFO* laraitem)
+{
+	short xrotrel = laraitem->pos.rotX - item->pos.rotX;
+	short yrotrel = laraitem->pos.rotY - item->pos.rotY;
+	short zrotrel = laraitem->pos.rotZ - item->pos.rotZ;
+
+	if (xrotrel < bounds[6] || xrotrel > bounds[7] ||
+		yrotrel < bounds[8] || yrotrel > bounds[9] ||
+		zrotrel < bounds[10] || zrotrel > bounds[11])
+		return FALSE;
+
+	int x = laraitem->pos.x - item->pos.x;
+	int y = laraitem->pos.y - item->pos.y;
+	int z = laraitem->pos.z - item->pos.z;
+
+	phd_PushUnitMatrix();
+	phd_RotYXZ(item->pos.rotY, item->pos.rotX, item->pos.rotZ);
+	PHD_MATRIX* mptr = PhdMatrixPtr;
+	int rx = ((mptr->_00 * x + mptr->_01 * y + mptr->_02 * z) >> W2V_SHIFT);
+	int ry = ((mptr->_10 * x + mptr->_11 * y + mptr->_12 * z) >> W2V_SHIFT);
+	int rz = ((mptr->_20 * x + mptr->_21 * y + mptr->_22 * z) >> W2V_SHIFT);
+	phd_PopMatrix();
+
+	if (rx < (int)bounds[0] || rx > (int)bounds[1] ||
+		ry < (int)bounds[2] || ry > (int)bounds[3] ||
+		rz < (int)bounds[4] || rz > (int)bounds[5])
+		return FALSE;
+
+	return TRUE;
+}
+
+void AlignLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* laraitem)
+{
+	laraitem->pos.rotX = item->pos.rotX;
+	laraitem->pos.rotY = item->pos.rotY;
+	laraitem->pos.rotZ = item->pos.rotZ;
+
+	phd_PushUnitMatrix();
+	phd_RotYXZ(item->pos.rotY, item->pos.rotX, item->pos.rotZ);
+	PHD_MATRIX* mptr = PhdMatrixPtr;
+	int x = item->pos.x + ((mptr->_00 * vec->x + mptr->_01 * vec->y + mptr->_02 * vec->z) >> W2V_SHIFT);
+	int y = item->pos.y + ((mptr->_10 * vec->x + mptr->_11 * vec->y + mptr->_12 * vec->z) >> W2V_SHIFT);
+	int z = item->pos.z + ((mptr->_20 * vec->x + mptr->_21 * vec->y + mptr->_22 * vec->z) >> W2V_SHIFT);
+	phd_PopMatrix();
+
+	short roomNumber = laraitem->roomNumber;
+	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+	int height = GetHeight(floor, x, y, z);
+	int ceiling = GetCeiling(floor, x, y, z);
+	if (ABS(height - laraitem->pos.y) > CLICK(1) ||
+		ABS(ceiling - laraitem->pos.y) < CLICK(3))
+		return;
+
+	laraitem->pos.x = x;
+	laraitem->pos.y = y;
+	laraitem->pos.z = z;
+}
+
+BOOL MoveLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* laraItem)
+{
+	PHD_3DPOS dest = {};
+	dest.rotX = item->pos.rotX;
+	dest.rotY = item->pos.rotY;
+	dest.rotZ = item->pos.rotZ;
+	phd_PushUnitMatrix();
+	phd_RotYXZ(item->pos.rotY, item->pos.rotX, item->pos.rotZ);
+	PHD_MATRIX* mptr = PhdMatrixPtr;
+	dest.x = item->pos.x + ((mptr->_00 * vec->x + mptr->_01 * vec->y + mptr->_02 * vec->z) >> W2V_SHIFT);
+	dest.y = item->pos.y + ((mptr->_10 * vec->x + mptr->_11 * vec->y + mptr->_12 * vec->z) >> W2V_SHIFT);
+	dest.z = item->pos.z + ((mptr->_20 * vec->x + mptr->_21 * vec->y + mptr->_22 * vec->z) >> W2V_SHIFT);
+	phd_PopMatrix();
+
+	if (item->objectID == ID_FLARE_ITEM)
+	{
+		short roomNumber = laraItem->roomNumber;
+		int height = GetHeight(GetFloor(dest.x, dest.y, dest.z, &roomNumber), dest.x, dest.y, dest.z);
+		if (ABS(height - laraItem->pos.y) > CLICK(2))
+		{
+			return 0;
+		}
+		else
+		{
+			int x = dest.x - laraItem->pos.x;
+			int y = dest.y - laraItem->pos.y;
+			int z = dest.z - laraItem->pos.z;
+			int dist = phd_sqrt(SQR(x) + SQR(y) + SQR(z));
+			if (dist < HALF_CLICK(1))
+				return 1;
+		}
+	}
+
+	return Move3DPosTo3DPos(&laraItem->pos, &dest, 16, ANGLE(2));
+}
+
+BOOL Move3DPosTo3DPos(PHD_3DPOS* srcpos, PHD_3DPOS* destpos, int velocity, short angadd)
+{
+	int x = destpos->x - srcpos->x;
+	int y = destpos->y - srcpos->y;
+	int z = destpos->z - srcpos->z;
+	int dist = phd_sqrt(SQR(x) + SQR(y) + SQR(z));
+
+	if (velocity >= dist)
+	{
+		srcpos->x = destpos->x;
+		srcpos->y = destpos->y;
+		srcpos->z = destpos->z;
+	}
+	else
+	{
+		srcpos->x += (x * velocity) / dist;
+		srcpos->y += (y * velocity) / dist;
+		srcpos->z += (z * velocity) / dist;
+	}
+
+	short angdif = destpos->rotX - srcpos->rotX;
+	if (angdif > angadd)
+		srcpos->rotX += angadd;
+	else if (angdif < -angadd)
+		srcpos->rotX -= angadd;
+	else
+		srcpos->rotX = destpos->rotX;
+
+	angdif = destpos->rotY - srcpos->rotY;
+	if (angdif > angadd)
+		srcpos->rotY += angadd;
+	else if (angdif < -angadd)
+		srcpos->rotY -= angadd;
+	else
+		srcpos->rotY = destpos->rotY;
+
+	angdif = destpos->rotZ - srcpos->rotZ;
+	if (angdif > angadd)
+		srcpos->rotZ += angadd;
+	else if (angdif < -angadd)
+		srcpos->rotZ -= angadd;
+	else
+		srcpos->rotZ = destpos->rotZ;
+
+	return srcpos->x == destpos->x &&
+		   srcpos->y == destpos->y &&
+		   srcpos->z == destpos->z &&
+		   srcpos->rotX == destpos->rotX &&
+		   srcpos->rotY == destpos->rotY &&
+		   srcpos->rotZ == destpos->rotZ;
 }
 
 // NOTE: This fix the elevator not working in all direction.
@@ -586,19 +928,19 @@ void Inject_Collide() {
 	INJECT(0x00412FC0, CollideStaticObjects);
 	INJECT(0x004133B0, GetNearByRooms);
 	INJECT(0x00413480, GetNewRoom);
-	//INJECT(0x004134E0, ShiftItem);
-	//INJECT(0x00413520, UpdateLaraRoom);
+	INJECT(0x004134E0, ShiftItem);
+	INJECT(0x00413520, UpdateLaraRoom);
 	INJECT(0x00413580, GetTiltType);
 	INJECT(0x00413620, LaraBaddieCollision);
-	//INJECT(0x004137C0, EffectSpaz);
-	//INJECT(0x00413840, CreatureCollision);
-	//INJECT(0x004138C0, ObjectCollision);
-	//INJECT(0x00413920, DoorCollision);
-	//INJECT(0x004139A0, TrapCollision);
-	//INJECT(0x00413A10, ItemPushLara);
-	//INJECT(0x00413D20, TestBoundsCollide);
-	//INJECT(0x00413DF0, TestLaraPosition);
-	//INJECT(0x00413F30, AlignLaraPosition);
-	//INJECT(0x00414070, MoveLaraPosition);
-	//INJECT(0x00414200, Move3DPosTo3DPos);
+	INJECT(0x004137C0, EffectSpaz);
+	INJECT(0x00413840, CreatureCollision);
+	INJECT(0x004138C0, ObjectCollision);
+	INJECT(0x00413920, DoorCollision);
+	INJECT(0x004139A0, TrapCollision);
+	INJECT(0x00413A10, ItemPushLara);
+	INJECT(0x00413D20, TestBoundsCollide);
+	INJECT(0x00413DF0, TestLaraPosition);
+	INJECT(0x00413F30, AlignLaraPosition);
+	INJECT(0x00414070, MoveLaraPosition);
+	INJECT(0x00414200, Move3DPosTo3DPos);
 }
