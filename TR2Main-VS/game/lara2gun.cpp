@@ -37,24 +37,16 @@
 #define RECOIL_F	24                      // 24-32
 
 void set_pistol_arm(LARA_ARM* arm, int frame) {
+	OBJECT_INFO* obj = &Objects[ID_LARA_PISTOLS];
 	short anim;
-
-	if (frame < 5) {
-		anim = Objects[ID_LARA_PISTOLS].animIndex;
-	}
-	else {
-		if (frame < 13) {
-			anim = Objects[ID_LARA_PISTOLS].animIndex + 1;
-		}
-		else {
-			if (frame < 24) {
-				anim = Objects[ID_LARA_PISTOLS].animIndex + 2;
-			}
-			else {
-				anim = Objects[ID_LARA_PISTOLS].animIndex + 3;
-			}
-		}
-	}
+	if (frame < DRAW1_F)
+		anim = obj->animIndex;
+	else if (frame < DRAW2_F)
+		anim = obj->animIndex + 1;
+	else if (frame < RECOIL_F)
+		anim = obj->animIndex + 2;
+	else
+		anim = obj->animIndex + 3;
 	arm->anim_number = anim;
 	arm->frame_number = frame;
 	arm->frame_base = Anims[anim].framePtr;
@@ -62,26 +54,26 @@ void set_pistol_arm(LARA_ARM* arm, int frame) {
 
 void draw_pistols(int weaponType)
 {
-	short ani = Lara.left_arm.frame_number;
-	ani++;
+	short frm = Lara.left_arm.frame_number;
+	frm++;
 
-	if (ani < 5 || ani > 23)
+	if (frm < DRAW1_F || frm > (RECOIL_F - 1))
 	{
-		ani = 5;
+		frm = DRAW1_F;
 	}
-	else if (ani == 13)
+	else if (frm == DRAW2_F)
 	{
 		draw_pistol_meshes(weaponType);
 		PlaySoundEffect(6, &LaraItem->pos, 0);
 	}
-	else if (ani == 23)
+	else if (frm == (RECOIL_F - 1))
 	{
 		ready_pistols(weaponType);
-		ani = 0;
+		frm = AIMGUNS_F;
 	}
 
-	set_pistol_arm(&Lara.right_arm, ani);
-	set_pistol_arm(&Lara.left_arm, ani);
+	set_pistol_arm(&Lara.right_arm, frm);
+	set_pistol_arm(&Lara.left_arm, frm);
 }
 
 void undraw_pistols(int weaponType)
