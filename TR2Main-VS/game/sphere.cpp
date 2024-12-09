@@ -21,7 +21,18 @@
 
 #include "precompiled.h"
 #include "game/sphere.h"
+#include "game/effects.h"
 #include "global/vars.h"
+
+void BaddieBiteEffect(ITEM_INFO* item, BITE_INFO* bite)
+{
+	PHD_VECTOR pos = {};
+	pos.x = bite->x;
+	pos.y = bite->y;
+	pos.z = bite->z;
+	GetJointAbsPosition(item, &pos, bite->meshIndex);
+	DoBloodSplat(pos.x, pos.y, pos.z, item->speed, item->pos.rotY, item->roomNumber);
+}
 
  /*
   * Inject function
@@ -30,5 +41,5 @@ void Inject_Sphere() {
 	//INJECT(0x0043FA60, TestCollision);
 	//INJECT(0x0043FB90, GetSpheres);
 	//INJECT(0x0043FE70, GetJointAbsPosition);
-	//INJECT(0x00440010, BaddieBiteEffect);
+	INJECT(0x00440010, BaddieBiteEffect);
 }
