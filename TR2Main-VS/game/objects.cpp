@@ -22,6 +22,7 @@
 #include "precompiled.h"
 #include "game/objects.h"
 #include "3dsystem/phd_math.h"
+#include "game/collide.h"
 #include "game/control.h"
 #include "game/draw.h"
 #include "game/effects.h"
@@ -336,20 +337,16 @@ void LiftControl(short itemNumber) {
 		ItemNewRoom(itemNumber, roomID);
 }
 
-// TODO: Refactor it to work in all direction !
-void LiftFloorCeiling(ITEM_INFO* item, int x, int y, int z, int* floor, int* ceiling) {
-	int liftX, liftZ, laraX, laraZ;
-	BOOL inside;
-	liftX = item->pos.x >> WALL_SHIFT;
-	liftZ = item->pos.z >> WALL_SHIFT;
-	laraX = LaraItem->pos.x >> WALL_SHIFT;
-	laraZ = LaraItem->pos.z >> WALL_SHIFT;
-	x >>= WALL_SHIFT;
-	z >>= WALL_SHIFT;
-	inside = (x == liftX || (x + 1 == liftX) && (z == liftZ || (z - 1 == liftZ)));
+// TODO: Make the wall of the elevator collidable !
+// Though it would need refactor to enable box instead of spheres...
+void LiftFloorCeiling(ITEM_INFO* item, int x, int y, int z, int* floor, int* ceiling)
+{
 	*floor = 0x7FFF;
 	*ceiling = -0x7FFF;
-	if ((laraX != liftX && laraX + 1 != liftX) || (laraZ != liftZ && laraZ - 1 != liftZ)) {
+
+	bool inside = IsCollidingOnFloorLift(x, z, item->pos.x, item->pos.z, item->pos.rotY);
+	bool laraInside = IsCollidingOnFloorLift(LaraItem->pos.x, LaraItem->pos.z, item->pos.x, item->pos.z, item->pos.rotY);
+	if (!laraInside) {
 		if (inside) {
 			if (y <= item->pos.y - 1280) {
 				*floor = item->pos.y - 1280;
@@ -358,7 +355,7 @@ void LiftFloorCeiling(ITEM_INFO* item, int x, int y, int z, int* floor, int* cei
 				if (y < item->pos.y + 256) {
 					if (!item->currentAnimState) {
 						*floor = NO_HEIGHT;
-						*ceiling = 0x7FFF;
+						*ceiling = -0x7FFF;
 					}
 					else {
 						*floor = item->pos.y;
@@ -371,30 +368,28 @@ void LiftFloorCeiling(ITEM_INFO* item, int x, int y, int z, int* floor, int* cei
 			}
 		}
 	}
-	else {
-		if (!item->currentAnimState && LaraItem->pos.y < item->pos.y + 256 && LaraItem->pos.y > item->pos.y - 1024) {
-			if (inside) {
-				*floor = item->pos.y;
-				*ceiling = item->pos.y - 1024;
-			}
-			else {
-				*floor = 0x7FFF;
-				*ceiling = 0x7FFF;
-			}
+	else if (!item->currentAnimState && LaraItem->pos.y < item->pos.y + 256 && LaraItem->pos.y > item->pos.y - 1024) {
+		if (inside) {
+			*floor = item->pos.y;
+			*ceiling = item->pos.y - 1024;
 		}
 		else {
-			if (inside) {
-				if (LaraItem->pos.y < item->pos.y - 1024) {
-					*floor = item->pos.y - 1280;
+			*floor = 0x7FFF;
+			*ceiling = -0x7FFF;
+		}
+	}
+	else {
+		if (inside) {
+			if (LaraItem->pos.y < item->pos.y - 1024) {
+				*floor = item->pos.y - 1280;
+			}
+			else {
+				if (LaraItem->pos.y < item->pos.y + 256) {
+					*floor = item->pos.y;
+					*ceiling = item->pos.y - 1024;
 				}
 				else {
-					if (LaraItem->pos.y < item->pos.y + 256) {
-						*floor = item->pos.y;
-						*ceiling = item->pos.y - 1024;
-					}
-					else {
-						*ceiling = item->pos.y + 256;
-					}
+					*ceiling = item->pos.y + 256;
 				}
 			}
 		}

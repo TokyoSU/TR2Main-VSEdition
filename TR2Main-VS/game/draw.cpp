@@ -23,7 +23,10 @@
 #include "game/draw.h"
 #include "3dsystem/3d_gen.h"
 #include "3dsystem/scalespr.h"
+#include "game/control.h"
+#include "game/laraswim.h"
 #include "game/hair.h"
+#include "game/health.h"
 #include "game/weather.h"
 #include "specific/game.h"
 #include "specific/output.h"
@@ -48,6 +51,26 @@ void ResetGoldenLaraAlpha() {
 	GoldenLaraAlpha = (Lara.water_status == LWS_Cheat) ? 0xFF : 0;
 }
 #endif // FEATURE_VIDEOFX_IMPROVED
+
+int DrawPhaseCinematic()
+{
+	UnderwaterCamera = FALSE;
+	DrawRooms(Camera.pos.roomNumber);
+	S_OutputPolyList();
+	Camera.numberFrames = S_DumpScreen();
+	S_AnimateTextures(Camera.numberFrames);
+	return Camera.numberFrames;
+}
+
+int DrawPhaseGame()
+{
+	DrawRooms(Camera.pos.roomNumber);
+	DrawGameInfo(TRUE);
+	S_OutputPolyList();
+	Camera.numberFrames = S_DumpScreen();
+	S_AnimateTextures(Camera.numberFrames);
+	return Camera.numberFrames;
+}
 
 void DrawRooms(short currentRoom) {
 	ROOM_INFO* room = &Rooms[currentRoom];
@@ -81,6 +104,7 @@ void DrawRooms(short currentRoom) {
 	GetRoomBounds();
 	MidSort = 0;
 
+	// Draw Skybox
 	if (OutsideCamera) {
 		PhdWinLeft = OutsideLeft;
 		PhdWinRight = OutsideRight;
@@ -688,6 +712,306 @@ void DrawAnimatingItem(ITEM_INFO* item) {
 	phd_PopMatrix();
 }
 
+void DrawLara(ITEM_INFO* item)
+{
+	short* frames[2];
+	int left = PhdWinLeft;
+	int right = PhdWinRight;
+	int top = PhdWinTop;
+	int bottom = PhdWinBottom;
+	PhdWinLeft = PhdWinTop = 0;
+	PhdWinBottom = PhdWinMaxY;
+	PhdWinRight = PhdWinMaxX;
+
+	int rate;
+	int frac = GetFrames(item, frames, &rate);
+	if (Lara.hit_direction < 0 && frac != 0)
+	{
+		DrawLaraInt(item, frames[0], frames[1], frac, rate);
+		PhdWinLeft = left;
+		PhdWinRight = right;
+		PhdWinTop = top;
+		PhdWinBottom = bottom;
+		return;
+	}
+
+	OBJECT_INFO* obj = &Objects[item->objectID];
+	int* bone = &AnimBones[obj->boneIndex];
+	int size = 0;
+	short* frame = NULL;
+	if (Lara.hit_direction >= 0)
+	{
+		switch (Lara.hit_direction)
+		{
+		default:
+		case NORTH: frame = Anims[125].framePtr; size = Anims[125].interpolation >> 8; break;
+		case EAST: frame = Anims[127].framePtr; size = Anims[127].interpolation >> 8; break;
+		case SOUTH: frame = Anims[126].framePtr; size = Anims[126].interpolation >> 8; break;
+		case WEST: frame = Anims[128].framePtr; size = Anims[128].interpolation >> 8; break;
+		}
+		frame += (int)(Lara.hit_frame * size);
+	}
+	else
+	{
+		frame = frames[0];
+	}
+
+	if (Lara.skidoo == -1)
+		S_PrintShadow(obj->shadowSize, frame, item);
+
+	PHD_MATRIX hairPos = {};
+	memcpy(&hairPos, PhdMatrixPtr, sizeof(PHD_MATRIX));
+
+	phd_PushMatrix();
+	phd_TranslateAbs(item->pos.x, item->pos.y, item->pos.z);
+	phd_RotYXZ(item->pos.rotY, item->pos.rotX, item->pos.rotZ);
+
+	int clip = S_GetObjectBounds(frame);
+	if (!clip)
+	{
+		phd_PopMatrix();
+		return;
+	}
+
+	phd_PushMatrix(); // Starting HIPS.
+	CalculateObjectLighting(item, frame);
+	UINT16* rotation = (UINT16*)&frame[9];
+
+	// Hips
+	phd_TranslateRel(frame[6], frame[7], frame[8]);
+	phd_RotYXZsuperpack(&rotation, 0);
+	phd_PutPolygons(Lara.mesh_ptrs[LM_Hips], clip);
+
+	// Thight, Calf and Foot Left
+	phd_PushMatrix();
+	{
+		phd_TranslateRel(bone[1], bone[2], bone[3]);
+		phd_RotYXZsuperpack(&rotation, 0);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_ThighL], clip);
+
+		phd_TranslateRel(bone[5], bone[6], bone[7]);
+		phd_RotYXZsuperpack(&rotation, 0);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_CalfL], clip);
+
+		phd_TranslateRel(bone[9], bone[10], bone[11]);
+		phd_RotYXZsuperpack(&rotation, 0);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_FootL], clip);
+	}
+	phd_PopMatrix();
+
+	// Thight, Calf and Foot Right
+	phd_PushMatrix();
+	{
+		phd_TranslateRel(bone[13], bone[14], bone[15]);
+		phd_RotYXZsuperpack(&rotation, 0);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_ThighR], clip);
+
+		phd_TranslateRel(bone[17], bone[18], bone[19]);
+		phd_RotYXZsuperpack(&rotation, 0);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_CalfR], clip);
+
+		phd_TranslateRel(bone[21], bone[22], bone[23]);
+		phd_RotYXZsuperpack(&rotation, 0);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_FootR], clip);
+	}
+	phd_PopMatrix(); // Return to HIPS.
+
+	// Torso
+	phd_TranslateRel(bone[25], bone[26], bone[27]);
+	if (Lara.weapon_item != 0 && Lara.gun_type == LGT_M16)
+	{
+		ITEM_INFO* weaponItem = &Items[Lara.weapon_item];
+		if (weaponItem->currentAnimState == 0 || weaponItem->currentAnimState == 2 || weaponItem->currentAnimState == 4)
+		{
+			rotation = (UINT16*)(Lara.right_arm.frame_base + Lara.right_arm.frame_number * (Anims[Lara.right_arm.anim_number].interpolation >> 8) + 9);
+			phd_RotYXZsuperpack(&rotation, 7);
+		}
+		else
+		{
+			phd_RotYXZsuperpack(&rotation, 0);
+		}
+	}
+	else
+	{
+		phd_RotYXZsuperpack(&rotation, 0);
+	}
+	phd_RotYXZ(Lara.torso_y_rot, Lara.torso_x_rot, Lara.torso_z_rot);
+	phd_PutPolygons(Lara.mesh_ptrs[LM_Torso], clip);
+
+	// Head
+
+	phd_PushMatrix();
+	phd_TranslateRel(bone[53], bone[54], bone[55]);
+	UINT16* oldRot = rotation;
+	phd_RotYXZsuperpack(&rotation, 6);
+	rotation = oldRot;
+	phd_RotYXZ(Lara.head_y_rot, Lara.head_x_rot, Lara.head_z_rot);
+	phd_PutPolygons(Lara.mesh_ptrs[LM_Head], clip);
+
+	// Restore matrix for hair position.
+	memcpy(PhdMatrixPtr, &hairPos, sizeof(PHD_MATRIX));
+	DrawHair();
+
+	phd_PopMatrix(); // Return to torso.
+
+	if (Lara.back_gun != 0)
+	{
+		phd_PushMatrix();
+		int* boneW = &AnimBones[Objects[Lara.back_gun].boneIndex];
+		phd_TranslateRel(boneW[53], boneW[54], boneW[55]);
+		UINT16* rotW = (UINT16*)(Objects[Lara.back_gun].frameBase + 9);
+		phd_RotYXZsuperpack(&rotW, 14);
+		phd_PutPolygons(MeshPtr[Objects[Lara.back_gun].meshIndex + LM_Head], clip);
+		phd_PopMatrix();
+	}
+
+	int fire_arms = LGT_Unarmed;
+	if (Lara.gun_status == LGS_Ready ||
+		Lara.gun_status == LGS_Special ||
+		Lara.gun_status == LGS_Draw ||
+		Lara.gun_status == LGS_Undraw)
+		fire_arms = Lara.gun_type;
+
+	switch (fire_arms)
+	{
+	case LGT_Unarmed:
+	case LGT_Flare:
+		phd_PushMatrix(); // Start right arm.
+
+		phd_TranslateRel(bone[29], bone[30], bone[31]);
+		phd_RotYXZsuperpack(&rotation, 0);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_UArmR], clip);
+
+		phd_TranslateRel(bone[33], bone[34], bone[35]);
+		phd_RotYXZsuperpack(&rotation, 0);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_LArmR], clip);
+
+		phd_TranslateRel(bone[37], bone[38], bone[39]);
+		phd_RotYXZsuperpack(&rotation, 0);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_HandR], clip);
+
+		phd_PopMatrix();
+		phd_PushMatrix(); // Start left arm.
+
+		phd_TranslateRel(bone[41], bone[42], bone[43]);
+		if (Lara.flare_control_left)
+		{
+			rotation = (UINT16*)(Lara.left_arm.frame_base + (Lara.left_arm.frame_number - Anims[Lara.left_arm.anim_number].frameBase) * (Anims[Lara.left_arm.anim_number].interpolation >> 8) + 9);
+			phd_RotYXZsuperpack(&rotation, 11);
+		}
+		else
+		{
+			phd_RotYXZsuperpack(&rotation, 0);
+		}
+		phd_PutPolygons(Lara.mesh_ptrs[LM_UArmL], clip);
+
+		phd_TranslateRel(bone[45], bone[46], bone[47]);
+		phd_RotYXZsuperpack(&rotation, 0);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_LArmL], clip);
+
+		phd_TranslateRel(bone[49], bone[50], bone[51]);
+		phd_RotYXZsuperpack(&rotation, 0);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_HandL], clip);
+		break;
+
+	case LGT_Pistols:
+	case LGT_Magnums:
+	case LGT_Uzis:
+		phd_PushMatrix(); // Start right arm.
+
+		phd_TranslateRel(bone[29], bone[30], bone[31]);
+		PhdMatrixPtr->_00 = PhdMatrixPtr[-2]._00;
+		PhdMatrixPtr->_01 = PhdMatrixPtr[-2]._01;
+		PhdMatrixPtr->_02 = PhdMatrixPtr[-2]._02;
+		PhdMatrixPtr->_10 = PhdMatrixPtr[-2]._10;
+		PhdMatrixPtr->_11 = PhdMatrixPtr[-2]._11;
+		PhdMatrixPtr->_12 = PhdMatrixPtr[-2]._12;
+		PhdMatrixPtr->_20 = PhdMatrixPtr[-2]._20;
+		PhdMatrixPtr->_21 = PhdMatrixPtr[-2]._21;
+		PhdMatrixPtr->_22 = PhdMatrixPtr[-2]._22;
+		phd_RotYXZ(Lara.right_arm.y_rot, Lara.right_arm.x_rot, Lara.right_arm.z_rot);
+		rotation = (UINT16*)(Lara.right_arm.frame_base + (Lara.right_arm.frame_number - Anims[Lara.right_arm.anim_number].frameBase) * (Anims[Lara.right_arm.anim_number].interpolation >> 8) + 9);
+		phd_RotYXZsuperpack(&rotation, 8);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_UArmR], clip);
+
+		phd_TranslateRel(bone[33], bone[34], bone[35]);
+		phd_RotYXZsuperpack(&rotation, 0);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_LArmR], clip);
+
+		phd_TranslateRel(bone[37], bone[38], bone[39]);
+		phd_RotYXZsuperpack(&rotation, 0);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_HandR], clip);
+
+		phd_PopMatrix();
+		phd_PushMatrix(); // Start left arm.
+
+		phd_TranslateRel(bone[41], bone[42], bone[43]);
+		PhdMatrixPtr->_00 = PhdMatrixPtr[-2]._00;
+		PhdMatrixPtr->_01 = PhdMatrixPtr[-2]._01;
+		PhdMatrixPtr->_02 = PhdMatrixPtr[-2]._02;
+		PhdMatrixPtr->_10 = PhdMatrixPtr[-2]._10;
+		PhdMatrixPtr->_11 = PhdMatrixPtr[-2]._11;
+		PhdMatrixPtr->_12 = PhdMatrixPtr[-2]._12;
+		PhdMatrixPtr->_20 = PhdMatrixPtr[-2]._20;
+		PhdMatrixPtr->_21 = PhdMatrixPtr[-2]._21;
+		PhdMatrixPtr->_22 = PhdMatrixPtr[-2]._22;
+		phd_RotYXZ(Lara.left_arm.y_rot, Lara.left_arm.x_rot, Lara.left_arm.z_rot);
+		rotation = (UINT16*)(Lara.left_arm.frame_base + (Lara.left_arm.frame_number - Anims[Lara.left_arm.anim_number].frameBase) * (Anims[Lara.left_arm.anim_number].interpolation >> 8) + 9);
+		phd_RotYXZsuperpack(&rotation, 11);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_UArmL], clip);
+
+		phd_TranslateRel(bone[45], bone[46], bone[47]);
+		phd_RotYXZsuperpack(&rotation, 0);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_LArmL], clip);
+
+		phd_TranslateRel(bone[49], bone[50], bone[51]);
+		phd_RotYXZsuperpack(&rotation, 0);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_HandL], clip);
+		break;
+
+	case LGT_Shotgun:
+	case LGT_Harpoon:
+	case LGT_Grenade:
+	case LGT_M16:
+		phd_PushMatrix(); // Start right arm.
+		phd_TranslateRel(bone[29], bone[30], bone[31]);
+		rotation = (UINT16*)(Lara.right_arm.frame_base + Lara.right_arm.frame_number * (Anims[Lara.right_arm.anim_number].interpolation >> 8) + 9);
+		phd_RotYXZsuperpack(&rotation, 8);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_UArmR], clip);
+
+		phd_TranslateRel(bone[33], bone[34], bone[35]);
+		phd_RotYXZsuperpack(&rotation, 0);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_LArmR], clip);
+
+		phd_TranslateRel(bone[37], bone[38], bone[39]);
+		phd_RotYXZsuperpack(&rotation, 0);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_HandR], clip);
+		phd_PopMatrix();
+
+		phd_PushMatrix(); // Start left arm.
+		phd_TranslateRel(bone[41], bone[42], bone[43]);
+		phd_RotYXZsuperpack(&rotation, 0);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_UArmL], clip);
+
+		phd_TranslateRel(bone[45], bone[46], bone[47]);
+		phd_RotYXZsuperpack(&rotation, 0);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_LArmL], clip);
+
+		phd_TranslateRel(bone[49], bone[50], bone[51]);
+		phd_RotYXZsuperpack(&rotation, 0);
+		phd_PutPolygons(Lara.mesh_ptrs[LM_HandL], clip);
+		break;
+	}
+
+	phd_PopMatrix(); // Return from arms.
+	phd_PopMatrix(); // Return to absolute pos.
+	phd_PopMatrix(); // Return to start.
+	PhdWinLeft = left;
+	PhdWinRight = right;
+	PhdWinTop = top;
+	PhdWinBottom = bottom;
+}
+
 void DrawLaraInt(ITEM_INFO* item, short* frame1, short* frame2, int frac, int rate) {
 	PHD_MATRIX matrix;
 	UINT16* rot1, *rot2, *rot1copy, *rot2copy;
@@ -928,6 +1252,97 @@ void DrawLaraInt(ITEM_INFO* item, short* frame1, short* frame2, int frac, int ra
 	phd_PopMatrix();
 }
 
+void InitInterpolate(int frac, int rate)
+{
+	IMFrac = frac;
+	IMRate = rate;
+	IMPtr = IMStack;
+	memcpy(IMStack, PhdMatrixPtr, sizeof(PHD_MATRIX));
+}
+
+void phd_PopMatrix_I()
+{
+	phd_PopMatrix();
+	IMPtr--;
+}
+
+void phd_PushMatrix_I()
+{
+	phd_PushMatrix();
+	memcpy(&IMPtr[1], &IMPtr[0], sizeof(PHD_MATRIX));
+	IMPtr++;
+}
+
+void phd_RotY_I(short angle)
+{
+	PHD_MATRIX* oldMat;
+	phd_RotY(angle);
+	oldMat = PhdMatrixPtr;
+	PhdMatrixPtr = IMPtr;
+	phd_RotY(angle);
+	PhdMatrixPtr = oldMat;
+}
+
+void phd_RotX_I(short angle)
+{
+	PHD_MATRIX* oldMat;
+	phd_RotX(angle);
+	oldMat = PhdMatrixPtr;
+	PhdMatrixPtr = IMPtr;
+	phd_RotX(angle);
+	PhdMatrixPtr = oldMat;
+}
+
+void phd_RotZ_I(short angle)
+{
+	PHD_MATRIX* oldMat;
+	phd_RotZ(angle);
+	oldMat = PhdMatrixPtr;
+	PhdMatrixPtr = IMPtr;
+	phd_RotZ(angle);
+	PhdMatrixPtr = oldMat;
+}
+
+void phd_TranslateRel_I(int x, int y, int z)
+{
+	PHD_MATRIX* oldMat;
+	phd_TranslateRel(x, y, z);
+	oldMat = PhdMatrixPtr;
+	PhdMatrixPtr = IMPtr;
+	phd_TranslateRel(x, y, z);
+	PhdMatrixPtr = oldMat;
+}
+
+void phd_TranslateRel_ID(int x, int y, int z, int x2, int y2, int z2)
+{
+	PHD_MATRIX* oldMat;
+	phd_TranslateRel(x, y, z);
+	oldMat = PhdMatrixPtr;
+	PhdMatrixPtr = IMPtr;
+	phd_TranslateRel(x2, y2, z2);
+	PhdMatrixPtr = oldMat;
+}
+
+void phd_RotYXZ_I(short yRot, short xRot, short zRot)
+{
+	PHD_MATRIX* oldMat;
+	phd_RotYXZ(yRot, xRot, zRot);
+	oldMat = PhdMatrixPtr;
+	PhdMatrixPtr = IMPtr;
+	phd_RotYXZ(yRot, xRot, zRot);
+	PhdMatrixPtr = oldMat;
+}
+
+void phd_RotYXZsuperpack_I(UINT16** pptr1, UINT16** pptr2, int index)
+{
+	PHD_MATRIX* oldMat;
+	phd_RotYXZsuperpack(pptr1, index);
+	oldMat = PhdMatrixPtr;
+	PhdMatrixPtr = IMPtr;
+	phd_RotYXZsuperpack(pptr2, index);
+	PhdMatrixPtr = oldMat;
+}
+
 void phd_RotYXZsuperpack(UINT16** pptr, int index) {
 	for (int i = 0; i < index; ++i) {
 		if ((**pptr >> 14) == 0)
@@ -961,6 +1376,87 @@ void phd_PutPolygons_I(short* ptrObj, int clip) {
 	InterpolateMatrix();
 	phd_PutPolygons(ptrObj, clip);
 	phd_PopMatrix();
+}
+
+void InterpolateMatrix()
+{
+	PHD_MATRIX* mptr = PhdMatrixPtr;
+	PHD_MATRIX* iptr = IMPtr;
+	int frac = IMFrac;
+	int rate = IMRate;
+
+	if (rate == 2)
+	{
+		mptr->_00 = (mptr->_00 + iptr->_00) >> 1;
+		mptr->_01 = (mptr->_01 + iptr->_01) >> 1;
+		mptr->_02 = (mptr->_02 + iptr->_02) >> 1;
+		mptr->_03 = (mptr->_03 + iptr->_03) >> 1;
+
+		mptr->_10 = (mptr->_10 + iptr->_10) >> 1;
+		mptr->_11 = (mptr->_11 + iptr->_11) >> 1;
+		mptr->_12 = (mptr->_12 + iptr->_12) >> 1;
+		mptr->_13 = (mptr->_13 + iptr->_13) >> 1;
+
+		mptr->_20 = (mptr->_20 + iptr->_20) >> 1;
+		mptr->_21 = (mptr->_21 + iptr->_21) >> 1;
+		mptr->_22 = (mptr->_22 + iptr->_22) >> 1;
+		mptr->_23 = (mptr->_23 + iptr->_23) >> 1;
+	}
+	else
+	{
+		mptr->_00 += (frac * (iptr->_00 - mptr->_00)) / rate;
+		mptr->_01 += (frac * (iptr->_01 - mptr->_01)) / rate;
+		mptr->_02 += (frac * (iptr->_02 - mptr->_02)) / rate;
+		mptr->_03 += (frac * (iptr->_03 - mptr->_03)) / rate;
+
+		mptr->_10 += (frac * (iptr->_10 - mptr->_10)) / rate;
+		mptr->_11 += (frac * (iptr->_11 - mptr->_11)) / rate;
+		mptr->_12 += (frac * (iptr->_12 - mptr->_12)) / rate;
+		mptr->_13 += (frac * (iptr->_13 - mptr->_13)) / rate;
+
+		mptr->_20 += (frac * (iptr->_20 - mptr->_20)) / rate;
+		mptr->_21 += (frac * (iptr->_21 - mptr->_21)) / rate;
+		mptr->_22 += (frac * (iptr->_22 - mptr->_22)) / rate;
+		mptr->_23 += (frac * (iptr->_23 - mptr->_23)) / rate;
+	}
+}
+
+void InterpolateArmMatrix()
+{
+	PHD_MATRIX* mptr = PhdMatrixPtr;
+	PHD_MATRIX* iptr = IMPtr;
+	int frac = IMFrac;
+	int rate = IMRate;
+	if (rate == 2)
+	{
+		mptr->_00 = mptr[-2]._00;
+		mptr->_01 = mptr[-2]._01;
+		mptr->_02 = mptr[-2]._02;
+		mptr->_03 = (mptr->_03 + iptr->_03) / 2;
+		mptr->_10 = mptr[-2]._10;
+		mptr->_11 = mptr[-2]._11;
+		mptr->_12 = mptr[-2]._12;
+		mptr->_13 = (mptr->_13 + iptr->_13) / 2;
+		mptr->_20 = mptr[-2]._20;
+		mptr->_21 = mptr[-2]._21;
+		mptr->_22 = mptr[-2]._22;
+		mptr->_23 = (mptr->_23 + iptr->_23) / 2;
+	}
+	else
+	{
+		mptr->_00 = mptr[-2]._00;
+		mptr->_01 = mptr[-2]._01;
+		mptr->_02 = mptr[-2]._02;
+		mptr->_03 += frac * (iptr->_03 - mptr->_03) / rate;
+		mptr->_10 = mptr[-2]._10;
+		mptr->_11 = mptr[-2]._11;
+		mptr->_12 = mptr[-2]._12;
+		mptr->_13 += frac * (iptr->_13 - mptr->_13) / rate;
+		mptr->_20 = mptr[-2]._20;
+		mptr->_21 = mptr[-2]._21;
+		mptr->_22 = mptr[-2]._22;
+		mptr->_23 += frac * (iptr->_23 - mptr->_23) / rate;
+	}
 }
 
 void DrawGunFlash(int weapon, int clip) {
@@ -1049,6 +1545,26 @@ void CalculateObjectLighting(ITEM_INFO* item, short* frame) {
 	}
 }
 
+int GetFrames(ITEM_INFO* item, short** frames, int* rate)
+{
+	ANIM_STRUCT* anim = &Anims[item->animNumber];
+	int frm = item->frameNumber;
+	frames[0] = frames[1] = anim->framePtr;
+	int rat = *rate = anim->interpolation & 0x00FF;
+	int frame_size = anim->interpolation >> 8;
+	frm -= anim->frameBase;
+	int first = frm / rat;
+	int interp = frm % rat;
+	frames[0] += first * frame_size;
+	frames[1] = frames[0] + frame_size;
+	if (interp == 0)
+		return 0;
+	int second = first * rat + rat;
+	if (second > anim->frameEnd)
+		*rate = anim->frameEnd - (second - rat);
+	return interp;
+}
+
 short* GetBoundsAccurate(ITEM_INFO* item)
 {
 	int rate = 0;
@@ -1061,6 +1577,16 @@ short* GetBoundsAccurate(ITEM_INFO* item)
 		return InterpolateBounds;
 	}
 	return frame[0];
+}
+
+short* GetBestFrame(ITEM_INFO* item)
+{
+	int rate;
+	short* frames[2];
+	int frac = GetFrames(item, frames, &rate);
+	if (frac <= (rate / 2))
+		return frames[0];
+	return frames[1];
 }
 
 void AddDynamicLight(int x, int y, int z, int intensity, int falloff) {
@@ -1076,8 +1602,8 @@ void AddDynamicLight(int x, int y, int z, int intensity, int falloff) {
  * Inject function
  */
 void Inject_Draw() {
-	//INJECT(0x00418920, DrawPhaseCinematic);
-	//INJECT(0x00418960, DrawPhaseGame);
+	INJECT(0x00418920, DrawPhaseCinematic);
+	INJECT(0x00418960, DrawPhaseGame);
 	INJECT(0x004189A0, DrawRooms);
 	INJECT(0x00418C50, GetRoomBounds);
 	INJECT(0x00418E20, SetRoomBounds);
@@ -1088,26 +1614,26 @@ void Inject_Draw() {
 	INJECT(0x004199C0, DrawSpriteItem);
 	//INJECT(----------, DrawDummyItem);
 	INJECT(0x00419A50, DrawAnimatingItem);
-	//INJECT(0x00419DD0, DrawLara);
+	INJECT(0x00419DD0, DrawLara);
 	INJECT(0x0041AB00, DrawLaraInt);
-	//INJECT(0x0041B6F0, InitInterpolate);
-	//INJECT(0x0041B730, phd_PopMatrix_I);
-	//INJECT(0x0041B760, phd_PushMatrix_I);
-	//INJECT(0x0041B790, phd_RotY_I);
-	//INJECT(0x0041B7D0, phd_RotX_I);
-	//INJECT(0x0041B810, phd_RotZ_I);
-	//INJECT(0x0041B850, phd_TranslateRel_I);
-	//INJECT(0x0041B8A0, phd_TranslateRel_ID);
-	//INJECT(0x0041B8F0, phd_RotYXZ_I);
-	//INJECT(0x0041B940, phd_RotYXZsuperpack_I);
+	INJECT(0x0041B6F0, InitInterpolate);
+	INJECT(0x0041B730, phd_PopMatrix_I);
+	INJECT(0x0041B760, phd_PushMatrix_I);
+	INJECT(0x0041B790, phd_RotY_I);
+	INJECT(0x0041B7D0, phd_RotX_I);
+	INJECT(0x0041B810, phd_RotZ_I);
+	INJECT(0x0041B850, phd_TranslateRel_I);
+	INJECT(0x0041B8A0, phd_TranslateRel_ID);
+	INJECT(0x0041B8F0, phd_RotYXZ_I);
+	INJECT(0x0041B940, phd_RotYXZsuperpack_I);
 	INJECT(0x0041B980, phd_RotYXZsuperpack);
 	INJECT(0x0041BA30, phd_PutPolygons_I);
-	//INJECT(0x0041BA60, InterpolateMatrix);
-	//INJECT(0x0041BC10, InterpolateArmMatrix);
+	INJECT(0x0041BA60, InterpolateMatrix);
+	INJECT(0x0041BC10, InterpolateArmMatrix);
 	INJECT(0x0041BD10, DrawGunFlash);
 	INJECT(0x0041BE80, CalculateObjectLighting);
-	//INJECT(0x0041BF70, GetFrames);
+	INJECT(0x0041BF70, GetFrames);
 	INJECT(0x0041C010, GetBoundsAccurate);
-	//INJECT(0x0041C090, GetBestFrame);
+	INJECT(0x0041C090, GetBestFrame);
 	INJECT(0x0041C0D0, AddDynamicLight);
 }

@@ -390,7 +390,7 @@ extern FX_INFO Effects[MAX_EFFECTS]; // 0x005207C0
 #define SoundFx						VAR_U_(0x00521FE0, OBJECT_VECTOR*)
 #define AnimFrames					VAR_U_(0x005251B0, short*)
 #define MeshPtr						VAR_U_(0x005252B0, short**)
-#define OutsideCamera				VAR_U_(0x005252B4, int)
+#define OutsideCamera				VAR_U_(0x005252B4, BOOL)
 #define DrawRoomsCount				VAR_U_(0x005252B8, int)
 #define Anims						VAR_U_(0x005258F4, ANIM_STRUCT*)
 #define OutsideBottom				VAR_U_(0x00525B00, int)

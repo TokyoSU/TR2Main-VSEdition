@@ -39,7 +39,7 @@ int GetHeight(FLOOR_INFO* floor, int x, int y, int z); // 0x00414E50
 void TestTriggers(short* data, BOOL isHeavy); // 0x004151C0
 #define TriggerActive ((int(__cdecl*)(ITEM_INFO*)) 0x004158A0)
 int GetCeiling(FLOOR_INFO* floor, int x, int y, int z); // 0x00415900
-#define GetDoor ((short(__cdecl*)(FLOOR_INFO*)) 0x00415B60)
+short GetDoor(FLOOR_INFO* floor); // 0x00415B60
 int LOS(GAME_VECTOR* start, GAME_VECTOR* target); // 0x00415BB0
 int zLOS(GAME_VECTOR* start, GAME_VECTOR* target); // 0x00415C50
 int xLOS(GAME_VECTOR* start, GAME_VECTOR* target); // 0x00415F40

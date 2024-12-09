@@ -473,22 +473,23 @@ int GetHeight(FLOOR_INFO* floor, int x, int y, int z)
 {
 	HeightType = HT_WALL;
 
-	while (floor->pitRoom != NO_ROOM)
+	FLOOR_INFO* f = floor;
+	while (f->pitRoom != NO_ROOM)
 	{
-		auto* r = &Rooms[floor->pitRoom];
-		floor = GetFloorSector(x, z, r);
+		auto* r = &Rooms[f->pitRoom];
+		f = GetFloorSector(x, z, r);
 	}
 
-	int height = ((int)floor->floor << 8);
+	int height = ((int)f->floor << 8);
 	if (GF_NoFloor && GF_NoFloor == height)
 		height = 0x4000;
 
 	TriggerPtr = NULL;
-	if (floor->index)
+	if (f->index)
 	{
-		short* data = &FloorData[floor->index];
+		short* data = &FloorData[f->index];
 		short trigger = 0, type = 0;
-		char yoff, xoff;
+		int yoff, xoff;
 		do
 		{
 			type = *data++;
@@ -499,8 +500,9 @@ int GetHeight(FLOOR_INFO* floor, int x, int y, int z)
 				data++;
 				break;
 			case FT_TILT:
-				xoff = *data >> 8;
-				yoff = *(char*)data;
+				xoff = (*data) >> 8;
+				yoff = (signed char)(*data);
+
 				if (!IsChunkyCamera || ((ABS(xoff)) <= 2 && (ABS(yoff)) <= 2))
 				{
 					if ((ABS(xoff)) > 2 || (ABS(yoff)) > 2)
@@ -528,19 +530,19 @@ int GetHeight(FLOOR_INFO* floor, int x, int y, int z)
 				do
 				{
 					trigger = *data++;
-					if ((trigger & 0x3C00) != 0)
+					if (TRIG_BITS(trigger) != TO_OBJECT)
 					{
-						if ((trigger & 0x3C00) == 1024)
+						if (TRIG_BITS(trigger) == TO_CAMERA)
 							trigger = *data++;
 						continue;
 					}
 					else
 					{
-						ITEM_INFO* item = &Items[trigger & 0x3FF];
+						ITEM_INFO* item = &Items[trigger & VALUE_BITS];
 						if (Objects[item->objectID].floor != NULL)
 							Objects[item->objectID].floor(item, x, y, z, &height);
 					}
-				} while (!CHK_ANY(trigger, 0x8000));
+				} while (!CHK_ANY(trigger, END_BIT));
 				break;
 			case FT_LAVA:
 				TriggerPtr = data - 1;
@@ -596,8 +598,7 @@ void TestTriggers(short* data, BOOL isHeavy)
 		++data;
 	}
 
-	type = (*data >> 8) & 0x3F;
-	data++;
+	type = TRIG_TYPE(*(data++));
 	flags = *data++;
 	timer = flags & 0xFF;
 
@@ -831,34 +832,35 @@ void TestTriggers(short* data, BOOL isHeavy)
 
 int GetCeiling(FLOOR_INFO* floor, int x, int y, int z)
 {
-	while (floor->skyRoom != NO_ROOM)
+	FLOOR_INFO* f = floor;
+	while (f->skyRoom != NO_ROOM)
 	{
-		auto* r = &Rooms[floor->skyRoom];
-		floor = GetFloorSector(x, z, r);
+		auto* r = &Rooms[f->skyRoom];
+		f = GetFloorSector(x, z, r);
 	}
 
-	int height = ((int)floor->ceiling << 8);
-	if (floor->index)
+	int height = ((int)f->ceiling << 8);
+	if (f->index)
 	{
-		short* data = &FloorData[floor->index];
-		short type = *data++ & DATA_TYPE;
+		short* data = &FloorData[f->index];
+		short hadj = *data++;
+		short type = hadj & DATA_TYPE;
 		if (type == FT_TILT)
 		{
 			data++;
-			type = *(data++) & DATA_TYPE;
+			hadj = *(data++);
+			type = hadj & DATA_TYPE;
 		}
-
 		if (type == FT_ROOF)
 		{
-			char yoff = *(char*)data;
-			char xoff = *data >> 8;
+			int xoff = (*data) >> 8;
+			int yoff = (signed char)(*data);
 			if (!IsChunkyCamera || ((ABS(xoff)) <= 2 && (ABS(yoff)) <= 2))
 			{
 				if (xoff < 0)
 					height += (z & (WALL_SIZE - 1)) * xoff >> 2;
 				else
 					height -= ((WALL_SIZE - 1 - z) & (WALL_SIZE - 1)) * xoff >> 2;
-
 				if (yoff >= 0)
 					height -= (x & (WALL_SIZE - 1)) * yoff >> 2;
 				else
@@ -872,57 +874,83 @@ int GetCeiling(FLOOR_INFO* floor, int x, int y, int z)
 		auto* r = &Rooms[floor->pitRoom];
 		floor = GetFloorSector(x, z, r);
 	}
-	if (!floor->index)
-		return height;
 
-	short* data = &FloorData[floor->index];
-	short trigger = 0, type = 0;
-	do
+	if (floor->index)
 	{
-		type = *data++;
-		switch (type & DATA_TYPE)
+		short* data = &FloorData[floor->index];
+		short trigger = 0, type = 0;
+		do
 		{
-		case FT_DOOR:
-		case FT_ROOF:
-		case FT_TILT:
-			data++;
-			break;
-		case FT_TRIGGER:
-			++data;
-			do
+			type = *data++;
+			switch (type & DATA_TYPE)
 			{
-				trigger = *data++;
-				if ((trigger & 0x3C00) != 0)
+			case FT_DOOR:
+			case FT_ROOF:
+			case FT_TILT:
+				data++;
+				break;
+			case FT_TRIGGER:
+				data++;
+				do
 				{
-					if ((trigger & 0x3C00) == 1024)
-						trigger = *data++;
-					continue;
-				}
-				else
-				{
-					ITEM_INFO* item = &Items[trigger & 0x3FF];
-					if (Objects[item->objectID].ceiling != NULL)
-						Objects[item->objectID].ceiling(item, x, y, z, &height);
-				}
+					trigger = *data++;
+					if (TRIG_BITS(trigger) != TO_OBJECT)
+					{
+						if (TRIG_BITS(trigger) == TO_CAMERA)
+							trigger = *data++;
+						continue;
+					}
+					else
+					{
+						ITEM_INFO* item = &Items[trigger & VALUE_BITS];
+						if (Objects[item->objectID].ceiling != NULL)
+							Objects[item->objectID].ceiling(item, x, y, z, &height);
+					}
+				} while (!CHK_ANY(trigger, END_BIT));
+
+				break;
+			case FT_LAVA:
+			case FT_CLIMB:
+				break;
+			default:
+				S_ExitSystem("GetCeiling(): Unknown type");
+				break;
 			}
-			while (!CHK_ANY(trigger, 0x8000));
-
-			break;
-		case FT_LAVA:
-		case FT_CLIMB:
-			break;
-		default:
-			S_ExitSystem("GetCeiling(): Unknown type");
-			break;
-		}
-	} while (!CHK_ANY(type, END_BIT));
-
+		} while (!CHK_ANY(type, END_BIT));
+	}
 	return height;
+}
+
+short GetDoor(FLOOR_INFO* floor)
+{
+	if (!floor->index)
+		return NO_ROOM;
+	short* data = &FloorData[floor->index];
+	short type = *(data++);
+	short dataType = type & DATA_TYPE;
+	if (dataType == FT_TILT)
+	{
+		if (type & END_BIT)
+			return NO_ROOM;
+		data++;
+		type = *(data++);
+		dataType = type & DATA_TYPE;
+	}
+	if (dataType == FT_ROOF)
+	{
+		if (type & END_BIT)
+			return NO_ROOM;
+		data++;
+		type = *(data++);
+		dataType = type & DATA_TYPE;
+	}
+	if (dataType == FT_DOOR)
+		return *data;
+	return NO_ROOM;
 }
 
 int LOS(GAME_VECTOR* start, GAME_VECTOR* target) {
 	int beginning, ending;
-
 	if (ABS(target->z - start->z) > ABS(target->x - start->x)) {
 		beginning = xLOS(start, target);
 		ending = zLOS(start, target);
@@ -1096,7 +1124,6 @@ int xLOS(GAME_VECTOR* start, GAME_VECTOR* target) {
 
 int ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target, FLOOR_INFO* floor) {
 	int dx, dy, dz, height, ceiling;
-
 	dx = target->x - start->x;
 	dy = target->y - start->y;
 	dz = target->z - start->z;
@@ -1284,7 +1311,7 @@ void Inject_Control() {
 	INJECT(0x004151C0, TestTriggers);
 	//INJECT(0x004158A0, TriggerActive);
 	INJECT(0x00415900, GetCeiling);
-	//INJECT(0x00415B60, GetDoor);
+	INJECT(0x00415B60, GetDoor);
 	INJECT(0x00415BB0, LOS);
 	INJECT(0x00415C50, zLOS);
 	INJECT(0x00415F40, xLOS);

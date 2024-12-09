@@ -36,7 +36,7 @@ void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int he
 	coll->shift.x = 0;
 	head = y - height;
 	top = head - 160;
-	coll->quadrant = (UINT16)(coll->facing + PHD_45) >> W2V_SHIFT;
+	coll->quadrant = (short)GetOrientAxis(coll->facing);
 	floor = GetFloor(x, top, z, &roomID);
 	h = GetHeight(floor, x, top, z);
 	if (h != NO_HEIGHT)
@@ -53,7 +53,7 @@ void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int he
 	coll->xTilt = (char)(tilt);
 	coll->zTilt = (char)(tilt >> 8);
 	switch (coll->quadrant) {
-	case 0:
+	case NORTH:
 		frontX = coll->radius * phd_sin(coll->facing) >> W2V_SHIFT;
 		frontZ = coll->radius;
 		leftX = -coll->radius;
@@ -61,7 +61,7 @@ void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int he
 		rightX = coll->radius;
 		rightZ = coll->radius;
 		break;
-	case 1:
+	case EAST:
 		frontX = coll->radius;
 		frontZ = coll->radius * phd_cos(coll->facing) >> W2V_SHIFT;
 		leftX = coll->radius;
@@ -69,7 +69,7 @@ void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int he
 		rightX = coll->radius;
 		rightZ = -coll->radius;
 		break;
-	case 2:
+	case SOUTH:
 		frontX = coll->radius * phd_sin(coll->facing) >> W2V_SHIFT;
 		frontZ = -coll->radius;
 		leftX = coll->radius;
@@ -77,7 +77,7 @@ void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int he
 		rightX = -coll->radius;
 		rightZ = -coll->radius;
 		break;
-	case 3:
+	case WEST:
 		frontX = -coll->radius;
 		frontZ = coll->radius * phd_cos(coll->facing) >> W2V_SHIFT;
 		rightZ = coll->radius;
@@ -94,6 +94,7 @@ void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int he
 		rightX = 0;
 		break;
 	}
+
 	floor = GetFloor(x + frontX, top, z + frontZ, &roomID);
 	h = GetHeight(floor, x + frontX, top, z + frontZ);
 	if (h != NO_HEIGHT)
@@ -514,6 +515,66 @@ void LaraBaddieCollision(ITEM_INFO* laraitem, COLL_INFO* coll)
 	if (Lara.hit_direction == -1)
 		Lara.hit_frame = 0;
 	InventoryChosen = -1;
+}
+
+// NOTE: This fix the elevator not working in all direction.
+bool IsCollidingOnFloorLift(int x, int z, int ix, int iz, short angle)
+{
+	x >>= WALL_SHIFT;
+	z >>= WALL_SHIFT;
+	ix >>= WALL_SHIFT;
+	iz >>= WALL_SHIFT;
+	// Same block as elevator position.
+	if (x == ix && z == iz)
+		return true;
+	switch (FROM_ANGLE(ABS(angle)))
+	{
+	case 0: // NORTH
+		// Now check for east (+X)
+		if (x == ix + 1 && z == iz)
+			return true;
+		// Now check for south (-Z)
+		if (x == ix && z == iz - 1)
+			return true;
+		// Now check for east+south (+X and -Z)
+		if (x == ix + 1 && z == iz - 1)
+			return true;
+		break;
+	case 90: // EAST
+		// Now check for south (-Z)
+		if (x == ix && z == iz - 1)
+			return true;
+		// Now check for west (-X)
+		if (x == ix - 1 && z == iz)
+			return true;
+		// Now check for west and south (-Z and -X)
+		if (x == ix - 1 && z == iz - 1)
+			return true;
+		break;
+	case 180: // SOUTH
+		// Now check for west (-X)
+		if (x == ix - 1 && z == iz)
+			return true;
+		// Now check for north (+Z)
+		if (x == ix && z == iz + 1)
+			return true;
+		// Now check for north and west (+Z and -X)
+		if (x == ix - 1 && z == iz + 1)
+			return true;
+		break;
+	case 270: // WEST
+		// Now check for north (+Z)
+		if (x == ix && z == iz + 1)
+			return true;
+		// Now check for east (+X)
+		if (x == ix + 1 && z == iz)
+			return true;
+		// Now check for north and east (+Z and +X)
+		if (x == ix + 1 && z == iz + 1)
+			return true;
+		break;
+	}
+	return false;
 }
 
 /*

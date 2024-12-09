@@ -571,6 +571,55 @@ void SpikeCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	}
 }
 
+void TrapDoorControl(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	if (TriggerActive(item))
+	{
+		if (item->currentAnimState == DOOR_CLOSED)
+			item->goalAnimState = DOOR_OPEN;
+	}
+	else
+	{
+		if (item->currentAnimState == DOOR_OPEN)
+			item->goalAnimState = DOOR_CLOSED;
+	}
+	AnimateItem(item);
+}
+
+void TrapDoorFloor(ITEM_INFO* item, int x, int y, int z, int* height)
+{
+	if (!OnTrapDoor(item, x, z))
+		return;
+	if (y <= item->pos.y)
+	{
+		if (item->currentAnimState == DOOR_CLOSED && item->pos.y < *height)
+			*height = item->pos.y;
+	}
+}
+
+void TrapDoorCeiling(ITEM_INFO* item, int x, int y, int z, int* height)
+{
+	if (!OnTrapDoor(item, x, z))
+		return;
+	if (y > item->pos.y)
+	{
+		if (item->currentAnimState == DOOR_CLOSED && item->pos.y > *height)
+			*height = item->pos.y + CLICK(1);
+	}
+}
+
+BOOL OnTrapDoor(ITEM_INFO* item, int x, int z)
+{
+	x >>= WALL_SHIFT;
+	z >>= WALL_SHIFT;
+	int ix = item->pos.x >> WALL_SHIFT;
+	int iz = item->pos.z >> WALL_SHIFT;
+	// Same block as the item position.
+	// No need to calculate nearest block because trap is only 1 block.
+	return x == ix && z == iz;
+}
+
 void Pendulum(short itemNumber) {
 	ITEM_INFO* item = &Items[itemNumber];
 	if (TriggerActive(item))
@@ -1032,10 +1081,10 @@ void Inject_Traps() {
 	INJECT(0x00441C20, RollingBallControl);
 	INJECT(0x00441F70, RollingBallCollision);
 	INJECT(0x004421C0, SpikeCollision);
-	//INJECT(0x00442320, TrapDoorControl);
-	//INJECT(0x00442370, TrapDoorFloor);
-	//INJECT(0x004423B0, TrapDoorCeiling);
-	//INJECT(0x004423F0, OnTrapDoor);
+	INJECT(0x00442320, TrapDoorControl);
+	INJECT(0x00442370, TrapDoorFloor);
+	INJECT(0x004423B0, TrapDoorCeiling);
+	INJECT(0x004423F0, OnTrapDoor);
 	INJECT(0x004424A0, Pendulum);
 	//INJECT(0x004425B0, FallingBlock);
 	//INJECT(0x004426C0, FallingBlockFloor);

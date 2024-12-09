@@ -47,5 +47,6 @@ void LaraBaddieCollision(ITEM_INFO* item, COLL_INFO* coll); // 0x00413620
 #define AlignLaraPosition ((void(__cdecl*)(PHD_VECTOR*,ITEM_INFO*,ITEM_INFO*)) 0x00413F30)
 #define MoveLaraPosition ((int(__cdecl*)(PHD_VECTOR*,ITEM_INFO*,ITEM_INFO*)) 0x00414070)
 #define Move3DPosTo3DPos ((int(__cdecl*)(PHD_3DPOS*,PHD_3DPOS*,int,short)) 0x00414200)
+bool IsCollidingOnFloorLift(int x, int z, int ix, int iz, short itemAngle);
 
 #endif // COLLIDE_H_INCLUDED

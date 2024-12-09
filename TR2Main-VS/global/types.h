@@ -100,6 +100,7 @@ typedef struct {
 #define PHD_270				(PHD_90*3)
 #define PHD_DEGREE			(PHD_ONE/360)
 #define ANGLE(x)            ((x) * PHD_DEGREE)
+#define FROM_ANGLE(x)       ((x) / PHD_DEGREE)
 
 // String macros
 #ifdef FEATURE_HUD_IMPROVED
@@ -298,9 +299,10 @@ typedef struct {
 #define COLL_CLAMP		(0x20)
 
 // Trigger/floordata control bits
-#define END_BIT		(0x8000)
-#define VALUE_BITS	(0x03FF)
-#define DATA_TYPE	(0x1F)
+#define END_BIT		 (0x8000)
+#define VALUE_BITS	 (0x03FF)
+#define DATA_TYPE	 (0x1F)
+#define TRIG_TYPE(T) ((T >> 8) & 0x3F)
 #define TRIG_BITS(T) ((T & 0x3FFF) >> 10)
 
 // Target types for CalculateTarget()
