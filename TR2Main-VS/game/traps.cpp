@@ -169,20 +169,72 @@ void ControlCeilingSpikes(short itemNumber) {
 }
 
 void HookControl(short itemNumber) {
-	ITEM_INFO* item;
 	static BOOL IsHookHit = FALSE;
 
-	item = &Items[itemNumber];
-	if (item->touchBits && !IsHookHit) {
+	ITEM_INFO* item = &Items[itemNumber];
+	if (item->touchBits != 0 && !IsHookHit) {
 		LaraItem->hitPoints -= 50;
 		LaraItem->hitStatus = 1;
 		IsHookHit = TRUE;
-		DoLotsOfBlood(LaraItem->pos.x, LaraItem->pos.y - 512, LaraItem->pos.z, LaraItem->speed, LaraItem->pos.rotY, LaraItem->roomNumber, 3);
+		DoLotsOfBlood(LaraItem->pos.x, LaraItem->pos.y - CLICK(2), LaraItem->pos.z, LaraItem->speed, LaraItem->pos.rotY, LaraItem->roomNumber, 3);
 	}
 	else {
 		IsHookHit = FALSE;
 	}
+
 	AnimateItem(item);
+}
+
+void PropellerControl(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	if (TriggerActive(item) && !(item->flags & IFL_ONESHOT))
+	{
+		item->goalAnimState = 0;
+		if (item->touchBits & 6)
+		{
+			LaraItem->hitPoints -= 200;
+			LaraItem->hitStatus = TRUE;
+			DoLotsOfBlood(LaraItem->pos.x, LaraItem->pos.y - CLICK(2), LaraItem->pos.z, GetRandomDraw() >> 10, item->pos.rotY + CLICK(180), LaraItem->roomNumber, 3);
+			if (item->objectID == ID_PROPELLER1)
+				PlaySoundEffect(207, &item->pos, NULL);
+		}
+		else
+		{
+			switch (item->objectID)
+			{
+			case ID_PROPELLER2:
+				PlaySoundEffect(206, &item->pos, NULL);
+				break;
+			case ID_PROPELLER1:
+				PlaySoundEffect(213, &item->pos, NULL);
+				break;
+			case ID_PROPELLER3:
+				PlaySoundEffect(215, &item->pos, SFX_UNDERWATER);
+				break;
+			default:
+				PlaySoundEffect(217, &item->pos, NULL);
+				break;
+			}
+		}
+	}
+	else if (item->goalAnimState != 1)
+	{
+		if (item->objectID == ID_PROPELLER1)
+			PlaySoundEffect(213, &item->pos, NULL);
+		else if (item->objectID == ID_PROPELLER3)
+			PlaySoundEffect(216, &item->pos, SFX_UNDERWATER);
+		item->goalAnimState = 1;
+	}
+
+	AnimateItem(item);
+	if (item->status == ITEM_DISABLED)
+	{
+		RemoveActiveItem(itemNumber);
+		if (item->objectID != ID_PROPELLER2)
+			item->collidable = FALSE;
+	}
 }
 
 void SpinningBlade(short itemNumber) {
@@ -204,7 +256,7 @@ void SpinningBlade(short itemNumber) {
 		if (item->touchBits) {
 			LaraItem->hitStatus = 1;
 			LaraItem->hitPoints -= 100;
-			DoLotsOfBlood(LaraItem->pos.x, LaraItem->pos.y - 512, LaraItem->pos.z, 2 * item->speed, LaraItem->pos.rotY, LaraItem->roomNumber, 2);
+			DoLotsOfBlood(LaraItem->pos.x, LaraItem->pos.y - CLICK(2), LaraItem->pos.z, 2 * item->speed, LaraItem->pos.rotY, LaraItem->roomNumber, 2);
 		}
 		PlaySoundEffect(231, &item->pos, 0);
 	}
@@ -227,7 +279,6 @@ void SpinningBlade(short itemNumber) {
 #define ICICLE_DAMAGE 200
 #define ICICLE_FULLMESH (MESHBITS_GET(1) | MESHBITS_GET(2) | MESHBITS_GET(3) | MESHBITS_GET(4) | MESHBITS_GET(5) |  MESHBITS_GET(6))
 #define ICICLE_NOTIPMESH (MESHBITS_GET(1) | MESHBITS_GET(3) | MESHBITS_GET(5))
-
 
 void InitialiseIcicle(short itemNumber) {
 	ITEM_INFO* item = &Items[itemNumber];
@@ -641,6 +692,61 @@ void Pendulum(short itemNumber) {
 	{
 		AnimateItem(item);
 	}
+}
+
+void FallingBlock(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	if (item->currentAnimState == 0)
+	{
+		int origin = item->objectID == ID_FALLING_BLOCK3 ? BLOCK(1) : CLICK(2);
+		int dx = LaraItem->pos.x - item->pos.x;
+		int dz = LaraItem->pos.z - item->pos.z;
+		// NOTE: There was no check for X and Z position, so if lara was at the same height
+		// as the falling block, he just activate like nothing.
+		// This check avoid that !
+		if (ABS(dx) <= CLICK(2) && ABS(dz) <= CLICK(2) && LaraItem->pos.y == item->pos.y - origin)
+			item->goalAnimState = 1;
+	}
+	else if (item->currentAnimState == 1)
+		item->goalAnimState = 2;
+	else if (item->currentAnimState == 2 && item->goalAnimState != 3)
+		item->gravity = TRUE;
+
+	AnimateItem(item);
+	if (item->status == ITEM_DISABLED)
+	{
+		RemoveActiveItem(itemNumber);
+		return;
+	}
+
+	short room_number = item->roomNumber;
+	FLOOR_INFO* floor = GetFloor(item->pos.x, item->pos.y, item->pos.z, &room_number);
+	if (item->roomNumber != room_number)
+		ItemNewRoom(itemNumber, room_number);
+
+	item->floor = GetHeight(floor, item->pos.x, item->pos.y, item->pos.z);
+	if (item->currentAnimState == 2 && item->pos.y >= item->floor)
+	{
+		item->goalAnimState = 3;
+		item->pos.y = item->floor;
+		item->fallSpeed = 0;
+		item->gravity = FALSE;
+	}
+}
+
+void FallingBlockFloor(ITEM_INFO* item, int x, int y, int z, int* height)
+{
+	int origin = item->objectID == ID_FALLING_BLOCK3 ? BLOCK(1) : CLICK(2);
+	if (y <= item->pos.y - origin && item->currentAnimState <= 1)
+		*height = item->pos.y - origin;
+}
+
+void FallingBlockCeiling(ITEM_INFO* item, int x, int y, int z, int* height)
+{
+	int origin = item->objectID == ID_FALLING_BLOCK3 ? BLOCK(1) : CLICK(2);
+	if (y > item->pos.y - origin && item->currentAnimState <= 1)
+		*height = item->pos.y + CLICK(1) - origin;
 }
 
 void TeethTrap(short itemNumber) {
@@ -1069,7 +1175,7 @@ void Inject_Traps() {
 	INJECT(0x004411C0, ControlSpikeWall);
 	INJECT(0x00441300, ControlCeilingSpikes);
 	INJECT(0x00441420, HookControl);
-	//INJECT(0x004414B0, PropellerControl);
+	INJECT(0x004414B0, PropellerControl);
 	INJECT(0x00441640, SpinningBlade);
 	INJECT(0x004417C0, IcicleControl);
 	INJECT(0x004418C0, InitialiseBlade);
@@ -1086,9 +1192,9 @@ void Inject_Traps() {
 	INJECT(0x004423B0, TrapDoorCeiling);
 	INJECT(0x004423F0, OnTrapDoor);
 	INJECT(0x004424A0, Pendulum);
-	//INJECT(0x004425B0, FallingBlock);
-	//INJECT(0x004426C0, FallingBlockFloor);
-	//INJECT(0x00442700, FallingBlockCeiling);
+	INJECT(0x004425B0, FallingBlock);
+	INJECT(0x004426C0, FallingBlockFloor);
+	INJECT(0x00442700, FallingBlockCeiling);
 	INJECT(0x00442750, TeethTrap);
 	INJECT(0x00442810, FallingCeiling);
 	INJECT(0x004428F0, DartEmitterControl);

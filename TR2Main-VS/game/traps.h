@@ -32,7 +32,7 @@ void MineControl(short mineID); // 0x00440FC0
 void ControlSpikeWall(short itemNumber); // 0x004411C0
 void ControlCeilingSpikes(short itemNumber); // 0x00441300
 void HookControl(short itemNumber); // 0x00441420
-#define PropellerControl ((void(__cdecl*)(short)) 0x004414B0)
+void PropellerControl(short itemNumber); // 0x004414B0
 void SpinningBlade(short itemNumber); // 0x00441640
 void InitialiseIcicle(short itemNumber);
 void IcicleControl(short itemNumber); // 0x004417C0
@@ -50,9 +50,9 @@ void TrapDoorFloor(ITEM_INFO* item, int x, int y, int z, int* height); // 0x0044
 void TrapDoorCeiling(ITEM_INFO* item, int x, int y, int z, int* height); // 0x004423B0
 BOOL OnTrapDoor(ITEM_INFO* item, int x, int z); // 0x004423F0
 void Pendulum(short itemNumber); // 0x004424A0
-#define FallingBlock ((void(__cdecl*)(short)) 0x004425B0)
-#define FallingBlockFloor ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x004426C0)
-#define FallingBlockCeiling ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00442700)
+void FallingBlock(short itemNumber); // 0x004425B0
+void FallingBlockFloor(ITEM_INFO* item, int x, int y, int z, int* height); // 0x004426C0
+void FallingBlockCeiling(ITEM_INFO* item, int x, int y, int z, int* height); // 0x00442700
 void TeethTrap(short itemNumber); // 0x00442750
 void FallingCeiling(short itemNumber); // 0x00442810
 void DartEmitterControl(short itemNumber); // 0x004428F0
