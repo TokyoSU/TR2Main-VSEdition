@@ -32,6 +32,7 @@
 #include "game/laramisc.h"
 #include "game/traps.h"
 #include "game/lot.h"
+#include "game/moveblock.h"
 #include "game/pickup.h"
 #include "game/sound.h"
 #include "game/savegame.h"
@@ -335,6 +336,41 @@ void AnimateItem(ITEM_INFO* item)
 	item->pos.z += item->speed * phd_cos(item->pos.rotY) >> W2V_SHIFT;
 }
 
+BOOL GetChange(ITEM_INFO* item, ANIM_STRUCT* anim)
+{
+	if (item->currentAnimState == item->goalAnimState)
+		return FALSE;
+
+	CHANGE_STRUCT* change = &AnimChanges[anim->changeIndex];
+	for (short i = 0; i < anim->numberChanges; i++, change++)
+	{
+		if (change->goalAnimState == item->goalAnimState)
+		{
+			RANGE_STRUCT* range = &AnimRanges[change->rangeIndex];
+			for (short j = 0; j < change->numberRanges; j++, range++)
+			{
+				if (item->frameNumber >= range->startFrame && item->frameNumber <= range->endFrame)
+				{
+					item->animNumber = range->linkAnimNum;
+					item->frameNumber = range->linkFrameNum;
+					return TRUE;
+				}
+			}
+		}
+	}
+
+	return FALSE;
+}
+
+void TranslateItem(ITEM_INFO* item, int x, int y, int z)
+{
+	int c = phd_cos(item->pos.rotY);
+	int s = phd_sin(item->pos.rotY);
+	item->pos.x += ( c * x + s * z) >> W2V_SHIFT;
+	item->pos.y += y;
+	item->pos.z += (-s * x + c * z) >> W2V_SHIFT;
+}
+
 FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber)
 {
 	ROOM_INFO* r = &Rooms[*roomNumber];
@@ -558,6 +594,50 @@ int GetHeight(FLOOR_INFO* floor, int x, int y, int z)
 		while (!CHK_ANY(type, END_BIT));
 	}
 	return height;
+}
+
+void RefreshCamera(short type, short* data)
+{
+	short valid = 2, trigger, value;
+	do
+	{
+		trigger = *(data++);
+		value = trigger & VALUE_BITS;
+		switch (TRIG_BITS(trigger))
+		{
+		case TO_CAMERA:
+			data++;
+			if (value == Camera.last)
+			{
+				Camera.number = value;
+				if (Camera.timer < 0)
+				{
+					Camera.timer = -1;
+					valid = 0;
+					break;
+				}
+				Camera.type = CAM_Fixed;
+				valid = 1;
+			}
+			else
+			{
+				valid = 0;
+			}
+			break;
+		case TO_TARGET:
+			Camera.item = &Items[value];
+			break;
+		}
+	} while (!CHK_ANY(trigger, END_BIT));
+
+	if (Camera.item != NULL)
+	{
+		if (valid == 0 || (valid == 2 && Camera.item->looked_at && Camera.item != Camera.last_item))
+			Camera.item = NULL;
+	}
+
+	if (Camera.number == 0 && Camera.timer > 0)
+		Camera.timer = -1;
 }
 
 void TestTriggers(short* data, BOOL isHeavy)
@@ -830,6 +910,21 @@ void TestTriggers(short* data, BOOL isHeavy)
 	}
 }
 
+BOOL TriggerActive(ITEM_INFO* item)
+{
+	int isReversedActive = (item->flags & IFL_REVERSE) ? 0 : 1;
+	if ((item->flags & IFL_CODEBITS) != IFL_CODEBITS)
+		return !isReversedActive;
+	if (!item->timer)
+		return isReversedActive;
+	if (item->timer == -1)
+		return !isReversedActive;
+	item->timer--;
+	if (!item->timer)
+		item->timer = -1;
+	return isReversedActive;
+}
+
 int GetCeiling(FLOOR_INFO* floor, int x, int y, int z)
 {
 	FLOOR_INFO* f = floor;
@@ -843,13 +938,13 @@ int GetCeiling(FLOOR_INFO* floor, int x, int y, int z)
 	if (f->index)
 	{
 		short* data = &FloorData[f->index];
-		short hadj = *data++;
-		short type = hadj & DATA_TYPE;
+		short value = *data++;
+		short type = value & DATA_TYPE;
 		if (type == FT_TILT)
 		{
 			data++;
-			hadj = *(data++);
-			type = hadj & DATA_TYPE;
+			value = *(data++);
+			type = value & DATA_TYPE;
 		}
 		if (type == FT_ROOF)
 		{
@@ -1257,6 +1352,33 @@ void FlipMap()
 	FlipStatus = !FlipStatus;
 }
 
+void RemoveRoomFlipItems(ROOM_INFO* room)
+{
+	for (short itemNumber = room->itemNumber; itemNumber != -1; itemNumber = Items[itemNumber].nextItem)
+	{
+		ITEM_INFO* item = &Items[itemNumber];
+		if (Objects[item->objectID].control == MovableBlock)
+		{
+			AlterFloorHeight(item, BLOCK(1));
+		}
+		else if ((item->flags & IFL_ONESHOT) && Objects[item->objectID].intelligent && item->hitPoints <= 0)
+		{
+			RemoveDrawnItem(itemNumber);
+			item->flags |= IFL_KILLED;
+		}
+	}
+}
+
+void AddRoomFlipItems(ROOM_INFO* room)
+{
+	for (short itemNumber = room->itemNumber; itemNumber != -1; itemNumber = Items[itemNumber].nextItem)
+	{
+		ITEM_INFO* item = &Items[itemNumber];
+		if (Objects[item->objectID].control == MovableBlock)
+			AlterFloorHeight(item, -BLOCK(1));
+	}
+}
+
 void TriggerCDTrack(short value, UINT16 flags, short type) {
 	if (value > 1 && value < 64) {
 		TriggerNormalCDTrack(value, flags, type);
@@ -1302,14 +1424,14 @@ void TriggerNormalCDTrack(short value, UINT16 flags, short type) {
 void Inject_Control() {
 	INJECT(0x00414370, ControlPhase);
 	INJECT(0x004146C0, AnimateItem);
-	//INJECT(0x00414A30, GetChange);
-	//INJECT(0x00414AE0, TranslateItem);
+	INJECT(0x00414A30, GetChange);
+	INJECT(0x00414AE0, TranslateItem);
 	INJECT(0x00414B40, GetFloor);
 	INJECT(0x00414CE0, GetWaterHeight);
 	INJECT(0x00414E50, GetHeight);
-	//INJECT(0x004150D0, RefreshCamera);
+	INJECT(0x004150D0, RefreshCamera);
 	INJECT(0x004151C0, TestTriggers);
-	//INJECT(0x004158A0, TriggerActive);
+	INJECT(0x004158A0, TriggerActive);
 	INJECT(0x00415900, GetCeiling);
 	INJECT(0x00415B60, GetDoor);
 	INJECT(0x00415BB0, LOS);
@@ -1318,8 +1440,8 @@ void Inject_Control() {
 	INJECT(0x00416230, ClipTarget);
 	INJECT(0x00416310, ObjectOnLOS);
 	INJECT(0x00416610, FlipMap);
-	//INJECT(0x004166D0, RemoveRoomFlipItems);
-	//INJECT(0x00416770, AddRoomFlipItems);
+	INJECT(0x004166D0, RemoveRoomFlipItems);
+	INJECT(0x00416770, AddRoomFlipItems);
 	INJECT(0x004167D0, TriggerCDTrack);
 	INJECT(0x00416800, TriggerNormalCDTrack);
 }
