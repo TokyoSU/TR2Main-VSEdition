@@ -81,6 +81,7 @@
 #define MAX_WEATHER_RAIN_ALIVE 2048
 #define MAX_WEATHER_SNOW 4096
 #define MAX_WEATHER_SNOW_ALIVE 2048
+#define MAX_CREATURES 5
 
 /*
  * General Variables
@@ -816,7 +817,7 @@ extern TEXT_STR_INFO* CtrlTextB[ARRAY_SIZE(Layout->key)];
 #define PickUpBoundsUW				ARRAY_(0x00466030, short, [12])
 #define PickUpPositionUW			VAR_U_(0x00466048, PHD_VECTOR)
 #define BaddiesSlots                VAR_U_(0x005206C0, CREATURE_INFO*)
-#define BaddiesSlotsCount           VAR_U_(0x004D7C40, int)
+#define BaddiesSlotsUsedCount           VAR_U_(0x004D7C40, int)
 extern short* SampleLut; // 0x0051E6E0
 extern SOUND_SLOT LaSlot[32]; // 0x004D7C70
 #define DashTimer                   VAR_U_(0x005206E2, short)

@@ -28,6 +28,110 @@
 extern bool IsGold();
 #endif
 
+void InitialiseLOTarray()
+{
+    BaddiesSlots = (CREATURE_INFO*)game_malloc(sizeof(CREATURE_INFO) * MAX_CREATURES, GBUF_CreatureData);
+    for (int i = 0; i < MAX_CREATURES; i++)
+    {
+        CREATURE_INFO* creature = &BaddiesSlots[i];
+        creature->itemNumber = -1;
+        creature->LOT.node = (BOX_NODE*)game_malloc(sizeof(BOX_NODE) * BoxesCount, GBUF_CreatureLOT);
+    }
+    BaddiesSlotsUsedCount = 0;
+}
+
+void DisableBaddieAI(short itemNumber)
+{
+    CREATURE_INFO* creature = NULL;
+
+    if (itemNumber == Lara.item_number)
+    {
+        creature = Lara.creature;
+        Lara.creature = NULL;
+    }
+    else
+    {
+        ITEM_INFO* item = &Items[itemNumber];
+        CREATURE_INFO* creature = GetCreatureInfo(item);
+        item->data = NULL;
+    }
+
+    if (creature != NULL)
+    {
+        creature->itemNumber = -1;
+        BaddiesSlotsUsedCount--;
+    }
+}
+
+BOOL EnableBaddieAI(short itemNumber, BOOL always)
+{
+    CREATURE_INFO* creature = NULL;
+
+    if (Lara.item_number == itemNumber)
+    {
+        if (Lara.creature != NULL)
+            return TRUE;
+    }
+    else if (Items[itemNumber].data)
+    {
+        return TRUE;
+    }
+
+    if (BaddiesSlotsUsedCount < MAX_CREATURES)
+    {
+        creature = BaddiesSlots;
+        for (int slotIndex = 0; slotIndex < MAX_CREATURES; slotIndex++, creature++)
+        {
+            if (creature->itemNumber == -1)
+            {
+                InitialiseSlot(itemNumber, slotIndex);
+                return TRUE;
+            }
+        }
+    }
+
+    int worstdist = 0;
+    if (!always)
+    {
+        ITEM_INFO* item = &Items[itemNumber];
+        int x = (item->pos.x - Camera.pos.x) >> 8;
+        int y = (item->pos.y - Camera.pos.y) >> 8;
+        int z = (item->pos.z - Camera.pos.z) >> 8;
+        worstdist = SQR(x) + SQR(y) + SQR(z);
+    }
+    else
+    {
+        worstdist = 0;
+    }
+
+    int worstslot = -1;
+    creature = BaddiesSlots;
+    for (int slot = 0; slot < MAX_CREATURES; slot++, creature++)
+    {
+        ITEM_INFO* item = &Items[creature->itemNumber];
+        int x = (item->pos.x - Camera.pos.x) >> 8;
+        int y = (item->pos.y - Camera.pos.y) >> 8;
+        int z = (item->pos.z - Camera.pos.z) >> 8;
+        int dist = SQR(x) + SQR(y) + SQR(z);
+        if (dist > worstdist)
+        {
+            worstdist = dist;
+            worstslot = slot;
+        }
+    }
+
+    if (worstslot >= 0)
+    {
+        creature = &BaddiesSlots[worstslot];
+        Items[creature->itemNumber].status = ITEM_INVISIBLE;
+        DisableBaddieAI(creature->itemNumber);
+        InitialiseSlot(itemNumber, worstslot);
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
 void InitialiseSlot(short itemNumber, int baddieSlotID)
 {
     CREATURE_INFO* creature = &BaddiesSlots[baddieSlotID];
@@ -91,7 +195,7 @@ void InitialiseSlot(short itemNumber, int baddieSlotID)
     ClearLOT(&creature->LOT);
     if (itemNumber != Lara.item_number)
         CreateZone(item);
-    ++BaddiesSlotsCount;
+    ++BaddiesSlotsUsedCount;
 }
 
 void CreateZone(ITEM_INFO* item)
@@ -105,13 +209,13 @@ void CreateZone(ITEM_INFO* item)
     creature = GetCreatureInfo(item);
     if (creature->LOT.fly != 0)
     {
-        zone = FlyZones[0];
-        flip = FlyZones[1];
+        zone = FlyZones[FALSE];
+        flip = FlyZones[TRUE];
     }
     else
     {
-        zone = GroundZones[2 * (creature->LOT.step >> 8) + 0];
-        flip = GroundZones[2 * (creature->LOT.step >> 8) + 1];
+        zone = GroundZones[2 * (creature->LOT.step >> 8) + FALSE];
+        flip = GroundZones[2 * (creature->LOT.step >> 8) + TRUE];
     }
 
     ROOM_INFO* r = &Rooms[item->roomNumber];
@@ -129,14 +233,30 @@ void CreateZone(ITEM_INFO* item)
     }
 }
 
+void ClearLOT(LOT_INFO* LOT)
+{
+    LOT->head = -1;
+    LOT->tail = -1;
+    LOT->searchNumber = 0;
+    LOT->targetBox = -1;
+    LOT->requiredBox = -1;
+    for (DWORD i = 0; i < BoxesCount; i++)
+    {
+        BOX_NODE* node = &LOT->node[i];
+        node->exitBox = -1;
+        node->nextExpansion = -1;
+        node->searchNumber = 0;
+    }
+}
+
  /*
   * Inject function
   */
 void Inject_Lot() {
-	//INJECT(0x00432B10, InitialiseLOTarray);
-	//INJECT(0x00432B70, DisableBaddieAI);
-	//INJECT(0x00432BC0, EnableBaddieAI);
+	INJECT(0x00432B10, InitialiseLOTarray);
+	INJECT(0x00432B70, DisableBaddieAI);
+	INJECT(0x00432BC0, EnableBaddieAI);
 	INJECT(0x00432D70, InitialiseSlot);
 	INJECT(0x00432F80, CreateZone);
-	//INJECT(0x00433040, ClearLOT);
+	INJECT(0x00433040, ClearLOT);
 }
