@@ -850,30 +850,33 @@ bool IsCreatureNearTarget(ITEM_INFO* item, ITEM_INFO* enemy, int distance)
 		   ABS(item->pos.z - enemy->pos.z) < distance;
 }
 
-bool DamageTarget(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damage)
+bool DamageTarget(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damage, bool isLotofBlood)
 {
-	if (enemy)
+	if (enemy != NULL)
 	{
 		enemy->hitPoints -= damage;
 		enemy->hitStatus = TRUE;
-		CreatureEffect(item, bite, DoBloodSplat);
+		if (isLotofBlood)
+			DoLotsOfBlood(enemy->pos.x, enemy->pos.y, enemy->pos.z, 2, enemy->pos.rotY, enemy->roomNumber, 1);
+		else
+			CreatureEffect(item, bite, DoBloodSplat);
 		return true;
 	}
 	return false;
 }
 
-bool DamageLaraOrEnemy(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damageLara, int damageEnemy, bool touchBitsLara)
+bool DamageLaraOrEnemy(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damageLara, int damageEnemy, bool touchBitsLara, bool isLotofBlood)
 {
 	if (enemy != NULL)
 	{
 		if (enemy->objectID == ID_LARA && touchBitsLara)
 		{
-			DamageTarget(item, enemy, bite, damageLara);
+			DamageTarget(item, enemy, bite, damageLara, isLotofBlood);
 			return true;
 		}
 		else if (IsCreatureNearTarget(item, enemy))
 		{
-			DamageTarget(item, enemy, bite, damageEnemy);
+			DamageTarget(item, enemy, bite, damageEnemy, isLotofBlood);
 			return true;
 		}
 	}

@@ -59,8 +59,8 @@ void GetBaddieTarget(short creatureIdx, BOOL isMonk); // 0x004103A0
 
 void CreatureDropItem(ITEM_INFO* item);
 bool IsCreatureNearTarget(ITEM_INFO* item, ITEM_INFO* enemy, int distance = CLICK(2));
-bool DamageTarget(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damage); // NOTE: Only for hand to hand. (Not exist in the original game)
-bool DamageLaraOrEnemy(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damageLara, int damageEnemy, bool touchBitsLara); // NOTE: Only for hand to hand. (Not exist in the original game)
+bool DamageTarget(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damage, bool isLotofBlood = false); // NOTE: Only for hand to hand. (Not exist in the original game)
+bool DamageLaraOrEnemy(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damageLara, int damageEnemy, bool touchBitsLara, bool isLotofBlood = false); // NOTE: Only for hand to hand. (Not exist in the original game)
 void SetAnimation(ITEM_INFO* item, int animID, int stateID, int frameID = 0); // NOTE: Force animation. (Not exist in the original game)
 void SetAnimationWithObject(ITEM_INFO* item, GAME_OBJECT_ID fromObjectIndex, int animID, int stateID, int frameID = 0); // NOTE: Force animation using another object animation. (Not exist in the original game)
 

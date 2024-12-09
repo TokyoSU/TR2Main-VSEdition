@@ -29,6 +29,7 @@
 #include "game/sound.h"
 #include "specific/game.h"
 #include "specific/sndpc.h"
+#include "specific/winmain.h"
 #include "global/vars.h"
 
 #ifdef FEATURE_INPUT_IMPROVED
@@ -38,6 +39,11 @@
 #define CAM_DISTANCE (0x600)
 
 void InitialiseCamera() {
+	if (LaraItem == NULL)
+	{
+		S_ExitSystem("Failed to initialize Camera, LaraItem is NULL, Probably missing LARA object in the level.");
+		return;
+	}
 	Camera.shift = LaraItem->pos.y - 0x400;
 	Camera.target.x = LaraItem->pos.x;
 	Camera.target.y = Camera.shift;

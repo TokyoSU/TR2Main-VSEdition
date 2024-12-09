@@ -44,7 +44,7 @@ enum MouseState {
 	MOUSE_DEATH
 };
 
-static BITE_INFO MouseBite = { 0, 0, 57, 2 };
+static const BITE_INFO MouseBite = { 0, 0, 57, 2 };
 
 void MouseControl(short itemNumber)
 {

@@ -751,7 +751,7 @@ void FallingBlockCeiling(ITEM_INFO* item, int x, int y, int z, int* height)
 
 void TeethTrap(short itemNumber) {
 	ITEM_INFO* item;
-	static BITE_INFO Teeth[3][2] = {
+	static const BITE_INFO Teeth[3][2] = {
 		{{-23, 0, -1718, 0}, {71, 0, -1718, 1}},
 		{{-23, 10, -1718, 0}, {71, 10, -1718, 1}},
 		{{-23, -10, -1718, 0}, {71, -10, -1718, 1}}
@@ -1132,7 +1132,9 @@ void CandleFlameEmitterControl(short itemNumber)
 	if (candle->on)
 	{
 		AddDynamicLight(item->pos.x, item->pos.y, item->pos.z, 12, 11); // power, range
+		PlaySoundEffect(150, &item->pos, SFX_PITCH | 0x2000000);
 	}
+
 	if (candle->on && !TriggerActive(item))
 	{
 		KillEffect(candle->leftID);
@@ -1164,7 +1166,6 @@ void CandleEmitterSpriteControl(short fxNumber)
 	{
 		fx->counter--;
 	}
-	PlaySoundEffect(150, &fx->pos, NULL);
 }
 
 /*

@@ -88,8 +88,8 @@ enum DogState {
 	DOG_DEATH
 };
 
-static BITE_INFO DogBite = { 0, 30, 141, 20 };
-static BITE_INFO TigerBite = { 19, -13, 3, 26 };
+static const BITE_INFO DogBite = { 0, 30, 141, 20 };
+static const BITE_INFO TigerBite = { 19, -13, 3, 26 };
 
 void DogControl(short itemNumber)
 {

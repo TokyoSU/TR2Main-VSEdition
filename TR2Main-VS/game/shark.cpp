@@ -23,6 +23,7 @@
 #include "game/shark.h"
 #include "game/control.h"
 #include "game/box.h"
+#include "effects.h"
 #include "game/items.h"
 #include "game/missile.h"
 #include "game/lot.h"
@@ -80,9 +81,9 @@ enum SharkState {
 #define SHARK_KILL_ANIM 19
 #define SHARK_TOUCH 0x3400
 
-static BITE_INFO JellyBite = { 0, 0, 0, 0 };
-static BITE_INFO BaraBite = { 2, -60, 121, 7 };
-static BITE_INFO SharkBite = { 17, -22, 344, 12 };
+static const BITE_INFO JellyBite = { 0, 0, 0, 0 };
+static const BITE_INFO BaraBite = { 2, -60, 121, 7 };
+static const BITE_INFO SharkBite = { 17, -22, 344, 12 };
 
 void JellyControl(short item_number)
 {
@@ -124,7 +125,7 @@ void JellyControl(short item_number)
 			break;
 		}
 
-		DamageLaraOrEnemy(item, creature->enemy, &JellyBite, JELLY_STING, JELLY_STING_TO_OTHER, item->touchBits != 0);
+		DamageLaraOrEnemy(item, creature->enemy, &JellyBite, JELLY_STING, JELLY_STING_TO_OTHER, item->touchBits != 0, true);
 	}
 
 	CreatureAnimation(item_number, angle, 0);

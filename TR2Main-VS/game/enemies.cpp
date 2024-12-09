@@ -27,9 +27,74 @@
 #include "game/effects.h"
 #include "game/missile.h"
 #include "game/people.h"
+#include "game/lot.h"
 #include "game/sound.h"
 #include "specific/game.h"
 #include "global/vars.h"
+
+enum WarriorState {
+	WARRIOR_EMPTY,
+	WARRIOR_STOP,
+	WARRIOR_WALK,
+	WARRIOR_AIM1,
+	WARRIOR_SLASH1,
+	WARRIOR_AIM2,
+	WARRIOR_SLASH2,
+	WARRIOR_WAIT,
+	WARRIOR_FLY,
+	WARRIOR_START,
+	WARRIOR_AIM3,
+	WARRIOR_SLASH3,
+	WARRIOR_DEATH
+};
+
+enum XianState {
+	XIAN_EMPTY,
+	XIAN_STOP,
+	XIAN_STOP2,
+	XIAN_WALK,
+	XIAN_RUN,
+	XIAN_AIM1,
+	XIAN_HIT1,
+	XIAN_AIM2,
+	XIAN_HIT2,
+	XIAN_AIM3,
+	XIAN_HIT3,
+	XIAN_AIM4,
+	XIAN_HIT4,
+	XIAN_AIM5,
+	XIAN_HIT5,
+	XIAN_AIM6,
+	XIAN_HIT6,
+	XIAN_DEATH,
+	XIAN_START,
+	XIAN_KILL
+};
+
+#define XIAN_WALK_TURN ANGLE(3)
+#define XIAN_RUN_TURN ANGLE(5)
+#define XIAN_STOP_CHANCE 0x200
+#define XIAN_WALK_CHANCE (XIAN_STOP_CHANCE + 0x200)
+#define XIAN_ATTACK1_RANGE SQR(BLOCK(1))
+#define XIAN_ATTACK2_RANGE SQR(BLOCK(3)/2)
+#define XIAN_ATTACK3_RANGE SQR(BLOCK(2))
+#define XIAN_ATTACK4_RANGE SQR(BLOCK(2))
+#define XIAN_ATTACK5_RANGE SQR(BLOCK(1))
+#define XIAN_ATTACK6_RANGE SQR(BLOCK(2))
+#define XIAN_RUN_RANGE SQR(BLOCK(3))
+#define XIAN_DIE_ANIM 0
+#define XIAN_START_ANIM 48
+#define XIAN_KILL_ANIM 49
+#define XIAN_TOUCHL 0x00800
+#define XIAN_TOUCHR 0x40000
+
+#define WARRIOR_DAMAGE 300
+#define WARRIOR_DAMAGE_TO_OTHER 7
+#define WARRIOR_TOUCH 0x0c000
+#define WARRIOR_WALK_TURN ANGLE(5)
+#define WARRIOR_FLY_TURN ANGLE(4)
+#define WARRIOR_ATTACK1_RANGE SQR(BLOCK(1))
+#define WARRIOR_ATTACK3_RANGE SQR(BLOCK(2))
 
 #define MONK_DAMAGE_TO_OTHER_ENEMIES 5
 #define MONK_DAMAGE 150
@@ -78,8 +143,11 @@ enum Cult2State // Knifethrower StateIDs
 };
 
 static const BITE_INFO MonkBite = { -23, 16, 265, 14 };
-static const BITE_INFO Cult2Left = { 0, 0, 0, 5 };
-static const BITE_INFO Cult2Right = { 0, 0, 0, 8 };
+static const BITE_INFO Cult2LeftBite = { 0, 0, 0, 5 };
+static const BITE_INFO Cult2RightBite = { 0, 0, 0, 8 };
+static const BITE_INFO WarriorSwordBite = { 0, 37, 550, 15 };
+static const BITE_INFO XianLeftBite = { 0, 0, 920, 11 };
+static const BITE_INFO XianRightBite = { 0, 0, 920, 18 };
 
 short Knife(int x, int y, int z, short speed, short rotY, short roomNum)
 {
@@ -227,7 +295,7 @@ void Cult2Control(short itemNumber)
 			isLeft = (item->currentAnimState == CULT2_SHOOT1L);
 			if (!cult2->flags)
 			{
-				CreatureEffect(item, isLeft ? &Cult2Left : &Cult2Right, Knife);
+				CreatureEffect(item, isLeft ? &Cult2LeftBite : &Cult2RightBite, Knife);
 				cult2->flags = 1;
 			}
 
@@ -238,8 +306,8 @@ void Cult2Control(short itemNumber)
 
 			if (!cult2->flags)
 			{
-				CreatureEffect(item, &Cult2Left, Knife);
-				CreatureEffect(item, &Cult2Right, Knife);
+				CreatureEffect(item, &Cult2LeftBite, Knife);
+				CreatureEffect(item, &Cult2RightBite, Knife);
 				cult2->flags = 1;
 			}
 
@@ -456,6 +524,26 @@ void MonkControl(short itemNumber)
 	CreatureAnimation(itemNumber, angle, 0);
 }
 
+void XianDamage(ITEM_INFO* item, CREATURE_INFO* creature, int damage)
+{
+	if (!(creature->flags & 1))
+	{
+		if (DamageLaraOrEnemy(item, creature->enemy, &XianRightBite, damage, damage / 20, item->touchBits & XIAN_TOUCHR))
+		{
+			PlaySoundEffect(318, &item->pos, NULL);
+			creature->flags |= 1;
+		}
+	}
+	if (!(creature->flags & 2))
+	{
+		if (DamageLaraOrEnemy(item, creature->enemy, &XianLeftBite, damage, damage / 20, item->touchBits & XIAN_TOUCHL))
+		{
+			PlaySoundEffect(318, &item->pos, NULL);
+			creature->flags |= 2;
+		}
+	}
+}
+
 void WarriorSparkleTrail(ITEM_INFO* item)
 {
 	short fxNum = CreateEffect(item->roomNumber);
@@ -473,6 +561,165 @@ void WarriorSparkleTrail(ITEM_INFO* item)
 	PlaySoundEffect(312, &item->pos, 0);
 }
 
+void WarriorControl(short itemNumber)
+{
+	if (!CreatureActive(itemNumber))
+		return;
+
+	ITEM_INFO* item = &Items[itemNumber];
+	CREATURE_INFO* warrior = GetCreatureInfo(item);
+	short head = 0, neck = 0, angle = 0, tilt = 0;
+
+	if (item->hitPoints <= 0)
+	{
+		item->currentAnimState = WARRIOR_DEATH;
+		item->meshBits >>= 1;
+		if (item->meshBits == 0)
+		{
+			PlaySoundEffect(105, NULL, 0);
+			item->meshBits = 0xFFFFFFFF;
+			item->objectID = ID_CHINESE4;
+			ExplodingDeath(itemNumber, 0xFFFFFFFF, 0);
+			item->objectID = ID_WARRIOR;
+			DisableBaddieAI(itemNumber);
+			KillItem(itemNumber);
+			item->status = ITEM_DISABLED;
+			item->flags |= IFL_ONESHOT;
+		}
+		return;
+	}
+	else
+	{
+		AI_INFO info;
+		warrior->LOT.step = CLICK(1);
+		warrior->LOT.drop = -CLICK(1);
+		warrior->LOT.fly = 0;
+		CreatureAIInfo(item, &info);
+
+		if (item->currentAnimState == WARRIOR_FLY)
+		{
+			if (info.zoneNumber != info.enemyZone)
+			{
+				warrior->LOT.step = BLOCK(20);
+				warrior->LOT.drop = -BLOCK(20);
+				warrior->LOT.fly = CLICK(1) / 4;
+				CreatureAIInfo(item, &info);
+			}
+		}
+
+		CreatureMood(item, &info, TRUE);
+		angle = CreatureTurn(item, warrior->maximumTurn);
+		if (item->currentAnimState != WARRIOR_START)
+			item->meshBits = 0xFFFFFFFF;
+
+		switch (item->currentAnimState)
+		{
+		case WARRIOR_START:
+			if (!warrior->flags)
+			{
+				item->meshBits = (item->meshBits << 1) + 1;
+				warrior->flags = 3;
+			}
+			else
+				warrior->flags--;
+			break;
+
+		case WARRIOR_STOP:
+			warrior->maximumTurn = 0;
+			if (info.ahead)
+				neck = info.angle;
+
+			if (LaraItem->hitPoints <= 0)
+				item->goalAnimState = WARRIOR_WAIT;
+			else if (info.bite && info.distance < WARRIOR_ATTACK1_RANGE)
+			{
+				if (GetRandomControl() < 0x4000)
+					item->goalAnimState = WARRIOR_AIM1;
+				else
+					item->goalAnimState = WARRIOR_AIM2;
+			}
+			else if (info.zoneNumber != info.enemyZone)
+				item->goalAnimState = WARRIOR_FLY;
+			else
+				item->goalAnimState = WARRIOR_WALK;
+			break;
+
+		case WARRIOR_WALK:
+			warrior->maximumTurn = WARRIOR_WALK_TURN;
+			if (info.ahead)
+				neck = info.angle;
+
+			if (LaraItem->hitPoints <= 0)
+				item->goalAnimState = WARRIOR_STOP;
+			else if (info.bite && info.distance < WARRIOR_ATTACK3_RANGE)
+				item->goalAnimState = WARRIOR_AIM3;
+			else if (info.zoneNumber != info.enemyZone)
+				item->goalAnimState = WARRIOR_STOP;
+			break;
+
+		case WARRIOR_FLY:
+			warrior->maximumTurn = WARRIOR_FLY_TURN;
+			if (info.ahead)
+				neck = info.angle;
+			WarriorSparkleTrail(item);
+			if (warrior->LOT.fly == 0)
+				item->goalAnimState = WARRIOR_STOP;
+			break;
+
+		case WARRIOR_AIM1:
+			warrior->flags = 0;
+			if (info.ahead)
+				head = info.angle;
+
+			if (info.bite && info.distance < WARRIOR_ATTACK1_RANGE)
+				item->goalAnimState = WARRIOR_SLASH1;
+			else
+				item->goalAnimState = WARRIOR_STOP;
+			break;
+
+		case WARRIOR_AIM2:
+			warrior->flags = 0;
+			if (info.ahead)
+				head = info.angle;
+
+			if (info.bite && info.distance < WARRIOR_ATTACK1_RANGE)
+				item->goalAnimState = WARRIOR_SLASH2;
+			else
+				item->goalAnimState = WARRIOR_STOP;
+			break;
+
+		case WARRIOR_AIM3:
+			warrior->flags = 0;
+			if (info.ahead)
+				head = info.angle;
+
+			if (info.bite && info.distance < WARRIOR_ATTACK3_RANGE)
+				item->goalAnimState = WARRIOR_SLASH3;
+			else
+				item->goalAnimState = WARRIOR_WALK;
+			break;
+
+		case WARRIOR_SLASH1:
+		case WARRIOR_SLASH2:
+		case WARRIOR_SLASH3:
+			if (info.ahead)
+				head = info.angle;
+
+			if (!warrior->flags)
+			{
+				if (DamageLaraOrEnemy(item, warrior->enemy, &WarriorSwordBite, WARRIOR_DAMAGE, WARRIOR_DAMAGE_TO_OTHER, item->touchBits & WARRIOR_TOUCH))
+					warrior->flags = 1;
+			}
+			break;
+		}
+	}
+
+	CreatureTilt(item, tilt);
+	CreatureHead(item, head);
+	CreatureNeck(item, neck);
+	CreatureAnimation(itemNumber, angle, 0);
+}
+
  /*
   * Inject function
   */
@@ -482,9 +729,9 @@ void Inject_Enemies() {
 	INJECT(0x0041DFE0, MonkControl);
 	//INJECT(0x0041E4B0, Worker3Control);
 	//INJECT(0x0041EAC0, DrawXianLord);
-	//INJECT(0x0041EEC0, XianDamage);
+	INJECT(0x0041EEC0, XianDamage);
 	//INJECT(0x0041EF70, InitialiseXianLord);
 	//INJECT(0x0041EFD0, XianLordControl);
 	INJECT(0x0041F5B0, WarriorSparkleTrail);
-	//INJECT(0x0041F650, WarriorControl);
+	INJECT(0x0041F650, WarriorControl);
 }

@@ -40,8 +40,8 @@
 #include "modding/joy_output.h"
 #endif // FEATURE_INPUT_IMPROVED
 
-static BITE_INFO SkidooLeftGun = { 219, -71, 550, 0 };
-static BITE_INFO SkidooRightGun = { -235, -71, 550, 0 };
+static const BITE_INFO SkidooLeftGun = { 219, -71, 550, 0 };
+static const BITE_INFO SkidooRightGun = { -235, -71, 550, 0 };
 
 void SkidooBaddieCollision(ITEM_INFO* skidoo)
 {

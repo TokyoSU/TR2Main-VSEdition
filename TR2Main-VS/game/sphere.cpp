@@ -24,7 +24,7 @@
 #include "game/effects.h"
 #include "global/vars.h"
 
-void BaddieBiteEffect(ITEM_INFO* item, BITE_INFO* bite)
+void BaddieBiteEffect(ITEM_INFO* item, const BITE_INFO* bite)
 {
 	PHD_VECTOR pos = {};
 	pos.x = bite->x;
