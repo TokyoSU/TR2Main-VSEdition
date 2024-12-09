@@ -703,7 +703,7 @@ void FallingBlock(short itemNumber)
 		int dx = LaraItem->pos.x - item->pos.x;
 		int dz = LaraItem->pos.z - item->pos.z;
 		// NOTE: There was no check for X and Z position, so if lara was at the same height
-		// as the falling block, he just activate like nothing.
+		// as the falling block, he just activate like if lara was above it.
 		// This check avoid that !
 		if (ABS(dx) <= CLICK(2) && ABS(dz) <= CLICK(2) && LaraItem->pos.y == item->pos.y - origin)
 			item->goalAnimState = 1;
