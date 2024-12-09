@@ -41,7 +41,7 @@ void CreateExplosion(PHD_3DPOS* pos, short roomNumber, int yOffset = 0); // NOTE
 void LaraBubbles(ITEM_INFO* item); // 0x0041C8F0
 void ControlBubble1(short fxID); // 0x0041C970
 void Splash(ITEM_INFO* item); // 0x0041CA70
-// TODO: Change to 'Splash' when decompiled !
+// TODO: Change to 'Splash' when going to EXE !
 // NOTE: Not exist in the original code, new argument.
 void Splash2(ITEM_INFO* item, int waterHeight);
 void CreateRainSpash(DWORD color, int x, int y, int z, short scale, short roomNumber);

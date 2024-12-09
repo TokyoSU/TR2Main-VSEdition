@@ -31,6 +31,11 @@
 #include "modding/joy_output.h"
 #endif // FEATURE_INPUT_IMPROVED
 
+#define AIMGUNS_F	0						// 0-4
+#define DRAW1_F		5                       // 5-12
+#define DRAW2_F		13                      // 13-23
+#define RECOIL_F	24                      // 24-32
+
 void set_pistol_arm(LARA_ARM* arm, int frame) {
 	short anim;
 
@@ -55,6 +60,135 @@ void set_pistol_arm(LARA_ARM* arm, int frame) {
 	arm->frame_base = Anims[anim].framePtr;
 }
 
+void draw_pistols(int weaponType)
+{
+	short ani = Lara.left_arm.frame_number;
+	ani++;
+
+	if (ani < 5 || ani > 23)
+	{
+		ani = 5;
+	}
+	else if (ani == 13)
+	{
+		draw_pistol_meshes(weaponType);
+		PlaySoundEffect(6, &LaraItem->pos, 0);
+	}
+	else if (ani == 23)
+	{
+		ready_pistols(weaponType);
+		ani = 0;
+	}
+
+	set_pistol_arm(&Lara.right_arm, ani);
+	set_pistol_arm(&Lara.left_arm, ani);
+}
+
+void undraw_pistols(int weaponType)
+{
+	short anil = Lara.left_arm.frame_number;
+	if (anil >= RECOIL_F)
+	{
+		anil = DRAW1_F - 1;
+	}
+	else if (anil > 0 && anil < DRAW1_F)
+	{
+		Lara.left_arm.x_rot -= Lara.left_arm.x_rot / anil;
+		Lara.left_arm.y_rot -= Lara.left_arm.y_rot / anil;
+		anil--;
+	}
+	else if (anil == 0)
+	{
+		Lara.left_arm.x_rot = Lara.left_arm.y_rot = Lara.left_arm.z_rot = 0;
+		anil = RECOIL_F - 1;
+	}
+	else if (anil > DRAW1_F && anil < RECOIL_F)
+	{
+		anil--;
+		if (anil == DRAW2_F - 1)
+		{
+			undraw_pistol_mesh_left(weaponType);
+			PlaySoundEffect(7, &LaraItem->pos, 0);
+		}
+	}
+	set_pistol_arm(&Lara.left_arm, anil);
+
+	short anir = Lara.right_arm.frame_number;
+	if (anir >= RECOIL_F)
+	{
+		anir = DRAW1_F - 1;
+	}
+	else if (anir > 0 && anir < DRAW1_F)
+	{
+		Lara.right_arm.x_rot -= Lara.right_arm.x_rot / anir;
+		Lara.right_arm.y_rot -= Lara.right_arm.y_rot / anir;
+		anir--;
+	}
+	else if (anir == 0)
+	{
+		Lara.right_arm.x_rot = Lara.right_arm.y_rot = Lara.right_arm.z_rot = 0;
+		anir = RECOIL_F - 1;
+	}
+	else if (anir > DRAW1_F && anir < RECOIL_F)
+	{
+		anir--;
+		if (anir == DRAW2_F - 1)
+		{
+			undraw_pistol_mesh_right(weaponType);
+			PlaySoundEffect(7, &LaraItem->pos, 0);
+		}
+	}
+	set_pistol_arm(&Lara.right_arm, anir);
+
+	if (anil == DRAW1_F && anir == DRAW1_F)
+	{
+		Lara.gun_status = LGS_Armless;
+		Lara.right_arm.frame_number = Lara.left_arm.frame_number = 0;
+		Lara.target = NULL;
+		Lara.left_arm.lock = Lara.right_arm.lock = FALSE;
+	}
+
+	if (!CHK_ANY(InputStatus, IN_LOOK))
+	{
+		Lara.torso_y_rot = Lara.head_y_rot = (Lara.left_arm.y_rot + Lara.right_arm.y_rot) / 4;
+		Lara.torso_x_rot = Lara.head_x_rot = (Lara.left_arm.x_rot + Lara.right_arm.x_rot) / 4;
+	}
+}
+
+void ready_pistols(int weaponType)
+{
+	Lara.gun_status = LGS_Ready;
+	Lara.left_arm.x_rot = Lara.left_arm.y_rot = Lara.left_arm.z_rot = 0;
+	Lara.right_arm.x_rot = Lara.right_arm.y_rot = Lara.right_arm.z_rot = 0;
+	Lara.left_arm.frame_number = Lara.right_arm.frame_number = 0;
+	Lara.target = NULL;
+	Lara.left_arm.lock = Lara.right_arm.lock = FALSE;
+	Lara.left_arm.frame_base = Lara.right_arm.frame_base = Objects[ID_LARA_PISTOLS].frameBase;
+}
+
+void draw_pistol_meshes(int weaponType)
+{
+	int obj = WeaponObject(weaponType);
+	Lara.mesh_ptrs[LM_HandL] = MeshPtr[Objects[obj].meshIndex + LM_HandL];
+	Lara.mesh_ptrs[LM_HandR] = MeshPtr[Objects[obj].meshIndex + LM_HandR];
+	Lara.mesh_ptrs[LM_ThighL] = MeshPtr[Objects[ID_LARA].meshIndex + LM_ThighL];
+	Lara.mesh_ptrs[LM_ThighR] = MeshPtr[Objects[ID_LARA].meshIndex + LM_ThighR];
+}
+
+void undraw_pistol_mesh_left(int weaponType)
+{
+	int obj = WeaponObject(weaponType);
+	Lara.mesh_ptrs[LM_ThighL] = MeshPtr[Objects[obj].meshIndex + LM_ThighL];
+	Lara.mesh_ptrs[LM_HandL] = MeshPtr[Objects[ID_LARA].meshIndex + LM_HandL];
+}
+
+void undraw_pistol_mesh_right(int weaponType)
+{
+	int obj = WeaponObject(weaponType);
+	Lara.mesh_ptrs[LM_ThighR] = MeshPtr[Objects[obj].meshIndex + LM_ThighR];
+	Lara.mesh_ptrs[LM_HandR] = MeshPtr[Objects[ID_LARA].meshIndex + LM_HandR];
+}
+
 void PistolHandler(int weaponType) {
 	WEAPON_INFO* weapon = &Weapons[weaponType];
 
@@ -62,10 +196,10 @@ void PistolHandler(int weaponType) {
 		LaraTargetInfo(weapon);
 	}
 	else {
-		Lara.target = 0;
+		Lara.target = NULL;
 	}
 
-	if (!Lara.target) {
+	if (Lara.target == NULL) {
 		LaraGetNewTarget(weapon);
 	}
 
@@ -228,12 +362,12 @@ void AnimatePistols(int gunType) {
  */
 void Inject_Lara2Gun() {
 	INJECT(0x0042D000, set_pistol_arm);
-	//INJECT(0x0042D050, draw_pistols);
-	//INJECT(0x0042D0D0, undraw_pistols);
-	//INJECT(0x0042D300, ready_pistols);
-	//INJECT(0x0042D360, draw_pistol_meshes);
-	//INJECT(0x0042D3B0, undraw_pistol_mesh_left);
-	//INJECT(0x0042D3F0, undraw_pistol_mesh_right);
+	INJECT(0x0042D050, draw_pistols);
+	INJECT(0x0042D0D0, undraw_pistols);
+	INJECT(0x0042D300, ready_pistols);
+	INJECT(0x0042D360, draw_pistol_meshes);
+	INJECT(0x0042D3B0, undraw_pistol_mesh_left);
+	INJECT(0x0042D3F0, undraw_pistol_mesh_right);
 	INJECT(0x0042D430, PistolHandler);
 	INJECT(0x0042D5C0, AnimatePistols);
 }

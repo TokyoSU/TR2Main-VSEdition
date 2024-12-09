@@ -28,12 +28,12 @@
   * Function list
   */
 void set_pistol_arm(LARA_ARM* arm, int frame); // 0x0042D000
-#define draw_pistols ((void(__cdecl*)(short)) 0x0042D050)
-#define undraw_pistols ((void(__cdecl*)(short)) 0x0042D0D0)
-#define ready_pistols ((void(__cdecl*)(short)) 0x0042D300)
-#define draw_pistol_meshes ((void(__cdecl*)(short)) 0x0042D360)
-#define undraw_pistol_mesh_left ((void(__cdecl*)(short)) 0x0042D3B0)
-#define undraw_pistol_mesh_right ((void(__cdecl*)(short)) 0x0042D3F0)
+void draw_pistols(int weaponType); // 0x0042D050
+void undraw_pistols(int weaponType); // 0x0042D0D0
+void ready_pistols(int weaponType); // 0x0042D300
+void draw_pistol_meshes(int weaponType); // 0x0042D360
+void undraw_pistol_mesh_left(int weaponType); // 0x0042D3B0
+void undraw_pistol_mesh_right(int weaponType); // 0x0042D3F0
 void PistolHandler(int weaponType); // 0x0042D430
 void AnimatePistols(int gunType); // 0x0042D5C0
 
