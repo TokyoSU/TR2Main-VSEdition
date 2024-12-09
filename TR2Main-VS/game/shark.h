@@ -27,8 +27,8 @@
  /*
   * Function list
   */
-#define JellyControl ((void(__cdecl*)(short)) 0x0043C900)
-#define BaracuddaControl ((void(__cdecl*)(short)) 0x0043CA20)
-#define SharkControl ((void(__cdecl*)(short)) 0x0043CC50)
+void JellyControl(short itemNumber); // 0x0043C900
+void BaracuddaControl(short itemNumber); // 0x0043CA20
+void SharkControl(short itemNumber); // 0x0043CC50
 
 #endif // SHARK_H_INCLUDED
