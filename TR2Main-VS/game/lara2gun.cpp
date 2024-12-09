@@ -78,61 +78,61 @@ void draw_pistols(int weaponType)
 
 void undraw_pistols(int weaponType)
 {
-	short anil = Lara.left_arm.frame_number;
-	if (anil >= RECOIL_F)
+	short frmL = Lara.left_arm.frame_number;
+	if (frmL >= RECOIL_F)
 	{
-		anil = DRAW1_F - 1;
+		frmL = DRAW1_F - 1;
 	}
-	else if (anil > 0 && anil < DRAW1_F)
+	else if (frmL > 0 && frmL < DRAW1_F)
 	{
-		Lara.left_arm.x_rot -= Lara.left_arm.x_rot / anil;
-		Lara.left_arm.y_rot -= Lara.left_arm.y_rot / anil;
-		anil--;
+		Lara.left_arm.x_rot -= Lara.left_arm.x_rot / frmL;
+		Lara.left_arm.y_rot -= Lara.left_arm.y_rot / frmL;
+		frmL--;
 	}
-	else if (anil == 0)
+	else if (frmL == 0)
 	{
 		Lara.left_arm.x_rot = Lara.left_arm.y_rot = Lara.left_arm.z_rot = 0;
-		anil = RECOIL_F - 1;
+		frmL = RECOIL_F - 1;
 	}
-	else if (anil > DRAW1_F && anil < RECOIL_F)
+	else if (frmL > DRAW1_F && frmL < RECOIL_F)
 	{
-		anil--;
-		if (anil == DRAW2_F - 1)
+		frmL--;
+		if (frmL == DRAW2_F - 1)
 		{
 			undraw_pistol_mesh_left(weaponType);
 			PlaySoundEffect(7, &LaraItem->pos, 0);
 		}
 	}
-	set_pistol_arm(&Lara.left_arm, anil);
+	set_pistol_arm(&Lara.left_arm, frmL);
 
-	short anir = Lara.right_arm.frame_number;
-	if (anir >= RECOIL_F)
+	short frmR = Lara.right_arm.frame_number;
+	if (frmR >= RECOIL_F)
 	{
-		anir = DRAW1_F - 1;
+		frmR = DRAW1_F - 1;
 	}
-	else if (anir > 0 && anir < DRAW1_F)
+	else if (frmR > 0 && frmR < DRAW1_F)
 	{
-		Lara.right_arm.x_rot -= Lara.right_arm.x_rot / anir;
-		Lara.right_arm.y_rot -= Lara.right_arm.y_rot / anir;
-		anir--;
+		Lara.right_arm.x_rot -= Lara.right_arm.x_rot / frmR;
+		Lara.right_arm.y_rot -= Lara.right_arm.y_rot / frmR;
+		frmR--;
 	}
-	else if (anir == 0)
+	else if (frmR == 0)
 	{
 		Lara.right_arm.x_rot = Lara.right_arm.y_rot = Lara.right_arm.z_rot = 0;
-		anir = RECOIL_F - 1;
+		frmR = RECOIL_F - 1;
 	}
-	else if (anir > DRAW1_F && anir < RECOIL_F)
+	else if (frmR > DRAW1_F && frmR < RECOIL_F)
 	{
-		anir--;
-		if (anir == DRAW2_F - 1)
+		frmR--;
+		if (frmR == DRAW2_F - 1)
 		{
 			undraw_pistol_mesh_right(weaponType);
 			PlaySoundEffect(7, &LaraItem->pos, 0);
 		}
 	}
-	set_pistol_arm(&Lara.right_arm, anir);
+	set_pistol_arm(&Lara.right_arm, frmR);
 
-	if (anil == DRAW1_F && anir == DRAW1_F)
+	if (frmL == DRAW1_F && frmR == DRAW1_F)
 	{
 		Lara.gun_status = LGS_Armless;
 		Lara.right_arm.frame_number = Lara.left_arm.frame_number = 0;
