@@ -21,15 +21,18 @@
 
 #include "precompiled.h"
 #include "game/enemies.h"
+#include "3dsystem/3d_gen.h"
 #include "game/box.h"
 #include "game/items.h"
 #include "game/larafire.h"
+#include "game/draw.h"
 #include "game/effects.h"
 #include "game/missile.h"
 #include "game/people.h"
 #include "game/lot.h"
 #include "game/sound.h"
 #include "specific/game.h"
+#include "specific/output.h"
 #include "global/vars.h"
 
 enum WarriorState {
@@ -524,6 +527,131 @@ void MonkControl(short itemNumber)
 	CreatureAnimation(itemNumber, angle, 0);
 }
 
+void DrawXianLord(ITEM_INFO* item)
+{
+	short* frames[2];
+	int rate;
+	int frac = GetFrames(item, frames, &rate);
+
+	OBJECT_INFO* obj = &Objects[item->objectID];
+	if (obj->shadowSize)
+		S_PrintShadow(obj->shadowSize, frames[0], item);
+
+	phd_PushMatrix();
+	phd_TranslateAbs(item->pos.x, item->pos.y, item->pos.z);
+	phd_RotYXZ(item->pos.rotY, item->pos.rotX, item->pos.rotZ);
+
+	int clip = S_GetObjectBounds(frames[0]);
+	if (clip)
+	{
+		CalculateObjectLighting(item, frames[0]);
+		short* extra_rotation = (short*)item->data;
+		short** meshpp, **jadepp;
+
+		if (item->objectID == ID_XIAN_LORD)
+		{
+			meshpp = &MeshPtr[Objects[ID_XIAN_LORD].meshIndex];
+			jadepp = &MeshPtr[Objects[ID_CHINESE2].meshIndex];
+		}
+		else
+		{
+			meshpp = &MeshPtr[Objects[ID_WARRIOR].meshIndex];
+			jadepp = &MeshPtr[Objects[ID_CHINESE4].meshIndex];
+		}
+
+		int* bone = &AnimBones[obj->boneIndex];
+		int bit = 1;
+
+		if (!frac)
+		{
+			phd_TranslateRel((int)*(frames[0] + 6), (int)*(frames[0] + 7), (int)*(frames[0] + 8));
+			UINT16* rotation1 = (UINT16*)(frames[0] + 9);
+			phd_RotYXZsuperpack(&rotation1, 0);
+
+			if (bit & item->meshBits)
+				phd_PutPolygons(*meshpp, clip);
+			else
+				phd_PutPolygons(*jadepp, clip);
+			meshpp++;
+			jadepp++;
+
+			for (int i = obj->nMeshes - 1; i > 0; i--, bone += 4, meshpp++, jadepp++)
+			{
+				int poppush = *(bone);
+				if (poppush & 1)
+					phd_PopMatrix();
+				if (poppush & 2)
+					phd_PushMatrix();
+
+				phd_TranslateRel(*(bone + 1), *(bone + 2), *(bone + 3));
+				phd_RotYXZsuperpack(&rotation1, 0);
+
+				if (extra_rotation && (poppush & (8 | 4 | 16)))
+				{
+					if (poppush & 8)
+						phd_RotY(*(extra_rotation++));
+					if (poppush & 4)
+						phd_RotX(*(extra_rotation++));
+					if (poppush & 16)
+						phd_RotZ(*(extra_rotation++));
+				}
+
+				bit <<= 1;
+				if (bit & item->meshBits)
+					phd_PutPolygons(*meshpp, clip);
+				else
+					phd_PutPolygons(*jadepp, clip);
+			}
+		}
+		else
+		{
+			InitInterpolate(frac, rate);
+			phd_TranslateRel_ID((int)*(frames[0] + 6), (int)*(frames[0] + 7), (int)*(frames[0] + 8),
+				                (int)*(frames[1] + 6), (int)*(frames[1] + 7), (int)*(frames[1] + 8));
+			UINT16* rotation1 = (UINT16*)(frames[0] + 9);
+			UINT16* rotation2 = (UINT16*)(frames[1] + 9);
+			phd_RotYXZsuperpack_I(&rotation1, &rotation2, 0);
+
+			if (bit & item->meshBits)
+				phd_PutPolygons_I(*meshpp, clip);
+			else
+				phd_PutPolygons_I(*jadepp, clip);
+			meshpp++;
+			jadepp++;
+
+			for (int i = obj->nMeshes - 1; i > 0; i--, bone += 4, meshpp++, jadepp++)
+			{
+				int poppush = *(bone);
+				if (poppush & 1)
+					phd_PopMatrix_I();
+				if (poppush & 2)
+					phd_PushMatrix_I();
+
+				phd_TranslateRel_I(*(bone + 1), *(bone + 2), *(bone + 3));
+				phd_RotYXZsuperpack_I(&rotation1, &rotation2, 0);
+
+				if (extra_rotation && (poppush & (8 | 4 | 16)))
+				{
+					if (poppush & 8)
+						phd_RotY_I(*(extra_rotation++));
+					if (poppush & 4)
+						phd_RotX_I(*(extra_rotation++));
+					if (poppush & 16)
+						phd_RotZ_I(*(extra_rotation++));
+				}
+
+				bit <<= 1;
+				if (bit & item->meshBits)
+					phd_PutPolygons_I(*meshpp, clip);
+				else
+					phd_PutPolygons_I(*jadepp, clip);
+			}
+
+		}
+	}
+	phd_PopMatrix();
+}
+
 void XianDamage(ITEM_INFO* item, CREATURE_INFO* creature, int damage)
 {
 	if (!(creature->flags & 1))
@@ -542,6 +670,15 @@ void XianDamage(ITEM_INFO* item, CREATURE_INFO* creature, int damage)
 			creature->flags |= 2;
 		}
 	}
+}
+
+void InitialiseXianLord(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	if (item->objectID == ID_XIAN_LORD)
+		SetAnimation(item, XIAN_START_ANIM, XIAN_START);
+	item->status = ITEM_INACTIVE;
+	item->meshBits = 0;
 }
 
 void WarriorSparkleTrail(ITEM_INFO* item)
@@ -728,9 +865,9 @@ void Inject_Enemies() {
 	INJECT(0x0041DBB0, Cult2Control);
 	INJECT(0x0041DFE0, MonkControl);
 	//INJECT(0x0041E4B0, Worker3Control);
-	//INJECT(0x0041EAC0, DrawXianLord);
+	INJECT(0x0041EAC0, DrawXianLord);
 	INJECT(0x0041EEC0, XianDamage);
-	//INJECT(0x0041EF70, InitialiseXianLord);
+	INJECT(0x0041EF70, InitialiseXianLord);
 	//INJECT(0x0041EFD0, XianLordControl);
 	INJECT(0x0041F5B0, WarriorSparkleTrail);
 	INJECT(0x0041F650, WarriorControl);
