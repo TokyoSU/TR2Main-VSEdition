@@ -404,6 +404,21 @@ void EffectNewRoom(short fxNum, short newRoomNum)
 	newRoom->fxNumber = fxNum;
 }
 
+void ClearBodyBag()
+{
+	if (ClearBag == -1)
+		return;
+	short itemNumber = ClearBag;
+	while (itemNumber != -1)
+	{
+		ITEM_INFO* item = &Items[itemNumber];
+		KillItem(itemNumber);
+		itemNumber = item->nextActive;
+		item->nextActive = -1;
+	}
+	ClearBag = -1;
+}
+
 /*
  * Inject function
  */
@@ -421,5 +436,5 @@ void Inject_Items() {
 	INJECT(0x00427300, CreateEffect);
 	INJECT(0x00427370, KillEffect);
 	INJECT(0x00427460, EffectNewRoom);
-	//INJECT(0x00427500, ClearBodyBag);
+	INJECT(0x00427500, ClearBodyBag);
 }

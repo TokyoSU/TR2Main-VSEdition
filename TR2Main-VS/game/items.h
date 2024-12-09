@@ -40,6 +40,6 @@ void InitialiseFXArray(); // 0x004272D0
 short CreateEffect(short roomNum); // 0x00427300
 void KillEffect(short fxNum); // 0x00427370
 void EffectNewRoom(short fxNum, short newRoomNum); // 0x00427460
-#define ClearBodyBag ((void(__cdecl*)(void)) 0x00427500)
+void ClearBodyBag(); // 0x00427500
 
 #endif // ITEMS_H_INCLUDED

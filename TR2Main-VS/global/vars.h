@@ -820,6 +820,7 @@ extern TEXT_STR_INFO* CtrlTextB[ARRAY_SIZE(Layout->key)];
 extern short* SampleLut; // 0x0051E6E0
 extern SOUND_SLOT LaSlot[32]; // 0x004D7C70
 #define DashTimer                   VAR_U_(0x005206E2, short)
+#define ClearBag                    VAR_U_(0x005207CC, short)
 #define HoldStates                  ARRAY_(0x00465CB0, short, [16])
 
 extern DWORD SampleLutCount;
