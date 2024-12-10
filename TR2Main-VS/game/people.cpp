@@ -243,8 +243,10 @@ BOOL ShotTargetNew(ITEM_INFO* item, AI_INFO* AI, const BITE_INFO* bite, short an
 {
 	CREATURE_INFO* creature = GetCreatureInfo(item);
 	if (creature == NULL) return FALSE;
+
 	ITEM_INFO* target = creature->enemy;
 	if (target == NULL) return FALSE;
+
 	GAME_VECTOR startPos{}, targetPos{};
 	BOOL isHit = FALSE, isTargetable = FALSE;
 	int distance = 0, random = 0;

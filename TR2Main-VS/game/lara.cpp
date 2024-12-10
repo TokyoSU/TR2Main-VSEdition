@@ -22,6 +22,7 @@
 #include "precompiled.h"
 #include "game/lara.h"
 #include "3dsystem/3d_gen.h"
+#include "game/box.h"
 #include "game/control.h"
 #include "game/collide.h"
 #include "game/draw.h"
@@ -178,6 +179,317 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	TestTriggers(coll->trigger, FALSE);
 }
 
+void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = AS_STOP;
+		return;
+	}
+
+	if (CHK_ANY(InputStatus, IN_LOOK))
+		LookUpDown();
+
+	if (CHK_ANY(InputStatus, IN_LEFT))
+	{
+		Lara.turn_rate -= 409;
+		if (Lara.turn_rate < -728)
+			Lara.turn_rate = -728;
+	}
+	else if (CHK_ANY(InputStatus, IN_RIGHT))
+	{
+		Lara.turn_rate += 409;
+		if (Lara.turn_rate > 728)
+			Lara.turn_rate = 728;
+	}
+
+	if (CHK_ANY(InputStatus, IN_FORWARD))
+	{
+		if (Lara.water_status == LWS_Wade)
+			item->goalAnimState = AS_WADE;
+		else
+		{
+			if (!CHK_ANY(InputStatus, IN_SLOW))
+				item->goalAnimState = AS_RUN;
+			else
+				item->goalAnimState = AS_WALK;
+		}
+	}
+	else
+	{
+		item->goalAnimState = AS_STOP;
+	}
+}
+
+void lara_as_run(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = AS_DEATH;
+		return;
+	}
+
+	if (CHK_ANY(InputStatus, IN_ROLL))
+	{
+		SetAnimation(item, 146, AS_ROLL);
+		return;
+	}
+
+	if (CHK_ANY(InputStatus, IN_LOOK))
+		LookUpDown();
+
+	if (CHK_ANY(InputStatus, IN_LEFT))
+	{
+		Lara.turn_rate -= 409;
+		if (Lara.turn_rate < -1456)
+			Lara.turn_rate = -1456;
+		item->pos.rotZ -= 273;
+		if (item->pos.rotZ < -2002)
+			item->pos.rotZ = -2002;
+	}
+	else if (CHK_ANY(InputStatus, IN_RIGHT))
+	{
+		Lara.turn_rate += 409;
+		if (Lara.turn_rate > 1456)
+			Lara.turn_rate = 1456;
+		item->pos.rotZ += 273;
+		if (item->pos.rotZ > 2002)
+			item->pos.rotZ = 2002;
+	}
+
+	bool jump_ok = (item->animNumber == 0 || item->animNumber == 4) && item->animNumber != 6;
+	if (CHK_ANY(InputStatus, IN_JUMP) && jump_ok && !item->gravity)
+	{
+		item->goalAnimState = AS_FORWARDJUMP;
+	}
+	else if (CHK_ANY(InputStatus, IN_FORWARD))
+	{
+		if (Lara.water_status == LWS_Wade)
+		{
+			item->goalAnimState = AS_WADE;
+		}
+		else
+		{
+			if (CHK_ANY(InputStatus, IN_SLOW))
+				item->goalAnimState = AS_WALK;
+			else
+				item->goalAnimState = AS_RUN;
+		}
+	}
+	else
+	{
+		item->goalAnimState = AS_STOP;
+	}
+}
+
+void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = AS_DEATH;
+		return;
+	}
+
+	if (CHK_ANY(InputStatus, IN_ROLL) && Lara.water_status != LWS_Wade)
+	{
+		SetAnimation(item, 146, AS_ROLL);
+		return;
+	}
+
+	item->goalAnimState = AS_STOP;
+
+	if (CHK_ANY(InputStatus, IN_LOOK))
+		LookUpDown();
+
+	bool isQuicksand = CHK_ANY(Rooms[item->roomNumber].flags, ROOM_QUICKSAND);
+	if (isQuicksand)
+	{
+		if (CHK_ANY(InputStatus, IN_LEFT))
+			item->goalAnimState = AS_TURN_L;
+		else if (CHK_ANY(InputStatus, IN_RIGHT))
+			item->goalAnimState = AS_TURN_R;
+	}
+	else
+	{
+		if (CHK_ANY(InputStatus, IN_STEPL))
+			item->goalAnimState = AS_STEPLEFT;
+		else if (CHK_ANY(InputStatus, IN_STEPR))
+			item->goalAnimState = AS_STEPRIGHT;
+		else if (CHK_ANY(InputStatus, IN_LEFT))
+			item->goalAnimState = AS_TURN_L;
+		else if (CHK_ANY(InputStatus, IN_RIGHT))
+			item->goalAnimState = AS_TURN_R;
+	}
+
+	if (Lara.water_status == LWS_Wade)
+	{
+		if (CHK_ANY(InputStatus, IN_JUMP) && !isQuicksand)
+			item->goalAnimState = AS_COMPRESS;
+
+		if (CHK_ANY(InputStatus, IN_FORWARD))
+		{
+			if (CHK_ANY(InputStatus, IN_SLOW) || isQuicksand)
+				lara_as_wade(item, coll);
+			else
+				lara_as_walk(item, coll);
+		}
+		else if (CHK_ANY(InputStatus, IN_BACK))
+			lara_as_back(item, coll);
+	}
+	else
+	{
+		if (CHK_ANY(InputStatus, IN_JUMP))
+			item->goalAnimState = AS_COMPRESS;
+
+		else if (CHK_ANY(InputStatus, IN_FORWARD))
+		{
+			if (CHK_ANY(InputStatus, IN_SLOW))
+				lara_as_walk(item, coll);
+			else
+				lara_as_run(item, coll);
+		}
+
+		else if (CHK_ANY(InputStatus, IN_BACK))
+		{
+			if (CHK_ANY(InputStatus, IN_SLOW))
+				lara_as_back(item, coll);
+			else
+				item->goalAnimState = AS_FASTBACK;
+		}
+	}
+}
+
+void lara_as_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (item->goalAnimState == AS_SWANDIVE || item->goalAnimState == AS_REACH)
+		item->goalAnimState = AS_FORWARDJUMP;
+
+	if (item->goalAnimState != AS_DEATH && item->goalAnimState != AS_STOP && item->goalAnimState != AS_RUN)
+	{
+		if (CHK_ANY(InputStatus, IN_ACTION) && Lara.gun_status == LGS_Armless)
+			item->goalAnimState = AS_REACH;
+		if (CHK_ANY(InputStatus, IN_ROLL) || CHK_ANY(InputStatus, IN_BACK))
+			item->goalAnimState = AS_TWIST;
+		if (CHK_ANY(InputStatus, IN_SLOW) && Lara.gun_status == LGS_Armless)
+			item->goalAnimState = AS_SWANDIVE;
+		if (item->fallSpeed > 131)
+			item->goalAnimState = AS_FASTFALL;
+	}
+
+	if (CHK_ANY(InputStatus, IN_LEFT))
+	{
+		Lara.turn_rate -= 409;
+		if (Lara.turn_rate < -546)
+			Lara.turn_rate = -546;
+	}
+	else if (CHK_ANY(InputStatus, IN_RIGHT))
+	{
+		Lara.turn_rate += 409;
+		if (Lara.turn_rate > 546)
+			Lara.turn_rate = 546;
+	}
+}
+
+void lara_as_fastback(ITEM_INFO* item, COLL_INFO* coll)
+{
+	item->goalAnimState = AS_STOP;
+
+	if (CHK_ANY(InputStatus, IN_LEFT))
+	{
+		Lara.turn_rate -= 409;
+		if (Lara.turn_rate < -1092)
+			Lara.turn_rate = -1092;
+	}
+	else if (CHK_ANY(InputStatus, IN_RIGHT))
+	{
+		Lara.turn_rate += 409;
+		if (Lara.turn_rate > 1092)
+			Lara.turn_rate = 1092;
+	}
+}
+
+void lara_as_turn_r(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = AS_STOP;
+		return;
+	}
+
+	Lara.turn_rate += 409;
+	if (Lara.gun_status == LGS_Ready)
+	{
+		item->goalAnimState = AS_FASTTURN;
+	}
+	else if (Lara.turn_rate > 728)
+	{
+		if (!CHK_ANY(InputStatus, IN_SLOW) && !CHK_ANY(Rooms[item->roomNumber].flags, ROOM_QUICKSAND))
+			item->goalAnimState = AS_FASTTURN;
+		else
+			Lara.turn_rate = 728;
+	}
+
+	if (CHK_ANY(InputStatus, IN_FORWARD))
+	{
+		if (Lara.water_status == LWS_Wade)
+		{
+			item->goalAnimState = AS_WADE;
+		}
+		else
+		{
+			if (CHK_ANY(InputStatus, IN_SLOW))
+				item->goalAnimState = AS_WALK;
+			else
+				item->goalAnimState = AS_RUN;
+		}
+	}
+	else if (!CHK_ANY(InputStatus, IN_RIGHT))
+	{
+		item->goalAnimState = AS_STOP;
+	}
+}
+
+void lara_as_turn_l(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = AS_STOP;
+		return;
+	}
+
+	Lara.turn_rate -= 409;
+	if (Lara.gun_status == LGS_Ready)
+	{
+		item->goalAnimState = AS_FASTTURN;
+	}
+	else if (Lara.turn_rate < -728)
+	{
+		if (!CHK_ANY(InputStatus, IN_SLOW) && !CHK_ANY(Rooms[item->roomNumber].flags, ROOM_QUICKSAND))
+			item->goalAnimState = AS_FASTTURN;
+		else
+			Lara.turn_rate = -728;
+	}
+
+	if (CHK_ANY(InputStatus, IN_FORWARD))
+	{
+		if (Lara.water_status == LWS_Wade)
+		{
+			item->goalAnimState = AS_WADE;
+		}
+		else
+		{
+			if (CHK_ANY(InputStatus, IN_SLOW))
+				item->goalAnimState = AS_WALK;
+			else
+				item->goalAnimState = AS_RUN;
+		}
+	}
+	else if (!CHK_ANY(InputStatus, IN_LEFT))
+	{
+		item->goalAnimState = AS_STOP;
+	}
+}
+
 void lara_col_null(ITEM_INFO* item, COLL_INFO* coll)
 {
 }
@@ -228,7 +540,7 @@ void GetLaraJointAbsPosition(PHD_VECTOR* pos, int meshID)
 	frac = GetFrames(item, frames, &rate);
 	if (frac)
 	{
-		GetLJAInt(item, pos, frames[0], frames[1], frac, rate, meshID);
+		GetLaraJointAbsPositionInterpolated(item, pos, frames[0], frames[1], frac, rate, meshID);
 		return;
 	}
 
@@ -603,7 +915,7 @@ void GetLaraJointAbsPosition(PHD_VECTOR* pos, int meshID)
 	phd_PopMatrix();
 }
 
-void GetLJAInt(ITEM_INFO* item, PHD_VECTOR* pos, short* frame1, short* frame2, int frac, int rate, int meshID)
+void GetLaraJointAbsPositionInterpolated(ITEM_INFO* item, PHD_VECTOR* pos, short* frame1, short* frame2, int frac, int rate, int meshID)
 {
 	OBJECT_INFO* obj = &Objects[item->objectID];
 	UINT16* rot1, *rot2, *rot1copy, *rot2copy;
@@ -961,14 +1273,14 @@ void Inject_Lara() {
 	//INJECT(0x00427700, LookUpDown);
 	//INJECT(0x00427770, LookLeftRight);
 	//INJECT(0x004277F0, ResetLook);
-	//INJECT(0x00427880, lara_as_walk);
-	//INJECT(0x00427910, lara_as_run);
-	//INJECT(0x00427A60, lara_as_stop);
-	//INJECT(0x00427BB0, lara_as_forwardjump);
-	//INJECT(----------, lara_as_pose);
-	//INJECT(0x00427C90, lara_as_fastback);
-	//INJECT(0x00427CF0, lara_as_turn_r);
-	//INJECT(0x00427D80, lara_as_turn_l);
+
+	INJECT(0x00427880, lara_as_walk);
+	INJECT(0x00427910, lara_as_run);
+	INJECT(0x00427A60, lara_as_stop);
+	INJECT(0x00427BB0, lara_as_forwardjump);
+	INJECT(0x00427C90, lara_as_fastback);
+	INJECT(0x00427CF0, lara_as_turn_r);
+	INJECT(0x00427D80, lara_as_turn_l);
 	//INJECT(0x00427E10, lara_as_death);
 	//INJECT(0x00427E30, lara_as_fastfall);
 	//INJECT(0x00427E70, lara_as_hang);
@@ -1080,7 +1392,9 @@ void Inject_Lara() {
 	//INJECT(0x00429E90, lara_col_wade);
 	//INJECT(----------, lara_col_twist);
 	//INJECT(0x0042A000, lara_default_col);
+
 	INJECT(0x0042A040, lara_col_jumper);
+
 	//INJECT(0x0042A120, lara_col_kick);
 	//INJECT(----------, lara_col_deathslide);
 	//INJECT(0x0042A130, GetLaraCollisionInfo);
@@ -1101,6 +1415,7 @@ void Inject_Lara() {
 	//INJECT(0x0042B370, TestLaraSlide);
 	//INJECT(0x0042B4A0, LaraFloorFront);
 	//INJECT(0x0042B520, LaraLandedBad);
+
 	INJECT(0x0042B5E0, GetLaraJointAbsPosition);
-	INJECT(0x0042B970, GetLJAInt);
+	INJECT(0x0042B970, GetLaraJointAbsPositionInterpolated);
 }
