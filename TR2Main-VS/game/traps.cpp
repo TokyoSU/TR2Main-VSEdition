@@ -1122,6 +1122,7 @@ static void SpawnCandleFlame(ITEM_INFO* item, int radius, short angle, int heigh
 		fx->pos.z = item->pos.z + (radius * phd_cos(item->pos.rotY + angle) >> W2V_SHIFT);
 		fx->objectID = ID_CANDLE_FLAME_SPRITE;
 		fx->frameNumber = Objects[fx->objectID].nMeshes * GetRandomControl() / 0x7FFF;
+		fx->scale = 256;
 	}
 }
 
@@ -1131,7 +1132,7 @@ void CandleFlameEmitterControl(short itemNumber)
 	CANDLE_EMITTER_DATA* candle = GetCandleFlameData(item);
 	if (candle->on)
 	{
-		AddDynamicLight(item->pos.x, item->pos.y, item->pos.z, 12, 11); // power, range
+		AddDynamicLight(item->pos.x, item->pos.y, item->pos.z, 11, 11); // power, range
 		PlaySoundEffect(150, &item->pos, SFX_PITCH | 0x2000000);
 	}
 
@@ -1151,7 +1152,6 @@ void CandleFlameEmitterControl(short itemNumber)
 	}
 }
 
-#define CANDLE_TIMER (FRAMES_PER_SECOND / 4)
 void CandleEmitterSpriteControl(short fxNumber)
 {
 	FX_INFO* fx = &Effects[fxNumber];
@@ -1160,7 +1160,7 @@ void CandleEmitterSpriteControl(short fxNumber)
 		if (--fx->frameNumber <= Objects[ID_CANDLE_FLAME_SPRITE].nMeshes) {
 			fx->frameNumber = 0;
 		}
-		fx->counter = CANDLE_TIMER;
+		fx->counter = (FRAMES_PER_SECOND / 4);
 	}
 	else
 	{

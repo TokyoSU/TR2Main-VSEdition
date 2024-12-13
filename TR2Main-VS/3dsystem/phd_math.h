@@ -30,7 +30,7 @@
 int __fastcall phd_atan(int x, int y); // 0x00457EA0
 int __fastcall phd_cos(short angle); // 0x00457EE8
 int __fastcall phd_sin(short angle); // 0x00457EEE
-DWORD __fastcall phd_sqrt(DWORD n); // 0x00457F23
+long __fastcall phd_sqrt(long n); // 0x00457F23
 DWORD __fastcall mGetAngle(long x, long z, long x1, long z1);
 
 #endif // PHD_MATH_H_INCLUDED

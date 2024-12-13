@@ -56,6 +56,7 @@
 #define FLARE_AMMO_CLIPS 6
 
 // Lara values.
+#define STEPUP_HEIGHT (CLICK(3)/2)
 #define NO_AIR -1
 #define LARA_RESTORE_AIR_PER_TICK 10
 #define LARA_AIR_MAX 1800
@@ -162,7 +163,7 @@ extern int PhdFov;
 #define PhdWinHeight				VAR_U_(0x0047031C, int)
 #define PhdWinCenterX				VAR_U_(0x00470320, int)
 #define PhdWinCenterY				VAR_U_(0x00470324, int)
-#define PhdLsYaw					VAR_U_(0x00470328, short)
+#define PhdLsXRot					VAR_U_(0x00470328, short)
 #define FltWinTop					VAR_U_(0x00470330, float)
 #define FltWinLeft					VAR_U_(0x00478038, float)
 #define PhdWinMinY					VAR_U_(0x0047803C, short)
@@ -195,7 +196,7 @@ extern int PhdFov;
 #define Info3dPtr					VAR_U_(0x004B2AE0, short*)
 #define PhdWinWidth					VAR_U_(0x004B2AE4, int)
 #define PhdViewDistance				VAR_U_(0x004BCAF0, int)
-#define PhdLsPitch					VAR_U_(0x004BCAF4, short)
+#define PhdLsYRot					VAR_U_(0x004BCAF4, short)
 #define PhdScreenWidth				VAR_U_(0x004BF3C8, int)
 #define LsDivider					VAR_U_(0x004BF3CC, int)
 #define FltWinRight					VAR_U_(0x004D6B50, float)

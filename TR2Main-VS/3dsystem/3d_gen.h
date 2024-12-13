@@ -50,7 +50,7 @@ void S_InsertInvBgnd(short* ptrObj); // ----------
 short* calc_object_vertices(short* ptrObj); // 0x00401D50
 short* calc_vertice_light(short* ptrObj); // 0x00401F30
 void calc_room_vertices(ROOM_DATA* ptrObj, BYTE farClip); // 0x004020A0
-void phd_RotateLight(short pitch, short yaw); // 0x00402320
+void phd_RotateLight(short yRot, short xRot); // 0x00402320
 void phd_InitPolyList(); // 0x004023F0
 void phd_SortPolyList(); // 0x00402420
 void do_quickysorty(int left, int right); // 0x00402460
@@ -62,5 +62,6 @@ void phd_InitWindow(short x, short y, int width, int height, int nearZ, int farZ
 void phd_PopMatrix(); // ----------
 void phd_PushMatrix(); // 0x00457510
 void phd_PushUnitMatrix(); // 0x0045752E
+void phd_DecomposeMatrix(PHD_MATRIX* matrix, PHD_VECTOR* position, POS_3D* rotation, PHD_VECTOR* scale, bool changeToOriginalScale = true);
 
 #endif // _3DGEN_H_INCLUDED

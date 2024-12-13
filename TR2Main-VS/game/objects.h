@@ -47,7 +47,7 @@ void OpenNearestDoor();
 #define ShutThatDoor ((void(__cdecl*)(DOORPOS_DATA*)) 0x00435100)
 #define OpenThatDoor ((void(__cdecl*)(DOORPOS_DATA*)) 0x00435150)
 void InitialiseDoor(short itemNumber); // 0x00435190
-#define DoorControl ((void(__cdecl*)(short)) 0x00435570)
+void DoorControl(short itemNumber); // 0x00435570
 #define OnDrawBridge ((int(__cdecl*)(ITEM_INFO*,int,int)) 0x00435640)
 #define DrawBridgeFloor ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00435700)
 #define DrawBridgeCeiling ((void(__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00435740)

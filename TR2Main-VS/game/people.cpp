@@ -97,11 +97,11 @@ BOOL Targetable(ITEM_INFO* item, AI_INFO* info) {
 	enemy = creature->enemy;
 	if (enemy->hitPoints > 0 && info->ahead && info->distance < SQR(8192)) {
 		source.x = item->pos.x;
-		source.y = item->pos.y - 768;
+		source.y = item->pos.y - 762;
 		source.z = item->pos.z;
 		source.roomNumber = item->roomNumber;
 		destination.x = enemy->pos.x;
-		destination.y = enemy->pos.y - 768;
+		destination.y = enemy->pos.y - 762;
 		destination.z = enemy->pos.z;
 		return LOS(&source, &destination);
 	}
@@ -304,11 +304,11 @@ BOOL ShotTargetNew(ITEM_INFO* item, AI_INFO* AI, const BITE_INFO* bite, short an
 		Effects[fxIdx].pos.rotY += angle;
 
 	startPos.x = item->pos.x;
-	startPos.y = item->pos.y - 768;
+	startPos.y = item->pos.y - 762;
 	startPos.z = item->pos.z;
 	startPos.roomNumber = item->roomNumber;
 	targetPos.x = target->pos.x;
-	targetPos.y = target->pos.y - 768;
+	targetPos.y = target->pos.y - 762;
 	targetPos.z = target->pos.z;
 	smashIdx = ObjectOnLOS(&startPos, &targetPos);
 	if (smashIdx != -1)

@@ -49,9 +49,9 @@ void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int he
 	c = GetCeiling(floor, x, top, z);
 	if (c != NO_HEIGHT)
 		c -= head;
-	coll->sideMid.floor = h;
-	coll->sideMid.ceiling = c;
-	coll->sideMid.type = HeightType;
+	coll->middle.floor = h;
+	coll->middle.ceiling = c;
+	coll->middle.type = HeightType;
 	coll->trigger = TriggerPtr;
 	// NOTE: They added lara pos Y there instead of the argument y because it seem like lara could slide on bridge ?
 	tilt = GetTiltType(floor, x, LaraItem->pos.y, z);
@@ -108,17 +108,17 @@ void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int he
 	if (c != NO_HEIGHT)
 		c -= head;
 
-	coll->sideFront.floor = h;
-	coll->sideFront.ceiling = c;
-	coll->sideFront.type = HeightType;
-	if (CHK_ANY(coll->flags, CF_SLOPE_ARE_WALLS) && coll->sideFront.type == HT_BIG_SLOPE && coll->sideFront.floor < 0) {
-		coll->sideFront.floor = -32767;
+	coll->front.floor = h;
+	coll->front.ceiling = c;
+	coll->front.type = HeightType;
+	if (CHK_ANY(coll->flags, CF_SLOPE_ARE_WALLS) && coll->front.type == HT_BIG_SLOPE && coll->front.floor < 0) {
+		coll->front.floor = -32767;
 	}
 	else {
 		if ((CHK_ANY(coll->flags, CF_SLOPE_ARE_PITS) &&
-			coll->sideFront.type == HT_BIG_SLOPE &&
-			coll->sideFront.floor > 0) || (CHK_ANY(coll->flags, CF_LAVA_IS_PIT) && coll->sideFront.floor > 0 && TriggerPtr != NULL && (TriggerPtr[0] & DATA_TYPE) == FT_LAVA))
-			coll->sideFront.floor = 512;
+			coll->front.type == HT_BIG_SLOPE &&
+			coll->front.floor > 0) || (CHK_ANY(coll->flags, CF_LAVA_IS_PIT) && coll->front.floor > 0 && TriggerPtr != NULL && (TriggerPtr[0] & DATA_TYPE) == FT_LAVA))
+			coll->front.floor = 512;
 	}
 	floor = GetFloor(x + leftX, top, z + leftZ, &roomID);
 	h = GetHeight(floor, x + leftX, top, z + leftZ);
@@ -127,21 +127,21 @@ void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int he
 	c = GetCeiling(floor, x + leftX, top, z + leftZ);
 	if (c != NO_HEIGHT)
 		c -= head;
-	coll->sideLeft.ceiling = c;
-	coll->sideLeft.floor = h;
-	coll->sideLeft.type = HeightType;
-	if (CHK_ANY(coll->flags, CF_SLOPE_ARE_WALLS) && coll->sideLeft.type == HT_BIG_SLOPE && coll->sideLeft.floor < 0) {
-		coll->sideLeft.floor = -32767;
+	coll->left.ceiling = c;
+	coll->left.floor = h;
+	coll->left.type = HeightType;
+	if (CHK_ANY(coll->flags, CF_SLOPE_ARE_WALLS) && coll->left.type == HT_BIG_SLOPE && coll->left.floor < 0) {
+		coll->left.floor = -32767;
 	}
 	else {
 		if ((CHK_ANY(coll->flags, CF_SLOPE_ARE_PITS) &&
-			coll->sideLeft.type == HT_BIG_SLOPE &&
-			coll->sideLeft.floor > 0) ||
+			coll->left.type == HT_BIG_SLOPE &&
+			coll->left.floor > 0) ||
 			(CHK_ANY(coll->flags, CF_LAVA_IS_PIT) &&
-				coll->sideLeft.floor > 0 &&
+				coll->left.floor > 0 &&
 				TriggerPtr &&
 				(*TriggerPtr & DATA_TYPE) == FT_LAVA))
-			coll->sideLeft.floor = 512;
+			coll->left.floor = 512;
 	}
 	floor = GetFloor(x + rightX, top, z + rightZ, &roomID);
 	h = GetHeight(floor, x + rightX, top, z + rightZ);
@@ -150,21 +150,21 @@ void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int he
 	c = GetCeiling(floor, x + rightX, top, z + rightZ);
 	if (c != NO_HEIGHT)
 		c -= head;
-	coll->sideRight.ceiling = c;
-	coll->sideRight.floor = h;
-	coll->sideRight.type = HeightType;
-	if (CHK_ANY(coll->flags, CF_SLOPE_ARE_WALLS) && coll->sideRight.type == HT_BIG_SLOPE && coll->sideRight.floor < 0) {
-		coll->sideRight.floor = -32767;
+	coll->right.ceiling = c;
+	coll->right.floor = h;
+	coll->right.type = HeightType;
+	if (CHK_ANY(coll->flags, CF_SLOPE_ARE_WALLS) && coll->right.type == HT_BIG_SLOPE && coll->right.floor < 0) {
+		coll->right.floor = -32767;
 	}
 	else {
 		if ((CHK_ANY(coll->flags, CF_SLOPE_ARE_PITS) &&
-			coll->sideRight.type == HT_BIG_SLOPE &&
-			coll->sideRight.floor > 0) ||
+			coll->right.type == HT_BIG_SLOPE &&
+			coll->right.floor > 0) ||
 			(CHK_ANY(coll->flags, CF_LAVA_IS_PIT) &&
-				coll->sideRight.floor > 0 &&
+				coll->right.floor > 0 &&
 				TriggerPtr &&
 				(*TriggerPtr & DATA_TYPE) == FT_LAVA))
-			coll->sideRight.floor = 512;
+			coll->right.floor = 512;
 	}
 	if (CollideStaticObjects(coll, x, y, z, roomID, height)) {
 		floor = GetFloor(x + coll->shift.x, y, z + coll->shift.z, &roomID);
@@ -175,29 +175,29 @@ void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int he
 			coll->shift.z = -coll->shift.z;
 		}
 	}
-	if (coll->sideMid.floor == NO_HEIGHT) {
+	if (coll->middle.floor == NO_HEIGHT) {
 		coll->shift.y = coll->old.y - y;
 		coll->shift.x = coll->old.x - x;
 		coll->shift.z = coll->old.z - z;
 		coll->collType = COLL_FRONT;
 	}
 	else {
-		if (coll->sideMid.floor - coll->sideMid.ceiling <= 0) {
+		if (coll->middle.floor - coll->middle.ceiling <= 0) {
 			coll->shift.y = coll->old.y - y;
 			coll->shift.x = coll->old.x - x;
 			coll->shift.z = coll->old.z - z;
 			coll->collType = COLL_CLAMP;
 		}
 		else {
-			if (coll->sideMid.ceiling >= 0) {
-				coll->shift.y = coll->sideMid.ceiling;
+			if (coll->middle.ceiling >= 0) {
+				coll->shift.y = coll->middle.ceiling;
 				coll->collType = COLL_TOP;
 			}
-			if (coll->sideFront.floor <= coll->badPos &&
-				coll->sideFront.floor >= coll->badNeg &&
-				coll->sideFront.ceiling <= coll->badCeiling)
+			if (coll->front.floor <= coll->badPos &&
+				coll->front.floor >= coll->badNeg &&
+				coll->front.ceiling <= coll->badCeiling)
 			{
-				if (coll->sideFront.ceiling >= coll->badCeiling)
+				if (coll->front.ceiling >= coll->badCeiling)
 				{
 					coll->shift.y = coll->old.y - y;
 					coll->shift.x = coll->old.x - x;
@@ -205,8 +205,8 @@ void GetCollisionInfo(COLL_INFO* coll, int x, int y, int z, short roomID, int he
 					coll->collType = COLL_TOPFRONT;
 				}
 				else {
-					if (coll->sideLeft.floor <= coll->badPos && coll->sideLeft.floor >= coll->badNeg) {
-						if (coll->sideRight.floor > coll->badPos || coll->sideRight.floor < coll->badNeg) {
+					if (coll->left.floor <= coll->badPos && coll->left.floor >= coll->badNeg) {
+						if (coll->right.floor > coll->badPos || coll->right.floor < coll->badNeg) {
 							switch (coll->quadrant) {
 							case 0:
 							case 2:
@@ -281,7 +281,7 @@ int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomID, int
 	for (int i = 0; i < DrawRoomsCount; ++i) {
 		ROOM_INFO* room = &Rooms[DrawRoomsArray[i]];
 		for (int j = 0; j < room->numMeshes; ++j) {
-			MESH_INFO* mesh = &room->mesh[j];
+			MESH_INFO* mesh = &room->meshList[j];
 			if (CHK_ANY(StaticObjects[mesh->staticNumber].flags, 1)) {
 				continue;
 			}

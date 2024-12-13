@@ -334,7 +334,7 @@ void phd_LookAt(int xsrc, int ysrc, int zsrc, int xtar, int ytar, int ztar, shor
 }
 
 void phd_GetVectorAngles(int x, int y, int z, VECTOR_ANGLES* angles) {
-	short pitch;
+	short xRot;
 
 	angles->rotY = phd_atan(z, x);
 	while ((short)x != x || (short)y != y || (short)z != z) {
@@ -342,10 +342,10 @@ void phd_GetVectorAngles(int x, int y, int z, VECTOR_ANGLES* angles) {
 		y >>= 2;
 		z >>= 2;
 	}
-	pitch = phd_atan(phd_sqrt(SQR(x) + SQR(z)), y);
-	if ((y > 0 && pitch > 0) || (y < 0 && pitch < 0))
-		pitch = -pitch;
-	angles->rotX = pitch;
+	xRot = phd_atan(phd_sqrt(SQR(x) + SQR(z)), y);
+	if ((y > 0 && xRot > 0) || (y < 0 && xRot < 0))
+		xRot = -xRot;
+	angles->rotX = xRot;
 }
 
 void phd_RotX(short angle) {
@@ -497,7 +497,7 @@ short* calc_background_light(short* ptrObj) {
 	}
 
 	// Skybox has normal brightness
-	int shade = 0x0FFF;
+	int shade = 0xFFF;
 
 	// NOTE: Sunset did not change the skybox brightness in the original game
 	if (GF_SunsetEnabled)
@@ -756,18 +756,17 @@ void calc_room_vertices(ROOM_DATA* ptrObj, BYTE farClip) {
 	}
 }
 
-void phd_RotateLight(short pitch, short yaw) {
+void phd_RotateLight(short yRot, short xRot) {
 	int xcos, ysin, wcos, wsin;
 	int ls_x, ls_y, ls_z;
 
-	PhdLsYaw = yaw;
-	PhdLsPitch = pitch;
+	PhdLsXRot = xRot;
+	PhdLsYRot = yRot;
 
-	xcos = phd_cos(pitch);
-	ysin = phd_sin(pitch);
-
-	wcos = phd_cos(yaw);
-	wsin = phd_sin(yaw);
+	xcos = phd_cos(yRot);
+	ysin = phd_sin(yRot);
+	wcos = phd_cos(xRot);
+	wsin = phd_sin(xRot);
 
 	ls_x = TRIGMULT2(xcos, wsin);
 	ls_y = -ysin;
@@ -987,6 +986,74 @@ void phd_PushUnitMatrix() {
 	PhdMatrixPtr->_00 = W2V_SCALE;
 	PhdMatrixPtr->_11 = W2V_SCALE;
 	PhdMatrixPtr->_22 = W2V_SCALE;
+}
+
+/// <summary>
+/// Decompose the matrix to position, rotation and scale.
+/// Useful for making something follow a bone rotation like effects.
+/// </summary>
+/// <param name="matrix">A valid matrix (Usually PhdMatrixPtr).</param>
+/// <param name="position">Position will be in local space, use the item position to be in absolute space.</param>
+/// <param name="rotation">In TR angle (-16384 to 16384)</param>
+/// <param name="scale">In TR scale (16384 is 1)</param>
+void phd_DecomposeMatrix(PHD_MATRIX* matrix, PHD_VECTOR* position, POS_3D* rotation, PHD_VECTOR* scale, bool changeToOriginalScale)
+{
+	// Extract position
+	position->x = matrix->_03 >> W2V_SHIFT;
+	position->y = matrix->_13 >> W2V_SHIFT;
+	position->z = matrix->_23 >> W2V_SHIFT;
+
+	// Shift down the matrix components to adjust for W2V_SHIFT
+	int adjustedMatrix[3][3] = {
+		{ matrix->_00 >> W2V_SHIFT, matrix->_01 >> W2V_SHIFT, matrix->_02 >> W2V_SHIFT },
+		{ matrix->_10 >> W2V_SHIFT, matrix->_11 >> W2V_SHIFT, matrix->_12 >> W2V_SHIFT },
+		{ matrix->_20 >> W2V_SHIFT, matrix->_21 >> W2V_SHIFT, matrix->_22 >> W2V_SHIFT }
+	};
+
+	// Extract scale
+	scale->x = (int)phd_sqrt(adjustedMatrix[0][0] * adjustedMatrix[0][0] +
+		                     adjustedMatrix[0][1] * adjustedMatrix[0][1] +
+		                     adjustedMatrix[0][2] * adjustedMatrix[0][2]);
+
+	scale->y = (int)phd_sqrt(adjustedMatrix[1][0] * adjustedMatrix[1][0] +
+		                     adjustedMatrix[1][1] * adjustedMatrix[1][1] +
+		                     adjustedMatrix[1][2] * adjustedMatrix[1][2]);
+
+	scale->z = (int)phd_sqrt(adjustedMatrix[2][0] * adjustedMatrix[2][0] +
+		                     adjustedMatrix[2][1] * adjustedMatrix[2][1] +
+		                     adjustedMatrix[2][2] * adjustedMatrix[2][2]);
+
+	// Handle potential zero scales
+	scale->x = scale->x == 0 ? 1 : scale->x;
+	scale->y = scale->y == 0 ? 1 : scale->y;
+	scale->z = scale->z == 0 ? 1 : scale->z;
+
+	// Normalize rotation matrix
+	int rotMatrix[3][3] = {
+		{ adjustedMatrix[0][0] / scale->x, adjustedMatrix[0][1] / scale->x, adjustedMatrix[0][2] / scale->x },
+		{ adjustedMatrix[1][0] / scale->y, adjustedMatrix[1][1] / scale->y, adjustedMatrix[1][2] / scale->y },
+		{ adjustedMatrix[2][0] / scale->z, adjustedMatrix[2][1] / scale->z, adjustedMatrix[2][2] / scale->z }
+	};
+
+	// Restore original scale (Not 1 but 16384 which is original TR scale).
+	if (changeToOriginalScale)
+	{
+		scale->x <<= W2V_SHIFT;
+		scale->y <<= W2V_SHIFT;
+		scale->z <<= W2V_SHIFT;
+	}
+
+	// Extract Euler angles from normalized rotation matrix
+	rotation->y = (short)phd_atan(-rotMatrix[2][0], phd_sqrt(rotMatrix[2][1] * rotMatrix[2][1] + rotMatrix[2][2] * rotMatrix[2][2]));
+
+	if (rotMatrix[2][0] != 1 && rotMatrix[2][0] != -1) {
+		rotation->x = (short)phd_atan(rotMatrix[2][1], rotMatrix[2][2]);
+		rotation->z = (short)phd_atan(rotMatrix[1][0], rotMatrix[0][0]);
+	}
+	else {
+		rotation->z = 0; // Handle gimbal lock case
+		rotation->x = (short)phd_atan(rotMatrix[1][2], rotMatrix[1][1]);
+	}
 }
 
 /*

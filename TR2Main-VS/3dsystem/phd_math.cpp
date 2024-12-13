@@ -477,10 +477,10 @@ int __fastcall phd_sin(short angle) {
 	return result;
 }
 
-DWORD __fastcall phd_sqrt(DWORD n) {
-	DWORD result = 0;
-	DWORD base = 0x40000000;
-	DWORD basedResult;
+long __fastcall phd_sqrt(long n) {
+	long result = 0;
+	long base = 0x40000000;
+	long basedResult;
 
 	for (; base != 0; base >>= 2) {
 		for (; base != 0; base >>= 2) {

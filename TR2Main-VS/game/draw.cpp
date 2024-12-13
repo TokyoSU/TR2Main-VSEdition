@@ -478,21 +478,22 @@ void PrintObjects(short roomNumber) {
 	PhdWinRight = room->boundRight;
 	PhdWinBottom = room->boundBottom;
 
-	MESH_INFO* mesh = room->mesh;
+	MESH_INFO* meshList = room->meshList;
 	for (int i = 0; i < room->numMeshes; ++i) {
-		if (!CHK_ANY(StaticObjects[mesh[i].staticNumber].flags, 2)) {
+		MESH_INFO* curMesh = &meshList[i];
+		if (!CHK_ANY(StaticObjects[curMesh->staticNumber].flags, 2)) {
 			continue;
 		}
 		phd_PushMatrix();
-		phd_TranslateAbs(mesh[i].x, mesh[i].y, mesh[i].z);
-		phd_RotY(mesh[i].yRot);
-		short clip = S_GetObjectBounds((short*)&StaticObjects[mesh[i].staticNumber].drawBounds);
+		phd_TranslateAbs(curMesh->x, curMesh->y, curMesh->z);
+		phd_RotY(curMesh->yRot);
+		short clip = S_GetObjectBounds((short*)&StaticObjects[curMesh->staticNumber].drawBounds);
 		if (clip) {
-			S_CalculateStaticMeshLight(mesh[i].x, mesh[i].y, mesh[i].z, mesh[i].shade1, mesh[i].shade2, room);
+			S_CalculateStaticMeshLight(curMesh->x, curMesh->y, curMesh->z, curMesh->shade1, curMesh->shade2, room);
 #ifdef FEATURE_VIDEOFX_IMPROVED
-			SetMeshReflectState(mesh[i].staticNumber, -1);
+			SetMeshReflectState(curMesh->staticNumber, -1);
 #endif // FEATURE_VIDEOFX_IMPROVED
-			phd_PutPolygons(MeshPtr[StaticObjects[mesh[i].staticNumber].meshIndex], clip);
+			phd_PutPolygons(MeshPtr[StaticObjects[curMesh->staticNumber].meshIndex], clip);
 #ifdef FEATURE_VIDEOFX_IMPROVED
 			ClearMeshReflectState();
 #endif // FEATURE_VIDEOFX_IMPROVED
@@ -570,16 +571,9 @@ void DrawEffect(short fx_id) {
 }
 
 void DrawSpriteItem(ITEM_INFO* item) {
-	OBJECT_INFO* obj;
-
-	phd_PushUnitMatrix(); // NOTE: this push is workaround for sprites with no matrix
-	S_CalculateStaticMeshLight(item->pos.x, item->pos.y, item->pos.z, item->shade1, item->shade2, &Rooms[item->roomNumber]);
-	phd_PopMatrix(); // NOTE: this pop is workaround for sprites with no matrix
-
-	obj = &Objects[item->objectID];
-
-	// NOTE: SPR_ITEM is not presented in the original game
-	S_DrawSprite(SPR_ITEM | SPR_ABS | SPR_SHADE | (obj->semi_transparent ? SPR_SEMITRANS : 0), item->pos.x, item->pos.y, item->pos.z, obj->meshIndex - item->frameNumber, LsAdder + 0x1000, 0);
+	OBJECT_INFO* obj = &Objects[item->objectID];
+	S_CalculateLight(item->pos.x, item->pos.y, item->pos.z, item->roomNumber);
+	S_DrawSprite(SPR_ITEM | SPR_ABS | SPR_SHADE | (obj->semi_transparent ? SPR_SEMITRANS : 0), item->pos.x, item->pos.y, item->pos.z, obj->meshIndex - item->frameNumber, LsAdder, 0);
 }
 
 void DrawDummyItem(ITEM_INFO* item) {

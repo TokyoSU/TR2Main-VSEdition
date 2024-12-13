@@ -649,7 +649,7 @@ void BoatControl(short itemNumber)
 		BoatAnimation(item, hitWall);
 
 		// NOTE: Changed how lara change room there, to fix a bug where lara don't update room correctly !
-		UpdateLaraRoom(LaraItem, -768); // 768 is the height of lara from 0,0,0 to the eyes.
+		UpdateLaraRoom(LaraItem, -762); // 762 is the height of lara from 0,0,0 to the eyes.
 		if (room_number != item->roomNumber)
 			ItemNewRoom(itemNumber, room_number);
 

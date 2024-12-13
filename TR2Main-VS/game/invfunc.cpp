@@ -831,7 +831,7 @@ void Inv_RingLight(RING_INFO* ring) {
 
 	LsDivider = 0x6000;
 	phd_GetVectorAngles(ring->light.x, ring->light.y, ring->light.z, &angles);
-	phd_RotateLight(angles.rotX, angles.rotY);
+	phd_RotateLight(angles.rotY, angles.rotX);
 }
 
 void Inv_RingCalcAdders(RING_INFO* ring, short rotDuration) {

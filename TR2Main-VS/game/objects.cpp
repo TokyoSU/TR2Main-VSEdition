@@ -215,7 +215,7 @@ static void InitDoorData(ITEM_INFO* item, DOORPOS_DATA* door, short doorRoomNumb
 					boxNumber = GetSectorBoxXZ(item, b);
 			}
 
-			door->block = (Boxes[boxNumber].overlapIndex & 0x8000) ? boxNumber : -1;
+			door->boxNumber = (Boxes[boxNumber].overlapIndex & 0x8000) ? boxNumber : -1;
 			memcpy(&door->data, door->floor, sizeof(FLOOR_INFO));
 		}
 		else
@@ -244,7 +244,7 @@ static void InitDoorData(ITEM_INFO* item, DOORPOS_DATA* door, short doorRoomNumb
 				boxNumber = GetSectorBoxXZ(item, b);
 		}
 
-		door->block = (Boxes[boxNumber].overlapIndex & 0x8000) ? boxNumber : -1;
+		door->boxNumber = (Boxes[boxNumber].overlapIndex & 0x8000) ? boxNumber : -1;
 		memcpy(&door->data, door->floor, sizeof(FLOOR_INFO));
 	}
 }
@@ -278,6 +278,43 @@ void InitialiseDoor(short itemNumber)
 		ItemNewRoom(itemNumber, two_room);
 		item->roomNumber = room_number;
 	}
+}
+
+void DoorControl(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	DOOR_DATA* door = GetDoorData(item);
+
+	if (TriggerActive(item))
+	{
+		if (item->currentAnimState == DOOR_CLOSED)
+		{
+			item->goalAnimState = DOOR_OPEN;
+		}
+		else
+		{
+			OpenThatDoor(&door->d1);
+			OpenThatDoor(&door->d2);
+			OpenThatDoor(&door->d1Flip);
+			OpenThatDoor(&door->d2Flip);
+		}
+	}
+	else
+	{
+		if (item->currentAnimState == DOOR_OPEN)
+		{
+			item->goalAnimState = DOOR_CLOSED;
+		}
+		else
+		{
+			ShutThatDoor(&door->d1);
+			ShutThatDoor(&door->d2);
+			ShutThatDoor(&door->d1Flip);
+			ShutThatDoor(&door->d2Flip);
+		}
+	}
+
+	AnimateItem(item);
 }
 
 static LIFT_DATA* GetLiftData(ITEM_INFO* item)
@@ -465,7 +502,7 @@ void Inject_Objects() {
 	//INJECT(0x00435100, ShutThatDoor);
 	//INJECT(0x00435150, OpenThatDoor);
 	INJECT(0x00435190, InitialiseDoor);
-	//INJECT(0x00435570, DoorControl);
+	INJECT(0x00435570, DoorControl);
 	//INJECT(0x00435640, OnDrawBridge);
 	//INJECT(0x00435700, DrawBridgeFloor);
 	//INJECT(0x00435740, DrawBridgeCeiling);

@@ -1924,10 +1924,10 @@ enum COLL_FLAGS
 };
 
 typedef struct CollInfo_t {
-	COLL_SIDE sideMid;
-	COLL_SIDE sideFront;
-	COLL_SIDE sideLeft;
-	COLL_SIDE sideRight;
+	COLL_SIDE middle;
+	COLL_SIDE front;
+	COLL_SIDE left;
+	COLL_SIDE right;
 	int radius;
 	int badPos;
 	int badNeg;
@@ -1984,7 +1984,7 @@ typedef struct PhdMatrix_t {
 typedef struct DoorPosData_t {
 	FLOOR_INFO* floor;
 	FLOOR_INFO data;
-	short block;
+	short boxNumber;
 } DOORPOS_DATA;
 
 typedef struct DoorData_t {
@@ -2069,7 +2069,7 @@ typedef struct RoomInfo_t {
 	DOOR_INFOS* doors;
 	FLOOR_INFO* floor;
 	LIGHT_INFO* light;
-	MESH_INFO* mesh;
+	MESH_INFO* meshList;
 	DWORD flags;
 	int x;
 	int y;

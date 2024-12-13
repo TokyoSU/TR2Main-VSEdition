@@ -600,11 +600,11 @@ BOOL LoadRooms(HANDLE hFile) {
 		// Static mesh infos
 		ReadFileSync(hFile, &room->numMeshes, sizeof(short), &bytesRead, NULL);
 		if (room->numMeshes == 0) {
-			room->mesh = NULL;
+			room->meshList = NULL;
 		}
 		else {
-			room->mesh = (MESH_INFO*)game_malloc(sizeof(MESH_INFO) * room->numMeshes, GBUF_RoomStaticMeshInfos);
-			ReadFileSync(hFile, room->mesh, sizeof(MESH_INFO) * room->numMeshes, &bytesRead, NULL);
+			room->meshList = (MESH_INFO*)game_malloc(sizeof(MESH_INFO) * room->numMeshes, GBUF_RoomStaticMeshInfos);
+			ReadFileSync(hFile, room->meshList, sizeof(MESH_INFO) * room->numMeshes, &bytesRead, NULL);
 		}
 
 		// Flipped (alternative) room

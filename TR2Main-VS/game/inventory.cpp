@@ -1049,7 +1049,7 @@ void DoInventoryBackground() {
 		// set lighting
 		LsDivider = 0x6000;
 		phd_GetVectorAngles(-0x600, 0x100, 0x400, &angles);
-		phd_RotateLight(angles.rotX, angles.rotY);
+		phd_RotateLight(angles.rotY, angles.rotX);
 
 		// transform and insert the mesh
 		phd_PushMatrix();

@@ -533,125 +533,133 @@ void S_PrintShadow(short radius, short* bPtr, ITEM_INFO* item) {
 	phd_PopMatrix();
 }
 
-void S_CalculateLight(int x, int y, int z, short roomNumber) {
-	ROOM_INFO* room;
-	int xDist, yDist, zDist, distance, radius, depth;
-	int xBrightest = 0, yBrightest = 0, zBrightest = 0;
-	int brightest, adder;
+struct LIGHT_ROOM
+{
+	int x = 0, y = 0, z = 0;
+	int brightest = 0;
+	short ambient = 0;
+};
+
+static LIGHT_ROOM S_CalculateRoomStaticLights(int x, int y, int z, short roomNumber)
+{
+	LIGHT_ROOM light_result;
+	ROOM_INFO* room = &Rooms[roomNumber];
+	LIGHT_INFO* light = NULL;
+	int distance;
+	int intensity, intensity2;
+	int falloff, falloff2;
+	int xdist, ydist, zdist;
 	int shade, shade1, shade2;
-	int falloff, falloff1, falloff2;
-	int intensity, intensity1, intensity2;
-	int lightShade;
-	VECTOR_ANGLES angles;
 
-	room = &Rooms[roomNumber];
-	brightest = 0;
-
-	// Static light calculation
+	light_result.ambient = room->ambient1;
 	if (room->lightMode != 0) {
-		lightShade = RoomLightShades[room->lightMode];
+		int lightShade = RoomLightShades[room->lightMode];
 		for (int i = 0; i < room->numLights; ++i) {
-			xDist = x - room->light[i].x;
-			yDist = y - room->light[i].y;
-			zDist = z - room->light[i].z;
-			falloff1 = room->light[i].fallOff1;
-			falloff2 = room->light[i].fallOff2;
-			intensity1 = room->light[i].intensity1;
-			intensity2 = room->light[i].intensity2;
-
-			distance = (SQR(xDist) + SQR(yDist) + SQR(zDist)) >> 12;
-			falloff1 = SQR(falloff1) >> 12;
+			light = &room->light[i];
+			xdist = x - light->x;
+			ydist = y - light->y;
+			zdist = z - light->z;
+			falloff = light->fallOff1;
+			falloff2 = light->fallOff2;
+			intensity = light->intensity1;
+			intensity2 = light->intensity2;
+			distance = (SQR(xdist) + SQR(ydist) + SQR(zdist)) >> 12;
+			falloff = SQR(falloff) >> 12;
 			falloff2 = SQR(falloff2) >> 12;
-			shade1 = falloff1 * intensity1 / (falloff1 + distance);
+			shade1 = falloff * intensity / (falloff + distance);
 			shade2 = falloff2 * intensity2 / (falloff2 + distance);
-
 			shade = shade1 + (shade2 - shade1) * lightShade / (WIBBLE_SIZE - 1);
-			if (shade > brightest) {
-				brightest = shade;
-				xBrightest = xDist;
-				yBrightest = yDist;
-				zBrightest = zDist;
+			if (shade > light_result.brightest) {
+				light_result.brightest = shade;
+				light_result.x = xdist;
+				light_result.y = ydist;
+				light_result.z = zdist;
 			}
 		}
 	}
 	else {
 		for (int i = 0; i < room->numLights; ++i) {
-			xDist = x - room->light[i].x;
-			yDist = y - room->light[i].y;
-			zDist = z - room->light[i].z;
-			falloff = room->light[i].fallOff1;
-			intensity = room->light[i].intensity1;
-
+			light = &room->light[i];
+			xdist = x - light->x;
+			ydist = y - light->y;
+			zdist = z - light->z;
+			falloff = light->fallOff1;
+			intensity = light->intensity1;
+			distance = (SQR(xdist) + SQR(ydist) + SQR(zdist)) >> 12;
 			falloff = SQR(falloff) >> 12;
-			distance = (SQR(xDist) + SQR(yDist) + SQR(zDist)) >> 12;
-
 			shade = falloff * intensity / (falloff + distance);
-			if (shade > brightest) {
-				brightest = shade;
-				xBrightest = xDist;
-				yBrightest = yDist;
-				zBrightest = zDist;
+			if (shade > light_result.brightest) {
+				light_result.brightest = shade;
+				light_result.x = xdist;
+				light_result.y = ydist;
+				light_result.z = zdist;
 			}
 		}
 	}
-	adder = brightest;
 
-	// Dynamic light calculation
-	brightest = 0;
+	return light_result;
+}
+
+static int S_CalculateDynamicLights(int x, int y, int z, int adder, bool isStatic)
+{
 	for (DWORD i = 0; i < DynamicLightCount; ++i) {
-		auto& dynLight = DynamicLights[i];
-		xDist = x - dynLight.x;
-		yDist = y - dynLight.y;
-		zDist = z - dynLight.z;
-		falloff1 = dynLight.fallOff1;
-		intensity1 = dynLight.intensity1;
-		radius = 1 << falloff1;
+		LIGHT_INFO* light = &DynamicLights[i];
+		int xDist = x - light->x;
+		int yDist = y - light->y;
+		int zDist = z - light->z;
+		int falloff = light->fallOff1;
+		int intensity = light->intensity1;
+		int radius = 1 << falloff;
 		if ((xDist >= -radius && xDist <= radius) &&
 			(yDist >= -radius && yDist <= radius) &&
 			(zDist >= -radius && zDist <= radius))
 		{
-			distance = (SQR(xDist) + SQR(yDist) + SQR(zDist));
-			if (distance <= SQR(radius))
-			{
-				shade = (1 << intensity1) - (distance >> ((2 * falloff1) - intensity1));
-				if (shade > brightest) {
-					brightest = shade;
-					xBrightest = xDist;
-					yBrightest = yDist;
-					zBrightest = zDist;
+			int distance = SQR(xDist) + SQR(yDist) + SQR(zDist);
+			if (distance <= SQR(radius)) {
+				int shade = (1 << intensity) - (distance >> (2 * falloff - intensity));
+				if (isStatic)
+				{
+					adder -= shade;
+					if (adder < 0)
+						break;
 				}
-				adder += shade;
+				else
+				{
+					adder += shade;
+				}
 			}
 		}
 	}
+	return adder;
+}
 
-	// Light finalization
-	adder /= 2;
+static void S_CalculateFinalLights(LIGHT_ROOM& light, int adder, bool isStatic)
+{
+	VECTOR_ANGLES angles;
+
+	if (!isStatic)
+		adder /= 2;
+
 	if (adder == 0) {
-		LsAdder = room->ambient1;
+		LsAdder = light.ambient;
 		LsDivider = 0;
 	}
 	else {
-		LsAdder = room->ambient1 - adder;
-		LsDivider = (1 << (W2V_SHIFT + 12)) / adder;
-		phd_GetVectorAngles(xBrightest, yBrightest, zBrightest, &angles);
-		phd_RotateLight(angles.rotX, angles.rotY);
+		if (isStatic) {
+			LsAdder = ((light.ambient - 0x800) - adder) - 0x500;
+			LsDivider = (1 << 24) / adder;
+		}
+		else {
+			LsAdder = light.ambient - adder;
+			LsDivider = (1 << 27) / adder;
+		}
+		phd_GetVectorAngles(light.x, light.y, light.z, &angles);
+		phd_RotateLight(angles.rotY, angles.rotX);
 	}
-
-	// Fog calculation
-	depth = PhdMatrixPtr->_23 >> W2V_SHIFT;
-#ifdef FEATURE_VIEW_IMPROVED
-	LsAdder += CalculateFogShade(depth);
-#else // !FEATURE_VIEW_IMPROVED
-	if (depth > DEPTHQ_START) // fog begin
-		LsAdder += depth - DEPTHQ_START;
-#endif // FEATURE_VIEW_IMPROVED
-	if (LsAdder > 0x1FFF) // fog end
-		LsAdder = 0x1FFF;
 }
 
-void S_CalculateStaticLight(short adder) {
-	LsAdder = adder - 0x1000;
+static void S_CalculateFinalLightFromFog()
+{
 	int depth = PhdMatrixPtr->_23 >> W2V_SHIFT;
 #ifdef FEATURE_VIEW_IMPROVED
 	LsAdder += CalculateFogShade(depth);
@@ -663,55 +671,41 @@ void S_CalculateStaticLight(short adder) {
 		LsAdder = 0x1FFF;
 }
 
-void S_CalculateStaticMeshLight(int x, int y, int z, int shade1, int shade2, ROOM_INFO* room) {
-	int adder, shade, falloff, intensity;
-	int xDist, yDist, zDist, distance, radius;
+void S_CalculateLight(int x, int y, int z, short roomNumber)
+{
+	LIGHT_ROOM light = S_CalculateRoomStaticLights(x, y, z, roomNumber);
+	int adder = S_CalculateDynamicLights(x, y, z, light.brightest, false);
+	S_CalculateFinalLights(light, adder, false);
+	S_CalculateFinalLightFromFog();
+}
 
-	adder = shade1;
+void S_CalculateStaticLight(short adder) {
+	LsAdder = adder - 0x1000;
+	S_CalculateFinalLightFromFog();
+}
+
+void S_CalculateStaticMeshLight(int x, int y, int z, int shade1, int shade2, ROOM_INFO* room) {
+	int adder = shade1;
 	if (room->lightMode != 0) {
 		adder += (shade2 - shade1) * RoomLightShades[room->lightMode] / (WIBBLE_SIZE - 1);
 	}
-
-	for (DWORD i = 0; i < DynamicLightCount; ++i) {
-		xDist = x - DynamicLights[i].x;
-		yDist = y - DynamicLights[i].y;
-		zDist = z - DynamicLights[i].z;
-		falloff = DynamicLights[i].fallOff1;
-		intensity = DynamicLights[i].intensity1;
-
-		radius = 1 << falloff;
-
-		if ((xDist >= -radius && xDist <= radius) &&
-			(yDist >= -radius && yDist <= radius) &&
-			(zDist >= -radius && zDist <= radius))
-		{
-			distance = SQR(xDist) + SQR(yDist) + SQR(zDist);
-			if (distance <= SQR(radius)) {
-				shade = (1 << intensity) - (distance >> (2 * falloff - intensity));
-				adder -= shade;
-				if (adder < 0) {
-					adder = 0;
-					break;
-				}
-			}
-		}
-	}
+	adder = S_CalculateDynamicLights(x, y, z, adder, true);
 	S_CalculateStaticLight(adder);
 }
 
 void S_LightRoom(ROOM_INFO* room) {
+	ROOM_VERTEX* roomVtx;
+	int roomVtxCount;
 	int shade, falloff, intensity;
 	int xPos, yPos, zPos;
 	int xDist, yDist, zDist, distance, radius;
-	int roomVtxCount;
-	ROOM_VERTEX* roomVtx;
 
 	if (room->lightMode != 0) {
 		int* roomLightTable = RoomLightTables[RoomLightShades[room->lightMode]].table;
 		roomVtxCount = room->data->vtxSize;
 		roomVtx = room->data->vertices;
 		for (int i = 0; i < roomVtxCount; ++i) {
-			__int16 wibble = roomLightTable[roomVtx[i].lightTableValue % WIBBLE_SIZE];
+			short wibble = roomLightTable[roomVtx[i].lightTableValue % WIBBLE_SIZE];
 			roomVtx[i].lightAdder = roomVtx[i].lightBase + wibble;
 		}
 	}
@@ -735,9 +729,7 @@ void S_LightRoom(ROOM_INFO* room) {
 		zPos = DynamicLights[i].z - room->z;
 		falloff = DynamicLights[i].fallOff1;
 		intensity = DynamicLights[i].intensity1;
-
 		radius = 1 << falloff;
-
 		if (xPos + radius >= xMin && zPos + radius >= zMin && xPos - radius <= xMax && zPos - radius <= zMax) {
 			room->flags |= 0x10;
 			roomVtxCount = room->data->vtxSize;

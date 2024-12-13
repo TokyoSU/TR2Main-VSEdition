@@ -299,9 +299,9 @@ void LaraWaterCurrent(COLL_INFO* coll)
 	else if (coll->collType == COLL_RIGHT)
 		LaraItem->pos.rotY -= ANGLE(5);
 
-	if (coll->sideMid.floor < 0)
+	if (coll->middle.floor < 0)
 	{
-		LaraItem->pos.y += coll->sideMid.floor;
+		LaraItem->pos.y += coll->middle.floor;
 		LaraItem->pos.rotX += ANGLE(2);
 	}
 
