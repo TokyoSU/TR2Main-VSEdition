@@ -1847,11 +1847,19 @@ typedef struct Phd3dPos_t {
 	short rotZ;
 } PHD_3DPOS;
 
+typedef struct SoundSourceInfo_t {
+	int x;
+	int y;
+	int z;
+	UINT16 soundID;
+	UINT16 flags;
+} SOUND_SOURCE_INFO;
+
 typedef struct ItemInfo_t {
 	int floor;
 	DWORD touchBits;
 	DWORD meshBits;
-	short objectID;
+	UINT16 objectID;
 	short currentAnimState;
 	short goalAnimState;
 	short requiredAnimState;
@@ -2011,10 +2019,19 @@ typedef struct LightInfo_t {
 	int x;
 	int y;
 	int z;
-	short intensity1;
-	short intensity2;
-	int fallOff1;
-	int fallOff2;
+	short intensity;
+	int fallOff;
+	/// <summary>
+	/// 0 = Point
+	/// 1 = Shadow
+	/// 2 = Spot
+	/// </summary>
+	/*BYTE lightType;
+	DWORD color; // RGB color.
+	float in;
+	float out;
+	float cutoff;
+	float length;*/
 } LIGHT_INFO;
 
 typedef struct MeshInfo_t {
@@ -2078,7 +2095,7 @@ typedef struct RoomInfo_t {
 	int maxCeiling;
 	short xSize;
 	short ySize;
-	short ambient1;
+	short ambient;
 	short ambient2;
 	LIGHT_TYPE lightMode;
 	short numLights;
@@ -2096,10 +2113,6 @@ typedef struct RoomInfo_t {
 	short fxNumber;
 	short flippedRoom;
 	BYTE reverbType;
-
-	int GetCenter() const {
-		return y - (maxCeiling - minFloor);
-	}
 } ROOM_INFO;
 
 typedef struct LiftData_t {
@@ -2198,10 +2211,10 @@ typedef struct PhdSprite_t {
 } PHD_SPRITE;
 
 typedef struct BoxInfo_t {
-	BYTE left;
-	BYTE right;
-	BYTE top;
-	BYTE bottom;
+	BYTE zMin;
+	BYTE zMax;
+	BYTE xMin;
+	BYTE xMax;
 	short height;
 	UINT16 overlapIndex;
 } BOX_INFO;
@@ -2213,8 +2226,8 @@ typedef struct CineFrameInfo_t {
 	short zPos;
 	short yPos;
 	short xPos;
-	short fov;
-	short roll;
+	UINT16 fov;
+	UINT16 roll;
 } CINE_FRAME_INFO;
 
 typedef struct ControlLayout_t {

@@ -58,7 +58,7 @@ void SoundEffects()
 {
 	for (DWORD i = 0; i < SoundFxCount; ++i) {
 		if ((FlipStatus && CHK_ANY(SoundFx[i].flags, 0x40)) || (!FlipStatus && CHK_ANY(SoundFx[i].flags, 0x80)))
-			PlaySoundEffect(SoundFx[i].data, (PHD_3DPOS*)&SoundFx[i].x, 0);
+			PlaySoundEffect(SoundFx[i].soundID, (PHD_3DPOS*)&SoundFx[i].x, 0);
 	}
 
 	if (FlipEffect != -1)

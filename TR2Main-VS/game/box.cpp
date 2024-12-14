@@ -112,9 +112,9 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 void TargetBox(LOT_INFO* LOT, short boxNumber)
 {
 	BOX_INFO* box = &Boxes[boxNumber];
-	LOT->target.x = GetRandomControl() * (((int)box->bottom - (int)box->top - 1) >> 5) + 512 + ((int)box->top * 1024);
+	LOT->target.x = GetRandomControl() * (((int)box->xMax - (int)box->xMin - 1) >> 5) + 512 + ((int)box->xMin * 1024);
 	LOT->target.y = LOT->fly != 0 ? box->height - 384 : box->height;
-	LOT->target.z = GetRandomControl() * (((int)box->right - (int)box->left - 1) >> 5) + 512 + ((int)box->left * 1024);
+	LOT->target.z = GetRandomControl() * (((int)box->zMax - (int)box->zMin - 1) >> 5) + 512 + ((int)box->zMin * 1024);
 	LOT->requiredBox = boxNumber;
 }
 
@@ -127,8 +127,8 @@ int ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber)
 	BOX_INFO* box = &Boxes[boxNumber];
 	if (creature->LOT.blockMask & box->overlapIndex)
 		return FALSE;
-	if (item->pos.z > ((int)box->left << WALL_SHIFT) && item->pos.z < ((int)box->right << WALL_SHIFT)
-    &&  item->pos.x > ((int)box->top << WALL_SHIFT)  && item->pos.x < ((int)box->bottom << WALL_SHIFT))
+	if (item->pos.z > ((int)box->zMin << WALL_SHIFT) && item->pos.z < ((int)box->zMax << WALL_SHIFT)
+    &&  item->pos.x > ((int)box->xMin << WALL_SHIFT)  && item->pos.x < ((int)box->xMax << WALL_SHIFT))
 		return FALSE;
 	return TRUE;
 }

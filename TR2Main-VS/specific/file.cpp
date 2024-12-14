@@ -585,8 +585,7 @@ BOOL LoadRooms(HANDLE hFile) {
 		ReadFileSync(hFile, room->floor, sizeof(FLOOR_INFO) * dwCount, &bytesRead, NULL);
 
 		// Room lights
-		ReadFileSync(hFile, &room->ambient1, sizeof(short), &bytesRead, NULL);
-		ReadFileSync(hFile, &room->ambient2, sizeof(short), &bytesRead, NULL);
+		ReadFileSync(hFile, &room->ambient, sizeof(short), &bytesRead, NULL);
 		ReadFileSync(hFile, &room->lightMode, sizeof(short), &bytesRead, NULL);
 		ReadFileSync(hFile, &room->numLights, sizeof(short), &bytesRead, NULL);
 		if (room->numLights == 0) {
@@ -613,8 +612,6 @@ BOOL LoadRooms(HANDLE hFile) {
 		// Room flags
 		ReadFileSync(hFile, &room->flags, sizeof(short), &bytesRead, NULL);
 		ReadFileSync(hFile, &room->reverbType, sizeof(BYTE), &bytesRead, NULL);
-		if (room->reverbType != 0)
-			LogDebug("ReverbType: %d", room->reverbType);
 
 		// Initialise some variables
 		room->boundActive = 0;
@@ -864,14 +861,15 @@ BOOL LoadItems(HANDLE hFile) {
 		ReadFileSync(hFile, &Items[i].pos.y, sizeof(int), &bytesRead, NULL);
 		ReadFileSync(hFile, &Items[i].pos.z, sizeof(int), &bytesRead, NULL);
 		ReadFileSync(hFile, &Items[i].pos.rotY, sizeof(short), &bytesRead, NULL);
-		ReadFileSync(hFile, &Items[i].shade1, sizeof(short), &bytesRead, NULL);
-		ReadFileSync(hFile, &Items[i].shade2, sizeof(short), &bytesRead, NULL);
+		ReadFileSync(hFile, &Items[i].shade1, sizeof(UINT16), &bytesRead, NULL);
+		ReadFileSync(hFile, &Items[i].shade2, sizeof(UINT16), &bytesRead, NULL);
 		ReadFileSync(hFile, &Items[i].flags, sizeof(UINT16), &bytesRead, NULL);
 
 		if (Items[i].objectID < 0 || Items[i].objectID >= ID_NUMBER_OBJECTS) {
 			wsprintf(StringToShow, "LoadItems(): Bad Object number (%d) on Item %d", Items[i].objectID, i);
 			return FALSE;
 		}
+
 		InitialiseItem((short)i);
 	}
 
@@ -955,11 +953,11 @@ BOOL LoadSoundEffects(HANDLE hFile) {
 
 	ReadFileSync(hFile, &SoundFxCount, sizeof(DWORD), &bytesRead, NULL);
 	if (SoundFxCount != 0) {
-		SoundFx = (OBJECT_VECTOR*)game_malloc(sizeof(OBJECT_VECTOR) * SoundFxCount, GBUF_SoundFX);
+		SoundFx = (SOUND_SOURCE_INFO*)game_malloc(sizeof(SOUND_SOURCE_INFO) * SoundFxCount, GBUF_SoundFX);
 		if (SoundFx == NULL) {
 			return FALSE;
 		}
-		ReadFileSync(hFile, SoundFx, sizeof(OBJECT_VECTOR) * SoundFxCount, &bytesRead, NULL);
+		ReadFileSync(hFile, SoundFx, sizeof(SOUND_SOURCE_INFO) * SoundFxCount, &bytesRead, NULL);
 	}
 	return TRUE;
 }
@@ -1043,6 +1041,7 @@ BOOL LoadDemo(HANDLE hFile) {
 	else {
 		IsDemoLoaded = FALSE;
 	}
+
 	return TRUE;
 }
 

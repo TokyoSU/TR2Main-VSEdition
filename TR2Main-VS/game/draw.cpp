@@ -1611,8 +1611,8 @@ void AddDynamicLight(int x, int y, int z, int intensity, int falloff) {
 	light->x = x;
 	light->y = y;
 	light->z = z;
-	light->intensity1 = intensity;
-	light->fallOff1 = falloff;
+	light->intensity = intensity;
+	light->fallOff = falloff;
 }
 
 /*

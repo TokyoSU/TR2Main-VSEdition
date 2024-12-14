@@ -545,13 +545,13 @@ static LIGHT_ROOM S_CalculateRoomStaticLights(int x, int y, int z, short roomNum
 	LIGHT_ROOM light_result;
 	ROOM_INFO* room = &Rooms[roomNumber];
 	LIGHT_INFO* light = NULL;
-	int distance;
-	int intensity, intensity2;
-	int falloff, falloff2;
 	int xdist, ydist, zdist;
-	int shade, shade1, shade2;
+	int distance;
+	int intensity;
+	int falloff;
+	int shade;
 
-	light_result.ambient = room->ambient1;
+	light_result.ambient = room->ambient;
 	if (room->lightMode != 0) {
 		int lightShade = RoomLightShades[room->lightMode];
 		for (int i = 0; i < room->numLights; ++i) {
@@ -559,16 +559,11 @@ static LIGHT_ROOM S_CalculateRoomStaticLights(int x, int y, int z, short roomNum
 			xdist = x - light->x;
 			ydist = y - light->y;
 			zdist = z - light->z;
-			falloff = light->fallOff1;
-			falloff2 = light->fallOff2;
-			intensity = light->intensity1;
-			intensity2 = light->intensity2;
+			falloff = light->fallOff;
+			intensity = light->intensity;
 			distance = (SQR(xdist) + SQR(ydist) + SQR(zdist)) >> 12;
 			falloff = SQR(falloff) >> 12;
-			falloff2 = SQR(falloff2) >> 12;
-			shade1 = falloff * intensity / (falloff + distance);
-			shade2 = falloff2 * intensity2 / (falloff2 + distance);
-			shade = shade1 + (shade2 - shade1) * lightShade / (WIBBLE_SIZE - 1);
+			shade = (falloff * intensity / (falloff + distance)) * lightShade / (WIBBLE_SIZE - 1);
 			if (shade > light_result.brightest) {
 				light_result.brightest = shade;
 				light_result.x = xdist;
@@ -583,8 +578,8 @@ static LIGHT_ROOM S_CalculateRoomStaticLights(int x, int y, int z, short roomNum
 			xdist = x - light->x;
 			ydist = y - light->y;
 			zdist = z - light->z;
-			falloff = light->fallOff1;
-			intensity = light->intensity1;
+			falloff = light->fallOff;
+			intensity = light->intensity;
 			distance = (SQR(xdist) + SQR(ydist) + SQR(zdist)) >> 12;
 			falloff = SQR(falloff) >> 12;
 			shade = falloff * intensity / (falloff + distance);
@@ -607,8 +602,8 @@ static int S_CalculateDynamicLights(int x, int y, int z, int adder, bool isStati
 		int xDist = x - light->x;
 		int yDist = y - light->y;
 		int zDist = z - light->z;
-		int falloff = light->fallOff1;
-		int intensity = light->intensity1;
+		int falloff = light->fallOff;
+		short intensity = light->intensity;
 		int radius = 1 << falloff;
 		if ((xDist >= -radius && xDist <= radius) &&
 			(yDist >= -radius && yDist <= radius) &&
@@ -727,8 +722,8 @@ void S_LightRoom(ROOM_INFO* room) {
 		xPos = DynamicLights[i].x - room->x;
 		yPos = DynamicLights[i].y;
 		zPos = DynamicLights[i].z - room->z;
-		falloff = DynamicLights[i].fallOff1;
-		intensity = DynamicLights[i].intensity1;
+		falloff = DynamicLights[i].fallOff;
+		intensity = DynamicLights[i].intensity;
 		radius = 1 << falloff;
 		if (xPos + radius >= xMin && zPos + radius >= zMin && xPos - radius <= xMax && zPos - radius <= zMax) {
 			room->flags |= 0x10;

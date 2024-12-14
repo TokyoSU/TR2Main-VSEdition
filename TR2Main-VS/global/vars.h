@@ -391,7 +391,7 @@ extern FX_INFO Effects[MAX_EFFECTS]; // 0x005207C0
 #define PrevItemActive				VAR_U_(0x005207CC, short)
 #define SkipHairPhysics				VAR_U_(0x00521CD0, BOOL)
 #define SoundFxCount				VAR_U_(0x00521FDC, DWORD)
-#define SoundFx						VAR_U_(0x00521FE0, OBJECT_VECTOR*)
+#define SoundFx						VAR_U_(0x00521FE0, SOUND_SOURCE_INFO*)
 #define AnimFrames					VAR_U_(0x005251B0, short*)
 #define MeshPtr						VAR_U_(0x005252B0, short**)
 #define OutsideCamera				VAR_U_(0x005252B4, BOOL)
