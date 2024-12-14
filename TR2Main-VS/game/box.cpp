@@ -42,7 +42,8 @@ void InitialiseCreature(short itemNumber)
 	ITEM_INFO* item = &Items[itemNumber];
 	item->collidable = TRUE;
 	item->data = NULL;
-	item->pos.rotY += (GetRandomControl() - PHD_90) >> 1;
+	if (item->objectID != ID_EEL && item->objectID != ID_BIG_EEL)
+		item->pos.rotY += (GetRandomControl() - PHD_90) >> 1;
 }
 
 int CreatureActive(short itemNumber)

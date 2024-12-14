@@ -27,7 +27,9 @@
  /*
   * Function list
   */
-#define BigEelControl ((void(__cdecl*)(short)) 0x0041C120)
-#define EelControl ((void(__cdecl*)(short)) 0x0041C2C0)
+
+void BigEelControl(short itemNumber); // 0x0041C120
+void InitializeEel(short itemNumber);
+void EelControl(short itemNumber); // 0x0041C2C0
 
 #endif // EEL_H_INCLUDED

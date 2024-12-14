@@ -547,8 +547,7 @@ static LIGHT_ROOM S_CalculateRoomStaticLights(int x, int y, int z, short roomNum
 	LIGHT_INFO* light = NULL;
 	int xdist, ydist, zdist;
 	int distance;
-	int intensity;
-	int falloff;
+	int intensity, falloff;
 	int shade;
 
 	light_result.ambient = room->ambient;

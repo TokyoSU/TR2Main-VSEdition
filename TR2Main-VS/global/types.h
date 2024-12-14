@@ -99,8 +99,8 @@ typedef struct {
 #define PHD_45				(PHD_ONE/8)
 #define PHD_270				(PHD_90*3)
 #define PHD_DEGREE			(PHD_ONE/360)
-#define ANGLE(x)            ((x) * PHD_DEGREE)
-#define FROM_ANGLE(x)       ((x) / PHD_DEGREE)
+#define ANGLE(x) ((x) * PHD_DEGREE)
+#define ANGLE_TO_DEGREE(x) ((x) / PHD_DEGREE)
 
 // String macros
 #ifdef FEATURE_HUD_IMPROVED
@@ -2637,11 +2637,11 @@ typedef enum OrientAxis_e
 
 static inline ORIENT_AXIS GetOrientAxis(short rotY)
 {
-	return static_cast<ORIENT_AXIS>((USHORT)(rotY + PHD_45) / PHD_90);
+	return static_cast<ORIENT_AXIS>((UINT16)(rotY + PHD_45) / PHD_90);
 }
 static inline ORIENT_AXIS GetOrientAxisInverted(short rotY)
 {
-	return static_cast<ORIENT_AXIS>((USHORT)((rotY + PHD_180) + PHD_45) / PHD_90);
+	return static_cast<ORIENT_AXIS>((UINT16)((rotY + PHD_180) + PHD_45) / PHD_90);
 }
 static inline PHD_VECTOR GetOrientAxisDirection(short rotY, int radius = 1) {
 	ORIENT_AXIS axis = GetOrientAxis(rotY);

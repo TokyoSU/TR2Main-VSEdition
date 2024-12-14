@@ -869,7 +869,7 @@ bool IsCollidingOnFloorLift(int x, int z, int ix, int iz, short angle)
 	// Same block as elevator position.
 	if (x == ix && z == iz)
 		return true;
-	switch (FROM_ANGLE(ABS(angle)))
+	switch (ANGLE_TO_DEGREE(ABS(angle)))
 	{
 	case 0: // NORTH
 		// Now check for east (+X)

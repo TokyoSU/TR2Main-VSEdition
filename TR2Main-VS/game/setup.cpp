@@ -732,7 +732,7 @@ void BaddyObjects() {
 	}
 	obj = &Objects[ID_EEL];
 	if (obj->loaded) {
-		obj->initialise = InitialiseCreature;
+		obj->initialise = InitializeEel;
 		obj->collision = CreatureCollision;
 		obj->control = EelControl;
 #if defined(FEATURE_MOD_CONFIG)
