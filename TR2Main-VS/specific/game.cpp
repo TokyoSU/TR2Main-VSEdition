@@ -41,6 +41,12 @@
 #include "specific/winvid.h"
 #include "specific/texture.h"
 #include "global/vars.h"
+#include <random>
+
+std::random_device rd;  // Seed source (hardware-based if available)
+std::mt19937 gen(rd()); // Mersenne Twister random engine
+std::uniform_int_distribution<> randShort(SHRT_MIN, SHRT_MAX);
+std::uniform_int_distribution<> randInt(INT_MIN, INT_MAX);
 
 #ifdef FEATURE_BACKGROUND_IMPROVED
 #include "modding/background_new.h"
@@ -337,10 +343,7 @@ int GameStats(int levelID) {
 }
 
 int GetRandomControl() {
-	RandomControl = RandomControl * 1103515245 + 12345;
-	return (RandomControl >> 10) & 0x7FFF;
-	// NOTE: the shift value should be 0x10, but the original game has 10,
-	// it left "as is" to save consistency with the original game.
+	return randInt(gen) & SHRT_MAX;
 }
 
 void SeedRandomControl(int seed) {
@@ -348,15 +351,23 @@ void SeedRandomControl(int seed) {
 }
 
 int GetRandomDraw() {
-	RandomDraw = RandomDraw * 1103515245 + 12345;
-	return (RandomDraw >> 10) & 0x7FFF;
+	return randInt(gen) & SHRT_MAX;
 	// NOTE: the shift value should be 0x10, but the original game has 10,
 	// it left "as is" to save consistency with the original game.
 }
 
 int GetRandomDrawWithNeg() {
-	RandomDraw = RandomDraw * 1103515245 + 12345;
-	return (RandomDraw >> 10);
+	return randShort(gen);
+}
+
+int GetRandomDrawWithNegInt() {
+	return randInt(gen);
+}
+
+int GetRandom(int min, int max)
+{
+	std::uniform_int_distribution<> randInt(min, max);
+	return randInt(gen);
 }
 
 void SeedRandomDraw(int seed) {

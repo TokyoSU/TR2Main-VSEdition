@@ -23,25 +23,35 @@ struct WEATHER_INFO
 static WEATHER_INFO SnowList[MAX_WEATHER_SNOW], RainList[MAX_WEATHER_RAIN];
 static int SnowCount = 0, RainCount = 0;
 
-static GAME_VECTOR WEATHER_GetRoomCeilingRandomPos(short roomNumber, short roomFlags)
+static GAME_VECTOR WEATHER_GetRoomSquareRandomPos(short roomNumber)
 {
 	GAME_VECTOR vec = { 0, 0, 0, 0 };
-	short rad = GetRandomDrawWithNeg();
-	short angle = GetRandomDraw() & 32766;
 	ROOM_INFO* r = &Rooms[roomNumber];
-	vec.x = r->x + (rad * phd_sin(angle) >> W2V_SHIFT);
-	vec.z = r->z + (rad * phd_cos(angle) >> W2V_SHIFT);
+
+	// Calculate the room's boundaries in world coordinates
+	int width = BLOCK(r->xSize);  // Full width of the room (east-west)
+	int height = BLOCK(r->zSize); // Full length of the room (north-south)
+	int minX = r->x - width;  // Minimum X position (center minus half the width)
+	int maxX = r->x + width;  // Maximum X position (center plus half the width)
+	int minZ = r->z - height; // Minimum Z position (center minus half the length)
+	int maxZ = r->z + height; // Maximum Z position (center plus half the length)
+
+	// Ensure that the random values are distributed across the entire room size
+	// Generate random X and Z positions within the room boundaries
+	vec.x = minX + (GetRandomDrawWithNegInt() % (maxX - minX + 1));
+	vec.y = r->maxCeiling + 1; // Start Y position; GetCeiling will adjust it
+	vec.z = minZ + (GetRandomDrawWithNegInt() % (maxZ - minZ + 1));
+
+	// Get the ceiling Y position
 	short roomNum = roomNumber;
-	vec.y = GetCeiling(GetFloor(vec.x, vec.y, vec.z, &roomNum), vec.x, vec.y, vec.z); // Avoid rain splash to spawn on the ceiling !
+	vec.y = GetCeiling(GetFloor(vec.x, vec.y, vec.z, &roomNum), vec.x, vec.y, vec.z);
+	if (vec.y == NO_HEIGHT)
+		return vec;
+
+	// Assign additional info
 	vec.roomNumber = roomNum;
-	r = &Rooms[roomNum];
-	if (FlipStatus && !CHK_ANY(r->flags, ROOM_FLIP))
-		return vec;
-	else if (!FlipStatus && CHK_ANY(r->flags, ROOM_FLIP))
-		return vec;
-	else if (!CHK_ANY(r->flags, roomFlags))
-		return vec;
-	vec.boxNumber = TRUE;
+	vec.boxNumber = TRUE; // Ensure this stays TRUE for rain logic
+
 	return vec;
 }
 
@@ -54,7 +64,7 @@ void WEATHER_UpdateAndDrawRain()
 			auto* r = &Rooms[j];
 			if (CHK_ANY(r->flags, ROOM_RAIN)) {
 				if (!rainDrop.on && RainCount < Mod.rainDensity) {
-					GAME_VECTOR vec = WEATHER_GetRoomCeilingRandomPos(r->index, ROOM_RAIN);
+					GAME_VECTOR vec = WEATHER_GetRoomSquareRandomPos(r->index);
 					if (vec.boxNumber == TRUE)
 					{
 						rainDrop.x = vec.x;
@@ -89,23 +99,20 @@ void WEATHER_UpdateAndDrawRain()
 				continue;
 			}
 			
-			if (Lara.water_status != LWS_Cheat)
+			if (Mod.rainDoDamageOnHit)
 			{
-				if (Mod.rainDoDamageOnHit)
+				PHD_3DPOS effectPos = {};
+				effectPos.x = rainDrop.x;
+				effectPos.y = rainDrop.y;
+				effectPos.z = rainDrop.z;
+				if (ItemNearLara(&effectPos, Mod.rainDamageRange))
 				{
-					PHD_3DPOS effectPos = {};
-					effectPos.x = rainDrop.x;
-					effectPos.y = rainDrop.y;
-					effectPos.z = rainDrop.z;
-					if (ItemNearLara(&effectPos, Mod.rainDamageRange))
-					{
-						DoBloodSplat(rainDrop.x, rainDrop.y, rainDrop.z, 5, LaraItem->pos.rotY + ANGLE(180), rainDrop.room);
-						LaraItem->hitPoints -= Mod.rainDamage;
-						LaraItem->hitStatus = TRUE;
-						rainDrop.on = false;
-						RainCount--;
-						continue;
-					}
+					DoBloodSplat(rainDrop.x, rainDrop.y, rainDrop.z, 5, LaraItem->pos.rotY + ANGLE(180), rainDrop.room);
+					LaraItem->hitPoints -= Mod.rainDamage;
+					LaraItem->hitStatus = TRUE;
+					rainDrop.on = false;
+					RainCount--;
+					continue;
 				}
 			}
 
@@ -146,7 +153,7 @@ void WEATHER_UpdateAndDrawSnow()
 			auto* r = &Rooms[j];
 			if (CHK_ANY(r->flags, ROOM_SNOW)) {
 				if (!snowDrop.on && SnowCount < Mod.snowDensity) {
-					GAME_VECTOR vec = WEATHER_GetRoomCeilingRandomPos(r->index, ROOM_SNOW);
+					GAME_VECTOR vec = WEATHER_GetRoomSquareRandomPos(r->index);
 					if (vec.boxNumber == TRUE)
 					{
 						snowDrop.x = vec.x;

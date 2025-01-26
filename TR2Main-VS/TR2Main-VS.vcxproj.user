@@ -5,14 +5,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DX9|Win32'">
     <LocalDebuggerCommand>Tomb2.exe</LocalDebuggerCommand>
-    <LocalDebuggerWorkingDirectory>C:\Users\vleva\Documents\TRProject\HandOfGods\Engine\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>C:\Users\vleva\Desktop\Deadly Cargo\Engine\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>
     </LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_DX9|Win32'">
     <LocalDebuggerCommand>Tomb2.exe</LocalDebuggerCommand>
-    <LocalDebuggerWorkingDirectory>C:\Users\vleva\Documents\TRProject\HandOfGods\Engine\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>C:\Users\vleva\Desktop\Deadly Cargo\Engine\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>
     </LocalDebuggerCommandArguments>
