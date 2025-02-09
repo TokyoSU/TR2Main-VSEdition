@@ -26,6 +26,10 @@
 #include "specific/smain.h"
 #include "global/vars.h"
 
+#if defined(FEATURE_MOD_CONFIG)
+#include "modding/mod_utils.h"
+#endif
+
 #define REQ_NEARZ		(8)
 #define REQ_MIDZ		(16)
 #define REQ_FARZ		(48)
@@ -35,7 +39,7 @@
 
  // Y coordinates relative to the bottom of the screen
 #ifdef FEATURE_HUD_IMPROVED
-#define STATS_Y_POS		(-44)
+#define STATS_Y_POS	  (-44)
 #define REQ_LN_HEIGHT (15)
 
 extern DWORD InvTextBoxMode;
@@ -614,7 +618,7 @@ void ShowGymStatsText() {
 
 void ShowStatsText(char* timeString, BOOL removeOnDeselect) {
 	static bool isStatsTextReady = false;
-	bool isSecret1, isSecret2, isSecret3, isSecret4;
+	bool isSecret1 = false, isSecret2 = false, isSecret3 = false, isSecret4 = false;
 	int bufLen, distance;
 	char bufStr[32]{};
 
@@ -645,9 +649,9 @@ void ShowStatsText(char* timeString, BOOL removeOnDeselect) {
 			isSecret1 = CHK_ANY(SaveGame.statistics.secrets, 1);
 			isSecret2 = CHK_ANY(SaveGame.statistics.secrets, 2);
 			isSecret3 = CHK_ANY(SaveGame.statistics.secrets, 4);
-			isSecret4 = CHK_ANY(SaveGame.statistics.secrets, 8);
+			if (Mod.enableFourSecret) isSecret4 = CHK_ANY(SaveGame.statistics.secrets, 8);
 
-			if (isSecret1 || isSecret2 || isSecret3) {
+			if (isSecret1 || isSecret2 || isSecret3 || isSecret4) {
 				bufLen = 0;
 
 				if (isSecret1) {
@@ -788,7 +792,8 @@ void ShowEndStatsText() {
 			total += CHK_ANY(SaveGame.start[i].statistics.secrets, 1) ? 1 : 0;
 			total += CHK_ANY(SaveGame.start[i].statistics.secrets, 2) ? 1 : 0;
 			total += CHK_ANY(SaveGame.start[i].statistics.secrets, 4) ? 1 : 0;
-			total += CHK_ANY(SaveGame.start[i].statistics.secrets, 8) ? 1 : 0;
+			if (Mod.enableFourSecret)
+				total += CHK_ANY(SaveGame.start[i].statistics.secrets, 8) ? 1 : 0;
 			maxTotal += GF_GetNumSecrets(i); // In the original code there is 3 instead of GF_GetNumSecrets function
 		}
 		sprintf(bufStr, "%d %s %d", total, GF_GameStringTable[GSI_String_Of], maxTotal);

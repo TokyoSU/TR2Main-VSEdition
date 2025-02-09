@@ -16,10 +16,13 @@ struct ModConfig
 	bool isBarefoot = false;
 	bool disableGiantYetiNextLevelOnDeath = false;
 	bool laraIgnoreMonkIfNotAngry = true;
-	bool makeMonkAttackLaraFirst = false;
-	bool makeMercenaryAttackLaraFirst = false;
+	bool monkAttackBandit = false;
+	bool banditAttackMonk = false;
 	bool enemyBarEnabled = true;
 	bool makeYetiExplodeOnDeath = false;
+	bool enableFourSecret = false;
+	bool workerAttackTRex = true;
+	bool trexAttackWorker = true;
 
 	bool pistolAtStart = true;
 	bool shotgunAtStart = true;

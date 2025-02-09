@@ -31,11 +31,11 @@
 void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll); // 0x00432000
 void SwimTurn(ITEM_INFO* item); // 0x00432230
 void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll); // 0x004322C0
-//0x00432330:		lara_as_glide
-//0x004323B0:		lara_as_tread
-//0x00432440:		lara_as_dive
-//0x00432460:		lara_as_uwdeath
-//0x004324C0:		lara_as_waterroll
+#define lara_as_glide ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00432330)
+#define lara_as_tread ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004323B0)
+#define lara_as_dive ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00432440)
+#define lara_as_uwdeath ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00432460)
+#define lara_as_waterroll ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004324C0)
 #define lara_col_swim ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004324D0)
 #define lara_col_uwdeath ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004324F0)
 int GetWaterDepth(int x, int y, int z, short roomNumber); // 0x00432550

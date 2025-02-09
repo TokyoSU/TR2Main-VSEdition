@@ -45,7 +45,7 @@ VALUE "CompanyName", "Michael Chaban (arsunt@gmail.com)"
 VALUE "FileDescription", "Tomb Raider II Main Library"
 VALUE "FileVersion", VER_FULL
 VALUE "InternalName", "TR2Main"
-VALUE "LegalCopyright", "© 2017-2023 Michael Chaban"
+VALUE "LegalCopyright", "© 2017-2025 Michael Chaban & TokyoSU"
 VALUE "LegalTrademarks", "Original game is created by Core Design Ltd. in 1997. Lara Croft and Tomb Raider are trademarks of Embracer Group AB."
 VALUE "OriginalFilename", "TR2Main.dll"
 VALUE "ProductName", "Tomb Raider II Community Edition"

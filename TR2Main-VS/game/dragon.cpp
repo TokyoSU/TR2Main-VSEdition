@@ -32,6 +32,7 @@
 
 #define DINO_TOUCH (0x3000)
 #define DINO_KILL_ANIM 11
+#define DINO_ATTACK_FRAME 21 // NOTE: This will smooth the special lara death animation and avoid other enemies to be kill in one animation...
 #define DINO_TOUCH_DAMAGE 1
 #define DINO_TRAMPLE_DAMAGE 10
 #define DINO_BITE_DAMAGE 10000
@@ -225,7 +226,7 @@ void DinoControl(short itemNumber)
 			break;
 
 		case DINO_ATTACK2:
-			if (item->frameNumber == Anims[item->animNumber].frameBase + 21)
+			if (item->frameNumber == (Anims[item->animNumber].frameBase + DINO_ATTACK_FRAME))
 			{
 				if (DamageLaraOrEnemy(item, dino->enemy, &DinoBite, DINO_BITE_DAMAGE, DINO_BITE_DAMAGE, item->touchBits & DINO_TOUCH, BLOCK(4), DamageTargetFlags::DisableBlood))
 					if (dino->enemy != NULL && dino->enemy->objectID == ID_LARA) break;

@@ -29,11 +29,11 @@
   */
 
 void LaraSurface(ITEM_INFO* item, COLL_INFO* coll); // 0x00431710
-//0x00431870:		lara_as_surfswim
-//0x004318E0:		lara_as_surfback
-//0x00431940:		lara_as_surfleft
-//0x004319A0:		lara_as_surfright
-//0x00431A00:		lara_as_surftread
+#define lara_as_surfswim ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00431870)
+#define lara_as_surfback ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004318E0)
+#define lara_as_surfleft ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00431940)
+#define lara_as_surfright ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x004319A0)
+#define lara_as_surftread ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00431A00)
 #define lara_col_surfswim ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00431AC0)
 #define lara_col_surfback ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00431B00)
 #define lara_col_surfleft ((void(__cdecl*)(ITEM_INFO*,COLL_INFO*)) 0x00431B30)

@@ -228,6 +228,7 @@ void LoadCustomInventoryItems(Value& data)
 void LoadLevelConfig(Value& data) {
     SizeType size = 0;
 
+    Mod.enableFourSecret = GetValueByNameBool(data, "enable_four_secret", false);
     Mod.picturePix = GetValueByNameString(data, "picture", &size, "");
     Mod.waterColor = GetColorRGBByName(data, "watercolor", RGB_MAKE(255, 255, 255));
     Mod.isBarefoot = GetValueByNameBool(data, "barefoot", false);
@@ -293,8 +294,10 @@ void LoadLevelConfig(Value& data) {
 
     Mod.disableGiantYetiNextLevelOnDeath = GetValueByNameBool(data, "disable_giant_yeti_next_level_on_death", false);
     Mod.laraIgnoreMonkIfNotAngry = GetValueByNameBool(data, "lara_ignore_monk_if_not_angry", true);
-    Mod.makeMercenaryAttackLaraFirst = GetValueByNameBool(data, "mercenary_attack_lara_directly", false);
-    Mod.makeMonkAttackLaraFirst = GetValueByNameBool(data, "monks_attack_lara_directly", false);
+    Mod.banditAttackMonk = GetValueByNameBool(data, "does_bandit_attack_monk", true);
+    Mod.monkAttackBandit = GetValueByNameBool(data, "does_monk_attack_bandit", true);
+    Mod.trexAttackWorker = GetValueByNameBool(data, "does_trex_attack_worker", false);
+    Mod.workerAttackTRex = GetValueByNameBool(data, "does_worker_attack_trex", false);
     Mod.enemyBarEnabled = GetValueByNameBool(data, "enable_enemy_bar", true);
     Mod.makeYetiExplodeOnDeath = GetValueByNameBool(data, "make_yeti_explode_on_death", false);
 

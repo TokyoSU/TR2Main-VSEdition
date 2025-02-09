@@ -27,15 +27,30 @@
 #include "specific/output.h"
 #include "global/vars.h"
 
+#ifdef FEATURE_MOD_CONFIG
+#include "modding/mod_utils.h"
+#endif
+
 #ifdef FEATURE_HUD_IMPROVED
 #include "modding/texture_utils.h"
 
 extern DWORD InvTextBoxMode;
 #endif // FEATURE_HUD_IMPROVED
 
-#define IS_CHAR_SECRET(x)		((x) >= CHAR_SECRET1 && (x) <= CHAR_SECRET4)
-#define IS_CHAR_LEGAL(x)		((x) <= 0x12 || ((x) >= 0x20 && (x) <= 0x7F) || IS_CHAR_SECRET(x))
-#define IS_CHAR_DIACRITIC(x)	((x) == '(' || (x) == ')' || (x) == '$' || (x) == '~')
+static bool IS_CHAR_SECRET(BYTE x)
+{
+	return ((x) >= CHAR_SECRET1 && (x) <= CHAR_SECRET4);
+}
+
+static bool IS_CHAR_LEGAL(BYTE x)
+{
+	return ((x) <= 0x12 || ((x) >= 0x20 && (x) <= 0x7F) || IS_CHAR_SECRET(x));
+}
+
+static bool IS_CHAR_DIACRITIC(BYTE x)
+{
+	return ((x) == '(' || (x) == ')' || (x) == '$' || (x) == '~');
+}
 
 static const BYTE T_TextSpacing[0x6E] = {
 	//A	B	C	D	E	F	G	H

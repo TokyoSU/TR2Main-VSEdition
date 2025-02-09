@@ -58,7 +58,7 @@ void PickUpCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
 				AddDisplayPickup(item->objectID, item->objectID == ID_SECRETS ? item->ocb : -1);
 				Inv_AddItem((GAME_OBJECT_ID)item->objectID, item->objectID == ID_SECRETS ? item->ocb : -1);
 				// Give items when all secrets is found, ID_SECRET4 not included !
-				if (item->objectID == ID_SECRETS && CHK_ALL(SaveGame.statistics.secrets, 1| 2 | 4))
+				if (item->objectID == ID_SECRETS && CHK_ALL(SaveGame.statistics.secrets, 1 | 2 | 4))
 					GF_ModifyInventory(CurrentLevel, TRUE);
 				item->status = ITEM_INVISIBLE;
 				RemoveDrawnItem(itemNumber);

@@ -64,13 +64,13 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 	if (creature == NULL) return;
 
 #if defined(FEATURE_MOD_CONFIG)
-	if ((item->objectID == ID_BANDIT1 || item->objectID == ID_BANDIT2 || item->objectID == ID_BANDIT2B) && !Mod.makeMercenaryAttackLaraFirst)
+	if ((item->objectID == ID_BANDIT1 || item->objectID == ID_BANDIT2 || item->objectID == ID_BANDIT2B) && Mod.banditAttackMonk)
 		GetBaddieTarget(creature->itemNumber, BTT_ToMonk);
-	else if ((item->objectID == ID_MONK1 || item->objectID == ID_MONK2) && !Mod.makeMonkAttackLaraFirst)
+	else if ((item->objectID == ID_MONK1 || item->objectID == ID_MONK2) && Mod.monkAttackBandit)
 		GetBaddieTarget(creature->itemNumber, BTT_ToBandit);
-	else if (item->objectID == ID_WORKER1 || item->objectID == ID_WORKER2 || item->objectID == ID_WORKER3 || item->objectID == ID_WORKER4 || item->objectID == ID_WORKER5)
+	else if ((item->objectID == ID_WORKER1 || item->objectID == ID_WORKER2 || item->objectID == ID_WORKER3 || item->objectID == ID_WORKER4 || item->objectID == ID_WORKER5) && Mod.workerAttackTRex)
 		GetBaddieTarget(creature->itemNumber, BTT_ToTrex);
-	else if (item->objectID == ID_TREX)
+	else if (item->objectID == ID_TREX && Mod.trexAttackWorker)
 		GetBaddieTarget(creature->itemNumber, BTT_ToWorker);
 #else
 	if (item->objectID == ID_BANDIT1 || item->objectID == ID_BANDIT2 || item->objectID == ID_BANDIT2B)

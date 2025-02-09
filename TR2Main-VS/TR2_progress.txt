@@ -362,15 +362,15 @@ x function is unused / included in another function
 
 	game/enemies.cpp
 0x0041DB30:	+	Knife
-0x0041DBB0:	 *	Cult2Control
+0x0041DBB0:	+	Cult2Control
 0x0041DFE0:	+	MonkControl
-0x0041E4B0:	 *	Worker3Control
-0x0041EAC0:	 *	DrawXianLord
-0x0041EEC0:		XianDamage
-0x0041EF70:	 *	InitialiseXianLord
-0x0041EFD0:	 *	XianLordControl
+0x0041E4B0:	+	Worker3Control
+0x0041EAC0:	+	DrawXianLord
+0x0041EEC0:	+	XianDamage
+0x0041EF70:	+	InitialiseXianLord
+0x0041EFD0:	+	XianLordControl
 0x0041F5B0:	+	WarriorSparkleTrail
-0x0041F650:	 *	WarriorControl
+0x0041F650:	+	WarriorControl
 
 	game/gameflow.cpp
 0x0041FA40:	+	GF_LoadScriptFile
@@ -456,92 +456,92 @@ x function is unused / included in another function
 
 	game/items.cpp
 0x00426CD0:	+	InitialiseItemArray
-0x00426D30:	 *	KillItem
-0x00426E50:	 *	CreateItem
+0x00426D30:	+	KillItem
+0x00426E50:	+	CreateItem
 0x00426E90:	+	InitialiseItem
-0x00427050:	 *	RemoveActiveItem
-0x004270E0:	 *	RemoveDrawnItem
+0x00427050:	+	RemoveActiveItem
+0x004270E0:	+	RemoveDrawnItem
 0x00427150:	+	AddActiveItem
-0x004271B0:	 *	ItemNewRoom
+0x004271B0:	+	ItemNewRoom
 0x00427250:	+	GlobalItemReplace
 0x004272D0:	+	InitialiseFXArray
 0x00427300:	+	CreateEffect
 0x00427370:	+	KillEffect
 0x00427460:	+	EffectNewRoom
-0x00427500:	 *	ClearBodyBag
+0x00427500:	+	ClearBodyBag
 
 	game/lara.cpp
 0x00427560:	+	LaraAboveWater
 0x00427700:	 *	LookUpDown
 0x00427770:	 *	LookLeftRight
 0x004277F0:	 *	ResetLook
-0x00427880:		lara_as_walk
-0x00427910:		lara_as_run
-0x00427A60:		lara_as_stop
-0x00427BB0:		lara_as_forwardjump
+0x00427880:	+	lara_as_walk
+0x00427910:	+	lara_as_run
+0x00427A60:	+	lara_as_stop
+0x00427BB0:	+	lara_as_forwardjump
 ----------:		lara_as_pose
-0x00427C90:		lara_as_fastback
-0x00427CF0:		lara_as_turn_r
-0x00427D80:		lara_as_turn_l
-0x00427E10:		lara_as_death
-0x00427E30:		lara_as_fastfall
-0x00427E70:		lara_as_hang
-0x00427ED0:		lara_as_reach
-0x00427EF0:		lara_as_splat
+0x00427C90:	+	lara_as_fastback
+0x00427CF0:	+	lara_as_turn_r
+0x00427D80:	+	lara_as_turn_l
+0x00427E10:	+	lara_as_death
+0x00427E30:	+	lara_as_fastfall
+0x00427E70:	+	lara_as_hang
+0x00427ED0:	+	lara_as_reach
+0x00427EF0:	+	lara_as_splat
 ----------:		lara_as_land
-0x00427F00:		lara_as_compress
-0x00428010:		lara_as_back
-0x004280A0:		lara_as_null
-0x004280B0:		lara_as_fastturn
-0x00428100:		lara_as_stepright
-0x00428180:		lara_as_stepleft
-0x00428200:		lara_as_slide
-0x00428230:		lara_as_backjump
-0x00428280:		lara_as_rightjump
-0x004282C0:		lara_as_leftjump
-0x00428300:		lara_as_upjump
-0x00428320:		lara_as_fallback
-0x00428350:		lara_as_hangleft
-0x00428390:		lara_as_hangright
-0x004283D0:		lara_as_slideback
-0x004283F0:		lara_as_pushblock
+0x00427F00:	+	lara_as_compress
+0x00428010:	+	lara_as_back
+0x004280A0:	+	lara_as_null
+0x004280B0:	+	lara_as_fastturn
+0x00428100:	+	lara_as_stepright
+0x00428180:	+	lara_as_stepleft
+0x00428200:	+	lara_as_slide
+0x00428230:	+	lara_as_backjump
+0x00428280:	+	lara_as_rightjump
+0x004282C0:	+	lara_as_leftjump
+0x00428300:	+	lara_as_upjump
+0x00428320:	+	lara_as_fallback
+0x00428350:	+	lara_as_hangleft
+0x00428390:	+	lara_as_hangright
+0x004283D0:	+	lara_as_slideback
+0x004283F0:	+	lara_as_pushblock
 ----------:		lara_as_pullblock
-0x00428420:		lara_as_ppready
-0x00428450:		lara_as_pickup
-0x00428480:		lara_as_pickupflare
-0x004284E0:		lara_as_switchon
+0x00428420:	+	lara_as_ppready
+0x00428450:	+	lara_as_pickup
+0x00428480:	+	lara_as_pickupflare
+0x004284E0:	+	lara_as_switchon
 ----------:		lara_as_switchoff
-0x00428520:		lara_as_usekey
+0x00428520:	+	lara_as_usekey
 ----------:		lara_as_usepuzzle
 ----------:		lara_as_roll
 ----------:		lara_as_roll2
-0x00428550:		lara_as_special
+0x00428550:	+	lara_as_special
 ----------:		lara_as_usemidas
 ----------:		lara_as_diemidas
-0x00428570:		lara_as_swandive
-0x004285A0:		lara_as_fastdive
+0x00428570:	+	lara_as_swandive
+0x004285A0:	+	lara_as_fastdive
 ----------:		lara_as_gymnast
-0x00428600:		lara_as_waterout
+0x00428600:	+	lara_as_waterout
 ----------:		lara_as_laratest1
 ----------:		lara_as_laratest2
 ----------:		lara_as_laratest3
-0x00428620:		lara_as_wade
+0x00428620:	+	lara_as_wade
 ----------:		lara_as_twist
 ----------:		lara_as_kick
-0x004286F0:		lara_as_deathslide
-0x00428790:		extra_as_breath
+0x004286F0:	+	lara_as_deathslide
+0x00428790:	 *	extra_as_breath
 ----------:		extra_as_plunger
-0x004287E0:		extra_as_yetikill
-0x00428830:		extra_as_sharkkill
-0x004288D0:		extra_as_airlock
-0x004288F0:		extra_as_gongbong
-0x00428910:		extra_as_dinokill
-0x00428970:		extra_as_pulldagger
-0x00428A30:		extra_as_startanim
-0x00428A80:		extra_as_starthouse
-0x00428B30:		extra_as_finalanim
-0x00428BE0:		LaraFallen
-0x00428C40:		LaraCollideStop
+0x004287E0:	 *	extra_as_yetikill
+0x00428830:	 *	extra_as_sharkkill
+0x004288D0:	 *	extra_as_airlock
+0x004288F0:	 *	extra_as_gongbong
+0x00428910:	 *	extra_as_dinokill
+0x00428970:	 *	extra_as_pulldagger
+0x00428A30:	 *	extra_as_startanim
+0x00428A80:	 *	extra_as_starthouse
+0x00428B30:	 *	extra_as_finalanim
+0x00428BE0:	+	LaraFallen
+0x00428C40:	 *	LaraCollideStop
 0x00428D00:	 *	lara_col_walk
 0x00428EA0:	 *	lara_col_run
 0x00429020:	 *	lara_col_stop
@@ -593,30 +593,30 @@ x function is unused / included in another function
 ----------:		lara_col_laratest3
 0x00429E90:	 *	lara_col_wade
 ----------:		lara_col_twist
-0x0042A000:	 *	lara_default_col
+0x0042A000:	+	lara_default_col
 0x0042A040:	+	lara_col_jumper
-0x0042A120:	 *	lara_col_kick
+0x0042A120:	+	lara_col_kick
 ----------:		lara_col_deathslide
-0x0042A130:	 *	GetLaraCollisionInfo
-0x0042A170:		lara_slide_slope
-0x0042A260:		LaraHitCeiling
-0x0042A2D0:		LaraDeflectEdge
+0x0042A130:	+	GetLaraCollisionInfo
+0x0042A170:	+	LaraSlideSlope
+0x0042A260:	 *	LaraHitCeiling
+0x0042A2D0:	 *	LaraDeflectEdge
 0x0042A350:	 *	LaraDeflectEdgeJump
-0x0042A4D0:		LaraSlideEdgeJump
-0x0042A5C0:		TestWall
-0x0042A6D0:		LaraTestHangOnClimbWall
-0x0042A7E0:		LaraTestClimbStance
-0x0042A8A0:		LaraHangTest
-0x0042AC00:		LaraTestEdgeCatch
-0x0042ACB0:		LaraTestHangJumpUp
-0x0042AE20:		LaraTestHangJump
-0x0042AFC0:		TestHangSwingIn
-0x0042B080:		TestLaraVault
-0x0042B370:		TestLaraSlide
-0x0042B4A0:		LaraFloorFront
+0x0042A4D0:	 *	LaraSlideEdgeJump
+0x0042A5C0:	 *	TestWall
+0x0042A6D0:	 *	LaraTestHangOnClimbWall
+0x0042A7E0:	 *	LaraTestClimbStance
+0x0042A8A0:	 *	LaraHangTest
+0x0042AC00:	 *	LaraTestEdgeCatch
+0x0042ACB0:	 *	LaraTestHangJumpUp
+0x0042AE20:	 *	LaraTestHangJump
+0x0042AFC0:	 *	TestHangSwingIn
+0x0042B080:	 *	TestLaraVault
+0x0042B370:	 *	TestLaraSlide
+0x0042B4A0:	 *	LaraFloorFront
 0x0042B520:	 *	LaraLandedBad
 0x0042B5E0:	+	GetLaraJointAbsPosition
-0x0042B970:	+	GetLJAInt
+0x0042B970:	+	GetLaraJointAbsPositionInterpolated
 
 	game/lara1gun.cpp
 0x0042BC90:	+	draw_shotgun_meshes
@@ -635,46 +635,46 @@ x function is unused / included in another function
 
 	game/lara2gun.cpp
 0x0042D000:	+	set_pistol_arm
-0x0042D050:	 *	draw_pistols
-0x0042D0D0:	 *	undraw_pistols
-0x0042D300:		ready_pistols
-0x0042D360:		draw_pistol_meshes
-0x0042D3B0:		undraw_pistol_mesh_left
-0x0042D3F0:		undraw_pistol_mesh_right
+0x0042D050:	+	draw_pistols
+0x0042D0D0:	+	undraw_pistols
+0x0042D300:	+	ready_pistols
+0x0042D360:	+	draw_pistol_meshes
+0x0042D3B0:	+	undraw_pistol_mesh_left
+0x0042D3F0:	+	undraw_pistol_mesh_right
 0x0042D430:	+	PistolHandler
 0x0042D5C0:	+	AnimatePistols
 
 	game/laraclimb.cpp
-0x0042D8F0:		lara_as_climbleft
-0x0042D930:		lara_as_climbright
-0x0042D970:		lara_as_climbstnc
-0x0042D9F0:		lara_as_climbing
-0x0042DA10:		lara_as_climbend
-0x0042DA30:		lara_as_climbdown
-0x0042DA50:	 *	lara_col_climbleft
-0x0042DAB0:	 *	lara_col_climbright
-0x0042DB10:	 *	lara_col_climbstnc
-0x0042DD20:	 *	lara_col_climbing
+0x0042D8F0:	+	lara_as_climbleft
+0x0042D930:	+	lara_as_climbright
+0x0042D970:	+	lara_as_climbstnc
+0x0042D9F0:	+	lara_as_climbing
+0x0042DA10:	+	lara_as_climbend
+0x0042DA30:	+	lara_as_climbdown
+0x0042DA50:	+	lara_col_climbleft
+0x0042DAB0:	+	lara_col_climbright
+0x0042DB10:	+	lara_col_climbstnc
+0x0042DD20:	+	lara_col_climbing
 ----------:		lara_col_climbend
-0x0042DE70:	 *	lara_col_climbdown
-0x0042E010:		LaraCheckForLetGo
-0x0042E0C0:		LaraTestClimb
-0x0042E330:		LaraTestClimbPos
-0x0042E400:		LaraDoClimbLeftRight
-0x0042E4F0:		LaraTestClimbUpPos
+0x0042DE70:	+	lara_col_climbdown
+0x0042E010:	 *	LaraCheckForLetGo
+0x0042E0C0:	 *	LaraTestClimb
+0x0042E330:	 *	LaraTestClimbPos
+0x0042E400:	 *	LaraDoClimbLeftRight
+0x0042E4F0:	 *	LaraTestClimbUpPos
 
 	game/larafire.cpp
 0x0042E740:	+	LaraGun
-0x0042ECB0:	 *	CheckForHoldingState
-0x0042ECF0:	 *	InitialiseNewWeapon
-0x0042EE30:	 *	LaraTargetInfo
+0x0042ECB0: +	CheckForHoldingState
+0x0042ECF0:	+	InitialiseNewWeapon
+0x0042EE30:	+	LaraTargetInfo
 0x0042EFD0:	+	LaraGetNewTarget
-0x0042F1F0:	 *	find_target_point
-0x0042F2A0:	 *	AimWeapon
+0x0042F1F0:	+	find_target_point
+0x0042F2A0:	+	AimWeapon
 0x0042F370:	+	FireWeapon
 0x0042F6E0:	+	HitTarget
 0x0042F780:	+	SmashItem
-0x0042F7E0:	 *	WeaponObject
+0x0042F7E0:	+	WeaponObject
 
 	game/laraflare.cpp
 0x0042F840:	+	DoFlareLight
@@ -691,22 +691,22 @@ x function is unused / included in another function
 
 	game/laramisc.cpp
 0x00430380:	+	LaraControl
-0x00430A10:	 *	AnimateLara
+0x00430A10:	+	AnimateLara
 0x00430D10:	+	UseItem
 0x00430ED0:	+	LaraCheatGetStuff
 0x00430F90:	+	ControlLaraExtra
 0x00430FB0:	+	InitialiseLaraLoad
-0x00430FE0:	 *	InitialiseLara
+0x00430FE0:	+	InitialiseLara
 0x004312A0:	+	InitialiseLaraInventory
 0x00431610:	+	LaraInitialiseMeshes
 
 	game/larasurf.cpp
 0x00431710:	+	LaraSurface
-0x00431870:		lara_as_surfswim
-0x004318E0:		lara_as_surfback
-0x00431940:		lara_as_surfleft
-0x004319A0:		lara_as_surfright
-0x00431A00:		lara_as_surftread
+0x00431870:	 *	lara_as_surfswim
+0x004318E0:	 *	lara_as_surfback
+0x00431940:	 *	lara_as_surfleft
+0x004319A0:	 *	lara_as_surfright
+0x00431A00:	 *	lara_as_surftread
 0x00431AC0:	 *	lara_col_surfswim
 0x00431B00:	 *	lara_col_surfback
 0x00431B30:	 *	lara_col_surfleft
@@ -720,29 +720,29 @@ x function is unused / included in another function
 0x00432000:	+	LaraUnderWater
 0x00432230:	+	SwimTurn
 0x004322C0:	+	lara_as_swim
-0x00432330:		lara_as_glide
-0x004323B0:		lara_as_tread
-0x00432440:		lara_as_dive
-0x00432460:		lara_as_uwdeath
-0x004324C0:		lara_as_waterroll
+0x00432330:	 *	lara_as_glide
+0x004323B0:	 *	lara_as_tread
+0x00432440:	 *	lara_as_dive
+0x00432460:	 *	lara_as_uwdeath
+0x004324C0:	 *	lara_as_waterroll
 0x004324D0:	 *	lara_col_swim
 ----------:		lara_col_glide
 ----------:		lara_col_tread
 ----------:		lara_col_dive
 0x004324F0:	 *	lara_col_uwdeath
 ----------:		lara_col_waterroll
-0x00432550:	 *	GetWaterDepth
+0x00432550:	+	GetWaterDepth
 0x004326F0:		LaraTestWaterDepth
 0x004327C0:		LaraSwimCollision
 0x00432920:	+	LaraWaterCurrent
 
 	game/lot.cpp
-0x00432B10:	 *	InitialiseLOTarray
-0x00432B70:	 *	DisableBaddieAI
-0x00432BC0:	 *	EnableBaddieAI
+0x00432B10:	+	InitialiseLOTarray
+0x00432B70:	+	DisableBaddieAI
+0x00432BC0:	+	EnableBaddieAI
 0x00432D70:	+	InitialiseSlot
-0x00432F80:	 *	CreateZone
-0x00433040:	 *	ClearLOT
+0x00432F80:	+	CreateZone
+0x00433040:	+	ClearLOT
 
 	game/missile.cpp
 0x00433090:	+	ControlMissile
@@ -754,9 +754,9 @@ x function is unused / included in another function
 0x004339A0:	 *	InitialiseMovingBlock
 0x004339D0:	 *	MovableBlock
 0x00433B20:	 *	MovableBlockCollision
-0x00433D80:		TestBlockMovable
-0x00433DD0:		TestBlockPush
-0x00433F20:		TestBlockPull
+0x00433D80:	 *	TestBlockMovable
+0x00433DD0:	 *	TestBlockPush
+0x00433F20:	 *	TestBlockPull
 0x00434160:	 *	AlterFloorHeight
 0x00434220:	 *	DrawMovableBlock
 0x00434250:	 *	DrawUnclippedItem
@@ -767,7 +767,7 @@ x function is unused / included in another function
 0x004343E0:	 *	InitialiseFinalLevel
 0x004344B0:	 *	FinalLevelCounter
 0x004346C0:	 *	MiniCopterControl
-0x004347A0:	 *	InitialiseDyingMonk
+0x004347A0:	+	InitialiseDyingMonk
 0x00434820:	 *	DyingMonk
 0x004348B0:	 *	ControlGongBonger
 0x00434970:	 *	DeathSlideCollision
@@ -780,8 +780,8 @@ x function is unused / included in another function
 0x00435020:	 *	SmashIceControl
 0x00435100:	 *	ShutThatDoor
 0x00435150:	 *	OpenThatDoor
-0x00435190:	 *	InitialiseDoor
-0x00435570:	 *	DoorControl
+0x00435190:	+	InitialiseDoor
+0x00435570:	+	DoorControl
 0x00435640:	 *	OnDrawBridge
 0x00435700:	 *	DrawBridgeFloor
 0x00435740:	 *	DrawBridgeCeiling
@@ -799,7 +799,7 @@ x function is unused / included in another function
 0x00435BC0:	 *	BridgeTilt2Floor
 0x00435BF0:	 *	BridgeTilt2Ceiling
 0x00435C30:	 *	CopterControl
-0x00435D40:	 *	GeneralControl
+0x00435D40:	+	GeneralControl
 0x00435E20:	 *	DetonatorControl
 
 	game/people.cpp
@@ -810,14 +810,14 @@ x function is unused / included in another function
 0x00436040:	+	GunHit
 0x00436100:	+	GunMiss
 0x004361B0:	+	ShotTarget
-0x00436380:	 *	InitialiseCult1
+0x00436380:	+	InitialiseCult1
 0x004363D0:	 *	Cult1Control
 0x00436800:	 *	InitialiseCult3
-0x00436850:	 *	Cult3Control
-0x00436DC0:	 *	Worker1Control
-0x004371C0:	 *	Worker2Control
-0x00437620:	 *	BanditControl
-0x00437960:	 *	Bandit2Control
+0x00436850:	+	Cult3Control
+0x00436DC0:	+	Worker1Control
+0x004371C0:	+	Worker2Control
+0x00437620:	+	BanditControl
+0x00437960:	+	Bandit2Control
 0x00437DA0:	+	WinstonControl
 
 	game/pickup.cpp
@@ -831,10 +831,10 @@ x function is unused / included in another function
 0x00438E30:	 *	SwitchTrigger
 0x00438EF0:	 *	KeyTrigger
 0x00438F30:	 *	PickupTrigger
-0x00438F70:		SecretControl
+0x00438F70:	 *	SecretControl
 
 	game/rat.cpp
-0x00438FA0:	 *	MouseControl
+0x00438FA0:	+	MouseControl
 
 	game/savegame.cpp
 0x00439190:	+	InitialiseStartInfo
@@ -848,24 +848,24 @@ x function is unused / included in another function
 
 	game/setup.cpp
 0x0043A330:	+	InitialiseLevel
-0x0043A490:	 *	InitialiseGameFlags
+0x0043A490:	+	InitialiseGameFlags
 0x0043A500:	+	InitialiseLevelFlags
 0x0043A530:	+	BaddyObjects
 0x0043B570:	+	TrapObjects
 0x0043BB70:	+	ObjectObjects
 0x0043C7C0:	+	InitialiseObjects
-0x0043C830:	 *	GetCarriedItems
+0x0043C830:	+	GetCarriedItems
 
 	game/shark.cpp
-0x0043C900:	 *	JellyControl
-0x0043CA20:	 *	BaracuddaControl
-0x0043CC50:	 *	SharkControl
+0x0043C900:	+	JellyControl
+0x0043CA20:	+	BaracuddaControl
+0x0043CC50:	+	SharkControl
 
 	game/skidoo.cpp
 0x0043CEE0:	 *	InitialiseSkidoo
 0x0043CF20:		SkidooCheckGeton
 0x0043D010:	 *	SkidooCollision
-0x0043D110:		SkidooBaddieCollision
+0x0043D110:	+	SkidooBaddieCollision
 0x0043D310:		TestHeight
 0x0043D3D0:	 *	DoShift
 0x0043D650:		DoDynamics
@@ -882,22 +882,22 @@ x function is unused / included in another function
 0x0043EB10:	+	DrawSkidoo
 0x0043EDF0:	 *	InitialiseSkidman
 0x0043EE80:	 *	SkidManControl
-0x0043F280:		SkidmanPush
+0x0043F280:	 *	SkidmanPush
 0x0043F3A0:	 *	SkidmanCollision
 
 	game/sound.cpp
 0x0043F430:	+	GetRealTrack
-0x0043F470:	 *	PlaySoundEffect
-0x0043F910:	 *	StopSoundEffect
-0x0043F970:	 *	SOUND_EndScene
-0x0043FA00:	 *	SOUND_Stop
+0x0043F470:	+	PlaySoundEffect
+0x0043F910:	+	StopSoundEffect
+0x0043F970:	+	SOUND_EndScene
+0x0043FA00:	+	SOUND_Stop
 0x0043FA30:	+	SOUND_Init
 
 	game/sphere.cpp
 0x0043FA60:	 *	TestCollision
 0x0043FB90:	 *	GetSpheres
 0x0043FE70:	 *	GetJointAbsPosition
-0x00440010:	 *	BaddieBiteEffect
+0x00440010:	+	BaddieBiteEffect
 
 	game/spider.cpp
 0x00440070:	+	SpiderLeap
@@ -932,7 +932,7 @@ x function is unused / included in another function
 0x004411C0:	+	ControlSpikeWall
 0x00441300:	+	ControlCeilingSpikes
 0x00441420:	+	HookControl
-0x004414B0:	 *	PropellerControl
+0x004414B0:	+	PropellerControl
 0x00441640:	+	SpinningBlade
 0x004417C0:	+	IcicleControl
 0x004418C0:	+	InitialiseBlade
@@ -943,15 +943,15 @@ x function is unused / included in another function
 0x00441BE0:	+	InitialiseRollingBall
 0x00441C20:	+	RollingBallControl
 0x00441F70:	+	RollingBallCollision
-0x004421C0:	 *	SpikeCollision
-0x00442320:	 *	TrapDoorControl
-0x00442370:	 *	TrapDoorFloor
-0x004423B0:	 *	TrapDoorCeiling
-0x004423F0:	 *	OnTrapDoor
+0x004421C0:	+	SpikeCollision
+0x00442320:	+	TrapDoorControl
+0x00442370:	+	TrapDoorFloor
+0x004423B0:	+	TrapDoorCeiling
+0x004423F0:	+	OnTrapDoor
 0x004424A0:	+	Pendulum
-0x004425B0:	 *	FallingBlock
-0x004426C0:	 *	FallingBlockFloor
-0x00442700:	 *	FallingBlockCeiling
+0x004425B0:	+	FallingBlock
+0x004426C0:	+	FallingBlockFloor
+0x00442700:	+	FallingBlockCeiling
 0x00442750:	+	TeethTrap
 0x00442810:	+	FallingCeiling
 0x004428F0:	+	DartEmitterControl
@@ -965,8 +965,8 @@ x function is unused / included in another function
 0x00442FF0:	+	ControlLavaBlob
 
 	game/yeti.cpp
-0x00443100:	 *	GiantYetiControl
-0x00443400:	 *	YetiControl
+0x00443100:	+	GiantYetiControl
+0x00443400:	+	YetiControl
 
 // ======================================
 // SPECIFIC

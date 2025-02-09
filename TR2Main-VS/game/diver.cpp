@@ -24,11 +24,11 @@
 #include "3dsystem/phd_math.h"
 #include "game/box.h"
 #include "game/control.h"
+#include "game/effects.h"
 #include "game/items.h"
 #include "game/missile.h"
+#include "game/people.h"
 #include "global/vars.h"
-#include "people.h"
-#include "effects.h"
 
 typedef enum {
     DIVER_EMPTY,
