@@ -36,12 +36,12 @@ short GunHit(int x, int y, int z, short speed, short rotY, short roomNumber); //
 short GunMiss(int x, int y, int z, short speed, short rotY, short roomNumber); // 0x00436100
 BOOL ShotTargetNew(ITEM_INFO* item, AI_INFO* AI, const BITE_INFO* bite, short angle, int damageLara, int damageOther); // NOTE, TODO: Will remplace the original below.
 BOOL ShotTarget(ITEM_INFO* item, AI_INFO* AI, const BITE_INFO* bite, short angle, int damage); // 0x004361B0
-#define InitialiseCult1 ((void(__cdecl*)(short)) 0x00436380)
-#define Cult1Control ((void(__cdecl*)(short)) 0x004363D0)
+void InitialiseCult1(short itemNumber); // 0x00436380
+void Cult1Control(short itemNumber); // 0x004363D0
 #define InitialiseCult3 ((void(__cdecl*)(short)) 0x00436800)
 #define Cult3Control ((void(__cdecl*)(short)) 0x00436850)
-#define Worker1Control ((void(__cdecl*)(short)) 0x00436DC0)
-#define Worker2Control ((void(__cdecl*)(short)) 0x004371C0)
+void Worker1Control(short itemNumber); // 0x00436DC0
+void Worker2Control(short itemNumber); // 0x004371C0
 void BanditControl(short itemNumber); // 0x00437620
 void Bandit2Control(short itemNumber); // 0x00437960
 void WinstonControl(short itemNumber); // 0x00437DA0

@@ -125,7 +125,7 @@ void JellyControl(short item_number)
 			break;
 		}
 
-		DamageLaraOrEnemy(item, creature->enemy, &JellyBite, JELLY_STING, JELLY_STING_TO_OTHER, item->touchBits != 0, true);
+		DamageLaraOrEnemy(item, creature->enemy, &JellyBite, JELLY_STING, JELLY_STING_TO_OTHER, item->touchBits != 0, CLICK(2), DamageTargetFlags::DoLotsOfBloods);
 	}
 
 	CreatureAnimation(item_number, angle, 0);
@@ -302,7 +302,7 @@ void SharkControl(short itemNumber)
 	{
 		CreatureHead(item, head);
 		CreatureAnimation(itemNumber, angle, 0);
-		CreatureUnderwater(item, BLOCK(1) / 3);
+		CreatureUnderwater(item, CLICK(1));
 	}
 	else
 	{

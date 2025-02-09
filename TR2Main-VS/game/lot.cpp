@@ -188,7 +188,7 @@ void InitialiseSlot(short itemNumber, int baddieSlotID)
         creature->LOT.step = CLICK(1) / 2;
         creature->LOT.drop = -BLOCK(1);
         break;
-    case ID_DINO:
+    case ID_TREX:
         creature->LOT.blockMask = 0x8000;
         break;
     }

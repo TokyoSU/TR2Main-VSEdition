@@ -29,12 +29,12 @@ static GAME_VECTOR WEATHER_GetRoomSquareRandomPos(short roomNumber)
 	ROOM_INFO* r = &Rooms[roomNumber];
 
 	// Calculate the room's boundaries in world coordinates
-	int width = BLOCK(r->xSize);  // Full width of the room (east-west)
-	int height = BLOCK(r->zSize); // Full length of the room (north-south)
-	int minX = r->x - width;  // Minimum X position (center minus half the width)
-	int maxX = r->x + width;  // Maximum X position (center plus half the width)
-	int minZ = r->z - height; // Minimum Z position (center minus half the length)
-	int maxZ = r->z + height; // Maximum Z position (center plus half the length)
+	int sizeX = BLOCK(r->xSize);  // Full width of the room (east-west)
+	int sizeZ = BLOCK(r->zSize); // Full length of the room (north-south)
+	int minX = r->x - sizeX;  // Minimum X position (center minus half the width)
+	int maxX = r->x + sizeX;  // Maximum X position (center plus half the width)
+	int minZ = r->z - sizeZ; // Minimum Z position (center minus half the length)
+	int maxZ = r->z + sizeZ; // Maximum Z position (center plus half the length)
 
 	// Ensure that the random values are distributed across the entire room size
 	// Generate random X and Z positions within the room boundaries
@@ -47,11 +47,8 @@ static GAME_VECTOR WEATHER_GetRoomSquareRandomPos(short roomNumber)
 	vec.y = GetCeiling(GetFloor(vec.x, vec.y, vec.z, &roomNum), vec.x, vec.y, vec.z);
 	if (vec.y == NO_HEIGHT)
 		return vec;
-
-	// Assign additional info
 	vec.roomNumber = roomNum;
-	vec.boxNumber = TRUE; // Ensure this stays TRUE for rain logic
-
+	vec.boxNumber = TRUE;
 	return vec;
 }
 

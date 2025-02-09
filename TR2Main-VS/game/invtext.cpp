@@ -614,9 +614,9 @@ void ShowGymStatsText() {
 
 void ShowStatsText(char* timeString, BOOL removeOnDeselect) {
 	static bool isStatsTextReady = false;
-	bool isSecret1, isSecret2, isSecret3;
+	bool isSecret1, isSecret2, isSecret3, isSecret4;
 	int bufLen, distance;
-	char bufStr[32];
+	char bufStr[32]{};
 
 	if (!isStatsTextReady) {
 		StatsRequester.reqFlags |= REQFLAG_NOCURSOR;
@@ -645,6 +645,7 @@ void ShowStatsText(char* timeString, BOOL removeOnDeselect) {
 			isSecret1 = CHK_ANY(SaveGame.statistics.secrets, 1);
 			isSecret2 = CHK_ANY(SaveGame.statistics.secrets, 2);
 			isSecret3 = CHK_ANY(SaveGame.statistics.secrets, 4);
+			isSecret4 = CHK_ANY(SaveGame.statistics.secrets, 8);
 
 			if (isSecret1 || isSecret2 || isSecret3) {
 				bufLen = 0;
@@ -676,11 +677,21 @@ void ShowStatsText(char* timeString, BOOL removeOnDeselect) {
 					bufStr[bufLen++] = ' ';
 				}
 
-				bufStr[bufLen] = 0;
+				if (isSecret4) {
+					bufStr[bufLen++] = CHAR_SECRET4;
+				}
+				else {
+					bufStr[bufLen++] = ' ';
+					bufStr[bufLen++] = ' ';
+					bufStr[bufLen++] = ' ';
+				}
+
+				bufStr[bufLen] = '\0';
 			}
 			else {
 				sprintf(bufStr, GF_GameStringTable[GSI_String_None]);
 			}
+
 			AddRequesterItem(&StatsRequester, GF_GameStringTable[GSI_String_SecretsFound], REQFLAG_LEFT, bufStr, REQFLAG_RIGHT);
 		}
 
@@ -777,6 +788,7 @@ void ShowEndStatsText() {
 			total += CHK_ANY(SaveGame.start[i].statistics.secrets, 1) ? 1 : 0;
 			total += CHK_ANY(SaveGame.start[i].statistics.secrets, 2) ? 1 : 0;
 			total += CHK_ANY(SaveGame.start[i].statistics.secrets, 4) ? 1 : 0;
+			total += CHK_ANY(SaveGame.start[i].statistics.secrets, 8) ? 1 : 0;
 			maxTotal += GF_GetNumSecrets(i); // In the original code there is 3 instead of GF_GetNumSecrets function
 		}
 		sprintf(bufStr, "%d %s %d", total, GF_GameStringTable[GSI_String_Of], maxTotal);

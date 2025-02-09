@@ -26,12 +26,16 @@
 #include "game/control.h"
 #include "game/draw.h"
 #include "game/effects.h"
+#include "game/dragon.h"
 #include "game/items.h"
 #include "game/larafire.h"
 #include "game/sound.h"
 #include "game/sphere.h"
 #include "specific/game.h"
 #include "global/vars.h"
+
+#pragma warning(push)
+#pragma warning(disable: 26819)
 
 #ifdef FEATURE_VIDEOFX_IMPROVED
 extern DWORD AlphaBlendMode;
@@ -41,6 +45,17 @@ extern DWORD AlphaBlendMode;
 #define PEOPLE_HIT_CHANCE 0x2000
 #define PEOPLE_TARGETING_SPEED 300
 
+#define CULT1_DIE_ANIM 20
+#define CULT1_SHOT_DAMAGE 50
+#define CULT1_SHOT_DAMAGE_TO_OTHER 2
+#define CULT1_POSE_CHANCE (0x500)
+#define CULT1_UNPOSE_CHANCE (0x100)
+#define CULT1_WALK_CHANCE (CULT1_POSE_CHANCE + 0x500)
+#define CULT1_UNWALK_CHANCE (0x300)
+#define CULT1_RUN_RANGE SQR(BLOCK(2))
+#define CULT1_WALK_TURN ANGLE(5)
+#define CULT1_RUN_TURN ANGLE(5)
+
 #define BANDIT_DIE_ANIM 14
 #define BANDIT_STOP_SHOOTING 2
 #define BANDIT_DAMAGE 8
@@ -49,6 +64,67 @@ extern DWORD AlphaBlendMode;
 #define BANDIT2_DIE_ANIM 9
 #define BANDIT2_DAMAGE 50
 #define BANDIT2_DAMAGE_TO_OTHER 1
+
+#define WORK1_SHOT_DAMAGE 150
+#define WORK1_SHOT_DAMAGE_TO_OTHER 1
+#define WORK1_WALK_TURN ANGLE(3)
+#define WORK1_RUN_TURN ANGLE(5)
+#define WORK1_RUN_RANGE SQR(BLOCK(2))
+#define WORK1_SHOOT1_RANGE SQR(BLOCK(3))
+#define WORK1_DIE_ANIM 18
+
+#define WORK2_SHOT_DAMAGE 30
+#define WORK2_SHOT_DAMAGE_TO_OTHER 1
+#define WORK2_WALK_TURN ANGLE(3)
+#define WORK2_RUN_TURN ANGLE(5)
+#define WORK2_RUN_RANGE SQR(BLOCK(2))
+#define WORK2_SHOOT1_RANGE SQR(BLOCK(3))
+#define WORK2_DIE_ANIM 19
+
+typedef enum
+{
+	CULT1_WALK = 1,
+	CULT1_RUN,
+	CULT1_STOP,
+	CULT1_WAIT1,
+	CULT1_WAIT2,
+	CULT1_AIM1,
+	CULT1_SHOOT1,
+	CULT1_AIM2,
+	CULT1_SHOOT2,
+	CULT1_AIM3,
+	CULT1_SHOOT3,
+	CULT1_DEATH
+} CULT1_STATE;
+
+typedef enum
+{
+	WORK1_WALK = 1,
+	WORK1_STOP,
+	WORK1_WAIT,
+	WORK1_SHOOT1,
+	WORK1_RUN,
+	WORK1_SHOOT2,
+	WORK1_DEATH,
+	WORK1_AIM,
+	WORK1_AIM2,
+	WORK1_SHOOT3
+} WORK1_STATE;
+
+typedef enum
+{
+	WORK2_STOP = 1,
+	WORK2_WALK,
+	WORK2_RUN,
+	WORK2_WAIT,
+	WORK2_SHOOT1,
+	WORK2_SHOOT2,
+	WORK2_DEATH,
+	WORK2_AIM1,
+	WORK2_AIM2,
+	WORK2_AIM3,
+	WORK2_SHOOT3
+} WORK2_STATE;
 
 typedef enum
 {
@@ -85,6 +161,9 @@ typedef enum
 	BANDIT2_SHOOT5
 } BANDIT2_STATE;
 
+static const BITE_INFO Cult1GunBite = { 3,331,56, 10 };
+static const BITE_INFO Work1GunBite = { 0, 281, 40, 9 };
+static const BITE_INFO Work2GunBite = { 0, 308, 32, 9 };
 static const BITE_INFO BanditGunBite = { -2, 150, 19, 17 };
 static const BITE_INFO Bandit2GunBite = { -1, 230, 9, 17 };
 
@@ -319,6 +398,501 @@ BOOL ShotTargetNew(ITEM_INFO* item, AI_INFO* AI, const BITE_INFO* bite, short an
 BOOL ShotTarget(ITEM_INFO* item, AI_INFO* AI, const BITE_INFO* bite, short angle, int damage)
 {
 	return ShotTargetNew(item, AI, bite, angle, damage, damage / 10);
+}
+
+void InitialiseCult1(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	if (GetRandomControl() < 0x4000)
+		item->meshBits -= 0x30;
+	if (item->objectID == ID_CULT1B)
+		item->meshBits -= 0x1f8000;
+}
+
+void Cult1Control(short itemNumber)
+{
+	ITEM_INFO* item;
+	CREATURE_INFO* cult;
+	AI_INFO info;
+	int random;
+	short angle, head, tilt;
+
+	if (!CreatureActive(itemNumber))
+		return;
+
+	item = &Items[itemNumber];
+	cult = GetCreatureInfo(item);
+	head = angle = tilt = 0;
+
+	if (item->hitPoints <= 0)
+	{
+		if (item->currentAnimState != CULT1_DEATH)
+			SetAnimation(item, CULT1_DIE_ANIM + (GetRandomControl() / 0x4000), CULT1_DEATH);
+	}
+	else
+	{
+		CreatureAIInfo(item, &info);
+		CreatureMood(item, &info, FALSE);
+		angle = CreatureTurn(item, cult->maximumTurn);
+
+		switch (item->currentAnimState)
+		{
+		case CULT1_STOP:
+			cult->maximumTurn = 0;
+			if (item->requiredAnimState)
+				item->goalAnimState = item->requiredAnimState;
+			break;
+
+		case CULT1_WAIT1:
+			if (cult->mood == MOOD_ESCAPE)
+			{
+				item->requiredAnimState = CULT1_RUN;
+				item->goalAnimState = CULT1_STOP;
+			}
+			else if (Targetable(item, &info))
+			{
+				item->requiredAnimState = (GetRandomControl() < 0x4000) ? CULT1_AIM1 : CULT1_AIM3;
+				item->goalAnimState = CULT1_STOP;
+			}
+			else if (cult->mood == MOOD_BORED && info.ahead)
+			{
+				random = GetRandomControl();
+				if (random < CULT1_POSE_CHANCE)
+				{
+					item->requiredAnimState = CULT1_WAIT2;
+					item->goalAnimState = CULT1_STOP;
+				}
+				else if (random < CULT1_WALK_CHANCE)
+				{
+					item->requiredAnimState = CULT1_WALK;
+					item->goalAnimState = CULT1_STOP;
+				}
+			}
+			else if (info.distance < CULT1_RUN_RANGE || cult->mood == MOOD_BORED)
+			{
+				item->requiredAnimState = CULT1_WALK;
+				item->goalAnimState = CULT1_STOP;
+			}
+			else
+			{
+				item->requiredAnimState = CULT1_RUN;
+				item->goalAnimState = CULT1_STOP;
+			}
+			break;
+
+		case CULT1_WAIT2:
+			if (Targetable(item, &info))
+			{
+				item->goalAnimState = CULT1_STOP;
+				item->requiredAnimState = CULT1_AIM1;
+			}
+			else if (cult->mood != MOOD_BORED || GetRandomControl() < CULT1_UNPOSE_CHANCE || !info.ahead)
+				item->goalAnimState = CULT1_STOP;
+			break;
+
+		case CULT1_WALK:
+			cult->maximumTurn = CULT1_WALK_TURN;
+
+			if (cult->mood == MOOD_ESCAPE)
+				item->goalAnimState = CULT1_RUN;
+			else if (Targetable(item, &info))
+			{
+				item->requiredAnimState = (GetRandomControl() < 0x4000) ? CULT1_AIM1 : CULT1_AIM3;
+				item->goalAnimState = CULT1_STOP;
+			}
+			else if (info.distance > CULT1_RUN_RANGE || !info.ahead)
+				item->goalAnimState = CULT1_RUN;
+			else if (cult->mood == MOOD_BORED && info.ahead && GetRandomControl() < CULT1_UNWALK_CHANCE)
+				item->goalAnimState = CULT1_STOP;
+			break;
+
+		case CULT1_RUN:
+			cult->maximumTurn = CULT1_RUN_TURN;
+			tilt = angle / 4;
+			cult->flags = 0;
+
+			if (cult->mood == MOOD_ESCAPE)
+			{
+				if (Targetable(item, &info))
+					item->goalAnimState = CULT1_SHOOT2;
+			}
+			else if (Targetable(item, &info))
+			{
+				if (info.distance < CULT1_RUN_RANGE || info.zoneNumber != info.enemyZone)
+					item->goalAnimState = CULT1_STOP;
+				else
+					item->goalAnimState = CULT1_SHOOT2;
+			}
+			else if (cult->mood == MOOD_BORED)
+				item->goalAnimState = CULT1_STOP;
+			break;
+
+		case CULT1_AIM1:
+		case CULT1_AIM3:
+			cult->flags = 0;
+			if (info.ahead)
+				head = info.angle;
+
+			if (cult->mood == MOOD_ESCAPE)
+				item->goalAnimState = CULT1_STOP;
+			else if (Targetable(item, &info))
+				item->goalAnimState = (item->currentAnimState == CULT1_AIM1) ? CULT1_SHOOT1 : CULT1_SHOOT3;
+			else
+				item->goalAnimState = CULT1_STOP;
+			break;
+
+		case CULT1_SHOOT1:
+		case CULT1_SHOOT3:
+			if (info.ahead)
+				head = info.angle;
+
+			if (!cult->flags)
+			{
+				ShotTargetNew(item, &info, &Cult1GunBite, head, CULT1_SHOT_DAMAGE, CULT1_SHOT_DAMAGE_TO_OTHER);
+				cult->flags = 1;
+			}
+			break;
+
+		case CULT1_SHOOT2:
+			if (info.ahead)
+				head = info.angle;
+
+			if (!item->requiredAnimState)
+			{
+				if (!ShotTargetNew(item, &info, &Cult1GunBite, head, CULT1_SHOT_DAMAGE, CULT1_SHOT_DAMAGE_TO_OTHER))
+					item->goalAnimState = CULT1_RUN;
+				item->requiredAnimState = CULT1_SHOOT2;
+			}
+			break;
+		}
+	}
+
+	CreatureTilt(item, tilt);
+	CreatureHead(item, head);
+	CreatureAnimation(itemNumber, angle, 0);
+}
+
+void Worker1Control(short itemNumber)
+{
+	ITEM_INFO* item;
+	CREATURE_INFO* worker;
+	AI_INFO info;
+	short angle, head, neck, tilt;
+
+	if (!CreatureActive(itemNumber))
+		return;
+
+	item = &Items[itemNumber];
+	worker = GetCreatureInfo(item);
+	head = neck = angle = tilt = 0;
+
+	if (item->hitPoints <= 0)
+	{
+		if (item->currentAnimState != WORK1_DEATH)
+			SetAnimation(item, WORK1_DIE_ANIM, WORK1_DEATH);
+	}
+	else
+	{
+		CreatureAIInfo(item, &info);
+		CreatureMood(item, &info, FALSE);
+		angle = CreatureTurn(item, worker->maximumTurn);
+
+		switch (item->currentAnimState)
+		{
+		case WORK1_STOP:
+			if (info.ahead)
+				neck = info.angle;
+
+			worker->flags = 0;
+			worker->maximumTurn = 0;
+
+			if (worker->mood == MOOD_ESCAPE)
+				item->goalAnimState = WORK1_RUN;
+			else if (Targetable(item, &info))
+			{
+				if (info.distance < WORK1_SHOOT1_RANGE || info.zoneNumber != info.enemyZone)
+				{
+					if (GetRandomControl() < 0x4000)
+						item->goalAnimState = WORK1_AIM;
+					else
+						item->goalAnimState = WORK1_AIM2;
+				}
+				else
+					item->goalAnimState = WORK1_WALK;
+			}
+			else if (worker->mood == MOOD_BORED && info.ahead)
+				item->goalAnimState = WORK1_WAIT;
+			else if (info.distance > WORK1_RUN_RANGE)
+				item->goalAnimState = WORK1_RUN;
+			else
+				item->goalAnimState = WORK1_WALK;
+			break;
+
+		case WORK1_WAIT:
+			if (info.ahead)
+				neck = info.angle;
+
+			if (Targetable(item, &info))
+				item->goalAnimState = WORK1_SHOOT1;
+			else if (worker->mood != MOOD_BORED || !info.ahead)
+				item->goalAnimState = WORK1_STOP;
+			break;
+
+		case WORK1_WALK:
+			if (info.ahead)
+				neck = info.angle;
+
+			worker->flags = 0;
+			worker->maximumTurn = WORK1_WALK_TURN;
+
+			if (worker->mood == MOOD_ESCAPE)
+				item->goalAnimState = WORK1_RUN;
+			else if (Targetable(item, &info))
+			{
+				if (info.distance < WORK1_SHOOT1_RANGE || info.zoneNumber != info.enemyZone)
+					item->goalAnimState = WORK1_STOP;
+				else
+					item->goalAnimState = WORK1_SHOOT2;
+			}
+			else if (worker->mood == MOOD_BORED && info.ahead)
+				item->goalAnimState = WORK1_STOP;
+			else if (info.distance > WORK1_RUN_RANGE)
+				item->goalAnimState = WORK1_RUN;
+			break;
+
+		case WORK1_RUN:
+			if (info.ahead)
+				neck = info.angle;
+
+			worker->maximumTurn = WORK1_RUN_TURN;
+			tilt = angle / 2;
+
+			if (worker->mood == MOOD_ESCAPE)
+				break;
+			else if (Targetable(item, &info))
+				item->goalAnimState = WORK1_WALK;
+			else if (worker->mood == MOOD_BORED || worker->mood == MOOD_STALK)
+				item->goalAnimState = WORK1_WALK;
+			break;
+
+		case WORK1_AIM2:
+			worker->flags = 0;
+			if (info.ahead)
+				head = info.angle;
+			if (Targetable(item, &info))
+				item->goalAnimState = WORK1_SHOOT3;
+			break;
+
+		case WORK1_AIM:
+			worker->flags = 0;
+			if (info.ahead)
+				head = info.angle;
+			break;
+
+		case WORK1_SHOOT1:
+		case WORK1_SHOOT3:
+			if (info.ahead)
+				head = info.angle;
+
+			if (!worker->flags)
+			{
+				ShotTargetNew(item, &info, &Work1GunBite, head, WORK1_SHOT_DAMAGE, WORK1_SHOT_DAMAGE_TO_OTHER);
+				worker->flags = 1;
+			}
+
+			if (item->goalAnimState != WORK1_STOP)
+			{
+				if (worker->mood == MOOD_ESCAPE || info.distance > WORK1_SHOOT1_RANGE || !Targetable(item, &info))
+					item->goalAnimState = WORK1_STOP;
+			}
+			break;
+
+		case WORK1_SHOOT2:
+			if (info.ahead)
+				head = info.angle;
+
+			if (!worker->flags)
+			{
+				ShotTargetNew(item, &info, &Work1GunBite, head, WORK1_SHOT_DAMAGE, WORK1_SHOT_DAMAGE_TO_OTHER);
+				worker->flags = 1;
+			}
+			break;
+		}
+	}
+
+	CreatureTilt(item, tilt);
+	CreatureHead(item, head);
+	CreatureNeck(item, neck);
+	CreatureAnimation(itemNumber, angle, 0);
+}
+
+void Worker2Control(short itemNumber)
+{
+	ITEM_INFO* item;
+	CREATURE_INFO* worker;
+	AI_INFO info;
+	short angle, head, neck, tilt;
+
+	if (!CreatureActive(itemNumber))
+		return;
+
+	item = &Items[itemNumber];
+	worker = GetCreatureInfo(item);
+	head = neck = angle = tilt = 0;
+
+	if (item->hitPoints <= 0)
+	{
+		if (item->currentAnimState != WORK2_DEATH)
+			SetAnimation(item, WORK2_DIE_ANIM, WORK2_DEATH);
+	}
+	else
+	{
+		CreatureAIInfo(item, &info);
+		CreatureMood(item, &info, FALSE);
+		angle = CreatureTurn(item, worker->maximumTurn);
+
+		switch (item->currentAnimState)
+		{
+		case WORK2_STOP:
+			if (info.ahead)
+				neck = info.angle;
+
+			worker->flags = 0;
+			worker->maximumTurn = 0;
+
+			if (worker->mood == MOOD_ESCAPE)
+				item->goalAnimState = WORK2_RUN;
+			else if (Targetable(item, &info))
+			{
+				if (info.distance < WORK2_SHOOT1_RANGE || info.zoneNumber != info.enemyZone)
+				{
+					if (item->objectID == ID_WORKER4 || GetRandomControl() < 0x4000)
+						item->goalAnimState = WORK2_AIM1;
+					else
+						item->goalAnimState = WORK2_AIM3;
+				}
+				else
+					item->goalAnimState = WORK2_WALK;
+			}
+			else if (worker->mood == MOOD_BORED && info.ahead)
+				item->goalAnimState = WORK2_WAIT;
+			else if (info.distance > WORK2_RUN_RANGE)
+				item->goalAnimState = WORK2_RUN;
+			else
+				item->goalAnimState = WORK2_WALK;
+			break;
+
+		case WORK2_WAIT:
+			if (info.ahead)
+				neck = info.angle;
+
+			if (Targetable(item, &info))
+				item->goalAnimState = WORK2_SHOOT1;
+			else if (worker->mood != MOOD_BORED || !info.ahead)
+				item->goalAnimState = WORK2_STOP;
+			break;
+
+		case WORK2_WALK:
+			if (info.ahead)
+				neck = info.angle;
+
+			worker->flags = 0;
+			worker->maximumTurn = WORK2_WALK_TURN;
+
+			if (worker->mood == MOOD_ESCAPE)
+				item->goalAnimState = WORK2_RUN;
+			else if (Targetable(item, &info))
+			{
+				if (info.distance < WORK2_SHOOT1_RANGE || info.zoneNumber != info.enemyZone)
+					item->goalAnimState = WORK2_STOP;
+				else
+					item->goalAnimState = WORK2_AIM2;
+			}
+			else if (worker->mood == MOOD_BORED && info.ahead)
+				item->goalAnimState = WORK2_STOP;
+			else if (info.distance > WORK2_RUN_RANGE)
+				item->goalAnimState = WORK2_RUN;
+			break;
+
+		case WORK2_RUN:
+			if (info.ahead)
+				neck = info.angle;
+
+			worker->maximumTurn = WORK2_RUN_TURN;
+			tilt = angle / 2;
+
+			if (worker->mood == MOOD_ESCAPE)
+				break;
+			else if (Targetable(item, &info))
+				item->goalAnimState = WORK2_WALK;
+			else if (worker->mood == MOOD_BORED || worker->mood == MOOD_STALK)
+				item->goalAnimState = WORK2_WALK;
+			break;
+
+		case WORK2_AIM1:
+		case WORK2_AIM3:
+			worker->flags = 0;
+
+			if (info.ahead)
+			{
+				head = info.angle;
+
+				if (Targetable(item, &info))
+					item->goalAnimState = (item->currentAnimState == WORK2_AIM1) ? WORK2_SHOOT1 : WORK2_SHOOT3;
+				else
+					item->goalAnimState = WORK2_STOP;
+			}
+			break;
+
+		case WORK2_AIM2:
+			worker->flags = 0;
+
+			if (info.ahead)
+			{
+				head = info.angle;
+
+				if (Targetable(item, &info))
+					item->goalAnimState = WORK2_SHOOT2;
+				else
+					item->goalAnimState = WORK2_WALK;
+			}
+			break;
+
+
+		case WORK2_SHOOT3:
+			if (item->goalAnimState != WORK2_STOP)
+			{
+				if (worker->mood == MOOD_ESCAPE || info.distance > WORK2_SHOOT1_RANGE || !Targetable(item, &info))
+					item->goalAnimState = WORK2_STOP;
+			} // Wanted fallthrough.
+		case WORK2_SHOOT2:
+		case WORK2_SHOOT1:
+			if (info.ahead)
+				head = info.angle;
+
+			if (item->objectID == ID_WORKER2)
+			{
+				if (!worker->flags)
+				{
+					ShotTargetNew(item, &info, &Work2GunBite, head, WORK2_SHOT_DAMAGE, WORK2_SHOT_DAMAGE_TO_OTHER);
+					worker->flags = 5;
+				}
+				else
+					worker->flags--;
+			}
+			else
+			{
+				// WORKER4: guy with flamethrower
+				CreatureEffect(item, &Work2GunBite, DragonFire);
+			}
+			break;
+		}
+	}
+
+	CreatureTilt(item, tilt);
+	CreatureHead(item, head);
+	CreatureNeck(item, neck);
+	CreatureAnimation(itemNumber, angle, 0);
 }
 
 void BanditControl(short itemNumber)
@@ -698,6 +1272,8 @@ void WinstonControl(short itemNumber) {
 	CreatureAnimation(itemNumber, angle, 0);
 }
 
+#pragma warning(pop)
+
 /*
  * Inject function
  */
@@ -709,12 +1285,12 @@ void Inject_People() {
 	INJECT(0x00436040, GunHit);
 	INJECT(0x00436100, GunMiss);
 	INJECT(0x004361B0, ShotTarget);
-	//INJECT(0x00436380, InitialiseCult1);
-	//INJECT(0x004363D0, Cult1Control);
+	INJECT(0x00436380, InitialiseCult1);
+	INJECT(0x004363D0, Cult1Control);
 	//INJECT(0x00436800, InitialiseCult3);
 	//INJECT(0x00436850, Cult3Control);
-	//INJECT(0x00436DC0, Worker1Control);
-	//INJECT(0x004371C0, Worker2Control);
+	INJECT(0x00436DC0, Worker1Control);
+	INJECT(0x004371C0, Worker2Control);
 	INJECT(0x00437620, BanditControl);
 	INJECT(0x00437960, Bandit2Control);
 	INJECT(0x00437DA0, WinstonControl);

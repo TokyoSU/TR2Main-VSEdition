@@ -195,11 +195,11 @@ int GetCinematicRoom(int x, int y, int z) {
 	for (i = 0; i < RoomCount; ++i) {
 		room = &Rooms[i];
 		if (x >= room->x + 1024 &&
-			x < room->x + (room->ySize << WALL_SHIFT) - 1024 &&
+			x < room->x + (room->xSize << WALL_SHIFT) - 1024 &&
 			y >= room->maxCeiling &&
 			y <= room->minFloor &&
 			z >= room->z + 1024 &&
-			z < room->z + (room->xSize << WALL_SHIFT) - 1024)
+			z < room->z + (room->zSize << WALL_SHIFT) - 1024)
 		{
 			roomID = i;
 			break;

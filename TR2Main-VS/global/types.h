@@ -474,7 +474,7 @@ typedef enum {
 	ID_BRIDGE_FLAT,
 	ID_BRIDGE_TILT1,
 	ID_BRIDGE_TILT2,
-	ID_PASSPORT_OPTION, // SECRET_1
+	ID_PASSPORT_OPTION, // SECRET_3
 	ID_COMPASS_OPTION,  // SECRET_2
 	ID_PHOTO_OPTION,
 	ID_PLAYER1,
@@ -487,7 +487,7 @@ typedef enum {
 	ID_PLAYER8,
 	ID_PLAYER9,
 	ID_PLAYER10,
-	ID_PASSPORT_CLOSED, // SECRET_3
+	ID_PASSPORT_CLOSED, // SECRET_1
 	ID_COMPASS_ITEM,
 	ID_PISTOL_ITEM,
 	ID_SHOTGUN_ITEM,
@@ -544,9 +544,9 @@ typedef enum {
 	ID_PUZZLE_DONE2,
 	ID_PUZZLE_DONE3,
 	ID_PUZZLE_DONE4,
-	ID_SECRET1,
-	ID_SECRET2,
-	ID_SECRET3,
+	ID_SECRET_SPRITE,
+	ID_SECRETS,
+	ID_UNUSED1,
 	ID_KEY_ITEM1,
 	ID_KEY_ITEM2,
 	ID_KEY_ITEM3,
@@ -568,12 +568,12 @@ typedef enum {
 	ID_SPHERE_OF_DOOM3,
 	ID_ALARM_SOUND,
 	ID_BIRD_TWEETER1,
-	ID_DINO,
+	ID_TREX,
 	ID_BIRD_TWEETER2,
 	ID_CLOCK_CHIMES,
 	ID_CANDLE_FLAME_EMITTER,
+	ID_DRAGON_BONES1,
 	ID_DRAGON_BONES2,
-	ID_DRAGON_BONES3,
 	ID_HOT_LIQUID,
 	ID_BOAT_BITS,
 	ID_MINE,
@@ -586,7 +586,7 @@ typedef enum {
 	ID_EXPLOSION,
 	ID_SPLASH,
 	ID_BUBBLES,
-	ID_BUBBLE_EMITTER,
+	ID_UNUSED2,
 	ID_BLOOD,
 	ID_DART_EFFECT,
 	ID_FLARE_FIRE,
@@ -1251,6 +1251,7 @@ typedef enum {
 #endif
 	CHAR_SECRET2,
 	CHAR_SECRET3,
+	CHAR_SECRET4,
 } CHAR_SECRETS;
 
 typedef enum {
@@ -1875,7 +1876,7 @@ typedef struct ItemInfo_t {
 	short timer;
 	UINT16 flags; // see IFL_* defines
 	short shade1;
-	short shade2;
+	short ocb;
 	short carriedItem;
 	LPVOID data;
 	PHD_3DPOS pos;
@@ -2093,8 +2094,8 @@ typedef struct RoomInfo_t {
 	int z;
 	int minFloor;
 	int maxCeiling;
+	short zSize;
 	short xSize;
-	short ySize;
 	short ambient;
 	short ambient2;
 	LIGHT_TYPE lightMode;
@@ -2695,16 +2696,16 @@ static inline PHD_VECTOR GetOrientAxisDirectionInverted(short rotY, int radius =
 }
 
 static inline FLOOR_INFO* GetFloorSector(int x, int z, ROOM_INFO* room) {
-	return &room->floor[((z - room->z) >> WALL_SHIFT) + ((x - room->x) >> WALL_SHIFT) * room->xSize];
+	return &room->floor[((z - room->z) >> WALL_SHIFT) + ((x - room->x) >> WALL_SHIFT) * room->zSize];
 }
 static inline FLOOR_INFO* GetFloorSector(ITEM_INFO* item, ROOM_INFO* room) {
-	return &room->floor[((item->pos.z - room->z) >> WALL_SHIFT) + ((item->pos.x - room->x) >> WALL_SHIFT) * room->xSize];
+	return &room->floor[((item->pos.z - room->z) >> WALL_SHIFT) + ((item->pos.x - room->x) >> WALL_SHIFT) * room->zSize];
 }
 static inline FLOOR_INFO* GetFloorSector(int x, int z, ROOM_INFO* room, int dx, int dz) {
-	return &room->floor[(((z - room->z) >> WALL_SHIFT) + dz) + (((x - room->x) >> WALL_SHIFT) + dx) * room->xSize];
+	return &room->floor[(((z - room->z) >> WALL_SHIFT) + dz) + (((x - room->x) >> WALL_SHIFT) + dx) * room->zSize];
 }
 static inline FLOOR_INFO* GetFloorSector(ITEM_INFO* item, ROOM_INFO* room, int dx, int dz) {
-	return &room->floor[(((item->pos.z - room->z) >> WALL_SHIFT) + dz) + (((item->pos.x - room->x) >> WALL_SHIFT) + dx) * room->xSize];
+	return &room->floor[(((item->pos.z - room->z) >> WALL_SHIFT) + dz) + (((item->pos.x - room->x) >> WALL_SHIFT) + dx) * room->zSize];
 }
 
 static inline short GetSectorBoxXZ(ITEM_INFO* item, ROOM_INFO* room) {

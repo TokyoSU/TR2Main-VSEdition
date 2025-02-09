@@ -24,6 +24,22 @@
 
 #include "global/types.h"
 
+enum BaddieTargetType
+{
+	BTT_ToBandit = 0x1,
+	BTT_ToMonk = 0x2,
+	BTT_ToCult = 0x4,
+	BTT_ToTrex = 0x8,
+	BTT_ToWorker = 0x10
+};
+
+enum class DamageTargetFlags
+{
+	None = 0,
+	DisableBlood = 1,
+	DoLotsOfBloods = 2
+};
+
 typedef short(CREATURE_EFFECT_CALLBACK)(int x, int y, int z, short speed, short rotY, short roomNumber);
 
  /*
@@ -53,14 +69,13 @@ short CreatureTurn(ITEM_INFO* item, short maximumTurn); // 0x0040FDD0
 #define CreatureEffect ((short(__cdecl*)(ITEM_INFO*, const BITE_INFO*, CREATURE_EFFECT_CALLBACK)) 0x00410090)
 int CreatureVault(short itemNumber, short angle, int vault, int shift); // 0x004100F0
 void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillState); // 0x00410230
-void GetBaddieTarget(short creatureIdx, BOOL isMonk); // 0x004103A0
+void GetBaddieTarget(short creatureIdx, BaddieTargetType type); // 0x004103A0
 
-// Not from TR2:
-
+/// Not from TR2:
 void CreatureDropItem(ITEM_INFO* item);
 bool IsCreatureNearTarget(ITEM_INFO* item, ITEM_INFO* enemy, int distance = CLICK(2));
-bool DamageTarget(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damage, bool isLotofBlood = false); // NOTE: Only for hand to hand. (Not exist in the original game)
-bool DamageLaraOrEnemy(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damageLara, int damageEnemy, bool touchBitsLara, bool isLotofBlood = false); // NOTE: Only for hand to hand. (Not exist in the original game)
+bool DamageTarget(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damage, DamageTargetFlags flags = DamageTargetFlags::None); // NOTE: Only for hand to hand. (Not exist in the original game)
+bool DamageLaraOrEnemy(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damageLara, int damageEnemy, bool touchBitsLara, int distance = CLICK(2), DamageTargetFlags flags = DamageTargetFlags::None); // NOTE: Only for hand to hand. (Not exist in the original game)
 void SetAnimation(ITEM_INFO* item, int animID, int stateID, int frameID = 0); // NOTE: Force animation. (Not exist in the original game)
 void SetAnimationWithObject(ITEM_INFO* item, GAME_OBJECT_ID fromObjectIndex, int animID, int stateID, int frameID = 0); // NOTE: Force animation using another object animation. (Not exist in the original game)
 

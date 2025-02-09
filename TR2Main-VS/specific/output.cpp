@@ -714,8 +714,8 @@ void S_LightRoom(ROOM_INFO* room) {
 
 	int xMin = 0x400;
 	int zMin = 0x400;
-	int xMax = 0x400 * (room->ySize - 1);
-	int zMax = 0x400 * (room->xSize - 1);
+	int xMax = 0x400 * (room->xSize - 1);
+	int zMax = 0x400 * (room->zSize - 1);
 
 	for (DWORD i = 0; i < DynamicLightCount; ++i) {
 		xPos = DynamicLights[i].x - room->x;

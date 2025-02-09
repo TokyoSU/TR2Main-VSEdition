@@ -34,7 +34,7 @@ void RingNotActive(INVENTORY_ITEM* item); // 0x00423E20
 void RingActive(); // 0x00424290
 void RingExamineSelected(INVENTORY_ITEM* item);
 void RingExamineNotSelected();
-BOOL Inv_AddItem(GAME_OBJECT_ID itemNumber); // 0x004242D0
+BOOL Inv_AddItem(GAME_OBJECT_ID objNumber, int secretType = -1); // 0x004242D0
 void Inv_InsertItem(INVENTORY_ITEM* item); // 0x00424AE0
 int Inv_RequestItem(GAME_OBJECT_ID itemNumber); // 0x00424C10
 void Inv_RemoveAllItems(); // 0x00424C90

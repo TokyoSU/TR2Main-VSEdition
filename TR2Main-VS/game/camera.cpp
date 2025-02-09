@@ -221,13 +221,13 @@ void SmartShift(GAME_VECTOR* goal, CB_SMARTCAM shift) {
 
 	LOS(&Camera.target, goal);
 	room = &Rooms[Camera.target.roomNumber];
-	box = &Boxes[room->floor[((Camera.target.x - room->x) >> WALL_SHIFT) * room->xSize + ((Camera.target.z - room->z) >> WALL_SHIFT)].box];
+	box = &Boxes[room->floor[((Camera.target.x - room->x) >> WALL_SHIFT) * room->zSize + ((Camera.target.z - room->z) >> WALL_SHIFT)].box];
 	left = box->zMin << WALL_SHIFT;
 	right = (box->zMax << WALL_SHIFT) - 1;
 	top = box->xMin << WALL_SHIFT;
 	bottom = (box->xMax << WALL_SHIFT) - 1;
 	room = &Rooms[goal->roomNumber];
-	boxID = room->floor[((goal->x - room->x) >> WALL_SHIFT) * room->xSize + ((goal->z - room->z) >> WALL_SHIFT)].box;
+	boxID = room->floor[((goal->x - room->x) >> WALL_SHIFT) * room->zSize + ((goal->z - room->z) >> WALL_SHIFT)].box;
 	if (boxID != -1 && (goal->z < left || goal->z > right || goal->x < top || goal->x > bottom)) {
 		box = &Boxes[boxID];
 		left = box->zMin << WALL_SHIFT;

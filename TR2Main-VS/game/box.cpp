@@ -65,9 +65,13 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 
 #if defined(FEATURE_MOD_CONFIG)
 	if ((item->objectID == ID_BANDIT1 || item->objectID == ID_BANDIT2 || item->objectID == ID_BANDIT2B) && !Mod.makeMercenaryAttackLaraFirst)
-		GetBaddieTarget(creature->itemNumber, FALSE);
+		GetBaddieTarget(creature->itemNumber, BTT_ToMonk);
 	else if ((item->objectID == ID_MONK1 || item->objectID == ID_MONK2) && !Mod.makeMonkAttackLaraFirst)
-		GetBaddieTarget(creature->itemNumber, TRUE);
+		GetBaddieTarget(creature->itemNumber, BTT_ToBandit);
+	else if (item->objectID == ID_WORKER1 || item->objectID == ID_WORKER2 || item->objectID == ID_WORKER3 || item->objectID == ID_WORKER4 || item->objectID == ID_WORKER5)
+		GetBaddieTarget(creature->itemNumber, BTT_ToTrex);
+	else if (item->objectID == ID_TREX)
+		GetBaddieTarget(creature->itemNumber, BTT_ToWorker);
 #else
 	if (item->objectID == ID_BANDIT1 || item->objectID == ID_BANDIT2 || item->objectID == ID_BANDIT2B)
 		GetBaddieTarget(creature->item_num, FALSE);
@@ -757,13 +761,14 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillStat
 	Camera.pos.roomNumber = LaraItem->roomNumber;
 }
 
-void GetBaddieTarget(short creatureIdx, BOOL isMonk)
+void GetBaddieTarget(short creatureItemNumber, BaddieTargetType flags)
 {
 	ITEM_INFO* item = NULL, *targetItem = NULL, *bestTarget = NULL;
 	CREATURE_INFO* creature = NULL, *baddy = NULL;
 	int bestdistance = 0, x = 0, y = 0, z = 0, distance = 0;
+	bool isNotMonkTarget = !CHK_ANY(flags, BTT_ToMonk);
 
-	item = &Items[creatureIdx];
+	item = &Items[creatureItemNumber];
 	creature = GetCreatureInfo(item);
 	if (creature == NULL) 
 		return;
@@ -772,16 +777,39 @@ void GetBaddieTarget(short creatureIdx, BOOL isMonk)
 	for (int i = 0; i < MAX_CREATURES; i++)
 	{
 		baddy = &BaddiesSlots[i];
-		if (baddy->itemNumber == -1 || creatureIdx == baddy->itemNumber)
+		if (baddy->itemNumber == -1 || creatureItemNumber == baddy->itemNumber)
 			continue;
+
 		targetItem = &Items[baddy->itemNumber];
-		if (isMonk)
+		if (targetItem->status != ITEM_ACTIVE)
+			continue;
+
+		if (CHK_ANY(flags, BTT_ToBandit))
 		{
 			if (targetItem->objectID != ID_BANDIT1 && targetItem->objectID != ID_BANDIT2 && targetItem->objectID != ID_BANDIT2B)
 				continue;
 		}
-		else if (targetItem->objectID != ID_MONK1 && targetItem->objectID != ID_MONK2)
-			continue;
+		else if (CHK_ANY(flags, BTT_ToMonk))
+		{
+			if (targetItem->objectID != ID_MONK1 && targetItem->objectID != ID_MONK2)
+				continue;
+		}
+		else if (CHK_ANY(flags, BTT_ToCult))
+		{
+			if (targetItem->objectID != ID_CULT1 && targetItem->objectID != ID_CULT1A && targetItem->objectID != ID_CULT1B && targetItem->objectID != ID_CULT2 && targetItem->objectID != ID_CULT3)
+				continue;
+		}
+		else if (CHK_ANY(flags, BTT_ToTrex))
+		{
+			if (targetItem->objectID != ID_TREX)
+				continue;
+		}
+		else if (CHK_ANY(flags, BTT_ToWorker))
+		{
+			if (targetItem->objectID != ID_WORKER1 && targetItem->objectID != ID_WORKER2 && targetItem->objectID != ID_WORKER3 && targetItem->objectID != ID_WORKER4 && targetItem->objectID != ID_WORKER5)
+				continue;
+		}
+
 		x = (targetItem->pos.x - item->pos.x) >> 6;
 		y = (targetItem->pos.y - item->pos.y) >> 6;
 		z = (targetItem->pos.z - item->pos.z) >> 6;
@@ -795,7 +823,7 @@ void GetBaddieTarget(short creatureIdx, BOOL isMonk)
 
 	if (bestTarget != NULL)
 	{
-		if (!isMonk || IsMonkAngry)
+		if (isNotMonkTarget || IsMonkAngry)
 		{
 			x = (LaraItem->pos.x - item->pos.x) >> 6;
 			y = (LaraItem->pos.y - item->pos.y) >> 6;
@@ -822,7 +850,7 @@ void GetBaddieTarget(short creatureIdx, BOOL isMonk)
 			creature->enemy = bestTarget;
 		}
 	}
-	else if (!isMonk || IsMonkAngry)
+	else if (isNotMonkTarget || IsMonkAngry)
 	{
 		creature->enemy = LaraItem;
 	}
@@ -851,33 +879,33 @@ bool IsCreatureNearTarget(ITEM_INFO* item, ITEM_INFO* enemy, int distance)
 		   ABS(item->pos.z - enemy->pos.z) < distance;
 }
 
-bool DamageTarget(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damage, bool isLotofBlood)
+bool DamageTarget(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damage, DamageTargetFlags flags)
 {
 	if (enemy != NULL)
 	{
 		enemy->hitPoints -= damage;
 		enemy->hitStatus = TRUE;
-		if (isLotofBlood)
+		if (flags == DamageTargetFlags::DoLotsOfBloods)
 			DoLotsOfBlood(enemy->pos.x, enemy->pos.y, enemy->pos.z, 2, enemy->pos.rotY, enemy->roomNumber, 1);
-		else
+		else if (flags != DamageTargetFlags::DisableBlood)
 			CreatureEffect(item, bite, DoBloodSplat);
 		return true;
 	}
 	return false;
 }
 
-bool DamageLaraOrEnemy(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damageLara, int damageEnemy, bool touchBitsLara, bool isLotofBlood)
+bool DamageLaraOrEnemy(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damageLara, int damageEnemy, bool touchBitsLara, int distance, DamageTargetFlags flags)
 {
 	if (enemy != NULL)
 	{
 		if (enemy->objectID == ID_LARA && touchBitsLara)
 		{
-			DamageTarget(item, enemy, bite, damageLara, isLotofBlood);
+			DamageTarget(item, enemy, bite, damageLara, flags);
 			return true;
 		}
-		else if (IsCreatureNearTarget(item, enemy))
+		else if (IsCreatureNearTarget(item, enemy, distance))
 		{
-			DamageTarget(item, enemy, bite, damageEnemy, isLotofBlood);
+			DamageTarget(item, enemy, bite, damageEnemy, flags);
 			return true;
 		}
 	}

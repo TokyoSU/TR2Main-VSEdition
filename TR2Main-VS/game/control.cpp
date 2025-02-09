@@ -388,23 +388,23 @@ FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber)
 			x_floor = 0;
 			if (y_floor < 1)
 				y_floor = 1;
-			else if (y_floor > r->ySize - 2)
-				y_floor = r->ySize - 2;
+			else if (y_floor > r->xSize - 2)
+				y_floor = r->xSize - 2;
 		}
-		else if (x_floor >= r->xSize - 1)
+		else if (x_floor >= r->zSize - 1)
 		{
-			x_floor = r->xSize - 1;
+			x_floor = r->zSize - 1;
 			if (y_floor < 1)
 				y_floor = 1;
-			else if (y_floor > r->ySize - 2)
-				y_floor = r->ySize - 2;
+			else if (y_floor > r->xSize - 2)
+				y_floor = r->xSize - 2;
 		}
 		else if (y_floor < 0)
 			y_floor = 0;
-		else if (y_floor >= r->ySize)
-			y_floor = r->ySize - 1;
+		else if (y_floor >= r->xSize)
+			y_floor = r->xSize - 1;
 
-		floor = &r->floor[x_floor + y_floor * r->xSize];
+		floor = &r->floor[x_floor + y_floor * r->zSize];
 		data = GetDoor(floor);
 		if (data != NO_ROOM)
 		{
@@ -456,23 +456,23 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			x_floor = 0;
 			if (y_floor < 1)
 				y_floor = 1;
-			else if (y_floor > r->ySize - 2)
-				y_floor = r->ySize - 2;
+			else if (y_floor > r->xSize - 2)
+				y_floor = r->xSize - 2;
 		}
-		else if (x_floor >= r->xSize - 1)
+		else if (x_floor >= r->zSize - 1)
 		{
-			x_floor = r->xSize - 1;
+			x_floor = r->zSize - 1;
 			if (y_floor < 1)
 				y_floor = 1;
-			else if (y_floor > r->ySize - 2)
-				y_floor = r->ySize - 2;
+			else if (y_floor > r->xSize - 2)
+				y_floor = r->xSize - 2;
 		}
 		else if (y_floor < 0)
 			y_floor = 0;
-		else if (y_floor >= r->ySize)
-			y_floor = r->ySize - 1;
+		else if (y_floor >= r->xSize)
+			y_floor = r->xSize - 1;
 
-		floor = &r->floor[x_floor + y_floor * r->xSize];
+		floor = &r->floor[x_floor + y_floor * r->zSize];
 		data = GetDoor(floor);
 		if (data != NO_ROOM)
 		{

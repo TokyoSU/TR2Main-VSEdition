@@ -358,9 +358,9 @@ void ClipRoom(ROOM_INFO* room) {
 	yv[0] = yv[1] = yv[2] = yv[3] = room->maxCeiling - room->y;
 	zv[0] = zv[1] = zv[4] = zv[5] = 0x400;
 
-	xv[1] = xv[2] = xv[5] = xv[6] = (room->ySize - 1) * 0x400;
+	xv[1] = xv[2] = xv[5] = xv[6] = (room->xSize - 1) * 0x400;
 	yv[4] = yv[5] = yv[6] = yv[7] = room->minFloor - room->y;
-	zv[2] = zv[3] = zv[6] = zv[7] = (room->xSize - 1) * 0x400;
+	zv[2] = zv[3] = zv[6] = zv[7] = (room->zSize - 1) * 0x400;
 
 	for (int i = 0; i < 8; ++i) {
 		PHD_MATRIX* m = PhdMatrixPtr;
@@ -573,7 +573,7 @@ void DrawEffect(short fx_id) {
 void DrawSpriteItem(ITEM_INFO* item) {
 	OBJECT_INFO* obj = &Objects[item->objectID];
 	S_CalculateLight(item->pos.x, item->pos.y, item->pos.z, item->roomNumber);
-	S_DrawSprite(SPR_ITEM | SPR_ABS | SPR_SHADE | (obj->semi_transparent ? SPR_SEMITRANS : 0), item->pos.x, item->pos.y, item->pos.z, obj->meshIndex - item->frameNumber, LsAdder, 0);
+	S_DrawSprite(SPR_ITEM | SPR_ABS | SPR_SHADE | (obj->semi_transparent ? SPR_SEMITRANS : 0), item->pos.x, item->pos.y, item->pos.z, item->objectID == ID_SECRETS ? Objects[ID_SECRET_SPRITE].meshIndex + item->ocb : obj->meshIndex - item->frameNumber, LsAdder, 0);
 }
 
 void DrawDummyItem(ITEM_INFO* item) {
@@ -1558,7 +1558,7 @@ void CalculateObjectLighting(ITEM_INFO* item, short* frame) {
 		S_CalculateLight(x, y, z, item->roomNumber);
 	}
 	else {
-		S_CalculateStaticMeshLight(item->pos.x, item->pos.y, item->pos.z, item->shade1, item->shade2, &Rooms[item->roomNumber]);
+		S_CalculateStaticMeshLight(item->pos.x, item->pos.y, item->pos.z, item->shade1, item->shade1, &Rooms[item->roomNumber]); // TODO: Check for Shade1 working !!!
 	}
 }
 

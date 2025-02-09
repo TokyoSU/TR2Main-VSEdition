@@ -33,7 +33,7 @@
 extern DWORD InvTextBoxMode;
 #endif // FEATURE_HUD_IMPROVED
 
-#define IS_CHAR_SECRET(x)		((x) >= CHAR_SECRET1 && (x) <= CHAR_SECRET3)
+#define IS_CHAR_SECRET(x)		((x) >= CHAR_SECRET1 && (x) <= CHAR_SECRET4)
 #define IS_CHAR_LEGAL(x)		((x) <= 0x12 || ((x) >= 0x20 && (x) <= 0x7F) || IS_CHAR_SECRET(x))
 #define IS_CHAR_DIACRITIC(x)	((x) == '(' || (x) == ')' || (x) == '$' || (x) == '~')
 
@@ -483,9 +483,9 @@ void T_DrawThisText(TEXT_STR_INFO* textInfo) {
 #ifdef FEATURE_HUD_IMPROVED
 			sx = GetTextScaleH(x + 10);
 			sy = GetTextScaleV(y);
-			S_DrawPickup(sx, sy, 0x1BE8, Objects[ID_SECRET1 + (*str - CHAR_SECRET1)].meshIndex, 0x1000);
+			S_DrawPickup(sx, sy, 0x1BE8, Objects[ID_SECRET_SPRITE].meshIndex + (*str - CHAR_SECRET1), 0x1000);
 #else // FEATURE_HUD_IMPROVED
-			S_DrawPickup(x + 10, y, 0x1BE8, Objects[ID_SECRET1 + (*str - CHAR_SECRET1)].meshIndex, 0x1000);
+			S_DrawPickup(x + 10, y, 0x1BE8, Objects[ID_SECRET_SPRITE].meshIndex + (*str - CHAR_SECRET1), 0x1000);
 #endif // FEATURE_HUD_IMPROVED
 			// "Secret" sprites have spacing=16
 			x += 16 * scaleH / PHD_ONE;

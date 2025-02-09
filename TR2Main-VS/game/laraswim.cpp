@@ -173,23 +173,23 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 			x_floor = 0;
 			if (y_floor < 1)
 				y_floor = 1;
-			else if (y_floor > r->ySize - 2)
-				y_floor = r->ySize - 2;
+			else if (y_floor > r->xSize - 2)
+				y_floor = r->xSize - 2;
 		}
-		else if (x_floor >= r->xSize - 1)
+		else if (x_floor >= r->zSize - 1)
 		{
-			x_floor = r->xSize - 1;
+			x_floor = r->zSize - 1;
 			if (y_floor < 1)
 				y_floor = 1;
-			else if (y_floor > r->ySize - 2)
-				y_floor = r->ySize - 2;
+			else if (y_floor > r->xSize - 2)
+				y_floor = r->xSize - 2;
 		}
 		else if (y_floor < 0)
 			y_floor = 0;
-		else if (y_floor >= r->ySize)
-			y_floor = r->ySize - 1;
+		else if (y_floor >= r->xSize)
+			y_floor = r->xSize - 1;
 
-		floor = &r->floor[x_floor + y_floor * r->xSize];
+		floor = &r->floor[x_floor + y_floor * r->zSize];
 		data = GetDoor(floor);
 		if (data != NO_ROOM)
 		{
@@ -233,7 +233,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 void LaraWaterCurrent(COLL_INFO* coll)
 {
 	auto* room = &Rooms[LaraItem->roomNumber];
-	LaraItem->boxNumber = room->floor[((LaraItem->pos.z - room->z) >> WALL_SHIFT) + ((LaraItem->pos.x - room->x) >> WALL_SHIFT) * room->xSize].box;
+	LaraItem->boxNumber = room->floor[((LaraItem->pos.z - room->z) >> WALL_SHIFT) + ((LaraItem->pos.x - room->x) >> WALL_SHIFT) * room->zSize].box;
 
 	// Exit if creature is not set !
 	if (Lara.creature == NULL)

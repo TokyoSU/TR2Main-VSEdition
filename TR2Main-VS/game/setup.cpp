@@ -955,7 +955,7 @@ void BaddyObjects() {
 		obj->save_anim = 1;
 		AnimBones[obj->boneIndex + 14 * 4] |= 0x08;
 	}
-	obj = &Objects[ID_DINO];
+	obj = &Objects[ID_TREX];
 	if (obj->loaded) {
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
@@ -1461,14 +1461,11 @@ void ObjectObjects()
 		obj->save_flags = TRUE;
 	}
 
-	for (int i = ID_SECRET1; i <= ID_SECRET3; i++)
-	{
-		obj = &Objects[i];
-		obj->collision = PickUpCollision;
-		obj->drawRoutine = DrawSpriteItem;
-		obj->save_position = TRUE;
-		obj->save_flags = TRUE;
-	}
+	obj = &Objects[ID_SECRETS];
+	obj->collision = PickUpCollision;
+	obj->drawRoutine = DrawSpriteItem;
+	obj->save_position = TRUE;
+	obj->save_flags = TRUE;
 
 	for (int i = ID_KEY_ITEM1; i <= ID_KEY_ITEM4; i++)
 	{

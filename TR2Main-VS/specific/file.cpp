@@ -578,9 +578,9 @@ BOOL LoadRooms(HANDLE hFile) {
 		}
 
 		// Room floor
+		ReadFileSync(hFile, &room->zSize, sizeof(short), &bytesRead, NULL);
 		ReadFileSync(hFile, &room->xSize, sizeof(short), &bytesRead, NULL);
-		ReadFileSync(hFile, &room->ySize, sizeof(short), &bytesRead, NULL);
-		dwCount = room->xSize * room->ySize;
+		dwCount = room->zSize * room->xSize;
 		room->floor = (FLOOR_INFO*)game_malloc(sizeof(FLOOR_INFO) * dwCount, GBUF_RoomFloor);
 		ReadFileSync(hFile, room->floor, sizeof(FLOOR_INFO) * dwCount, &bytesRead, NULL);
 
@@ -608,8 +608,6 @@ BOOL LoadRooms(HANDLE hFile) {
 
 		// Flipped (alternative) room
 		ReadFileSync(hFile, &room->flippedRoom, sizeof(short), &bytesRead, NULL);
-
-		// Room flags
 		ReadFileSync(hFile, &room->flags, sizeof(short), &bytesRead, NULL);
 		ReadFileSync(hFile, &room->reverbType, sizeof(BYTE), &bytesRead, NULL);
 
@@ -809,8 +807,8 @@ BOOL LoadObjects(HANDLE hFile) {
 
 BOOL LoadSprites(HANDLE hFile) {
 	DWORD bytesRead;
-	DWORD objNumber;
-	DWORD dwCount;
+	DWORD objNumber = 0;
+	DWORD dwCount = 0;
 
 	// Load sprite infos
 	ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
@@ -835,7 +833,7 @@ BOOL LoadSprites(HANDLE hFile) {
 }
 
 BOOL LoadItems(HANDLE hFile) {
-	DWORD itemsCount, bytesRead;
+	DWORD itemsCount = 0, bytesRead;
 
 	ReadFileSync(hFile, &itemsCount, sizeof(DWORD), &bytesRead, NULL);
 	if (itemsCount == 0)
@@ -862,7 +860,7 @@ BOOL LoadItems(HANDLE hFile) {
 		ReadFileSync(hFile, &Items[i].pos.z, sizeof(int), &bytesRead, NULL);
 		ReadFileSync(hFile, &Items[i].pos.rotY, sizeof(short), &bytesRead, NULL);
 		ReadFileSync(hFile, &Items[i].shade1, sizeof(UINT16), &bytesRead, NULL);
-		ReadFileSync(hFile, &Items[i].shade2, sizeof(UINT16), &bytesRead, NULL);
+		ReadFileSync(hFile, &Items[i].ocb, sizeof(UINT16), &bytesRead, NULL);
 		ReadFileSync(hFile, &Items[i].flags, sizeof(UINT16), &bytesRead, NULL);
 
 		if (Items[i].objectID < 0 || Items[i].objectID >= ID_NUMBER_OBJECTS) {
@@ -1080,6 +1078,7 @@ BOOL LoadSamples(HANDLE hFile) {
 
 	// Load Sample Lut
 	ReadFileSync(hFile, &SampleLutCount, sizeof(DWORD), &bytesRead, NULL);
+
 	SampleLut = (short*)game_malloc(sizeof(short) * SampleLutCount, GBUF_SampleInfos);
 	ReadFileSync(hFile, SampleLut, sizeof(short) * SampleLutCount, &bytesRead, NULL);
 

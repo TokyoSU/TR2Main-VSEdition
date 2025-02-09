@@ -324,10 +324,10 @@ void RingExamineNotSelected() {
 	InvItemText[2] = NULL;
 }
 
-BOOL Inv_AddItem(GAME_OBJECT_ID itemNumber) {
-	int i, j, items;
+BOOL Inv_AddItem(GAME_OBJECT_ID objNumber, int secretType) {
+	int i, j, count;
 	int found = 0;
-	GAME_OBJECT_ID optionID = Inv_GetItemOption(itemNumber);
+	GAME_OBJECT_ID optionID = Inv_GetItemOption(objNumber);
 
 	for (i = 0; i < InvMainObjectsCount; ++i) {
 		if (InvMainList[i]->objectID == optionID) {
@@ -344,7 +344,7 @@ BOOL Inv_AddItem(GAME_OBJECT_ID itemNumber) {
 	}
 
 	if (found == 1) {
-		if (itemNumber == ID_FLARES_ITEM)
+		if (objNumber == ID_FLARES_ITEM)
 			InvMainQtys[i] += FLARE_AMMO_CLIPS;
 		else
 			InvMainQtys[i] += 1;
@@ -357,7 +357,7 @@ BOOL Inv_AddItem(GAME_OBJECT_ID itemNumber) {
 		return TRUE;
 	}
 
-	switch (itemNumber) {
+	switch (objNumber) {
 	case ID_COMPASS_ITEM:
 	case ID_COMPASS_OPTION:
 		Inv_InsertItem(&InvCompassOption);
@@ -372,8 +372,8 @@ BOOL Inv_AddItem(GAME_OBJECT_ID itemNumber) {
 
 	case ID_SHOTGUN_ITEM:
 	case ID_SHOTGUN_OPTION:
-		items = Inv_RequestItem(ID_SHOTGUN_AMMO_ITEM);
-		for (i = 0; i < items; ++i) {
+		count = Inv_RequestItem(ID_SHOTGUN_AMMO_ITEM);
+		for (i = 0; i < count; ++i) {
 			Inv_RemoveItem(ID_SHOTGUN_AMMO_ITEM);
 			Lara.shotgun_ammo += SHOTGUN_AMMO_CLIPS;
 		}
@@ -388,8 +388,8 @@ BOOL Inv_AddItem(GAME_OBJECT_ID itemNumber) {
 
 	case ID_MAGNUM_ITEM:
 	case ID_MAGNUM_OPTION:
-		items = Inv_RequestItem(ID_MAGNUM_AMMO_ITEM);
-		for (i = 0; i < items; ++i) {
+		count = Inv_RequestItem(ID_MAGNUM_AMMO_ITEM);
+		for (i = 0; i < count; ++i) {
 			Inv_RemoveItem(ID_MAGNUM_AMMO_ITEM);
 			Lara.magnum_ammo += AUTOPISTOLS_AMMO_CLIPS;
 		}
@@ -400,8 +400,8 @@ BOOL Inv_AddItem(GAME_OBJECT_ID itemNumber) {
 
 	case ID_UZI_ITEM:
 	case ID_UZI_OPTION:
-		items = Inv_RequestItem(ID_UZI_AMMO_ITEM);
-		for (i = 0; i < items; ++i) {
+		count = Inv_RequestItem(ID_UZI_AMMO_ITEM);
+		for (i = 0; i < count; ++i) {
 			Inv_RemoveItem(ID_UZI_AMMO_ITEM);
 			Lara.uzi_ammo += UZIS_AMMO_CLIPS;
 		}
@@ -412,8 +412,8 @@ BOOL Inv_AddItem(GAME_OBJECT_ID itemNumber) {
 
 	case ID_HARPOON_ITEM:
 	case ID_HARPOON_OPTION:
-		items = Inv_RequestItem(ID_HARPOON_AMMO_ITEM);
-		for (i = 0; i < items; ++i) {
+		count = Inv_RequestItem(ID_HARPOON_AMMO_ITEM);
+		for (i = 0; i < count; ++i) {
 			Inv_RemoveItem(ID_HARPOON_AMMO_ITEM);
 			Lara.harpoon_ammo += HARPOON_AMMO_CLIPS;
 		}
@@ -424,8 +424,8 @@ BOOL Inv_AddItem(GAME_OBJECT_ID itemNumber) {
 
 	case ID_M16_ITEM:
 	case ID_M16_OPTION:
-		items = Inv_RequestItem(ID_M16_AMMO_ITEM);
-		for (i = 0; i < items; ++i) {
+		count = Inv_RequestItem(ID_M16_AMMO_ITEM);
+		for (i = 0; i < count; ++i) {
 			Inv_RemoveItem(ID_M16_AMMO_ITEM);
 			Lara.m16_ammo += M16_AMMO_CLIPS;
 		}
@@ -436,8 +436,8 @@ BOOL Inv_AddItem(GAME_OBJECT_ID itemNumber) {
 
 	case ID_GRENADE_ITEM:
 	case ID_GRENADE_OPTION:
-		items = Inv_RequestItem(ID_GRENADE_AMMO_ITEM);
-		for (i = 0; i < items; ++i) {
+		count = Inv_RequestItem(ID_GRENADE_AMMO_ITEM);
+		for (i = 0; i < count; ++i) {
 			Inv_RemoveItem(ID_GRENADE_AMMO_ITEM);
 			Lara.grenade_ammo += GRENADE_AMMO_CLIPS;
 		}
@@ -516,17 +516,27 @@ BOOL Inv_AddItem(GAME_OBJECT_ID itemNumber) {
 		Inv_InsertItem(&InvLargeMedipackOption);
 		return TRUE;
 
-	case ID_SECRET1:
-		SaveGame.statistics.secrets |= 1;
-		return TRUE;
-
-	case ID_SECRET2:
-		SaveGame.statistics.secrets |= 2;
-		return TRUE;
-
-	case ID_SECRET3:
-		SaveGame.statistics.secrets |= 4;
-		return TRUE;
+	case ID_SECRETS:
+		if (secretType != -1)
+		{
+			switch (secretType)
+			{
+			case 0:
+				SaveGame.statistics.secrets |= 1;
+				break;
+			case 1:
+				SaveGame.statistics.secrets |= 2;
+				break;
+			case 2:
+				SaveGame.statistics.secrets |= 4;
+				break;
+			case 3:
+				SaveGame.statistics.secrets |= 8;
+				break;
+			}
+			return TRUE;
+		}
+		return FALSE;
 
 	case ID_PICKUP_ITEM1:
 	case ID_PICKUP_OPTION1:
