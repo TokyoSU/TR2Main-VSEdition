@@ -29,7 +29,12 @@
 #include "game/invfunc.h"
 #include "game/laraflare.h"
 #include "game/items.h"
+#include "game/secrets.h"
 #include "global/vars.h"
+
+#if defined(FEATURE_MOD_CONFIG)
+#include "modding/mod_utils.h"
+#endif
 
 void PickUpCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
 {
@@ -55,11 +60,13 @@ void PickUpCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
 		{
 			if (laraitem->frameNumber == (Anims[135].frameBase + 42) && item->objectID != ID_FLARE_ITEM)
 			{
-				AddDisplayPickup(item->objectID, item->objectID == ID_SECRETS ? item->ocb : -1);
-				Inv_AddItem((GAME_OBJECT_ID)item->objectID, item->objectID == ID_SECRETS ? item->ocb : -1);
+				AddDisplayPickup(item->objectID, GetSecretType(item));
+				Inv_AddItem((GAME_OBJECT_ID)item->objectID, GetSecretType(item));
+
 				// Give items when all secrets is found, ID_SECRET4 not included !
-				if (item->objectID == ID_SECRETS && CHK_ALL(SaveGame.statistics.secrets, 1 | 2 | 4))
+				if (IsSecret(item->objectID) && CHK_ALL(SaveGame.statistics.secrets, 1 | 2 | 4))
 					GF_ModifyInventory(CurrentLevel, TRUE);
+
 				item->status = ITEM_INVISIBLE;
 				RemoveDrawnItem(itemNumber);
 			}
@@ -115,11 +122,13 @@ void PickUpCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
 		{
 			if (laraitem->frameNumber == (Anims[130].frameBase + 10) && item->objectID != ID_FLARE_ITEM)
 			{
-				AddDisplayPickup(item->objectID, item->objectID == ID_SECRETS ? item->ocb : -1);
-				Inv_AddItem((GAME_OBJECT_ID)item->objectID, item->objectID == ID_SECRETS ? item->ocb : -1);
+				AddDisplayPickup(item->objectID, GetSecretType(item));
+				Inv_AddItem((GAME_OBJECT_ID)item->objectID, GetSecretType(item));
+
 				// Give items when all secrets is found, ID_SECRET4 not included !
-				if (item->objectID == ID_SECRETS && CHK_ALL(SaveGame.statistics.secrets, 1 | 2 | 4))
+				if (IsSecret(item->objectID) && CHK_ALL(SaveGame.statistics.secrets, 1 | 2 | 4))
 					GF_ModifyInventory(CurrentLevel, TRUE);
+
 				item->status = ITEM_INVISIBLE;
 				RemoveDrawnItem(itemNumber);
 			}

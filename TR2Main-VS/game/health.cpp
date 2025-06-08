@@ -23,6 +23,7 @@
 #include "game/health.h"
 #include "3dsystem/scalespr.h"
 #include "game/text.h"
+#include "game/secrets.h"
 #include "specific/output.h"
 #include "specific/sndpc.h"
 #include "modding/mod_utils.h"
@@ -325,15 +326,13 @@ void DrawPickups(BOOL pickupState) {
 }
 
 void AddDisplayPickup(short objNumber, int secretType) {
-	if (objNumber == ID_SECRETS) {
+	if (IsSecret(objNumber))
 		S_CDPlay(GF_GameFlow.secretTrack, FALSE);
-	}
 
-	int realObjNumber = objNumber == ID_SECRETS ? ID_SECRET_SPRITE : objNumber;
 	for (int i = 0; i < 12; ++i) {
 		if (PickupInfos[i].timer <= 0) {
 			PickupInfos[i].timer = 75; // 2.5 seconds
-			PickupInfos[i].sprite = secretType != -1 ? Objects[realObjNumber].meshIndex + secretType : Objects[realObjNumber].meshIndex;
+			PickupInfos[i].sprite = GetSecretMesh(objNumber, secretType);
 			break;
 		}
 	}

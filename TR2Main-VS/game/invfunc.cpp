@@ -25,6 +25,7 @@
 #include "game/health.h"
 #include "game/items.h"
 #include "game/text.h"
+#include "game/secrets.h"
 #include "specific/frontend.h"
 #include "global/vars.h"
 
@@ -357,6 +358,10 @@ BOOL Inv_AddItem(GAME_OBJECT_ID objNumber, int secretType) {
 		return TRUE;
 	}
 
+	if (IsSecret(objNumber)) {
+		return AddSecret(secretType) != FALSE;
+	}
+
 	switch (objNumber) {
 	case ID_COMPASS_ITEM:
 	case ID_COMPASS_OPTION:
@@ -515,28 +520,6 @@ BOOL Inv_AddItem(GAME_OBJECT_ID objNumber, int secretType) {
 	case ID_LARGE_MEDIPACK_OPTION:
 		Inv_InsertItem(&InvLargeMedipackOption);
 		return TRUE;
-
-	case ID_SECRETS:
-		if (secretType != -1)
-		{
-			switch (secretType)
-			{
-			case 0:
-				SaveGame.statistics.secrets |= 1;
-				break;
-			case 1:
-				SaveGame.statistics.secrets |= 2;
-				break;
-			case 2:
-				SaveGame.statistics.secrets |= 4;
-				break;
-			case 3:
-				SaveGame.statistics.secrets |= 8;
-				break;
-			}
-			return TRUE;
-		}
-		return FALSE;
 
 	case ID_PICKUP_ITEM1:
 	case ID_PICKUP_OPTION1:

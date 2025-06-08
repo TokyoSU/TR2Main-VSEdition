@@ -1461,11 +1461,36 @@ void ObjectObjects()
 		obj->save_flags = TRUE;
 	}
 
-	obj = &Objects[ID_SECRETS];
-	obj->collision = PickUpCollision;
-	obj->drawRoutine = DrawSpriteItem;
-	obj->save_position = TRUE;
-	obj->save_flags = TRUE;
+#if defined(FEATURE_MOD_CONFIG)
+	if (Mod.useNewVersion && Mod.newVersion >= 1)
+	{
+		obj = &Objects[ID_SECRET2_OR_SECRET];
+		obj->collision = PickUpCollision;
+		obj->drawRoutine = DrawSpriteItem;
+		obj->save_position = TRUE;
+		obj->save_flags = TRUE;
+	}
+	else
+	{
+		obj = &Objects[ID_SECRET1_OR_SECRET_SPRITE]; // Secret 1
+		obj->collision = PickUpCollision;
+		obj->drawRoutine = DrawSpriteItem;
+		obj->save_position = TRUE;
+		obj->save_flags = TRUE;
+
+		obj = &Objects[ID_SECRET2_OR_SECRET]; // Secret 2
+		obj->collision = PickUpCollision;
+		obj->drawRoutine = DrawSpriteItem;
+		obj->save_position = TRUE;
+		obj->save_flags = TRUE;
+
+		obj = &Objects[ID_SECRET3]; // Secret 3
+		obj->collision = PickUpCollision;
+		obj->drawRoutine = DrawSpriteItem;
+		obj->save_position = TRUE;
+		obj->save_flags = TRUE;
+	}
+#endif
 
 	for (int i = ID_KEY_ITEM1; i <= ID_KEY_ITEM4; i++)
 	{

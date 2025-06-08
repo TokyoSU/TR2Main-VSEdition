@@ -170,6 +170,7 @@
     <ClCompile Include="game\pickup.cpp" />
     <ClCompile Include="game\rat.cpp" />
     <ClCompile Include="game\savegame.cpp" />
+    <ClCompile Include="game\secrets.cpp" />
     <ClCompile Include="game\setup.cpp" />
     <ClCompile Include="game\shark.cpp" />
     <ClCompile Include="game\skidoo.cpp" />
@@ -284,6 +285,7 @@
     <ClInclude Include="game\pickup.h" />
     <ClInclude Include="game\rat.h" />
     <ClInclude Include="game\savegame.h" />
+    <ClInclude Include="game\secrets.h" />
     <ClInclude Include="game\setup.h" />
     <ClInclude Include="game\shark.h" />
     <ClInclude Include="game\skidoo.h" />

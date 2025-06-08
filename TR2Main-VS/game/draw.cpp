@@ -573,7 +573,14 @@ void DrawEffect(short fx_id) {
 void DrawSpriteItem(ITEM_INFO* item) {
 	OBJECT_INFO* obj = &Objects[item->objectID];
 	S_CalculateLight(item->pos.x, item->pos.y, item->pos.z, item->roomNumber);
-	S_DrawSprite(SPR_ITEM | SPR_ABS | SPR_SHADE | (obj->semi_transparent ? SPR_SEMITRANS : 0), item->pos.x, item->pos.y, item->pos.z, item->objectID == ID_SECRETS ? Objects[ID_SECRET_SPRITE].meshIndex + item->ocb : obj->meshIndex - item->frameNumber, LsAdder, 0);
+#if defined(FEATURE_MOD_CONFIG)
+	int spriteIdx = ID_SECRET1_OR_SECRET_SPRITE;
+	if (Mod.useNewVersion && Mod.newVersion >= 1)
+		spriteIdx = Objects[ID_SECRET1_OR_SECRET_SPRITE].meshIndex + item->ocb;
+	else
+		spriteIdx = obj->meshIndex - item->frameNumber;
+	S_DrawSprite(SPR_ITEM | SPR_ABS | SPR_SHADE | (obj->semi_transparent ? SPR_SEMITRANS : 0), item->pos.x, item->pos.y, item->pos.z, spriteIdx, LsAdder, 0);
+#endif
 }
 
 void DrawDummyItem(ITEM_INFO* item) {

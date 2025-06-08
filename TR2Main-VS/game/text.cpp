@@ -498,7 +498,14 @@ void T_DrawThisText(TEXT_STR_INFO* textInfo) {
 #ifdef FEATURE_HUD_IMPROVED
 			sx = GetTextScaleH(x + 10);
 			sy = GetTextScaleV(y);
-			S_DrawPickup(sx, sy, 0x1BE8, Objects[ID_SECRET_SPRITE].meshIndex + (*str - CHAR_SECRET1), 0x1000);
+#if defined(FEATURE_MOD_CONFIG)
+			int spriteIdx = 0;
+			if (Mod.useNewVersion && Mod.newVersion >= 1)
+				spriteIdx = Objects[ID_SECRET1_OR_SECRET_SPRITE].meshIndex + (*str - CHAR_SECRET1);
+			else
+				spriteIdx = Objects[ID_SECRET1_OR_SECRET_SPRITE + (*str - CHAR_SECRET1)].meshIndex;
+			S_DrawPickup(sx, sy, 0x1BE8, Objects[ID_SECRET1_OR_SECRET_SPRITE].meshIndex + (*str - CHAR_SECRET1), 0x1000);
+#endif
 #else // FEATURE_HUD_IMPROVED
 			S_DrawPickup(x + 10, y, 0x1BE8, Objects[ID_SECRET_SPRITE].meshIndex + (*str - CHAR_SECRET1), 0x1000);
 #endif // FEATURE_HUD_IMPROVED
