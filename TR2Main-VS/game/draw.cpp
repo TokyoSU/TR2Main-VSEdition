@@ -28,6 +28,7 @@
 #include "game/hair.h"
 #include "game/health.h"
 #include "game/weather.h"
+#include "game/secrets.h"
 #include "specific/game.h"
 #include "specific/output.h"
 #include "global/vars.h"
@@ -573,14 +574,7 @@ void DrawEffect(short fx_id) {
 void DrawSpriteItem(ITEM_INFO* item) {
 	OBJECT_INFO* obj = &Objects[item->objectID];
 	S_CalculateLight(item->pos.x, item->pos.y, item->pos.z, item->roomNumber);
-#if defined(FEATURE_MOD_CONFIG)
-	int spriteIdx = ID_SECRET1_OR_SECRET_SPRITE;
-	if (Mod.useNewVersion && Mod.newVersion >= 1)
-		spriteIdx = Objects[ID_SECRET1_OR_SECRET_SPRITE].meshIndex + item->ocb;
-	else
-		spriteIdx = obj->meshIndex - item->frameNumber;
-	S_DrawSprite(SPR_ITEM | SPR_ABS | SPR_SHADE | (obj->semi_transparent ? SPR_SEMITRANS : 0), item->pos.x, item->pos.y, item->pos.z, spriteIdx, LsAdder, 0);
-#endif
+	S_DrawSprite(SPR_ITEM | SPR_ABS | SPR_SHADE | (obj->semi_transparent ? SPR_SEMITRANS : 0), item->pos.x, item->pos.y, item->pos.z, GetSecretSprite(item), LsAdder, 0);
 }
 
 void DrawDummyItem(ITEM_INFO* item) {

@@ -5,4 +5,5 @@ extern bool IsSecret(int objNumber);
 extern BOOL AddSecret(int secretType);
 extern int GetSecretType(ITEM_INFO* item);
 extern int GetSecretMesh(int objNumber, int secretType);
+extern int GetSecretSprite(ITEM_INFO* item);
 extern int GetSecretSpriteByStr(unsigned char characterType);

@@ -65,6 +65,15 @@ int GetSecretMesh(int objNumber, int secretType)
 	return Objects[objNumber].meshIndex;
 }
 
+int GetSecretSprite(ITEM_INFO* item)
+{
+#if defined(FEATURE_MOD_CONFIG)
+	if (Mod.useNewVersion && Mod.newVersion >= 1)
+		return Objects[ID_SECRET1_OR_SECRET_SPRITE].meshIndex + item->ocb;
+#endif
+	return Objects[item->objectID].meshIndex - item->frameNumber;
+}
+
 int GetSecretSpriteByStr(unsigned char characterType)
 {
 #if defined(FEATURE_MOD_CONFIG)
