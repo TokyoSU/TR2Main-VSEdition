@@ -52,7 +52,7 @@ void DisableBaddieAI(short itemNumber)
     else
     {
         ITEM_INFO* item = &Items[itemNumber];
-        CREATURE_INFO* creature = GetCreatureInfo(item);
+        creature = GetCreatureInfo(item);
         item->data = NULL;
     }
 
@@ -192,41 +192,47 @@ void InitialiseSlot(short itemNumber, int baddieSlotID)
         creature->LOT.blockMask = 0x8000;
         break;
     }
+
     ClearLOT(&creature->LOT);
     if (itemNumber != Lara.item_number)
         CreateZone(item);
+
     ++BaddiesSlotsUsedCount;
 }
 
 void CreateZone(ITEM_INFO* item)
 {
+    ROOM_INFO* r = &Rooms[item->roomNumber];
     CREATURE_INFO* creature;
     BOX_NODE* node;
-    DWORD i;
-    short* zone, zone_number;
-    short* flip, flip_number;
+    UINT16* zone, zone_number;
+    UINT16* flip, flip_number;
+    UINT16 i;
 
     creature = GetCreatureInfo(item);
-    if (creature->LOT.fly != 0)
+    item->boxNumber = GetSectorBoxXZ(item, r);
+
+    if (creature->LOT.fly == 0)
     {
-        zone = FlyZones[FALSE];
-        flip = FlyZones[TRUE];
+        zone = GroundZones[2 * (creature->LOT.step >> 8) + 0];
+        flip = GroundZones[2 * (creature->LOT.step >> 8) + 1];
+        zone_number = zone[item->boxNumber];
+        flip_number = flip[item->boxNumber];
+        for (i = 0, creature->LOT.zoneCount = 0, node = creature->LOT.node; i < BoxesCount; i++, zone++, flip++)
+        {
+            if (*zone == zone_number || *flip == flip_number)
+            {
+                node->boxNumber = i;
+                node++;
+                creature->LOT.zoneCount++;
+            }
+        }
     }
     else
     {
-        zone = GroundZones[2 * (creature->LOT.step >> 8) + FALSE];
-        flip = GroundZones[2 * (creature->LOT.step >> 8) + TRUE];
-    }
-
-    ROOM_INFO* r = &Rooms[item->roomNumber];
-    item->boxNumber = GetSectorBoxXZ(item, r);
-    zone_number = zone[item->boxNumber];
-    flip_number = flip[item->boxNumber];
-    for (i = 0, creature->LOT.zoneCount = 0, node = creature->LOT.node; i < BoxesCount; i++, zone++, flip++)
-    {
-        if (*zone == zone_number || *flip == flip_number)
+        for (i = 0, creature->LOT.zoneCount = 0, node = creature->LOT.node; i < BoxesCount; i++)
         {
-            node->boxNumber = (short)i;
+            node->boxNumber = i;
             node++;
             creature->LOT.zoneCount++;
         }

@@ -43,7 +43,7 @@ void InitialiseWindow(short itemNumber); // 0x00434E30
 void SmashWindow(short itemNumber); // 0x00434EB0
 void WindowControl(short itemNumber); // 0x00434F80
 void OpenNearestDoor();
-#define SmashIceControl ((void(__cdecl*)(short)) 0x00435020)
+void SmashIceControl(short itemNumber); // 0x00435020
 #define ShutThatDoor ((void(__cdecl*)(DOORPOS_DATA*)) 0x00435100)
 #define OpenThatDoor ((void(__cdecl*)(DOORPOS_DATA*)) 0x00435150)
 void InitialiseDoor(short itemNumber); // 0x00435190

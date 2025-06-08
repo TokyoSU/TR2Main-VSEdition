@@ -32,7 +32,6 @@
 #include "specific/texture.h"
 #include "specific/winvid.h"
 #include "specific/winmain.h"
-#include "modding/mod_utils.h"
 #include "global/vars.h"
 
 #define REQ_SCRIPT_VERSION	(3)
@@ -40,30 +39,29 @@
 #define REQ_GAME_STR_COUNT	(89)
 #define SPECIFIC_STR_COUNT	(41)
 
-#define READ_STRINGS(count, lpTable, lpBuffer, lpRead, hFile, failLabel) { \
-	if( NULL == ((lpTable)=(char **)GlobalAlloc(GMEM_FIXED, sizeof(char*) * (count))) || \
-		!Read_Strings((count), (lpTable), (lpBuffer), (lpRead), (hFile)) ) goto failLabel; \
-}
-
-#ifdef FEATURE_GOLD
+#if defined(FEATURE_GOLD)
 extern bool IsGold();
 #endif
 
-#ifdef FEATURE_BACKGROUND_IMPROVED
-#include "modding/background_new.h"
+#if defined(FEATURE_MOD_CONFIG)
+#include "modding/mod_utils.h"
+#endif // defined(FEATURE_MOD_CONFIG)
 
+#if defined(FEATURE_BACKGROUND_IMPROVED)
+#include "modding/background_new.h"
 extern bool LoadingScreensEnabled;
 #endif // FEATURE_BACKGROUND_IMPROVED
-
-#if defined(FEATURE_MOD_CONFIG) || defined(FEATURE_VIDEOFX_IMPROVED)
-#include "modding/mod_utils.h"
-#endif // defined(FEATURE_MOD_CONFIG) || defined(FEATURE_VIDEOFX_IMPROVED)
 
 #if defined(FEATURE_HUD_IMPROVED)
 #include "modding/texture_utils.h"
 #endif // FEATURE_HUD_IMPROVED
 
-#ifdef FEATURE_VIDEOFX_IMPROVED
+#define READ_STRINGS(count, lpTable, lpBuffer, lpRead, hFile, failLabel) { \
+	if( NULL == ((lpTable)=(char **)GlobalAlloc(GMEM_FIXED, sizeof(char*) * (count))) || \
+		!Read_Strings((count), (lpTable), (lpBuffer), (lpRead), (hFile)) ) goto failLabel; \
+}
+
+#if defined(FEATURE_VIDEOFX_IMPROVED)
 static bool MarkSemitransPolyObjects(short* ptrObj, int vtxCount, bool colored, LPVOID param) {
 	UINT16 index = ptrObj[vtxCount];
 	if (colored) {
@@ -294,7 +292,7 @@ static void LoadBareFootSFX(int* sampleIndexes, int sampleCount) {
 	for (i = 0; i < 4; ++i) { // there are no more than 4 barefoot step samples
 		if (SampleInfos[i].sampleIdx >= 4) break;
 		// SFX parameters are taken from the PlayStation version
-		SampleInfos[i].volume = 0x3332;
+		SampleInfos[i].volume = (BYTE)0x3332;
 		SampleInfos[i].randomness = 0;
 		SampleInfos[i].flags = 0x6010;
 	}
@@ -302,7 +300,7 @@ static void LoadBareFootSFX(int* sampleIndexes, int sampleCount) {
 }
 #endif // FEATURE_MOD_CONFIG
 
-#ifdef FEATURE_BACKGROUND_IMPROVED
+#if defined(FEATURE_BACKGROUND_IMPROVED)
 int PatternTexPage = -1;
 
 static struct {
@@ -481,8 +479,9 @@ BOOL LoadTexturePages(HANDLE hFile) {
 
 BOOL LoadRooms(HANDLE hFile) {
 	DWORD bytesRead;
-	DWORD dwCount, dwMeshSize;
-	short wCount;
+	DWORD reserved = 0;
+	DWORD dwCount, dwMeshSize = 0;
+	short wCount = 0;
 
 	// Get number of rooms
 	ReadFileSync(hFile, &RoomCount, sizeof(short), &bytesRead, NULL);
@@ -586,14 +585,44 @@ BOOL LoadRooms(HANDLE hFile) {
 
 		// Room lights
 		ReadFileSync(hFile, &room->ambient, sizeof(short), &bytesRead, NULL);
+#if defined(FEATURE_MOD_CONFIG)
+		if (!Mod.useNewVersion)
+			ReadFileSync(hFile, &reserved, sizeof(short), &bytesRead, NULL); // ambient2
+#endif
 		ReadFileSync(hFile, &room->lightMode, sizeof(short), &bytesRead, NULL);
 		ReadFileSync(hFile, &room->numLights, sizeof(short), &bytesRead, NULL);
+
 		if (room->numLights == 0) {
 			room->light = NULL;
 		}
 		else {
 			room->light = (LIGHT_INFO*)game_malloc(sizeof(LIGHT_INFO) * room->numLights, GBUF_RoomLights);
-			ReadFileSync(hFile, room->light, sizeof(LIGHT_INFO) * room->numLights, &bytesRead, NULL);
+			for (int i = 0; i < room->numLights; ++i) {
+				LIGHT_INFO* light = &room->light[i];
+				ReadFileSync(hFile, &light->x, sizeof(int), &bytesRead, NULL);
+				ReadFileSync(hFile, &light->y, sizeof(int), &bytesRead, NULL);
+				ReadFileSync(hFile, &light->z, sizeof(int), &bytesRead, NULL);
+#if defined(FEATURE_MOD_CONFIG)
+				if (Mod.useNewVersion && Mod.newVersion >= 1)
+				{
+					ReadFileSync(hFile, &light->intensity, sizeof(short), &bytesRead, NULL);
+					ReadFileSync(hFile, &light->fallOff, sizeof(int), &bytesRead, NULL);
+				}
+				else
+				{
+					ReadFileSync(hFile, &light->intensity, sizeof(short), &bytesRead, NULL);
+					ReadFileSync(hFile, &reserved, sizeof(short), &bytesRead, NULL); // intensity2
+					ReadFileSync(hFile, &light->fallOff, sizeof(int), &bytesRead, NULL);
+					ReadFileSync(hFile, &reserved, sizeof(int), &bytesRead, NULL); // fallOff2
+				}
+#else
+				ReadFileSync(hFile, &light->intensity, sizeof(short), &bytesRead, NULL);
+				ReadFileSync(hFile, &reserved, sizeof(short), &bytesRead, NULL); // intensity2
+				ReadFileSync(hFile, &light->fallOff, sizeof(int), &bytesRead, NULL);
+				ReadFileSync(hFile, &reserved, sizeof(int), &bytesRead, NULL); // fallOff2
+#endif
+			}
+			//ReadFileSync(hFile, room->light, sizeof(LIGHT_INFO) * room->numLights, &bytesRead, NULL);
 		}
 
 		// Static mesh infos
@@ -609,7 +638,10 @@ BOOL LoadRooms(HANDLE hFile) {
 		// Flipped (alternative) room
 		ReadFileSync(hFile, &room->flippedRoom, sizeof(short), &bytesRead, NULL);
 		ReadFileSync(hFile, &room->flags, sizeof(short), &bytesRead, NULL);
-		ReadFileSync(hFile, &room->reverbType, sizeof(BYTE), &bytesRead, NULL);
+#if defined(FEATURE_MOD_CONFIG)
+		if (Mod.useNewVersion && Mod.newVersion >= 1)
+			ReadFileSync(hFile, &room->reverbType, sizeof(BYTE), &bytesRead, NULL);
+#endif
 
 		// Initialise some variables
 		room->boundActive = 0;
@@ -760,8 +792,8 @@ BOOL LoadObjects(HANDLE hFile) {
 
 	// Initialise animated objects
 	InitialiseObjects();
-	if (!Objects[ID_LARA].loaded)
-		S_ExitSystem("Failed to load the level, LARA object is missing !");
+	//if (!Objects[ID_LARA].loaded)
+	//	S_ExitSystem("Failed to load the level, LARA object is missing !");
 
 	// Load static objects
 	ReadFileSync(hFile, &dwCount, sizeof(DWORD), &bytesRead, NULL);
@@ -984,16 +1016,16 @@ BOOL LoadBoxes(HANDLE hFile) {
 	// Load GroundZones and FlyZones
 	for (int i = 0; i < 2; ++i) {
 		for (int j = 0; j < 4; ++j) {
-			GroundZones[j * 2 + i] = (short*)game_malloc(sizeof(short) * BoxesCount, GBUF_GroundZone);
-			ReadFileSync(hFile, GroundZones[j * 2 + i], sizeof(short) * BoxesCount, &bytesRead, NULL);
-			if (bytesRead != sizeof(short) * BoxesCount) {
+			GroundZones[j * 2 + i] = (UINT16*)game_malloc(sizeof(UINT16) * BoxesCount, GBUF_GroundZone);
+			ReadFileSync(hFile, GroundZones[j * 2 + i], sizeof(UINT16) * BoxesCount, &bytesRead, NULL);
+			if (bytesRead != sizeof(UINT16) * BoxesCount) {
 				lstrcpy(StringToShow, "LoadBoxes(): Unable to load 'ground_zone'");
 				return FALSE;
 			}
 		}
-		FlyZones[i] = (short*)game_malloc(sizeof(short) * BoxesCount, GBUF_FlyZone);
-		ReadFileSync(hFile, FlyZones[i], sizeof(short) * BoxesCount, &bytesRead, NULL);
-		if (bytesRead != sizeof(short) * BoxesCount) {
+		FlyZones[i] = (UINT16*)game_malloc(sizeof(UINT16) * BoxesCount, GBUF_FlyZone);
+		ReadFileSync(hFile, FlyZones[i], sizeof(UINT16) * BoxesCount, &bytesRead, NULL);
+		if (bytesRead != sizeof(UINT16) * BoxesCount) {
 			lstrcpy(StringToShow, "LoadBoxes(): Unable to load 'fly_zone'");
 			return FALSE;
 		}
@@ -1002,8 +1034,7 @@ BOOL LoadBoxes(HANDLE hFile) {
 }
 
 BOOL LoadAnimatedTextures(HANDLE hFile) {
-	DWORD animTexCount, bytesRead;
-
+	DWORD animTexCount = 0, bytesRead;
 	ReadFileSync(hFile, &animTexCount, sizeof(DWORD), &bytesRead, NULL);
 	AnimatedTextureRanges = (short*)game_malloc(sizeof(short) * animTexCount, GBUF_AnimatingTextureRanges);
 	ReadFileSync(hFile, AnimatedTextureRanges, sizeof(short) * animTexCount, &bytesRead, NULL);
@@ -1077,10 +1108,23 @@ BOOL LoadSamples(HANDLE hFile) {
 	WinSndFreeAllSamples();
 
 	// Load Sample Lut
-	ReadFileSync(hFile, &SampleLutCount, sizeof(DWORD), &bytesRead, NULL);
-
-	SampleLut = (short*)game_malloc(sizeof(short) * SampleLutCount, GBUF_SampleInfos);
-	ReadFileSync(hFile, SampleLut, sizeof(short) * SampleLutCount, &bytesRead, NULL);
+#if defined(FEATURE_MOD_CONFIG)
+	if (Mod.useNewVersion && Mod.newVersion >= 1)
+	{ // New way to load sample lut.
+		ReadFileSync(hFile, &SampleLutCount, sizeof(DWORD), &bytesRead, NULL);
+		SampleLut = (short*)game_malloc(sizeof(short) * SampleLutCount, GBUF_SampleInfos);
+		ReadFileSync(hFile, SampleLut, sizeof(short) * SampleLutCount, &bytesRead, NULL);
+	}
+	else
+	{ // Old way to load sample lut.
+		SampleLutCount = 370; // Old way always has 370 entries.
+		SampleLut = (short*)game_malloc(sizeof(short) * 370, GBUF_SampleInfos);
+		ReadFileSync(hFile, SampleLut, sizeof(short) * 370, &bytesRead, NULL);
+	}
+#else
+	SampleLut = (short*)game_malloc(sizeof(short) * 370, GBUF_SampleInfos);
+	ReadFileSync(hFile, SampleLut, sizeof(short) * 370, &bytesRead, NULL);
+#endif
 
 	// Load Sample Infos
 	int sampleInfoCount = 0;
@@ -1093,13 +1137,29 @@ BOOL LoadSamples(HANDLE hFile) {
 	for (int i = 0; i < sampleInfoCount; i++)
 	{
 		SAMPLE_INFO& sample = SampleInfos.at(i);
-		ReadFileSync(hFile, &sample.sampleIdx, sizeof(UINT16), &bytesRead, NULL);
-		ReadFileSync(hFile, &sample.volume, sizeof(BYTE), &bytesRead, NULL);
-		ReadFileSync(hFile, &sample.randomness, sizeof(BYTE), &bytesRead, NULL);
-		ReadFileSync(hFile, &sample.radius, sizeof(BYTE), &bytesRead, NULL);
-		ReadFileSync(hFile, &sample.pitch, sizeof(BYTE), &bytesRead, NULL);
-		ReadFileSync(hFile, &sample.lutCount, sizeof(BYTE), &bytesRead, NULL);
-		ReadFileSync(hFile, &sample.flags, sizeof(UINT16), &bytesRead, NULL);
+#if defined(FEATURE_MOD_CONFIG)
+		if (Mod.useNewVersion && Mod.newVersion >= 1)
+		{
+			ReadFileSync(hFile, &sample.sampleIdx, sizeof(UINT16), &bytesRead, NULL);
+			ReadFileSync(hFile, &sample.volume, sizeof(BYTE), &bytesRead, NULL);
+			ReadFileSync(hFile, &sample.randomness, sizeof(BYTE), &bytesRead, NULL);
+			ReadFileSync(hFile, &sample.radius, sizeof(BYTE), &bytesRead, NULL);
+			ReadFileSync(hFile, &sample.pitch, sizeof(BYTE), &bytesRead, NULL);
+			ReadFileSync(hFile, &sample.lutCount, sizeof(BYTE), &bytesRead, NULL);
+			ReadFileSync(hFile, &sample.flags, sizeof(UINT16), &bytesRead, NULL);
+		}
+		else
+		{
+			ReadFileSync(hFile, &sample.sampleIdx, sizeof(UINT16), &bytesRead, NULL);
+			ReadFileSync(hFile, &sample.volume, sizeof(short), &bytesRead, NULL);
+			ReadFileSync(hFile, &sample.randomness, sizeof(short), &bytesRead, NULL);
+			ReadFileSync(hFile, &sample.flags, sizeof(UINT16), &bytesRead, NULL);
+			sample.volume = (unsigned char)round(sample.volume / 100.0f * 255.0f);
+			sample.randomness = (unsigned char)round(sample.randomness / 100.0f * 255.0f);
+			sample.radius = 10;
+			sample.pitch = 1;
+		}
+#endif
 	}
 
 	// Load Samples Indexes Count
@@ -1158,9 +1218,11 @@ BOOL LoadSamples(HANDLE hFile) {
 
 	CloseHandle(hSfxFile);
 	SoundIsActive = TRUE;
+
 #if defined(FEATURE_MOD_CONFIG)
 	LoadBareFootSFX(sampleIndexes, sampleCount);
 #endif // FEATURE_MOD_CONFIG
+
 	return TRUE;
 }
 
@@ -1217,9 +1279,9 @@ BOOL LoadLevel(LPCTSTR fileName, int levelID) {
 	BOOL result = FALSE;
 	LPCTSTR fullPath;
 	HANDLE hFile;
-	DWORD reserved;
+	DWORD reserved = 0;
 	DWORD bytesRead;
-	int levelVersion;
+	unsigned char levelVersion[4] = {};
 
 	fullPath = GetFullPath(fileName);
 	strcpy(LevelFileName, fullPath);
@@ -1231,14 +1293,37 @@ BOOL LoadLevel(LPCTSTR fileName, int levelID) {
 		return FALSE;
 	}
 
-	ReadFileSync(hFile, &levelVersion, sizeof(levelVersion), &bytesRead, NULL);
-	if (levelVersion != REQ_LEVEL_VERSION) {
-		if (levelVersion < REQ_LEVEL_VERSION)
-			wsprintf(StringToShow, "FATAL: Level %d (%s) is OUT OF DATE (version %d). COPY NEW EDITOR", levelID, fileName, levelVersion);
+	ReadFileSync(hFile, levelVersion, sizeof(levelVersion), &bytesRead, NULL);
+	LogDebug("Mod version %d.%d.%d.%d detected in level %s", levelVersion[0], levelVersion[1], levelVersion[2], levelVersion[3], fileName);
+
+	// Now check the level version, based on the last byte, the loading may change !
+	if (levelVersion[0] != REQ_LEVEL_VERSION) // This version reading is not present in the original game !
+	{
+#if defined(FEATURE_MOD_CONFIG)
+		if (levelVersion[0] == 'T' && levelVersion[1] == 'R' && levelVersion[2] == '2')
+		{
+			Mod.newVersion = (int)levelVersion[3];
+			Mod.useNewVersion = true;
+		}
 		else
-			wsprintf(StringToShow, "FATAL: Level %d (%s) requires a new TOMB2.EXE (version %d) to run", levelID, fileName, levelVersion);
-		goto EXIT;
+		{
+#endif
+			if (levelVersion[0] < REQ_LEVEL_VERSION)
+				wsprintf(StringToShow, "FATAL: Level %d (%s) is OUT OF DATE (version %s). COPY NEW EDITOR", levelID, fileName, levelVersion);
+			else
+				wsprintf(StringToShow, "FATAL: Level %d (%s) requires a new TOMB2.EXE (version %s) to run", levelID, fileName, levelVersion);
+			goto EXIT;
+#if defined(FEATURE_MOD_CONFIG)
+		}
+#endif
 	}
+#if defined(FEATURE_MOD_CONFIG)
+	else
+	{
+		Mod.useNewVersion = false;
+		Mod.newVersion = 0;
+	}
+#endif
 
 	if (SavedAppSettings.RenderMode == RM_Hardware) {
 		LoadTexPagesConfiguration(LevelFileName);

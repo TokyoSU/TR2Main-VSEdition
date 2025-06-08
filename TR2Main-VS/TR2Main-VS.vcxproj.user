@@ -5,14 +5,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DX9|Win32'">
     <LocalDebuggerCommand>Tomb2.exe</LocalDebuggerCommand>
-    <LocalDebuggerWorkingDirectory>C:\Users\vleva\Documents\TRProjects\TombRaider2Reloaded\Engine\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>C:\GOG Games\Tomb Raider 2\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>
     </LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_DX9|Win32'">
     <LocalDebuggerCommand>Tomb2.exe</LocalDebuggerCommand>
-    <LocalDebuggerWorkingDirectory>C:\Users\vleva\Documents\TRProjects\TombRaider2Reloaded\Engine\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>C:\GOG Games\Tomb Raider 2\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>
     </LocalDebuggerCommandArguments>

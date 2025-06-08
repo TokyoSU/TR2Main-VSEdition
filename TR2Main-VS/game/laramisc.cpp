@@ -62,7 +62,7 @@ void LaraControl() {
 				item->currentAnimState = AS_SWIM;
 				item->goalAnimState = AS_SWIM;
 				item->gravity = 0;
-				item->pos.rotX = ANGLE(30);
+				item->pos.rotX = ANGLE(0);
 				item->fallSpeed = 30;
 				Lara.torso_x_rot = Lara.torso_y_rot = 0;
 				Lara.head_x_rot = Lara.head_y_rot = 0;

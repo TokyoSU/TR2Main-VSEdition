@@ -1632,8 +1632,8 @@ typedef struct WavePcmHeader_t {
 
 typedef struct SampleInfo_t {
 	UINT16 sampleIdx;
-	BYTE volume;
-	BYTE randomness;
+	short volume;
+	short randomness;
 	BYTE radius;
 	BYTE pitch;
 	BYTE lutCount;
@@ -1872,7 +1872,7 @@ typedef struct ItemInfo_t {
 	short speed;
 	short fallSpeed;
 	short hitPoints;
-	short boxNumber;
+	UINT16 boxNumber;
 	short timer;
 	UINT16 flags; // see IFL_* defines
 	short shade1;
@@ -2212,10 +2212,10 @@ typedef struct PhdSprite_t {
 } PHD_SPRITE;
 
 typedef struct BoxInfo_t {
-	BYTE zMin;
-	BYTE zMax;
-	BYTE xMin;
-	BYTE xMax;
+	BYTE left;
+	BYTE right;
+	BYTE top;
+	BYTE bottom;
 	short height;
 	UINT16 overlapIndex;
 } BOX_INFO;
@@ -2305,24 +2305,24 @@ typedef struct RingInfo_t {
 } RING_INFO;
 
 typedef struct BoxNode_t {
-	short exitBox;
+	UINT16 exitBox;
 	UINT16 searchNumber;
-	short nextExpansion;
-	short boxNumber;
+	UINT16 nextExpansion;
+	UINT16 boxNumber;
 } BOX_NODE;
 
 typedef struct LotInfo_t {
 	BOX_NODE* node;
-	short head;
-	short tail;
+	UINT16 head;
+	UINT16 tail;
 	UINT16 searchNumber;
 	UINT16 blockMask;
 	short step;
 	short drop;
 	short fly;
 	short zoneCount;
-	short targetBox;
-	short requiredBox;
+	UINT16 targetBox;
+	UINT16 requiredBox;
 	PHD_VECTOR target;
 } LOT_INFO;
 
@@ -2354,7 +2354,7 @@ typedef struct CreatureInfo_t {
 } CREATURE_INFO;
 
 static inline CREATURE_INFO* GetCreatureInfo(ITEM_INFO* item) {
-	return static_cast<CREATURE_INFO*>(item->data);
+	return (CREATURE_INFO*)item->data;
 }
 
 typedef struct BoatInfo_t {
@@ -2460,8 +2460,8 @@ typedef struct BiteInfo_t {
 } BITE_INFO;
 
 typedef struct AIInfo_t {
-	short zoneNumber;
-	short enemyZone;
+	UINT16 zoneNumber;
+	UINT16 enemyZone;
 	int distance;
 	BOOL ahead;
 	BOOL bite;
@@ -2708,14 +2708,14 @@ static inline FLOOR_INFO* GetFloorSector(ITEM_INFO* item, ROOM_INFO* room, int d
 	return &room->floor[(((item->pos.z - room->z) >> WALL_SHIFT) + dz) + (((item->pos.x - room->x) >> WALL_SHIFT) + dx) * room->zSize];
 }
 
-static inline short GetSectorBoxXZ(ITEM_INFO* item, ROOM_INFO* room) {
+static inline UINT16 GetSectorBoxXZ(ITEM_INFO* item, ROOM_INFO* room) {
 	FLOOR_INFO* floor = GetFloorSector(item, room);
 	if (floor == NULL)
 		return -1;
 	return floor->box;
 }
 
-static inline short GetSectorBoxXZ(ITEM_INFO* item, ROOM_INFO* room, int dx, int dz) {
+static inline UINT16 GetSectorBoxXZ(ITEM_INFO* item, ROOM_INFO* room, int dx, int dz) {
 	FLOOR_INFO* floor = GetFloorSector(item, room, dx, dz);
 	if (floor == NULL)
 		return -1;

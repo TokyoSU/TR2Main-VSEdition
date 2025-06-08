@@ -228,12 +228,9 @@ bool DSIsChannelPlaying(DWORD channel)
 
 bool DXCreateSample(DWORD sampleIdx, LPWAVEFORMATEX format, const LPVOID data, DWORD dataSize)
 {
-	if (DSound == NULL)
-		return 0;
-
+	if (DSound == NULL) return 0;
 	if (format->nSamplesPerSec != 11025)
 		LogWarn("Incorrect SamplesPerSec for SampleID: %d, Found: %d", sampleIdx, format->nSamplesPerSec);
-
 	auto* buffer = &XA_Buffers[sampleIdx];
 	buffer->pAudioData = (BYTE*)malloc(dataSize);
 	if (buffer->pAudioData == NULL)

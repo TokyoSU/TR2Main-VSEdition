@@ -27,6 +27,7 @@ void LogDebug(const char* message, ...)
 	if (m_debug_prevmsg == buffer) // avoid spamming... (From TEN)
 		return;
 	m_log->debug(buffer);
+	m_log->flush();
 	m_debug_prevmsg = buffer;
 #endif
 }
@@ -41,5 +42,6 @@ void LogWarn(const char* message, ...)
 	if (m_warn_prevmsg == buffer) // avoid spamming... (From TEN)
 		return;
 	m_log->warn(buffer);
+	m_log->flush();
 	m_warn_prevmsg = buffer;
 }

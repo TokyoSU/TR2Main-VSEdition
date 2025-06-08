@@ -135,16 +135,8 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (Lara.skidoo != -1)
 	{
-		if (item->objectID == ID_SKIDOO_FAST)
-		{
-			if (SkidooControl())
-				return;
-		}
-		else
-		{
-			LaraGun();
-			return;
-		}
+		SkidooControl();
+		return;
 	}
 
 	if (Lara.extra_anim != 0)

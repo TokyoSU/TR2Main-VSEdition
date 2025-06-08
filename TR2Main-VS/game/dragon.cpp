@@ -149,14 +149,10 @@ void DinoControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item;
-	CREATURE_INFO* dino;
+	ITEM_INFO* item = &Items[itemNumber];
+	CREATURE_INFO* dino = GetCreatureInfo(item);
 	AI_INFO info;
-	short head, angle;
-
-	item = &Items[itemNumber];
-	dino = GetCreatureInfo(item);
-	head = angle = 0;
+	short head = 0, angle = 0;
 	bool isLaraAlive = LaraItem->hitPoints > 0;
 
 	if (item->hitPoints <= 0)

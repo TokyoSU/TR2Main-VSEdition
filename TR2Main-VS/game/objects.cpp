@@ -180,6 +180,28 @@ void OpenNearestDoor()
 	}
 }
 
+void SmashIceControl(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	if (item->flags & IFL_ONESHOT)
+		return;
+
+	item->meshBits = 0xFFFE; // Remove the mesh
+	item->collidable = FALSE; // Make it non-collidable
+
+	ROOM_INFO* room = &Rooms[item->roomNumber];
+	BOX_INFO* box = &Boxes[GetSectorBoxXZ(item, room)];
+	if (CHK_ANY(box->overlapIndex, 0x8000))
+		box->overlapIndex &= ~0x4000; // Remove the overlap
+
+	ExplodingDeath(itemNumber, 0xFEFE, 0); // Create the explosion effect
+	PlaySoundEffect(348, &item->pos, 0); // Play the sound effect
+
+	item->flags |= IFL_ONESHOT; // Set the oneshot flag
+	item->status = ITEM_DISABLED; // Set the item status to disabled
+	RemoveActiveItem(itemNumber);
+}
+
 static DOOR_DATA* GetDoorData(ITEM_INFO* item)
 {
 	return (DOOR_DATA*)item->data;
@@ -498,7 +520,7 @@ void Inject_Objects() {
 	INJECT(0x00434E30, InitialiseWindow);
 	INJECT(0x00434EB0, SmashWindow);
 	INJECT(0x00434F80, WindowControl);
-	//INJECT(0x00435020, SmashIceControl);
+	INJECT(0x00435020, SmashIceControl);
 	//INJECT(0x00435100, ShutThatDoor);
 	//INJECT(0x00435150, OpenThatDoor);
 	INJECT(0x00435190, InitialiseDoor);

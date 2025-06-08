@@ -676,8 +676,8 @@ extern STATIC_INFO StaticObjects[256];
 #define CDFlags						ARRAY_(0x005261C0, short, [MAX_CD])
 #define FlipMaps					ARRAY_(0x00526260, int, [MAX_FLIPMAPS])
 #define LosRooms					ARRAY_(0x005262A0, int, [20])
-#define GroundZones					ARRAY_(0x005263A0, short*, [8])
-#define FlyZones					ARRAY_(0x005263C0, short*, [2])
+#define GroundZones					ARRAY_(0x005263A0, UINT16*, [8])
+#define FlyZones					ARRAY_(0x005263C0, UINT16*, [2])
 
 /*
  * GameFlow/Inventory Variables

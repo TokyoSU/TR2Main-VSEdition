@@ -233,7 +233,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 void LaraWaterCurrent(COLL_INFO* coll)
 {
 	auto* room = &Rooms[LaraItem->roomNumber];
-	LaraItem->boxNumber = room->floor[((LaraItem->pos.z - room->z) >> WALL_SHIFT) + ((LaraItem->pos.x - room->x) >> WALL_SHIFT) * room->zSize].box;
+	LaraItem->boxNumber = GetFloorSector(LaraItem, room)->box;
 
 	// Exit if creature is not set !
 	if (Lara.creature == NULL)

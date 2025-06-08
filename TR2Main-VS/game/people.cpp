@@ -169,19 +169,15 @@ static const BITE_INFO Bandit2GunBite = { -1, 230, 9, 17 };
 
 BOOL Targetable(ITEM_INFO* item, AI_INFO* info) {
 	GAME_VECTOR source = {}, destination = {};
-	CREATURE_INFO* creature = NULL;
-	ITEM_INFO* enemy = NULL;
-
-	creature = GetCreatureInfo(item);
-	enemy = creature->enemy;
-	if (enemy->hitPoints > 0 && info->ahead && info->distance < SQR(8192)) {
+	CREATURE_INFO* creature = GetCreatureInfo(item);
+	if (creature->enemy != NULL && creature->enemy->hitPoints > 0 && info->ahead && info->distance < SQR(8192)) {
 		source.x = item->pos.x;
 		source.y = item->pos.y - 762;
 		source.z = item->pos.z;
 		source.roomNumber = item->roomNumber;
-		destination.x = enemy->pos.x;
-		destination.y = enemy->pos.y - 762;
-		destination.z = enemy->pos.z;
+		destination.x = creature->enemy->pos.x;
+		destination.y = creature->enemy->pos.y - 762;
+		destination.z = creature->enemy->pos.z;
 		return LOS(&source, &destination);
 	}
 	return FALSE;
@@ -189,19 +185,15 @@ BOOL Targetable(ITEM_INFO* item, AI_INFO* info) {
 
 BOOL Targetable2(ITEM_INFO* item, AI_INFO* info, int srcHeight, int targetHeight, int range) {
 	GAME_VECTOR source = {}, destination = {};
-	CREATURE_INFO* creature = NULL;
-	ITEM_INFO* enemy = NULL;
-
-	creature = GetCreatureInfo(item);
-	enemy = creature->enemy;
-	if (enemy->hitPoints > 0 && info->ahead && info->distance < SQR(range)) {
+	CREATURE_INFO* creature = GetCreatureInfo(item);
+	if (creature->enemy != NULL && creature->enemy->hitPoints > 0 && info->ahead && info->distance < SQR(range)) {
 		source.x = item->pos.x;
 		source.y = item->pos.y - srcHeight;
 		source.z = item->pos.z;
 		source.roomNumber = item->roomNumber;
-		destination.x = enemy->pos.x;
-		destination.y = enemy->pos.y - targetHeight;
-		destination.z = enemy->pos.z;
+		destination.x = creature->enemy->pos.x;
+		destination.y = creature->enemy->pos.y - targetHeight;
+		destination.z = creature->enemy->pos.z;
 		return LOS(&source, &destination);
 	}
 	return FALSE;

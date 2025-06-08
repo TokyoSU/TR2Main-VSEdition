@@ -48,12 +48,13 @@ typedef short(CREATURE_EFFECT_CALLBACK)(int x, int y, int z, short speed, short 
 void InitialiseCreature(short itemNumber); // 0x0040E190
 int CreatureActive(short itemNumber); // 0x0040E1C0
 void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI); // 0x0040E210
-#define SearchLOT ((int(__cdecl*)(LOT_INFO*,int)) 0x0040E470)
+int SearchLOT(LOT_INFO* LOT, int expansion); // 0x0040E470
+//#define SearchLOT ((int(__cdecl*)(LOT_INFO*,int)) 0x0040E470)
 #define UpdateLOT ((int(__cdecl*)(LOT_INFO*,int)) 0x0040E670)
-void TargetBox(LOT_INFO* LOT, short boxNum); // 0x0040E6E0
+void TargetBox(LOT_INFO* LOT, UINT16 boxNum); // 0x0040E6E0
 #define StalkBox ((int(__cdecl*)(ITEM_INFO*,ITEM_INFO*,short)) 0x0040E780)
 #define EscapeBox ((int(__cdecl*)(ITEM_INFO*,ITEM_INFO*,short)) 0x0040E880)
-int ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber); // 0x0040E930
+int ValidBox(ITEM_INFO* item, UINT16 zoneNumber, UINT16 boxNumber); // 0x0040E930
 void CreatureMood(ITEM_INFO* item, AI_INFO* ai, BOOL isViolent); // 0x0040E9E0
 #define CalculateTarget ((int(__cdecl*)(PHD_VECTOR*, ITEM_INFO*, LOT_INFO*)) 0x0040EE50)
 int CreatureCreature(short itemNumber); // 0x0040F2B0

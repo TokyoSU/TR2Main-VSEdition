@@ -12,6 +12,8 @@ struct ModConfig
 	}
 
 	bool isLoaded = false;
+	bool useNewVersion = false;
+	int newVersion = 0;
 
 	bool isBarefoot = false;
 	bool disableGiantYetiNextLevelOnDeath = false;

@@ -162,6 +162,7 @@ int ControlPhase(int nTicks, BOOL demoMode) {
 
 		for (id = NextItemActive; id >= 0; id = next) {
 			item = &Items[id];
+			LogDebug("ControlPhase: animating item %d, objectId: %d", id, item->objectID);
 			// NOTE: there is no IFL_CLEARBODY check in the original code
 			if (Objects[item->objectID].control != NULL && !CHK_ANY(item->flags, IFL_CLEARBODY)) {
 				Objects[item->objectID].control(id);
@@ -375,36 +376,36 @@ FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber)
 {
 	ROOM_INFO* r = &Rooms[*roomNumber];
 	FLOOR_INFO* floor = NULL;
-	int x_floor, y_floor;
+	int z_floor, x_floor;
 	short data;
 
 	do
 	{
-		x_floor = (z - r->z) >> WALL_SHIFT;
-		y_floor = (x - r->x) >> WALL_SHIFT;
+		z_floor = (z - r->z) >> WALL_SHIFT;
+		x_floor = (x - r->x) >> WALL_SHIFT;
 
-		if (x_floor <= 0)
+		if (z_floor <= 0)
 		{
+			z_floor = 0;
+			if (x_floor < 1)
+				x_floor = 1;
+			else if (x_floor > r->xSize - 2)
+				x_floor = r->xSize - 2;
+		}
+		else if (z_floor >= r->zSize - 1)
+		{
+			z_floor = r->zSize - 1;
+			if (x_floor < 1)
+				x_floor = 1;
+			else if (x_floor > r->xSize - 2)
+				x_floor = r->xSize - 2;
+		}
+		else if (x_floor < 0)
 			x_floor = 0;
-			if (y_floor < 1)
-				y_floor = 1;
-			else if (y_floor > r->xSize - 2)
-				y_floor = r->xSize - 2;
-		}
-		else if (x_floor >= r->zSize - 1)
-		{
-			x_floor = r->zSize - 1;
-			if (y_floor < 1)
-				y_floor = 1;
-			else if (y_floor > r->xSize - 2)
-				y_floor = r->xSize - 2;
-		}
-		else if (y_floor < 0)
-			y_floor = 0;
-		else if (y_floor >= r->xSize)
-			y_floor = r->xSize - 1;
+		else if (x_floor >= r->xSize)
+			x_floor = r->xSize - 1;
 
-		floor = &r->floor[x_floor + y_floor * r->zSize];
+		floor = &r->floor[z_floor + x_floor * r->zSize];
 		data = GetDoor(floor);
 		if (data != NO_ROOM)
 		{

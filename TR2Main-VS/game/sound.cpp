@@ -27,6 +27,12 @@
 #include "specific/game.h"
 #include "global/vars.h"
 
+#if defined(FEATURE_MOD_CONFIG)
+#include "modding/mod_utils.h"
+#endif
+
+enum sound_flags { NORMAL_SOUND, WAIT_SOUND, RESTART_SOUND, LOOPED_SOUND };
+
 static void S_SoundUpdatePanVolume(SOUND_SLOT* slot)
 {
 	int dx, dy, dz, radius, distance, nPan, nVolume;
@@ -174,69 +180,147 @@ int PlaySoundEffect(DWORD sampleIdx, PHD_3DPOS* pos, DWORD flags)
 	if (info.sampleIdx < 0)
 		return 0;
 
+	int nSfxSamples = 1; // Sample count.
+#if defined(FEATURE_MOD_CONFIG)
+	if (Mod.useNewVersion && Mod.newVersion >= 1)
+		nSfxSamples = info.lutCount;
+	else
+		nSfxSamples = info.flags >> 2 & 15;
+#endif
+
 	int nSample;
-	if (info.flags & 0x0080) // RANDOM_SAMPLE
-		nSample = info.sampleIdx + (int)((GetRandomDraw() * info.lutCount) >> 15);
+	if (info.flags & 0x0080 && nSfxSamples > 1) // RANDOM_SAMPLE
+		nSample = info.sampleIdx + (int)((GetRandomDraw() * nSfxSamples) >> 15);
 	else
 		nSample = info.sampleIdx;
 
-	if (info.flags & 0x0200) // WAIT (OneShot)
+#if defined(FEATURE_MOD_CONFIG)
+	if (Mod.useNewVersion && Mod.newVersion >= 1)
 	{
-		for (int nSlot = 0; nSlot < _countof(LaSlot); ++nSlot)
+		if (info.flags & 0x0200) // WAIT (OneShot)
 		{
-			auto& slot = LaSlot[nSlot];
-			if (slot.sampleIdx == lut)
+			for (int nSlot = 0; nSlot < _countof(LaSlot); ++nSlot)
 			{
-				if (S_SoundSampleIsPlaying(nSlot))
-					return 0;
-				slot.originalVolume = origVolume;
-				slot.sampleIdx = -1;
-			}
-		}
-	}
-	else if (info.flags & 0x0400) // REWOUND (OneShot)
-	{
-		for (int nSlot = 0; nSlot < _countof(LaSlot); ++nSlot)
-		{
-			auto& slot = LaSlot[nSlot];
-			if (slot.sampleIdx == lut)
-			{
-				S_SoundStopSample(nSlot);
-				slot.originalVolume = origVolume;
-				slot.sampleIdx = -1;
-				break;
-			}
-		}
-	}
-	else if (info.flags & 0x0800) // LOOPED
-	{
-		for (int nSlot = 0; nSlot < _countof(LaSlot); ++nSlot)
-		{
-			auto& slot = LaSlot[nSlot];
-			if (slot.sampleIdx == lut)
-			{
-				if (nVolume > slot.volume)
+				auto& slot = LaSlot[nSlot];
+				if (slot.sampleIdx == lut)
 				{
-					slot.volume = nVolume;
+					if (S_SoundSampleIsPlaying(nSlot))
+						return 0;
 					slot.originalVolume = origVolume;
-					slot.pan = pan;
-					slot.pitch = pitch;
-					slot.distance = nDistance;
-					if (pos)
-					{
-						slot.pos.x = pos->x;
-						slot.pos.y = pos->y;
-						slot.pos.z = pos->z;
-					}
-					return 1;
+					slot.sampleIdx = -1;
 				}
-				return 0;
+			}
+		}
+		else if (info.flags & 0x0400) // REWOUND (OneShot)
+		{
+			for (int nSlot = 0; nSlot < _countof(LaSlot); ++nSlot)
+			{
+				auto& slot = LaSlot[nSlot];
+				if (slot.sampleIdx == lut)
+				{
+					S_SoundStopSample(nSlot);
+					slot.originalVolume = origVolume;
+					slot.sampleIdx = -1;
+					break;
+				}
+			}
+		}
+		else if (info.flags & 0x0800) // LOOPED
+		{
+			for (int nSlot = 0; nSlot < _countof(LaSlot); ++nSlot)
+			{
+				auto& slot = LaSlot[nSlot];
+				if (slot.sampleIdx == lut)
+				{
+					if (nVolume > slot.volume)
+					{
+						slot.volume = nVolume;
+						slot.originalVolume = origVolume;
+						slot.pan = pan;
+						slot.pitch = pitch;
+						slot.distance = nDistance;
+						if (pos)
+						{
+							slot.pos.x = pos->x;
+							slot.pos.y = pos->y;
+							slot.pos.z = pos->z;
+						}
+						return 1;
+					}
+					return 0;
+				}
 			}
 		}
 	}
+	else
+	{
+		int nMode = info.flags & 3; // WAIT, REWOUND, LOOPED
+		LogDebug("SOUND: sampleIdx=%d, lut=%d, nMode=%d", sampleIdx, lut, nMode);
+		switch (nMode)
+		{
+		case NORMAL_SOUND: // NORMAL
+			break;
+		case WAIT_SOUND: // WAIT
+				for (int nSlot = 0; nSlot < _countof(LaSlot); ++nSlot)
+				{
+					auto& slot = LaSlot[nSlot];
+					if (slot.sampleIdx == lut)
+					{
+						if (S_SoundSampleIsPlaying(nSlot))
+							return 0;
+						slot.originalVolume = origVolume;
+						slot.sampleIdx = -1;
+					}
+				}
+				break;
+		case RESTART_SOUND: // REWOUND
+			for (int nSlot = 0; nSlot < _countof(LaSlot); ++nSlot)
+				{
+					auto& slot = LaSlot[nSlot];
+					if (slot.sampleIdx == lut)
+					{
+						S_SoundStopSample(nSlot);
+						slot.originalVolume = origVolume;
+						slot.sampleIdx = -1;
+						break;
+					}
+				}
+			break;
+		case LOOPED_SOUND: // LOOPED
+			for (int nSlot = 0; nSlot < _countof(LaSlot); ++nSlot)
+			{
+				auto& slot = LaSlot[nSlot];
+				if (slot.sampleIdx == lut)
+				{
+					if (nVolume > slot.volume)
+					{
+						slot.volume = nVolume;
+						slot.originalVolume = origVolume;
+						slot.pan = pan;
+						slot.pitch = pitch;
+						slot.distance = nDistance;
+						if (pos)
+						{
+							slot.pos.x = pos->x;
+							slot.pos.y = pos->y;
+							slot.pos.z = pos->z;
+						}
+						return 1;
+					}
+					return 0;
+				}
+			}
+			break;
+		}
+	}
+#endif
 
 	int nHandle;
-	if (info.flags & 0x0800) // LOOPED
+#if defined(FEATURE_MOD_CONFIG)
+	if ((Mod.useNewVersion && Mod.newVersion >= 1 && info.flags & 0x800) || (!Mod.useNewVersion && (info.flags & 3) == LOOPED_SOUND))
+#else
+	if ((info.flags & 3) == LOOPED_SOUND) // LOOPED
+#endif
 		nHandle = S_SoundPlaySampleLooped(nSample, nVolume, pitch, pan);
 	else
 		nHandle = S_SoundPlaySample(nSample, nVolume, pitch, pan);
@@ -291,7 +375,11 @@ int PlaySoundEffect(DWORD sampleIdx, PHD_3DPOS* pos, DWORD flags)
 	S_SoundStopSample(nMinSlot);
 	LaSlot[nMinSlot].sampleIdx = -1;
 
-	if (info.flags & 0x0800)
+#if defined(FEATURE_MOD_CONFIG)
+	if ((Mod.useNewVersion && Mod.newVersion >= 1 && info.flags & 0x800) || (!Mod.useNewVersion && (info.flags & 3) == LOOPED_SOUND))
+#else
+	if ((info.flags & 3) == LOOPED_SOUND) // LOOPED
+#endif
 		nHandle = S_SoundPlaySampleLooped(nSample, nVolume, pitch, pan);
 	else
 		nHandle = S_SoundPlaySample(nSample, nVolume, pitch, pan);
@@ -343,8 +431,12 @@ void SOUND_EndScene()
 		if (slot->sampleIdx < 0)
 			continue;
 
-		SAMPLE_INFO& sampleInfo = SampleInfos.at(slot->sampleIdx);
-		if (sampleInfo.flags & 0x0800) // Looped ?
+		SAMPLE_INFO& sample = SampleInfos.at(slot->sampleIdx);
+#if defined(FEATURE_MOD_CONFIG)
+		if ((Mod.useNewVersion && Mod.newVersion >= 1 && sample.flags & 0x800) || (!Mod.useNewVersion && (sample.flags & 3) == LOOPED_SOUND))
+#else
+		if ((info.flags & 3) == LOOPED_SOUND) // LOOPED
+#endif
 		{
 			if (!slot->volume)
 			{

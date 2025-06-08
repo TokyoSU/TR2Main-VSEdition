@@ -222,23 +222,23 @@ void SmartShift(GAME_VECTOR* goal, CB_SMARTCAM shift) {
 	LOS(&Camera.target, goal);
 	room = &Rooms[Camera.target.roomNumber];
 	box = &Boxes[room->floor[((Camera.target.x - room->x) >> WALL_SHIFT) * room->zSize + ((Camera.target.z - room->z) >> WALL_SHIFT)].box];
-	left = box->zMin << WALL_SHIFT;
-	right = (box->zMax << WALL_SHIFT) - 1;
-	top = box->xMin << WALL_SHIFT;
-	bottom = (box->xMax << WALL_SHIFT) - 1;
+	left = box->left << WALL_SHIFT;
+	right = (box->right << WALL_SHIFT) - 1;
+	top = box->top << WALL_SHIFT;
+	bottom = (box->bottom << WALL_SHIFT) - 1;
 	room = &Rooms[goal->roomNumber];
 	boxID = room->floor[((goal->x - room->x) >> WALL_SHIFT) * room->zSize + ((goal->z - room->z) >> WALL_SHIFT)].box;
 	if (boxID != -1 && (goal->z < left || goal->z > right || goal->x < top || goal->x > bottom)) {
 		box = &Boxes[boxID];
-		left = box->zMin << WALL_SHIFT;
-		right = (box->zMax << WALL_SHIFT) - 1;
-		top = box->xMin << WALL_SHIFT;
-		bottom = (box->xMax << WALL_SHIFT) - 1;
+		left = box->left << WALL_SHIFT;
+		right = (box->right << WALL_SHIFT) - 1;
+		top = box->top << WALL_SHIFT;
+		bottom = (box->bottom << WALL_SHIFT) - 1;
 	}
 	z = (goal->z - 1024) | 0x3FF;
 	floorL = GoodPosition(goal->x, goal->y, z, goal->roomNumber);
 	if (floorL) {
-		side = Boxes[floorL->box].zMin << WALL_SHIFT;
+		side = Boxes[floorL->box].left << WALL_SHIFT;
 		if (floorL->box != -1 && side < left)
 			left = side;
 	}
@@ -248,7 +248,7 @@ void SmartShift(GAME_VECTOR* goal, CB_SMARTCAM shift) {
 	z = (goal->z + 1024) & -0x400;
 	floorR = GoodPosition(goal->x, goal->y, z, goal->roomNumber);
 	if (floorR) {
-		side = (Boxes[floorR->box].zMax << WALL_SHIFT) - 1;
+		side = (Boxes[floorR->box].right << WALL_SHIFT) - 1;
 		if (floorR->box != -1 && side > right)
 			right = side;
 	}
@@ -258,7 +258,7 @@ void SmartShift(GAME_VECTOR* goal, CB_SMARTCAM shift) {
 	x = (goal->x - 1024) | 0x3FF;
 	floorT = GoodPosition(x, goal->y, goal->z, goal->roomNumber);
 	if (floorT) {
-		side = Boxes[floorT->box].xMin << WALL_SHIFT;
+		side = Boxes[floorT->box].top << WALL_SHIFT;
 		if (floorT->box != -1 && side < top)
 			top = side;
 	}
@@ -268,7 +268,7 @@ void SmartShift(GAME_VECTOR* goal, CB_SMARTCAM shift) {
 	x = (goal->x + 1024) & -0x400;
 	floorB = GoodPosition(x, goal->y, goal->z, goal->roomNumber);
 	if (floorB) {
-		side = (Boxes[floorB->box].xMax << WALL_SHIFT) - 1;
+		side = (Boxes[floorB->box].bottom << WALL_SHIFT) - 1;
 		if (floorB->box != -1 && side > bottom)
 			bottom = side;
 	}
@@ -399,8 +399,8 @@ int ShiftClamp(GAME_VECTOR* pos, int clamp) {
 	z = pos->z;
 	floor = GetFloor(x, pos->y, z, &pos->roomNumber);
 	box = &Boxes[floor->box];
-	left = (box->zMin << WALL_SHIFT) + clamp;
-	right = (box->zMax << WALL_SHIFT) - clamp - 1;
+	left = (box->left << WALL_SHIFT) + clamp;
+	right = (box->right << WALL_SHIFT) - clamp - 1;
 	if (z < left && !GoodPosition(x, pos->y, z - clamp, pos->roomNumber)) {
 		pos->z = left;
 	}
@@ -408,8 +408,8 @@ int ShiftClamp(GAME_VECTOR* pos, int clamp) {
 		if (z > right && !GoodPosition(x, pos->y, z + clamp, pos->roomNumber))
 			pos->z = right;
 	}
-	top = (box->xMin << WALL_SHIFT) + clamp;
-	bottom = (box->xMax << WALL_SHIFT) - clamp - 1;
+	top = (box->top << WALL_SHIFT) + clamp;
+	bottom = (box->bottom << WALL_SHIFT) - clamp - 1;
 	if (x < top && !GoodPosition(x - clamp, pos->y, z, pos->roomNumber)) {
 		pos->x = top;
 	}
