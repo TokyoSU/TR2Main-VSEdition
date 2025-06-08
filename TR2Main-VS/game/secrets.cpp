@@ -64,3 +64,12 @@ int GetSecretMesh(int objNumber, int secretType)
 #endif
 	return Objects[objNumber].meshIndex;
 }
+
+int GetSecretSpriteByStr(unsigned char characterType)
+{
+#if defined(FEATURE_MOD_CONFIG)
+	if (Mod.useNewVersion && Mod.newVersion >= 1)
+		return Objects[ID_SECRET1_OR_SECRET_SPRITE].meshIndex + (characterType - CHAR_SECRET1);
+#endif
+	return Objects[ID_SECRET1_OR_SECRET_SPRITE + (characterType - CHAR_SECRET1)].meshIndex;
+}
