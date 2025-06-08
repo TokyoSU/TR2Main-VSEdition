@@ -25,7 +25,7 @@
 #define VER_MAJOR	0
 #define VER_MINOR	9
 #define VER_PATCH	1
-#define VER_BUILD	4
+#define VER_BUILD	5
 #define STR_(x) #x
 #define STR(x) STR_(x)
 #define VER_FULL	STR(VER_MAJOR) "." STR(VER_MINOR) "." STR(VER_PATCH) "." STR(VER_BUILD) "\0"

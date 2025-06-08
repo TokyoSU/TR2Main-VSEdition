@@ -192,8 +192,8 @@ int SearchLOT(LOT_INFO* LOT, int expansion)
 void TargetBox(LOT_INFO* LOT, UINT16 boxNumber)
 {
 	BOX_INFO* box = &Boxes[boxNumber];
-	LOT->target.z = ((UINT32)box->left << WALL_SHIFT) + GetRandomControl() * (((UINT32)box->right - (UINT32)box->left - 1) >> 15 - WALL_SHIFT) + WALL_SIZE / 2;
-	LOT->target.x = ((UINT32)box->top << WALL_SHIFT) + GetRandomControl() * (((UINT32)box->bottom - (UINT32)box->top - 1) >> 15 - WALL_SHIFT) + WALL_SIZE / 2;
+	LOT->target.z = ((int)box->left << WALL_SHIFT) + GetRandomControl() * ((((int)box->right - (int)box->left - 1) >> 15) - WALL_SHIFT) + WALL_SIZE / 2;
+	LOT->target.x = ((int)box->top << WALL_SHIFT) + GetRandomControl() * ((((int)box->bottom - (int)box->top - 1) >> 15) - WALL_SHIFT) + WALL_SIZE / 2;
 	LOT->target.y = LOT->fly != 0 ? box->height - 384 : box->height;
 	LOT->requiredBox = boxNumber;
 }
@@ -208,8 +208,8 @@ int ValidBox(ITEM_INFO* item, UINT16 zoneNumber, UINT16 boxNumber)
 	BOX_INFO* box = &Boxes[boxNumber];
 	if (creature->LOT.blockMask & box->overlapIndex)
 		return FALSE;
-	if (item->pos.z > ((UINT32)box->left << WALL_SHIFT) && item->pos.z < ((UINT32)box->right << WALL_SHIFT)
-    &&  item->pos.x > ((UINT32)box->top << WALL_SHIFT)  && item->pos.x < ((UINT32)box->bottom << WALL_SHIFT))
+	if (item->pos.z > ((int)box->left << WALL_SHIFT) && item->pos.z < ((int)box->right << WALL_SHIFT)
+    &&  item->pos.x > ((int)box->top << WALL_SHIFT)  && item->pos.x < ((int)box->bottom << WALL_SHIFT))
 		return FALSE;
 	return TRUE;
 }
