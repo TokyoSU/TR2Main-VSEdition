@@ -305,22 +305,22 @@ void DrawTextureTile(int sx, int sy, int width, int height, HWR_TEXHANDLE texSou
 {
 	float sx0, sy0, sx1, sy1;
 	float tu0, tv0, tu1, tv1;
-	double uvAdjust;
+	float uvAdjust;
 	D3DTLVERTEX vertex[4];
 
-	sx0 = (double)sx;
-	sy0 = (double)sy;
-	sx1 = (double)(sx + width);
-	sy1 = (double)(sy + height);
+	sx0 = (float)sx;
+	sy0 = (float)sy;
+	sx1 = (float)(sx + width);
+	sy1 = (float)(sy + height);
 
 #ifdef FEATURE_BACKGROUND_IMPROVED
-	tu0 = (double)tu / 256.0;
-	tv0 = (double)tv / 256.0;
-	tu1 = (double)(tu + t_width) / 256.0;
-	tv1 = (double)(tv + t_height) / 256.0;
+	tu0 = (float)tu / 256.0f;
+	tv0 = (float)tv / 256.0f;
+	tu1 = (float)(tu + t_width) / 256.0f;
+	tv1 = (float)(tv + t_height) / 256.0f;
 	if (PatternTexPage < 0) {
-		uvAdjust = (double)UvAdd / (double)(256 * GetTextureSideByHandle(texSource));
-		CLAMPL(uvAdjust, 1.0 / double(PHD_ONE));
+		uvAdjust = (float)UvAdd / (float)(256 * GetTextureSideByHandle(texSource));
+		CLAMPL(uvAdjust, 1.0f / float(PHD_ONE));
 		tu0 += uvAdjust;
 		tv0 += uvAdjust;
 		tu1 -= uvAdjust;
@@ -328,8 +328,8 @@ void DrawTextureTile(int sx, int sy, int width, int height, HWR_TEXHANDLE texSou
 	}
 #else // FEATURE_BACKGROUND_IMPROVED
 	// NOTE: page side is not counted in the original game, but we need it for HD textures
-	uvAdjust = (double)UvAdd / (double)(256 * GetTextureSideByHandle(texSource));
-	CLAMPL(uvAdjust, 1.0 / double(PHD_ONE));
+	uvAdjust = (float)UvAdd / (float)(256 * GetTextureSideByHandle(texSource));
+	CLAMPL(uvAdjust, 1.0f / float(PHD_ONE));
 	tu0 = (double)tu / 256.0 + uvAdjust;
 	tv0 = (double)tv / 256.0 + uvAdjust;
 	tu1 = (double)(tu + t_width) / 256.0 - uvAdjust;
@@ -361,7 +361,7 @@ void DrawTextureTile(int sx, int sy, int width, int height, HWR_TEXHANDLE texSou
 	vertex[3].tv = tv1;
 
 	for (int i = 0; i < 4; ++i) {
-		vertex[i].sz = 0.995;
+		vertex[i].sz = 0.995f;
 		vertex[i].rhw = RhwFactor / FltFarZ;
 		vertex[i].specular = 0;
 	}
@@ -377,7 +377,7 @@ D3DCOLOR BGND_CenterLighting(int x, int y, int width, int height) {
 
 	xDist = (double)(x - (width / 2)) / (double)width; // xDist range will be: -0.5..0.5
 	yDist = (double)(y - (height / 2)) / (double)height; // yDist range will be: -0.5..0.5
-	light = 256 - (sqrt(xDist * xDist + yDist * yDist) * 300.0); // light range will be: 44..256
+	light = static_cast<int>(256 - (sqrt(xDist * xDist + yDist * yDist) * 300.0)); // light range will be: 44..256
 
 #if defined(FEATURE_VIDEOFX_IMPROVED)
 	if (SavedAppSettings.LightingMode) light /= 2;

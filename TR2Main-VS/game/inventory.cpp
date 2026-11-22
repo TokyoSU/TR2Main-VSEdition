@@ -812,10 +812,10 @@ void Construct_Inventory() {
 		InvCompassOption.yTransSel = PsxFovEnabled ? -140 : -170;
 	}
 	else if (scale < 1.7) {
-		InvCompassOption.yTransSel = -15 - (scale - 1.5) * 35.0;
+		InvCompassOption.yTransSel = static_cast<int>(-15 - (scale - 1.5) * 35.0);
 	}
 	else {
-		InvCompassOption.yTransSel = -22 - (scale - 1.7) / 0.0075;
+		InvCompassOption.yTransSel = static_cast<int>(-22 - (scale - 1.7) / 0.0075);
 	}
 #endif // FEATURE_HUD_IMPROVED
 }
@@ -919,13 +919,13 @@ void DrawInventoryItem(INVENTORY_ITEM* invItem) {
 					S_DrawScreenSprite(sx + sprite->x, sy + sprite->y, sprite->z, sprite->param1, sprite->param2, StaticObjects[ID_ALPHABET].meshIndex + sprite->invColour, 0x1000, 0);
 					break;
 				case 2:
-					S_DrawScreenLine(sx + sprite->x, sy + sprite->y, sprite->z, sprite->param1, sprite->param2, sprite->invColour, (D3DCOLOR*)sprite->gour, 0);
+					S_DrawScreenLine(sx + sprite->x, sy + sprite->y, sprite->z, sprite->param1, sprite->param2, static_cast<BYTE>(sprite->invColour), (D3DCOLOR*)sprite->gour, 0);
 					break;
 				case 3:
-					S_DrawScreenBox(sx + sprite->x, sy + sprite->y, sprite->z, sprite->param1, sprite->param2, sprite->invColour, (GOURAUD_OUTLINE*)sprite->gour, 0);
+					S_DrawScreenBox(sx + sprite->x, sy + sprite->y, sprite->z, sprite->param1, sprite->param2, static_cast<BYTE>(sprite->invColour), (GOURAUD_OUTLINE*)sprite->gour, 0);
 					break;
 				case 4:
-					S_DrawScreenFBox(sx + sprite->x, sy + sprite->y, sprite->z, sprite->param1, sprite->param2, sprite->invColour, (GOURAUD_FILL*)sprite->gour, 0);
+					S_DrawScreenFBox(sx + sprite->x, sy + sprite->y, sprite->z, sprite->param1, sprite->param2, static_cast<BYTE>(sprite->invColour), (GOURAUD_FILL*)sprite->gour, 0);
 					break;
 				}
 			}
@@ -1055,9 +1055,9 @@ void DoInventoryBackground() {
 		phd_PushMatrix();
 		ptr = (UINT16*)&Anims[Objects[ID_INV_BACKGROUND].animIndex].framePtr[9];
 		phd_TranslateAbs(0, 0x3000, 0);
-		phd_RotYXZ(0, PHD_90, PHD_180);
+		phd_RotYXZ(0, PHD_90, -PHD_180);
 		phd_RotYXZsuperpack(&ptr, 0);
-		phd_RotYXZ(PHD_180, 0, 0);
+		phd_RotYXZ(-PHD_180, 0, 0);
 		S_InsertInvBgnd(MeshPtr[Objects[ID_INV_BACKGROUND].meshIndex]);
 		phd_PopMatrix();
 	}

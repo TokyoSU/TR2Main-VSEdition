@@ -133,7 +133,7 @@ void CalculateWibbleTable() {
 	// This function calculates water effect tables
 	for (int i = 0; i < WIBBLE_SIZE; ++i) {
 		int sine = phd_sin(i * PHD_360 / WIBBLE_SIZE); // 360 degrees divided by wibble number
-		WibbleTable[i] = sine * MAX_WIBBLE >> W2V_SHIFT;
+		WibbleTable[i] = static_cast<float>(sine * MAX_WIBBLE >> W2V_SHIFT);
 		ShadesTable[i] = sine * MAX_SHADE >> W2V_SHIFT;
 		RandomTable[i] = (GetRandomDraw() >> 5) - 0x01FF;
 		for (int j = 0; j < WIBBLE_SIZE; ++j)

@@ -795,7 +795,7 @@ void Inv_RingInit(RING_INFO* ring, short type, INVENTORY_ITEM** itemList, short 
 	Inv_RingMotionInit(ring, 32, 0, 1);
 	Inv_RingMotionRadius(ring, 0x2B0);
 	Inv_RingMotionCameraPos(ring, -0x100);
-	Inv_RingMotionRotation(ring, PHD_180, (-PHD_90) - (ring->currentObj * ring->angleAdder));
+	Inv_RingMotionRotation(ring, -PHD_180, (-PHD_90) - (ring->currentObj * ring->angleAdder));
 	ring->ringPos.x = 0;
 	ring->ringPos.y = 0;
 	ring->ringPos.z = 0;

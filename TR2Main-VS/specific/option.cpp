@@ -20,6 +20,7 @@
  */
 
 #include "precompiled.h"
+#include "modding/texture_utils.h"
 #include "specific/option.h"
 #include "game/invtext.h"
 #include "game/sound.h"
@@ -230,8 +231,44 @@ extern GOURAUD_OUTLINE ReqSelGour2;
 /*
  * Control key names
  */
+static LPCSTR DefaultControlKeysText[0x110] = {
+	NULL,   "ESC",   "1",     "2",     "3",     "4",     "5",     "6",
+	"7",    "8",     "9",     "0",     "-",     "+",     "BKSP",  "TAB",
+	"Q",    "W",     "E",     "R",     "T",     "Y",     "U",     "I",
+	"O",    "P",     "<",     ">",     "RET",   "CTRL",  "A",     "S",
+	"D",    "F",     "G",     "H",     "J",     "K",     "L",     ";",
+	"'",    "`",     "SHIFT", "#",     "Z",     "X",     "C",     "V",
+	"B",    "N",     "M",     ",",     ".",     "/",     "SHIFT", "PADx",
+	"ALT",  "SPACE", "CAPS",  NULL,    NULL,    NULL,    NULL,    NULL,
+	NULL,   NULL,    NULL,    NULL,    NULL,    "NMLK",  NULL,    "PAD7",
+	"PAD8", "PAD9",  "PAD-",  "PAD4",  "PAD5",  "PAD6",  "PAD+",  "PAD1",
+	"PAD2", "PAD3",  "PAD0",  "PAD.",  NULL,    NULL,    "\\",    NULL,
+	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
+	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
+	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
+	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
+	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
+	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
+	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
+	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
+	NULL,   NULL,    NULL,    NULL,    "ENTER", "CTRL",  NULL,    NULL,
+	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
+	NULL,   NULL,    "SHIFT", NULL,    NULL,    NULL,    NULL,    NULL,
+	NULL,   NULL,    NULL,    NULL,    NULL,    "PAD/",  NULL,    NULL,
+	"ALT",  NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
+	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    "HOME",
+	"UP",   "PGUP",  NULL,    "LEFT",  NULL,    "RIGHT", NULL,    "END",
+	"DOWN", "PGDN",  "INS",   "DEL",   NULL,    NULL,    NULL,    NULL,
+	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
+	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
+	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
+	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
+	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
+	"JOY1", "JOY2",  "JOY3",  "JOY4",  "JOY5",  "JOY6",  "JOY7",  "JOY8",
+	"JOY9", "JOY10", "JOY11", "JOY12", "JOY13", "JOY14", "JOY15", "JOY16",
+};
 #ifdef FEATURE_HUD_IMPROVED
-static LPCSTR ControlKeysText[0x110] = {
+static LPCSTR ControlKeyIcons[0x110] = {
 	NULL,           K("esc"),       K("1"),         K("2"),         K("3"),         K("4"),         K("5"),         K("6"),
 	K("7"),         K("8"),         K("9"),         K("0"),         K("-"),         K("="),         K("backspace"), K("tab"),
 	K("q"),         K("w"),         K("e"),         K("r"),         K("t"),         K("y"),         K("u"),         K("i"),
@@ -268,6 +305,20 @@ static LPCSTR ControlKeysText[0x110] = {
 	K("joy9"),      K("joy10"),     K("joy11"),     K("joy12"),     K("joy13"),     K("joy14"),     K("joy15"),     K("joy16"),
 };
 
+#endif
+
+static LPCSTR GetControlKeyLabel(size_t key) {
+	if (key >= ARRAY_SIZE(DefaultControlKeysText)) return NULL;
+#ifdef FEATURE_HUD_IMPROVED
+	const char* icon = ControlKeyIcons[key];
+	if (icon && HasControlKeyImage(icon + 1, static_cast<int>(strlen(icon)) - 2)) {
+		return icon;
+	}
+#endif
+	return DefaultControlKeysText[key];
+}
+
+#ifdef FEATURE_HUD_IMPROVED
 static TEXT_STR_INFO* SelectHintText, * ContinueHintText, * DeselectHintText;
 
 typedef enum {
@@ -280,10 +331,10 @@ static const char* GetHintText(HINT_MODE mode, KEYMAP joyKeyMap, DWORD kbdKeyCod
 	static char text[64] = { 0 };
 	const char* key = NULL;
 	if (mode == HINT_JOYSTICK && Layout[CTRL_Joystick].key[joyKeyMap] < 0x10) {
-		key = ControlKeysText[0x100 + Layout[CTRL_Joystick].key[joyKeyMap]];
+		key = GetControlKeyLabel(0x100 + Layout[CTRL_Joystick].key[joyKeyMap]);
 	}
 	else {
-		key = ControlKeysText[kbdKeyCode];
+		key = GetControlKeyLabel(kbdKeyCode);
 	}
 	snprintf(text, sizeof(text), "%s %s", key, message);
 	return text;
@@ -496,43 +547,7 @@ static JOYOPT JoystickOpts[4] = {
 #endif // FEATURE_INPUT_IMPROVED
 	{GetEmptyOptName, GetEmptyOptState, ToggleEmptyOptState},
 };
-#else // FEATURE_HUD_IMPROVED
-static LPCSTR ControlKeysText[0x110] = {
-	NULL,   "ESC",   "1",     "2",     "3",     "4",     "5",     "6",
-	"7",    "8",     "9",     "0",     "-",     "+",     "BKSP",  "TAB",
-	"Q",    "W",     "E",     "R",     "T",     "Y",     "U",     "I",
-	"O",    "P",     "<",     ">",     "RET",   "CTRL",  "A",     "S",
-	"D",    "F",     "G",     "H",     "J",     "K",     "L",     ";",
-	"'",    "`",     "SHIFT", "#",     "Z",     "X",     "C",     "V",
-	"B",    "N",     "M",     ",",     ".",     "/",     "SHIFT", "PADx",
-	"ALT",  "SPACE", "CAPS",  NULL,    NULL,    NULL,    NULL,    NULL,
-	NULL,   NULL,    NULL,    NULL,    NULL,    "NMLK",  NULL,    "PAD7",
-	"PAD8", "PAD9",  "PAD-",  "PAD4",  "PAD5",  "PAD6",  "PAD+",  "PAD1",
-	"PAD2", "PAD3",  "PAD0",  "PAD.",  NULL,    NULL,    "\\",    NULL,
-	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
-	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
-	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
-	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
-	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
-	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
-	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
-	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
-	NULL,   NULL,    NULL,    NULL,    "ENTER", "CTRL",  NULL,    NULL,
-	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
-	NULL,   NULL,    "SHIFT", NULL,    NULL,    NULL,    NULL,    NULL,
-	NULL,   NULL,    NULL,    NULL,    NULL,    "PAD/",  NULL,    NULL,
-	"ALT",  NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
-	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    "HOME",
-	"UP",   "PGUP",  NULL,    "LEFT",  NULL,    "RIGHT", NULL,    "END",
-	"DOWN", "PGDN",  "INS",   "DEL",   NULL,    NULL,    NULL,    NULL,
-	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
-	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
-	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
-	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
-	NULL,   NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
-	"JOY1", "JOY2",  "JOY3",  "JOY4",  "JOY5",  "JOY6",  "JOY7",  "JOY8",
-	"JOY9", "JOY10", "JOY11", "JOY12", "JOY13", "JOY14", "JOY15", "JOY16",
-};
+
 #endif // FEATURE_HUD_IMPROVED
 
 // NOTE: not presented in the original game. SetPCRequesterSize() used directly instead
@@ -541,7 +556,7 @@ void SetPassportRequesterSize(REQUEST_INFO* req) {
 	extern DWORD SavegameSlots;
 	double scale = (double)GetRenderHeight() / (double)GetRenderScale(480);
 	DWORD adjust = (scale > 1.0) ? 5 : 0;
-	DWORD lines = (PASSPORT_LINE_COUNT + adjust) * scale - adjust;
+	DWORD lines = static_cast<DWORD>((PASSPORT_LINE_COUNT + adjust) * scale - adjust);
 	CLAMP(lines, 5, SavegameSlots);
 	SetPCRequesterSize(req, lines, PASSPORT_Y_BOX);
 #else // !FEATURE_HUD_IMPROVED
@@ -1517,7 +1532,7 @@ void do_control_option(INVENTORY_ITEM * item) {
 			}
 		}
 
-		if (i != 0 && ControlKeysText[i] != NULL && i != DIK_RETURN &&
+		if (i != 0 && GetControlKeyLabel(i) != NULL && i != DIK_RETURN &&
 			i != DIK_LEFT && i != DIK_RIGHT && i != DIK_UP && i != DIK_DOWN)
 		{
 			if (i != DIK_ESCAPE) {
@@ -1533,7 +1548,7 @@ void do_control_option(INVENTORY_ITEM * item) {
 				S_ChangeCtrlText();
 #else // FEATURE_HUD_IMPROVED
 				Layout[LayoutPage].key[KeyCursor] = i;
-				T_ChangeText(CtrlTextB[KeyCursor], ControlKeysText[i]);
+				T_ChangeText(CtrlTextB[KeyCursor], GetControlKeyLabel(i));
 #endif // FEATURE_HUD_IMPROVED
 			}
 
@@ -1585,6 +1600,32 @@ void do_control_option(INVENTORY_ITEM * item) {
 	InputDB = 0;
 }
 
+#ifdef FEATURE_HUD_IMPROVED
+static void PositionControlBindings(bool isCompact) {
+	const int center = GetRenderWidthDownscaled() / 2;
+	const int halfWidth = (isCompact ? CONTROL_WIDTH_LOW : CONTROL_WIDTH_HIGH) / 2;
+	for (DWORD i = 0; i < ARRAY_SIZE(Layout->key); ++i) {
+		const int column = (i < CONTROL_LINE_COUNT) ? -halfWidth : 0;
+		TEXT_STR_INFO* binding = CtrlTextB[i];
+		const bool keyboard = LayoutPage != CTRL_Joystick;
+		const bool textLabel = keyboard && (binding->pString[0] != 0x7F ||
+			(!ConflictLayout[i] && CtrlTextC[i]->pString[0] != 0x7F));
+		T_HideText(CtrlTextC[i], !keyboard || ConflictLayout[i] || textLabel);
+		if (textLabel) {
+			// The original text layout shows one left-aligned binding per action.
+			binding->xPos = center + column + 10;
+			T_CentreH(binding, 0);
+			T_SetScale(binding, isCompact ? PHD_ONE / 2 : PHD_ONE * 3 / 4, PHD_ONE);
+		}
+		else {
+			binding->xPos = column + (keyboard && !ConflictLayout[i] ? CONTROL_COLUMN_B1 : CONTROL_COLUMN_B2);
+			T_CentreH(binding, 1);
+			T_SetScale(binding, PHD_ONE, PHD_ONE);
+		}
+	}
+}
+#endif
+
 void S_ShowControls() {
 	DWORD i;
 	int x0, x1, xCenter;
@@ -1598,23 +1639,23 @@ void S_ShowControls() {
 		x1 = CONTROL_COLUMN_C;
 		x0 = x1 - (isCompact ? CONTROL_WIDTH_LOW : CONTROL_WIDTH_HIGH) / 2;
 
-		CtrlTextC[0] = T_Print(x0, CONTROL_Y_LINE1, CONTROL_NEARZ, ControlKeysText[Layout[CTRL_Default].key[0]]);
-		CtrlTextC[1] = T_Print(x0, CONTROL_Y_LINE2, CONTROL_NEARZ, ControlKeysText[Layout[CTRL_Default].key[1]]);
-		CtrlTextC[2] = T_Print(x0, CONTROL_Y_LINE3, CONTROL_NEARZ, ControlKeysText[Layout[CTRL_Default].key[2]]);
-		CtrlTextC[3] = T_Print(x0, CONTROL_Y_LINE4, CONTROL_NEARZ, ControlKeysText[Layout[CTRL_Default].key[3]]);
-		CtrlTextC[4] = T_Print(x0, CONTROL_Y_LINE5, CONTROL_NEARZ, ControlKeysText[Layout[CTRL_Default].key[4]]);
-		CtrlTextC[5] = T_Print(x0, CONTROL_Y_LINE6, CONTROL_NEARZ, ControlKeysText[Layout[CTRL_Default].key[5]]);
-		CtrlTextC[6] = T_Print(x0, CONTROL_Y_LINE7, CONTROL_NEARZ, ControlKeysText[Layout[CTRL_Default].key[6]]);
-		CtrlTextC[7] = T_Print(x0, CONTROL_Y_LINE8, CONTROL_NEARZ, ControlKeysText[Layout[CTRL_Default].key[7]]);
+		CtrlTextC[0] = T_Print(x0, CONTROL_Y_LINE1, CONTROL_NEARZ, GetControlKeyLabel(Layout[CTRL_Default].key[0]));
+		CtrlTextC[1] = T_Print(x0, CONTROL_Y_LINE2, CONTROL_NEARZ, GetControlKeyLabel(Layout[CTRL_Default].key[1]));
+		CtrlTextC[2] = T_Print(x0, CONTROL_Y_LINE3, CONTROL_NEARZ, GetControlKeyLabel(Layout[CTRL_Default].key[2]));
+		CtrlTextC[3] = T_Print(x0, CONTROL_Y_LINE4, CONTROL_NEARZ, GetControlKeyLabel(Layout[CTRL_Default].key[3]));
+		CtrlTextC[4] = T_Print(x0, CONTROL_Y_LINE5, CONTROL_NEARZ, GetControlKeyLabel(Layout[CTRL_Default].key[4]));
+		CtrlTextC[5] = T_Print(x0, CONTROL_Y_LINE6, CONTROL_NEARZ, GetControlKeyLabel(Layout[CTRL_Default].key[5]));
+		CtrlTextC[6] = T_Print(x0, CONTROL_Y_LINE7, CONTROL_NEARZ, GetControlKeyLabel(Layout[CTRL_Default].key[6]));
+		CtrlTextC[7] = T_Print(x0, CONTROL_Y_LINE8, CONTROL_NEARZ, GetControlKeyLabel(Layout[CTRL_Default].key[7]));
 
-		CtrlTextC[8] = T_Print(x1, CONTROL_Y_LINE1, CONTROL_NEARZ, ControlKeysText[Layout[CTRL_Default].key[8]]);
-		CtrlTextC[9] = T_Print(x1, CONTROL_Y_LINE2, CONTROL_NEARZ, ControlKeysText[Layout[CTRL_Default].key[9]]);
-		CtrlTextC[10] = T_Print(x1, CONTROL_Y_LINE3, CONTROL_NEARZ, ControlKeysText[Layout[CTRL_Default].key[10]]);
-		CtrlTextC[11] = T_Print(x1, CONTROL_Y_LINE4, CONTROL_NEARZ, ControlKeysText[Layout[CTRL_Default].key[11]]);
-		CtrlTextC[12] = T_Print(x1, CONTROL_Y_LINE5, CONTROL_NEARZ, ControlKeysText[Layout[CTRL_Default].key[12]]);
-		CtrlTextC[13] = T_Print(x1, CONTROL_Y_LINE6, CONTROL_NEARZ, ControlKeysText[Layout[CTRL_Default].key[13]]);
-		CtrlTextC[14] = T_Print(x1, CONTROL_Y_LINE7, CONTROL_NEARZ, ControlKeysText[Layout[CTRL_Default].key[14]]);
-		CtrlTextC[15] = T_Print(x1, CONTROL_Y_LINE8, CONTROL_NEARZ, ControlKeysText[Layout[CTRL_Default].key[15]]);
+		CtrlTextC[8] = T_Print(x1, CONTROL_Y_LINE1, CONTROL_NEARZ, GetControlKeyLabel(Layout[CTRL_Default].key[8]));
+		CtrlTextC[9] = T_Print(x1, CONTROL_Y_LINE2, CONTROL_NEARZ, GetControlKeyLabel(Layout[CTRL_Default].key[9]));
+		CtrlTextC[10] = T_Print(x1, CONTROL_Y_LINE3, CONTROL_NEARZ, GetControlKeyLabel(Layout[CTRL_Default].key[10]));
+		CtrlTextC[11] = T_Print(x1, CONTROL_Y_LINE4, CONTROL_NEARZ, GetControlKeyLabel(Layout[CTRL_Default].key[11]));
+		CtrlTextC[12] = T_Print(x1, CONTROL_Y_LINE5, CONTROL_NEARZ, GetControlKeyLabel(Layout[CTRL_Default].key[12]));
+		CtrlTextC[13] = T_Print(x1, CONTROL_Y_LINE6, CONTROL_NEARZ, GetControlKeyLabel(Layout[CTRL_Default].key[13]));
+		CtrlTextC[14] = T_Print(x1, CONTROL_Y_LINE7, CONTROL_NEARZ, GetControlKeyLabel(Layout[CTRL_Default].key[14]));
+		CtrlTextC[15] = T_Print(x1, CONTROL_Y_LINE8, CONTROL_NEARZ, GetControlKeyLabel(Layout[CTRL_Default].key[15]));
 
 		for (i = 0; i < CONTROL_LINE_COUNT * 2; ++i) {
 			T_CentreV(CtrlTextC[i], 1);
@@ -1642,53 +1683,48 @@ void S_ShowControls() {
 			CtrlTextB[3] = T_Print(x0, CONTROL_Y_LINE4, CONTROL_NEARZ, JoystickOpts[3].getState());
 		}
 		else {
-			CtrlTextB[0] = T_Print(x0, CONTROL_Y_LINE1, CONTROL_NEARZ, ControlKeysText[base + Layout[LayoutPage].key[0]]);
-			CtrlTextB[1] = T_Print(x0, CONTROL_Y_LINE2, CONTROL_NEARZ, ControlKeysText[base + Layout[LayoutPage].key[1]]);
-			CtrlTextB[2] = T_Print(x0, CONTROL_Y_LINE3, CONTROL_NEARZ, ControlKeysText[base + Layout[LayoutPage].key[2]]);
-			CtrlTextB[3] = T_Print(x0, CONTROL_Y_LINE4, CONTROL_NEARZ, ControlKeysText[base + Layout[LayoutPage].key[3]]);
+			CtrlTextB[0] = T_Print(x0, CONTROL_Y_LINE1, CONTROL_NEARZ, GetControlKeyLabel(base + Layout[LayoutPage].key[0]));
+			CtrlTextB[1] = T_Print(x0, CONTROL_Y_LINE2, CONTROL_NEARZ, GetControlKeyLabel(base + Layout[LayoutPage].key[1]));
+			CtrlTextB[2] = T_Print(x0, CONTROL_Y_LINE3, CONTROL_NEARZ, GetControlKeyLabel(base + Layout[LayoutPage].key[2]));
+			CtrlTextB[3] = T_Print(x0, CONTROL_Y_LINE4, CONTROL_NEARZ, GetControlKeyLabel(base + Layout[LayoutPage].key[3]));
 		}
-		CtrlTextB[4] = T_Print(x0, CONTROL_Y_LINE5, CONTROL_NEARZ, ControlKeysText[base + Layout[LayoutPage].key[4]]);
-		CtrlTextB[5] = T_Print(x0, CONTROL_Y_LINE6, CONTROL_NEARZ, ControlKeysText[base + Layout[LayoutPage].key[5]]);
-		CtrlTextB[6] = T_Print(x0, CONTROL_Y_LINE7, CONTROL_NEARZ, ControlKeysText[base + Layout[LayoutPage].key[6]]);
-		CtrlTextB[7] = T_Print(x0, CONTROL_Y_LINE8, CONTROL_NEARZ, ControlKeysText[base + Layout[LayoutPage].key[7]]);
+		CtrlTextB[4] = T_Print(x0, CONTROL_Y_LINE5, CONTROL_NEARZ, GetControlKeyLabel(base + Layout[LayoutPage].key[4]));
+		CtrlTextB[5] = T_Print(x0, CONTROL_Y_LINE6, CONTROL_NEARZ, GetControlKeyLabel(base + Layout[LayoutPage].key[5]));
+		CtrlTextB[6] = T_Print(x0, CONTROL_Y_LINE7, CONTROL_NEARZ, GetControlKeyLabel(base + Layout[LayoutPage].key[6]));
+		CtrlTextB[7] = T_Print(x0, CONTROL_Y_LINE8, CONTROL_NEARZ, GetControlKeyLabel(base + Layout[LayoutPage].key[7]));
 
-		CtrlTextB[8] = T_Print(x1, CONTROL_Y_LINE1, CONTROL_NEARZ, ControlKeysText[base + Layout[LayoutPage].key[8]]);
-		CtrlTextB[9] = T_Print(x1, CONTROL_Y_LINE2, CONTROL_NEARZ, ControlKeysText[base + Layout[LayoutPage].key[9]]);
-		CtrlTextB[10] = T_Print(x1, CONTROL_Y_LINE3, CONTROL_NEARZ, ControlKeysText[base + Layout[LayoutPage].key[10]]);
-		CtrlTextB[11] = T_Print(x1, CONTROL_Y_LINE4, CONTROL_NEARZ, ControlKeysText[base + Layout[LayoutPage].key[11]]);
-		CtrlTextB[12] = T_Print(x1, CONTROL_Y_LINE5, CONTROL_NEARZ, ControlKeysText[base + Layout[LayoutPage].key[12]]);
-		CtrlTextB[13] = T_Print(x1, CONTROL_Y_LINE6, CONTROL_NEARZ, ControlKeysText[base + Layout[LayoutPage].key[13]]);
-		CtrlTextB[14] = T_Print(x1, CONTROL_Y_LINE7, CONTROL_NEARZ, ControlKeysText[base + Layout[LayoutPage].key[14]]);
-		CtrlTextB[15] = T_Print(x1, CONTROL_Y_LINE8, CONTROL_NEARZ, ControlKeysText[base + Layout[LayoutPage].key[15]]);
+		CtrlTextB[8] = T_Print(x1, CONTROL_Y_LINE1, CONTROL_NEARZ, GetControlKeyLabel(base + Layout[LayoutPage].key[8]));
+		CtrlTextB[9] = T_Print(x1, CONTROL_Y_LINE2, CONTROL_NEARZ, GetControlKeyLabel(base + Layout[LayoutPage].key[9]));
+		CtrlTextB[10] = T_Print(x1, CONTROL_Y_LINE3, CONTROL_NEARZ, GetControlKeyLabel(base + Layout[LayoutPage].key[10]));
+		CtrlTextB[11] = T_Print(x1, CONTROL_Y_LINE4, CONTROL_NEARZ, GetControlKeyLabel(base + Layout[LayoutPage].key[11]));
+		CtrlTextB[12] = T_Print(x1, CONTROL_Y_LINE5, CONTROL_NEARZ, GetControlKeyLabel(base + Layout[LayoutPage].key[12]));
+		CtrlTextB[13] = T_Print(x1, CONTROL_Y_LINE6, CONTROL_NEARZ, GetControlKeyLabel(base + Layout[LayoutPage].key[13]));
+		CtrlTextB[14] = T_Print(x1, CONTROL_Y_LINE7, CONTROL_NEARZ, GetControlKeyLabel(base + Layout[LayoutPage].key[14]));
+		CtrlTextB[15] = T_Print(x1, CONTROL_Y_LINE8, CONTROL_NEARZ, GetControlKeyLabel(base + Layout[LayoutPage].key[15]));
 
 		for (i = 0; i < CONTROL_LINE_COUNT * 2; ++i) {
-			x1 = CONTROL_COLUMN_B2;
-			x0 = x1 - (isCompact ? CONTROL_WIDTH_LOW : CONTROL_WIDTH_HIGH) / 2;
-			if (LayoutPage != CTRL_Joystick && ConflictLayout[i]) {
-				CtrlTextB[i]->xPos = (i < CONTROL_LINE_COUNT) ? x0 : x1;
-			}
-			T_CentreH(CtrlTextB[i], 1);
 			T_CentreV(CtrlTextB[i], 1);
 		}
+		PositionControlBindings(isCompact);
 #else // FEATURE_HUD_IMPROVED
 		x0 = xCenter - (isCompact ? CONTROL_WIDTH_LOW : CONTROL_WIDTH_HIGH) / 2 + CONTROL_COLUMN_B;
 		x1 = xCenter + CONTROL_COLUMN_B;
 
-		CtrlTextB[0] = T_Print(x0, CONTROL_Y_LINE1, CONTROL_NEARZ, ControlKeysText[Layout[LayoutPage].key[0]]);
-		CtrlTextB[1] = T_Print(x0, CONTROL_Y_LINE2, CONTROL_NEARZ, ControlKeysText[Layout[LayoutPage].key[1]]);
-		CtrlTextB[2] = T_Print(x0, CONTROL_Y_LINE3, CONTROL_NEARZ, ControlKeysText[Layout[LayoutPage].key[2]]);
-		CtrlTextB[3] = T_Print(x0, CONTROL_Y_LINE4, CONTROL_NEARZ, ControlKeysText[Layout[LayoutPage].key[3]]);
-		CtrlTextB[4] = T_Print(x0, CONTROL_Y_LINE5, CONTROL_NEARZ, ControlKeysText[Layout[LayoutPage].key[4]]);
-		CtrlTextB[5] = T_Print(x0, CONTROL_Y_LINE6, CONTROL_NEARZ, ControlKeysText[Layout[LayoutPage].key[5]]);
-		CtrlTextB[6] = T_Print(x0, CONTROL_Y_LINE7, CONTROL_NEARZ, ControlKeysText[Layout[LayoutPage].key[6]]);
+		CtrlTextB[0] = T_Print(x0, CONTROL_Y_LINE1, CONTROL_NEARZ, GetControlKeyLabel(Layout[LayoutPage].key[0]));
+		CtrlTextB[1] = T_Print(x0, CONTROL_Y_LINE2, CONTROL_NEARZ, GetControlKeyLabel(Layout[LayoutPage].key[1]));
+		CtrlTextB[2] = T_Print(x0, CONTROL_Y_LINE3, CONTROL_NEARZ, GetControlKeyLabel(Layout[LayoutPage].key[2]));
+		CtrlTextB[3] = T_Print(x0, CONTROL_Y_LINE4, CONTROL_NEARZ, GetControlKeyLabel(Layout[LayoutPage].key[3]));
+		CtrlTextB[4] = T_Print(x0, CONTROL_Y_LINE5, CONTROL_NEARZ, GetControlKeyLabel(Layout[LayoutPage].key[4]));
+		CtrlTextB[5] = T_Print(x0, CONTROL_Y_LINE6, CONTROL_NEARZ, GetControlKeyLabel(Layout[LayoutPage].key[5]));
+		CtrlTextB[6] = T_Print(x0, CONTROL_Y_LINE7, CONTROL_NEARZ, GetControlKeyLabel(Layout[LayoutPage].key[6]));
 
-		CtrlTextB[7] = T_Print(x1, CONTROL_Y_LINE1, CONTROL_NEARZ, ControlKeysText[Layout[LayoutPage].key[7]]);
-		CtrlTextB[8] = T_Print(x1, CONTROL_Y_LINE2, CONTROL_NEARZ, ControlKeysText[Layout[LayoutPage].key[8]]);
-		CtrlTextB[9] = T_Print(x1, CONTROL_Y_LINE3, CONTROL_NEARZ, ControlKeysText[Layout[LayoutPage].key[9]]);
-		CtrlTextB[10] = T_Print(x1, CONTROL_Y_LINE4, CONTROL_NEARZ, ControlKeysText[Layout[LayoutPage].key[10]]);
-		CtrlTextB[11] = T_Print(x1, CONTROL_Y_LINE5, CONTROL_NEARZ, ControlKeysText[Layout[LayoutPage].key[11]]);
-		CtrlTextB[12] = T_Print(x1, CONTROL_Y_LINE6, CONTROL_NEARZ, ControlKeysText[Layout[LayoutPage].key[12]]);
-		CtrlTextB[13] = T_Print(x1, CONTROL_Y_LINE7, CONTROL_NEARZ, ControlKeysText[Layout[LayoutPage].key[13]]);
+		CtrlTextB[7] = T_Print(x1, CONTROL_Y_LINE1, CONTROL_NEARZ, GetControlKeyLabel(Layout[LayoutPage].key[7]));
+		CtrlTextB[8] = T_Print(x1, CONTROL_Y_LINE2, CONTROL_NEARZ, GetControlKeyLabel(Layout[LayoutPage].key[8]));
+		CtrlTextB[9] = T_Print(x1, CONTROL_Y_LINE3, CONTROL_NEARZ, GetControlKeyLabel(Layout[LayoutPage].key[9]));
+		CtrlTextB[10] = T_Print(x1, CONTROL_Y_LINE4, CONTROL_NEARZ, GetControlKeyLabel(Layout[LayoutPage].key[10]));
+		CtrlTextB[11] = T_Print(x1, CONTROL_Y_LINE5, CONTROL_NEARZ, GetControlKeyLabel(Layout[LayoutPage].key[11]));
+		CtrlTextB[12] = T_Print(x1, CONTROL_Y_LINE6, CONTROL_NEARZ, GetControlKeyLabel(Layout[LayoutPage].key[12]));
+		CtrlTextB[13] = T_Print(x1, CONTROL_Y_LINE7, CONTROL_NEARZ, GetControlKeyLabel(Layout[LayoutPage].key[13]));
 
 		for (i = 0; i < CONTROL_LINE_COUNT * 2; ++i) {
 			T_CentreV(CtrlTextB[i], 1);
@@ -1778,10 +1814,6 @@ void S_ChangeCtrlText() {
 #ifdef FEATURE_HUD_IMPROVED
 	T_ChangeText(ControlTextInfo[0], GetControlsHeaderString());
 
-	for (DWORD i = 0; i < CONTROL_LINE_COUNT * 2; ++i) {
-		T_HideText(CtrlTextC[i], (LayoutPage == CTRL_Joystick || ConflictLayout[i]) ? 1 : 0);
-	}
-
 	if (LayoutPage == CTRL_Joystick) {
 		for (DWORD i = 0; i < 4; ++i) {
 			T_ChangeText(CtrlTextA[i], JoystickOpts[i].getName());
@@ -1796,30 +1828,24 @@ void S_ChangeCtrlText() {
 	}
 
 	bool isCompact = (GetRenderWidthDownscaled() < CONTROL_WIDTH_HIGH + 20);
-	for (DWORD i = 0; i < CONTROL_LINE_COUNT * 2; ++i) {
-		int x1 = (LayoutPage == CTRL_Joystick || ConflictLayout[i]) ? CONTROL_COLUMN_B2 : CONTROL_COLUMN_B1;
-		int x0 = x1 - (isCompact ? CONTROL_WIDTH_LOW : CONTROL_WIDTH_HIGH) / 2;
-		CtrlTextB[i]->xPos = (i < CONTROL_LINE_COUNT) ? x0 : x1;
-		T_CentreH(CtrlTextB[i], 1);
-	}
-
 	for (DWORD i = (LayoutPage == CTRL_Joystick) ? 4 : 0; i < CONTROL_LINE_COUNT * 2; ++i) {
 		key = Layout[LayoutPage].key[i];
 		switch (LayoutPage) {
 		case CTRL_Joystick:
-			if (key < 0x10 && ControlKeysText[key + 0x100] != NULL)
-				T_ChangeText(CtrlTextB[i], ControlKeysText[key + 0x100]);
+			if (key < 0x10 && GetControlKeyLabel(key + 0x100) != NULL)
+				T_ChangeText(CtrlTextB[i], GetControlKeyLabel(key + 0x100));
 			else
 				T_ChangeText(CtrlTextB[i], "?");
 			break;
 		case CTRL_Custom:
-			if (key < 0x100 && ControlKeysText[key] != NULL)
-				T_ChangeText(CtrlTextB[i], ControlKeysText[key]);
+			if (key < 0x100 && GetControlKeyLabel(key) != NULL)
+				T_ChangeText(CtrlTextB[i], GetControlKeyLabel(key));
 			else
 				T_ChangeText(CtrlTextB[i], "?");
 			break;
 		}
 	}
+	PositionControlBindings(isCompact);
 #else // FEATURE_HUD_IMPROVED
 	char headerStr[40];
 
@@ -1835,8 +1861,8 @@ void S_ChangeCtrlText() {
 	for (DWORD i = 0; i < CONTROL_LINE_COUNT * 2; ++i) {
 		key = Layout[LayoutPage].key[i];
 		// NOTE: there was no key range check in the original code
-		if (key < 0x110 && ControlKeysText[key] != NULL)
-			T_ChangeText(CtrlTextB[i], ControlKeysText[key]);
+		if (key < 0x110 && GetControlKeyLabel(key) != NULL)
+			T_ChangeText(CtrlTextB[i], GetControlKeyLabel(key));
 		else
 			T_ChangeText(CtrlTextB[i], "BAD");
 	}

@@ -57,7 +57,7 @@ void InitializeHair() {
 void HairControl(BOOL isCutscene) {
 	SPHERE_INFO spheres[5] = {};
 	UINT16* rotation;
-	int* bone, x, y, z, i, j, water, height, random, dx, dy, dz, sum, distance;
+	int* bone, x, y, z, i, j, water, height, dx, dy, dz, sum, distance;
 	short* frame, *mesh, roomID;
 	static long wind = 0;
 	static long wind_angle = 2048;

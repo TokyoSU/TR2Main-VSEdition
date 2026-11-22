@@ -111,13 +111,13 @@ void RenderTexturedFarQuad(VERTEX2D* vtx0, VERTEX2D* vtx1, VERTEX2D* vtx2, VERTE
 	extern int PatternTexPage;
 	D3DTLVERTEX vtx[4];
 
-	float tu0 = (double)txr->u / 256.0;
-	float tv0 = (double)txr->v / 256.0;
-	float tu1 = (double)(txr->u + txr->width) / 256.0;
-	float tv1 = (double)(txr->v + txr->height) / 256.0;
+	float tu0 = (float)txr->u / 256.0f;
+	float tv0 = (float)txr->v / 256.0f;
+	float tu1 = (float)(txr->u + txr->width) / 256.0f;
+	float tv1 = (float)(txr->v + txr->height) / 256.0f;
 	if (PatternTexPage < 0) {
-		double uvAdjust = (double)UvAdd / (double)(256 * GetTextureSideByHandle(txr->handle));
-		CLAMPL(uvAdjust, 1.0 / double(PHD_ONE));
+		float uvAdjust = (float)UvAdd / (float)(256 * GetTextureSideByHandle(txr->handle));
+		CLAMPL(uvAdjust, 1.0f / float(PHD_ONE));
 		tu0 += uvAdjust;
 		tv0 += uvAdjust;
 		tu1 -= uvAdjust;
@@ -151,7 +151,7 @@ void RenderTexturedFarQuad(VERTEX2D* vtx0, VERTEX2D* vtx1, VERTEX2D* vtx2, VERTE
 	vtx[3].tv = tv1;
 
 	for (int i = 0; i < 4; ++i) {
-		vtx[i].sz = 0.995;
+		vtx[i].sz = 0.995f;
 		vtx[i].rhw = rhw;
 		vtx[i].specular = 0;
 	}
@@ -347,7 +347,7 @@ static int PickBestPictureFile(LPTSTR fileName, LPCTSTR modDir) {
 	BYTE tmp, idx[numAspects];
 	for (i = 0; i < numAspects; ++i) {
 		float imgAspect = (float)aspects[i][0] / (float)aspects[i][1];
-		idx[i] = i;
+		idx[i] = static_cast<BYTE>(i);
 		stretch[i] = (imgAspect > winAspect) ? (imgAspect / winAspect) : (winAspect / imgAspect);
 	}
 
@@ -844,15 +844,15 @@ static void BGND2_DrawTexture(RECT* rect, HWR_TEXHANDLE texSource,
 		return;
 	}
 
-	sx0 = (double)rect->left;
-	sy0 = (double)rect->top;
-	sx1 = (double)rect->right;
-	sy1 = (double)rect->bottom;
+	sx0 = (float)rect->left;
+	sy0 = (float)rect->top;
+	sx1 = (float)rect->right;
+	sy1 = (float)rect->bottom;
 
-	tu0 = (double)tu / (double)t_side;
-	tv0 = (double)tv / (double)t_side;
-	tu1 = (double)(tu + t_width) / (double)t_side;
-	tv1 = (double)(tv + t_height) / (double)t_side;
+	tu0 = static_cast<float>((double)tu / (double)t_side);
+	tv0 = static_cast<float>((double)tv / (double)t_side);
+	tu1 = static_cast<float>((double)(tu + t_width) / (double)t_side);
+	tv1 = static_cast<float>((double)(tv + t_height) / (double)t_side);
 
 	vertex[0].sx = sx0;
 	vertex[0].sy = sy0;
@@ -879,7 +879,7 @@ static void BGND2_DrawTexture(RECT* rect, HWR_TEXHANDLE texSource,
 	vertex[3].tv = tv1;
 
 	for (int i = 0; i < 4; ++i) {
-		vertex[i].sz = 0.995;
+		vertex[i].sz = 0.995f;
 		vertex[i].rhw = RhwFactor / FltFarZ;
 		vertex[i].specular = 0;
 	}
@@ -948,7 +948,7 @@ int BGND2_CalculatePictureRect(RECT* rect) {
 	double pictureAspect = (double)BGND_PictureWidth / (double)BGND_PictureHeight;
 
 	if (windowAspect > pictureAspect) {
-		w = (double)PhdWinHeight * pictureAspect;
+		w = static_cast<int>((double)PhdWinHeight * pictureAspect);
 		h = PhdWinHeight;
 		x = (PhdWinWidth - w) / 2;
 		y = 0;
@@ -956,7 +956,7 @@ int BGND2_CalculatePictureRect(RECT* rect) {
 	}
 	else {
 		w = PhdWinWidth;
-		h = (double)PhdWinWidth / pictureAspect;
+		h = static_cast<int>((double)PhdWinWidth / pictureAspect);
 		x = 0;
 		y = (PhdWinHeight - h) / 2;
 		stretch = 100 * PhdWinHeight / h - 100;

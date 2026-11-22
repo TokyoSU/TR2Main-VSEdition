@@ -700,7 +700,7 @@ void calc_room_vertices(ROOM_DATA* ptrObj, BYTE farClip) {
 			vbuf->g += ShadesTable[(WibbleOffset + (BYTE)RandomTable[(ptrObj->vtxSize - i) % WIBBLE_SIZE]) % WIBBLE_SIZE];
 
 		if (zv < FltNearZ) {
-			vbuf->clip = 0xFF80;
+			vbuf->clip = -128;
 			vbuf->zv = zv;
 		}
 		else {

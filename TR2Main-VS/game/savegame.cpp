@@ -112,9 +112,9 @@ void ModifyStartInfo(int levelIdx) {
 		start->m16Ammo = Mod.m16AmmoAtStart;
 		start->grenadeAmmo = Mod.grenadeAmmoAtStart;
 		start->harpoonAmmo = Mod.harpoonAmmoAtStart;
-		start->flares = Mod.flareAtStart;
-		start->smallMedipacks = Mod.smallMediAtStart;
-		start->largeMedipacks = Mod.bigMediAtStart;
+		start->flares = static_cast<BYTE>(Mod.flareAtStart);
+		start->smallMedipacks = static_cast<BYTE>(Mod.smallMediAtStart);
+		start->largeMedipacks = static_cast<BYTE>(Mod.bigMediAtStart);
 #else
 		start->has_pistols = TRUE; // Lara has pistols and shotgun
 		start->has_magnums = FALSE;
@@ -192,7 +192,7 @@ void CreateStartInfo(int levelID) {
 	start->has_pistols = Inv_RequestItem(ID_PISTOL_ITEM) ? 1 : 0;
 
 	if (Inv_RequestItem(ID_MAGNUM_ITEM)) {
-		start->autopistolAmmo = Lara.magnum_ammo;
+		start->autopistolAmmo = static_cast<UINT16>(Lara.magnum_ammo);
 		start->has_autopistol = 1;
 	}
 	else {
@@ -201,7 +201,7 @@ void CreateStartInfo(int levelID) {
 	}
 
 	if (Inv_RequestItem(ID_UZI_ITEM)) {
-		start->uziAmmo = Lara.uzi_ammo;
+		start->uziAmmo = static_cast<UINT16>(Lara.uzi_ammo);
 		start->has_uzis = 1;
 	}
 	else {
@@ -210,7 +210,7 @@ void CreateStartInfo(int levelID) {
 	}
 
 	if (Inv_RequestItem(ID_SHOTGUN_ITEM)) {
-		start->shotgunAmmo = Lara.shotgun_ammo;
+		start->shotgunAmmo = static_cast<UINT16>(Lara.shotgun_ammo);
 		start->has_shotgun = 1;
 	}
 	else {
@@ -219,7 +219,7 @@ void CreateStartInfo(int levelID) {
 	}
 
 	if (Inv_RequestItem(ID_HARPOON_ITEM)) {
-		start->harpoonAmmo = Lara.harpoon_ammo;
+		start->harpoonAmmo = static_cast<UINT16>(Lara.harpoon_ammo);
 		start->has_harpoon = 1;
 	}
 	else {
@@ -228,7 +228,7 @@ void CreateStartInfo(int levelID) {
 	}
 
 	if (Inv_RequestItem(ID_M16_ITEM)) {
-		start->m16Ammo = Lara.m16_ammo;
+		start->m16Ammo = static_cast<UINT16>(Lara.m16_ammo);
 		start->has_m16 = 1;
 	}
 	else {
@@ -237,7 +237,7 @@ void CreateStartInfo(int levelID) {
 	}
 
 	if (Inv_RequestItem(ID_GRENADE_ITEM)) {
-		start->grenadeAmmo = Lara.grenade_ammo;
+		start->grenadeAmmo = static_cast<UINT16>(Lara.grenade_ammo);
 		start->has_grenade = 1;
 	}
 	else {
@@ -249,7 +249,7 @@ void CreateStartInfo(int levelID) {
 	start->smallMedipacks = Inv_RequestItem(ID_SMALL_MEDIPACK_ITEM);
 	start->largeMedipacks = Inv_RequestItem(ID_LARGE_MEDIPACK_ITEM);
 
-	start->gunType = (Lara.gun_type == LGT_Flare) ? Lara.last_gun_type : Lara.gun_type;
+	start->gunType = static_cast<BYTE>((Lara.gun_type == LGT_Flare) ? Lara.last_gun_type : Lara.gun_type);
 	start->gunStatus = LGS_Armless;
 }
 

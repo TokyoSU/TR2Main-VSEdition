@@ -187,8 +187,8 @@ static void ScreenShotTGA(LPDDS screen, BYTE tgaBpp) {
 	if (hFile == INVALID_HANDLE_VALUE)
 		goto CLEANUP;
 
-	ScreenShotTgaHeader.width = width;
-	ScreenShotTgaHeader.height = height;
+	ScreenShotTgaHeader.width = static_cast<UINT16>(width);
+	ScreenShotTgaHeader.height = static_cast<UINT16>(height);
 	ScreenShotTgaHeader.bpp = tgaBpp;
 	WriteFile(hFile, &ScreenShotTgaHeader, sizeof(TGA_HEADER), &bytesWritten, NULL);
 
@@ -285,11 +285,11 @@ DWORD CompPCX(BYTE* bitmap, DWORD width, DWORD height, RGB888* palette, BYTE** p
 
 	pcxHeader->xMin = 0;
 	pcxHeader->yMin = 0;
-	pcxHeader->xMax = width - 1;
-	pcxHeader->yMax = height - 1;
-	pcxHeader->h_dpi = width;
-	pcxHeader->v_dpi = height;
-	pcxHeader->bytesPerLine = width;
+	pcxHeader->xMax = static_cast<UINT16>(width - 1);
+	pcxHeader->yMax = static_cast<UINT16>(height - 1);
+	pcxHeader->h_dpi = static_cast<UINT16>(width);
+	pcxHeader->v_dpi = static_cast<UINT16>(height);
+	pcxHeader->bytesPerLine = static_cast<UINT16>(width);
 
 	picData = *pcxData + sizeof(PCX_HEADER);
 	for (i = 0; i < height; ++i) {
@@ -304,7 +304,8 @@ DWORD CompPCX(BYTE* bitmap, DWORD width, DWORD height, RGB888* palette, BYTE** p
 }
 
 DWORD EncodeLinePCX(BYTE* src, DWORD width, BYTE* dst) {
-	BYTE current, add;
+	BYTE current;
+	DWORD add;
 	DWORD total = 0;
 	BYTE runCount = 1;
 	BYTE last = *src;

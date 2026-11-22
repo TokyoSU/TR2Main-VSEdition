@@ -44,12 +44,12 @@ static D3DCOLOR InterpolateColor(D3DCOLOR color0, D3DCOLOR color1, DWORD value, 
 	BYTE* res = (BYTE*)&result;
 
 	for (int i = 0; i < 4; ++i) {
-		res[i] = (DWORD)c0[i] * (range - value) / range + (DWORD)c1[i] * value / range;
+		res[i] = static_cast<BYTE>((DWORD)c0[i] * (range - value) / range + (DWORD)c1[i] * value / range);
 	}
 	return result;
 }
 
-static void DrawColoredRect(float sx0, float sy0, float sx1, float sy1, float z, D3DCOLOR color0, D3DCOLOR color1, D3DCOLOR color2, D3DCOLOR color3, BYTE alpha) {
+static void DrawColoredRect(int sx0, int sy0, int sx1, int sy1, double z, D3DCOLOR color0, D3DCOLOR color1, D3DCOLOR color2, D3DCOLOR color3, BYTE alpha) {
 	double sz, rhw;
 	D3DTLVERTEX vertex[4];
 
@@ -63,25 +63,25 @@ static void DrawColoredRect(float sx0, float sy0, float sx1, float sy1, float z,
 	rhw = RhwFactor / (double)z;
 	sz = FltResZBuf - rhw * FltResZORhw;
 
-	vertex[0].sx = sx0;
-	vertex[0].sy = sy0;
+	vertex[0].sx = static_cast<float>(sx0);
+	vertex[0].sy = static_cast<float>(sy0);
 	vertex[0].color = RGBA_SETALPHA(color0, alpha);
 
-	vertex[1].sx = sx1;
-	vertex[1].sy = sy0;
+	vertex[1].sx = static_cast<float>(sx1);
+	vertex[1].sy = static_cast<float>(sy0);
 	vertex[1].color = RGBA_SETALPHA(color1, alpha);
 
-	vertex[2].sx = sx0;
-	vertex[2].sy = sy1;
+	vertex[2].sx = static_cast<float>(sx0);
+	vertex[2].sy = static_cast<float>(sy1);
 	vertex[2].color = RGBA_SETALPHA(color2, alpha);
 
-	vertex[3].sx = sx1;
-	vertex[3].sy = sy1;
+	vertex[3].sx = static_cast<float>(sx1);
+	vertex[3].sy = static_cast<float>(sy1);
 	vertex[3].color = RGBA_SETALPHA(color3, alpha);
 
 	for (int i = 0; i < 4; ++i) {
-		vertex[i].sz = sz;
-		vertex[i].rhw = rhw;
+		vertex[i].sz = static_cast<float>(sz);
+		vertex[i].rhw = static_cast<float>(rhw);
 		vertex[i].specular = 0;
 	}
 

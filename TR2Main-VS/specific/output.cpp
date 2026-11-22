@@ -451,7 +451,7 @@ int S_GetObjectBounds(short* bPtr) {
 }
 
 void S_InsertBackPolygon(int x0, int y0, int x1, int y1) {
-	ins_flat_rect(PhdWinMinX + x0, PhdWinMinY + y0, PhdWinMinX + x1, PhdWinMinY + y1, PhdFarZ + 1, InvColours[ICLR_Black]);
+	ins_flat_rect(PhdWinMinX + x0, PhdWinMinY + y0, PhdWinMinX + x1, PhdWinMinY + y1, PhdFarZ + 1, static_cast<BYTE>(InvColours[ICLR_Black]));
 }
 
 void S_PrintShadow(short radius, short* bPtr, ITEM_INFO* item) {
@@ -510,12 +510,12 @@ void S_PrintShadow(short radius, short* bPtr, ITEM_INFO* item) {
 	}
 
 	// Update screen parameters
-	FltWinLeft = (double)(PhdWinMinX + PhdWinLeft);
-	FltWinTop = (double)(PhdWinMinY + PhdWinTop);
-	FltWinRight = (double)(PhdWinMinX + PhdWinRight + 1);
-	FltWinBottom = (double)(PhdWinMinY + PhdWinBottom + 1);
-	FltWinCenterX = (double)(PhdWinMinX + PhdWinCenterX);
-	FltWinCenterY = (double)(PhdWinMinY + PhdWinCenterY);
+	FltWinLeft = (float)(PhdWinMinX + PhdWinLeft);
+	FltWinTop = (float)(PhdWinMinY + PhdWinTop);
+	FltWinRight = (float)(PhdWinMinX + PhdWinRight + 1);
+	FltWinBottom = (float)(PhdWinMinY + PhdWinBottom + 1);
+	FltWinCenterX = (float)(PhdWinMinX + PhdWinCenterX);
+	FltWinCenterY = (float)(PhdWinMinY + PhdWinCenterY);
 
 	// Transform and print the shadow
 	phd_PushMatrix();
@@ -804,15 +804,15 @@ void S_DrawHealthBar(int percent) {
 	}
 
 	// Frame
-	ins_flat_rect(x0 - pixel * 2, y0 - pixel * 2, x1 + pixel * 2, y1 + pixel * 2, PhdNearZ + 50, InvColours[ICLR_White]);
-	ins_flat_rect(x0 - pixel * 1, y0 - pixel * 1, x1 + pixel * 2, y1 + pixel * 2, PhdNearZ + 40, InvColours[ICLR_Gray]);
-	ins_flat_rect(x0 - pixel * 1, y0 - pixel * 1, x1 + pixel * 1, y1 + pixel * 1, PhdNearZ + 30, InvColours[ICLR_Black]);
+	ins_flat_rect(x0 - pixel * 2, y0 - pixel * 2, x1 + pixel * 2, y1 + pixel * 2, PhdNearZ + 50, static_cast<BYTE>(InvColours[ICLR_White]));
+	ins_flat_rect(x0 - pixel * 1, y0 - pixel * 1, x1 + pixel * 2, y1 + pixel * 2, PhdNearZ + 40, static_cast<BYTE>(InvColours[ICLR_Gray]));
+	ins_flat_rect(x0 - pixel * 1, y0 - pixel * 1, x1 + pixel * 1, y1 + pixel * 1, PhdNearZ + 30, static_cast<BYTE>(InvColours[ICLR_Black]));
 
 	// Health bar
 	if (bar > 0) {
 #if defined(FEATURE_MOD_CONFIG)
-		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[barconfig.PC_color[0]]);
-		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[barconfig.PC_color[1]]);
+		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, static_cast<BYTE>(InvColours[barconfig.PC_color[0]]));
+		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, static_cast<BYTE>(InvColours[barconfig.PC_color[1]]));
 #else
 		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[ICLR_Red]);
 		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[ICLR_Orange]);
@@ -908,15 +908,15 @@ void S_DrawEnemyHealthBar(int percent, int originalHP) {
 	}
 
 	// Frame
-	ins_flat_rect(x0 - pixel * 2, y0 - pixel * 2, x1 + pixel * 2, y1 + pixel * 2, PhdNearZ + 50, InvColours[ICLR_White]);
-	ins_flat_rect(x0 - pixel * 1, y0 - pixel * 1, x1 + pixel * 2, y1 + pixel * 2, PhdNearZ + 40, InvColours[ICLR_Gray]);
-	ins_flat_rect(x0 - pixel * 1, y0 - pixel * 1, x1 + pixel * 1, y1 + pixel * 1, PhdNearZ + 30, InvColours[ICLR_Black]);
+	ins_flat_rect(x0 - pixel * 2, y0 - pixel * 2, x1 + pixel * 2, y1 + pixel * 2, PhdNearZ + 50, static_cast<BYTE>(InvColours[ICLR_White]));
+	ins_flat_rect(x0 - pixel * 1, y0 - pixel * 1, x1 + pixel * 2, y1 + pixel * 2, PhdNearZ + 40, static_cast<BYTE>(InvColours[ICLR_Gray]));
+	ins_flat_rect(x0 - pixel * 1, y0 - pixel * 1, x1 + pixel * 1, y1 + pixel * 1, PhdNearZ + 30, static_cast<BYTE>(InvColours[ICLR_Black]));
 
 	// Health bar
 	if (bar > 0) {
 #if defined(FEATURE_MOD_CONFIG)
-		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[barconfig.PC_color[0]]);
-		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[barconfig.PC_color[1]]);
+		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, static_cast<BYTE>(InvColours[barconfig.PC_color[0]]));
+		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, static_cast<BYTE>(InvColours[barconfig.PC_color[1]]));
 #else
 		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[ICLR_Red]);
 		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[ICLR_Red]);
@@ -1010,15 +1010,15 @@ void S_DrawAirBar(int percent) {
 	}
 
 	// Frame
-	ins_flat_rect(x0 - pixel * 2, y0 - pixel * 2, x1 + pixel * 2, y1 + pixel * 2, PhdNearZ + 50, InvColours[ICLR_White]);
-	ins_flat_rect(x0 - pixel * 1, y0 - pixel * 1, x1 + pixel * 2, y1 + pixel * 2, PhdNearZ + 40, InvColours[ICLR_Gray]);
-	ins_flat_rect(x0 - pixel * 1, y0 - pixel * 1, x1 + pixel * 1, y1 + pixel * 1, PhdNearZ + 30, InvColours[ICLR_Black]);
+	ins_flat_rect(x0 - pixel * 2, y0 - pixel * 2, x1 + pixel * 2, y1 + pixel * 2, PhdNearZ + 50, static_cast<BYTE>(InvColours[ICLR_White]));
+	ins_flat_rect(x0 - pixel * 1, y0 - pixel * 1, x1 + pixel * 2, y1 + pixel * 2, PhdNearZ + 40, static_cast<BYTE>(InvColours[ICLR_Gray]));
+	ins_flat_rect(x0 - pixel * 1, y0 - pixel * 1, x1 + pixel * 1, y1 + pixel * 1, PhdNearZ + 30, static_cast<BYTE>(InvColours[ICLR_Black]));
 
 	// Air bar
 	if (bar > 0) {
 #if defined(FEATURE_MOD_CONFIG)
-		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[barconfig.PC_color[0]]);
-		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[barconfig.PC_color[1]]);
+		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, static_cast<BYTE>(InvColours[barconfig.PC_color[0]]));
+		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, static_cast<BYTE>(InvColours[barconfig.PC_color[1]]));
 #else
 		ins_flat_rect(x0, y0 + pixel * 0, x0 + bar, y0 + barHeight, PhdNearZ + 20, InvColours[ICLR_Blue]);
 		ins_flat_rect(x0, y0 + pixel * 1, x0 + bar, y0 + pixel * 2, PhdNearZ + 10, InvColours[ICLR_White]);
@@ -1406,7 +1406,7 @@ BOOL DecompPCX(LPCBYTE pcx, DWORD pcxSize, LPBYTE pic, RGB888* pal) {
 	// NOTE: PCX decoder slightly redesigned to be more compatible and stable
 	while (h < height) {
 		if ((*src & 0xC0) == 0xC0) {
-			BYTE n = (*src++) & 0x3F;
+			DWORD n = (*src++) & 0x3F;
 			BYTE c = *src++;
 			if (n > 0) {
 				if (w < width) {

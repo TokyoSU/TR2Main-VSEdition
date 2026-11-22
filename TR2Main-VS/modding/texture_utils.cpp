@@ -346,7 +346,7 @@ static bool ParseSpriteInfo(Value& root, int id) {
 
 static bool ParseButton(Value& root, LPCSTR name)
 {
-	if (root.HasMember(name))
+	if (root.HasMember(name) && root[name].IsObject())
 	{
 		Value& btn = root[name];
 		int id = searchMap(name, btnMap, ARRAY_SIZE(btnMap));
@@ -600,41 +600,63 @@ static int LoadButtonSpriteTexturePage(bool* isExternal) {
 	return pageIndex;
 }
 
+static bool ControlKeyImageAvailable[button_sprites_number];
+
+static void CheckControlKeyImages(HWR_TEXHANDLE texture) {
+	D3DSURFACE_DESC desc;
+	D3DLOCKED_RECT pixels;
+	if (!texture || FAILED(texture->GetLevelDesc(0, &desc)) || desc.Format != D3DFMT_A8R8G8B8 ||
+		FAILED(texture->LockRect(0, &pixels, NULL, D3DLOCK_READONLY))) return;
+
+	for (int i = 0; i < button_sprites_number; ++i) {
+		const PHD_SPRITE& sprite = PhdSpriteInfo[BTN_SPR_IDX + i];
+		// Sprite UVs use a 256-unit grid regardless of the atlas resolution.
+		UINT u = sprite.offset & 255;
+		UINT v = sprite.offset >> 8;
+		UINT right = (u + (sprite.width >> 8)) * desc.Width / 256;
+		UINT bottom = (v + (sprite.height >> 8)) * desc.Height / 256;
+		if (right > desc.Width || bottom > desc.Height) continue;
+		for (UINT y = v * desc.Height / 256; y < bottom && !ControlKeyImageAvailable[i]; ++y) {
+			const DWORD* row = reinterpret_cast<const DWORD*>(static_cast<const BYTE*>(pixels.pBits) + y * pixels.Pitch);
+			for (UINT x = u * desc.Width / 256; x < right; ++x) {
+				if (row[x] >> 24) {
+					ControlKeyImageAvailable[i] = true;
+					break;
+				}
+			}
+		}
+	}
+	texture->UnlockRect(0);
+}
+
 bool LoadButtonSprites() {
-	ButtonSpriteLoaded = true;
+	ButtonSpriteLoaded = false;
+	memset(ControlKeyImageAvailable, 0, sizeof(ControlKeyImageAvailable));
 	memset(&PhdSpriteInfo[BTN_SPR_IDX], 0, sizeof(PHD_SPRITE) * button_sprites_number);
 	bool isExternalTexture = false;
 	int pageIndex = LoadButtonSpriteTexturePage(&isExternalTexture);
-	if (pageIndex >= 0) {
-		for (int i = 0; i < button_sprites_number; ++i) {
-			PhdSpriteInfo[BTN_SPR_IDX + i].texPage = pageIndex;
-		}
-#if defined(FEATURE_MOD_CONFIG)
-		if (isExternalTexture)
-		{
-			if (!PathFileExists("textures/buttons.png"))
-			{
-				LogWarn("Failed to load button texture at: %s, not found !", "textures/buttons.png");
-				ButtonSpriteLoaded = false;
-				return false;
-			}
-			std::ifstream file("textures/buttons.json");
+	if (pageIndex < 0) return false;
+
+	Document doc;
+	if (isExternalTexture) {
+		std::ifstream file("textures/buttons.json");
+		if (file) {
 			std::string json((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-			StringStream ss(json.c_str());
-			CursorStreamWrapper<StringStream> csw(ss);
-			Document doc;
-			doc.ParseStream(csw);
-			if (doc.HasParseError()) {
-				size_t lineID = csw.GetLine();
-				if (lineID > 0)
-					lineID--;
-				ParseJsonError("textures/buttons.json", lineID, doc.GetParseError());
-				return false;
-			}
-			ButtonSpriteLoaded = ParseButtonSprites(doc);
+			doc.Parse(json.c_str());
 		}
-#endif
 	}
+	if (!doc.IsObject()) {
+		DWORD size = 0;
+		const char* data = static_cast<const char*>(GetResourceData("buttons.json", &size));
+		if (!data || !size) return false;
+		doc.Parse(data, size);
+		if (!doc.IsObject()) return false;
+	}
+	for (int i = 0; i < button_sprites_number; ++i) {
+		PhdSpriteInfo[BTN_SPR_IDX + i].texPage = pageIndex;
+	}
+	ButtonSpriteLoaded = ParseButtonSprites(doc);
+	if (ButtonSpriteLoaded && isExternalTexture) CheckControlKeyImages(HWR_PageHandles[pageIndex]);
 	return ButtonSpriteLoaded;
 }
 
@@ -681,9 +703,17 @@ bool GetTextSpriteByName(const char* name, int nameLen, DWORD* sprite, int* spac
 	if (id < 0 || id >= button_sprites_number) {
 		return false;
 	}
+	const PHD_SPRITE& info = PhdSpriteInfo[BTN_SPR_IDX + id];
+	if (!info.width || !info.height) return false;
 	if (sprite) *sprite = BTN_SPR_IDX + id;
 	if (spacing) *spacing = ButtonSpriteSpacing[id];
 	return true;
+}
+
+bool HasControlKeyImage(const char* name, int nameLen) {
+	DWORD sprite;
+	if (!GetTextSpriteByName(name, nameLen, &sprite, NULL)) return false;
+	return ControlKeyImageAvailable[sprite - BTN_SPR_IDX];
 }
 #endif // FEATURE_HUD_IMPROVED
 

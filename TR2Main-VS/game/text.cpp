@@ -343,7 +343,7 @@ DWORD T_GetTextWidth(TEXT_STR_INFO* textInfo) {
 			BYTE* ptr = (BYTE*)strchr((const char*)str + 1, 0x1F);
 			if (ptr == NULL) break; // Closing code is not found, break now!
 			if (!GetTextSpriteByName((const char*)str + 1, ptr - str - 1, &sprite, &spacing)) {
-				spacing = 0;
+				continue; // Measure the button name as ordinary text.
 			}
 			str = ptr; // move pointer to the sequence end
 #endif // FEATURE_HUD_IMPROVED
@@ -516,9 +516,12 @@ void T_DrawThisText(TEXT_STR_INFO* textInfo) {
 					sy = GetTextScaleV(y);
 					sh = GetTextScaleH(scaleH);
 					sv = GetTextScaleV(scaleV);
-					S_DrawScreenSprite2d(sx, sy, z, sh, sv, sprite, 0x1000, textInfo->textFlags);
+					S_DrawScreenSprite2d(sx, sy, z, sh, sv, static_cast<short>(sprite), 0x1000, textInfo->textFlags);
 				}
 				x += xOff * scaleH / PHD_ONE;
+			}
+			else {
+				continue; // Draw the button name as ordinary text.
 			}
 			str = ptr; // move pointer to the sequence end
 #endif // FEATURE_HUD_IMPROVED
@@ -555,9 +558,9 @@ void T_DrawThisText(TEXT_STR_INFO* textInfo) {
 			if (x > 0 && x < GetRenderWidthDownscaled() && y > 0 && y < GetRenderHeightDownscaled()) {
 				sx = GetTextScaleH(x + GetTexPagesGlyphXOffset(sprite));
 				sy = GetTextScaleV(y + GetTexPagesGlyphYOffset(sprite));
-				sh = GetTextScaleH(scaleH * GetTexPagesGlyphXStretch(sprite));
-				sv = GetTextScaleV(scaleV * GetTexPagesGlyphYStretch(sprite));
-				S_DrawScreenSprite2d(sx, sy, z, sh, sv, (Objects[ID_ALPHABET].meshIndex + sprite), 0x1000, textInfo->textFlags);
+				sh = GetTextScaleH(static_cast<DWORD>(scaleH * GetTexPagesGlyphXStretch(sprite)));
+				sv = GetTextScaleV(static_cast<DWORD>(scaleV * GetTexPagesGlyphYStretch(sprite)));
+				S_DrawScreenSprite2d(sx, sy, z, sh, sv, static_cast<short>(Objects[ID_ALPHABET].meshIndex + sprite), 0x1000, textInfo->textFlags);
 			}
 #else // FEATURE_HUD_IMPROVED
 			if (x > 0 && x < GetRenderWidth() && y > 0 && y < GetRenderHeight()) {
@@ -620,13 +623,13 @@ void T_DrawThisText(TEXT_STR_INFO* textInfo) {
 
 		// Draw background
 		if (CHK_ANY(textInfo->flags, TIF_Bgnd)) {
-			S_DrawScreenFBox(sx, sy, boxZ, sh, sv, textInfo->bgndColor, textInfo->bgndGour, textInfo->bgndFlags);
+			S_DrawScreenFBox(sx, sy, boxZ, sh, sv, static_cast<BYTE>(textInfo->bgndColor), textInfo->bgndGour, textInfo->bgndFlags);
 		}
 
 		// Draw outline
 		if (CHK_ANY(textInfo->flags, TIF_Outline)) {
 			if (SavedAppSettings.RenderMode == RM_Hardware && InvTextBoxMode) {
-				S_DrawScreenBox(sx, sy, boxZ, sh, sv, textInfo->outlColour, textInfo->outlGour, textInfo->outlFlags);
+				S_DrawScreenBox(sx, sy, boxZ, sh, sv, static_cast<BYTE>(textInfo->outlColour), textInfo->outlGour, textInfo->outlFlags);
 			}
 			else {
 				T_DrawTextBox(sx, sy, z, sh, sv);

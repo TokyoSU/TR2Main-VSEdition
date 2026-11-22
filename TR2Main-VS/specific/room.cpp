@@ -43,7 +43,7 @@ void InsertRoomGT3(FACE3* ptrObj, int number, SORTTYPE sortType)
 				continue;
 
 			if (clipOR == 0) {
-				zv = CalculatePolyZ(sortType, vtx0->zv, vtx1->zv, vtx2->zv);
+				zv = static_cast<float>(CalculatePolyZ(sortType, vtx0->zv, vtx1->zv, vtx2->zv));
 				Sort3dPtr->_0 = (DWORD)Info3dPtr;
 				Sort3dPtr->_1 = MAKE_ZSORT(zv);
 				++Sort3dPtr;
@@ -172,7 +172,7 @@ void InsertRoomGT3(FACE3* ptrObj, int number, SORTTYPE sortType)
 		nPoints = XYGUVClipper(nPoints, VBuffer);
 		if (nPoints == 0) continue;
 
-		zv = CalculatePolyZ(sortType, vtx0->zv, vtx1->zv, vtx2->zv);
+		zv = static_cast<float>(CalculatePolyZ(sortType, vtx0->zv, vtx1->zv, vtx2->zv));
 		Sort3dPtr->_0 = (DWORD)Info3dPtr;
 		Sort3dPtr->_1 = MAKE_ZSORT(zv);
 		++Sort3dPtr;
@@ -243,7 +243,7 @@ void InsertRoomGT4(FACE4* ptrObj, int number, SORTTYPE sortType)
 				continue;
 
 			if (clipOR == 0) {
-				zv = CalculatePolyZ(sortType, vtx0->zv, vtx1->zv, vtx2->zv, vtx3->zv);
+				zv = static_cast<float>(CalculatePolyZ(sortType, vtx0->zv, vtx1->zv, vtx2->zv, vtx3->zv));
 				Sort3dPtr->_0 = (DWORD)Info3dPtr;
 				Sort3dPtr->_1 = MAKE_ZSORT(zv);
 				++Sort3dPtr;
@@ -405,7 +405,7 @@ void InsertRoomGT4(FACE4* ptrObj, int number, SORTTYPE sortType)
 		nPoints = XYGUVClipper(nPoints, VBuffer);
 		if (nPoints == 0) continue;
 
-		zv = CalculatePolyZ(sortType, vtx0->zv, vtx1->zv, vtx2->zv, vtx3->zv);
+		zv = static_cast<float>(CalculatePolyZ(sortType, vtx0->zv, vtx1->zv, vtx2->zv, vtx3->zv));
 		Sort3dPtr->_0 = (DWORD)Info3dPtr;
 		Sort3dPtr->_1 = MAKE_ZSORT(zv);
 		++Sort3dPtr;

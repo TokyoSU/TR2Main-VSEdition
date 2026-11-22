@@ -31,6 +31,7 @@
 #if defined(FEATURE_HUD_IMPROVED)
 #define HUD_SPRITE_RESERVED (256)
 bool LoadButtonSprites();
+bool HasControlKeyImage(const char* name, int nameLen);
 bool GetTextSpriteByName(const char* name, int nameLen, DWORD* sprite, int* spacing);
 #endif // FEATURE_HUD_IMPROVED
 

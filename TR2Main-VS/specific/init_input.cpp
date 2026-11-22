@@ -220,8 +220,8 @@ static void PovToPos(int* xPos, int* yPos, DWORD pov) {
 	if (LOWORD(pov) != 0xFFFF) {
 		// We need here cyclic quadrilateral with a side 32.
 		// The radius of circumscribed circle is approx 23 = 16 * SQRT(2)
-		x = +23 * phd_sin(pov * PHD_360 / 36000) / PHD_IONE;
-		y = -23 * phd_cos(pov * PHD_360 / 36000) / PHD_IONE;
+		x = +23 * phd_sin(static_cast<short>(pov * PHD_360 / 36000)) / PHD_IONE;
+		y = -23 * phd_cos(static_cast<short>(pov * PHD_360 / 36000)) / PHD_IONE;
 		CLAMP(x, -16, 16);
 		CLAMP(y, -16, 16);
 	}
@@ -455,7 +455,7 @@ bool DInputEnumDevices(JOYSTICK_LIST* joystickList) {
 		joystickList->tail = joyNode;
 		joystickList->dwCount++;
 		memset(&joyNode->body.joystickGuid, 0, sizeof(GUID));
-		joyNode->body.joystickGuid.Data4[7] = i;
+		joyNode->body.joystickGuid.Data4[7] = static_cast<unsigned char>(i);
 		joyNode->body.lpJoystickGuid = &joyNode->body.joystickGuid;
 		FlaggedStringCreate(&joyNode->body.productName, 256);
 		FlaggedStringCreate(&joyNode->body.instanceName, 256);
@@ -477,8 +477,8 @@ BOOL CALLBACK DInputEnumDevicesCallback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 	}
 
 #ifdef FEATURE_INPUT_IMPROVED
-	DWORD vid = LOWORD(lpddi->guidProduct.Data1);
-	DWORD pid = HIWORD(lpddi->guidProduct.Data1);
+	WORD vid = LOWORD(lpddi->guidProduct.Data1);
+	WORD pid = HIWORD(lpddi->guidProduct.Data1);
 	if (GetRawInputName(vid, pid, FALSE) || IsXInputDevice(vid, pid)) {
 		return DIENUM_CONTINUE;
 	}

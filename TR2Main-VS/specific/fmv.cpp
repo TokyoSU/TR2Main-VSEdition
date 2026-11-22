@@ -64,7 +64,7 @@ static bool FFplayInit() {
 		GET_DLL_PROC(hFFplay, ffplay_play_video);
 		GET_DLL_PROC(hFFplay, ffplay_cleanup);
 	}
-	catch (LPCTSTR procName) {
+	catch (LPCTSTR) {
 		// failed to load one of the procs
 		FreeLibrary(hFFplay);
 		hFFplay = NULL;
