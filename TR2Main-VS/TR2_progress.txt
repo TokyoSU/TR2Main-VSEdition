@@ -812,7 +812,7 @@ x function is unused / included in another function
 0x004361B0:	+	ShotTarget
 0x00436380:	+	InitialiseCult1
 0x004363D0:	+	Cult1Control
-0x00436800:	 *	InitialiseCult3
+0x00436800:	+	InitialiseCult3
 0x00436850:	+	Cult3Control
 0x00436DC0:	+	Worker1Control
 0x004371C0:	+	Worker2Control

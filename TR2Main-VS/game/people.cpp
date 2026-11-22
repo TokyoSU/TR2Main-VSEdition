@@ -56,6 +56,14 @@ extern DWORD AlphaBlendMode;
 #define CULT1_WALK_TURN ANGLE(5)
 #define CULT1_RUN_TURN ANGLE(5)
 
+#define CULT3_WAIT_ANIM 3
+#define CULT3_DIE_ANIM 32
+#define CULT3_SHOT_DAMAGE 50
+#define CULT3_RUN_TURN ANGLE(3)
+#define CULT3_WALK_TURN ANGLE(3)
+#define CULT3_STOP_RANGE SQR(BLOCK(3))
+#define CULT3_RUN_RANGE SQR(BLOCK(5))
+
 #define BANDIT_DIE_ANIM 14
 #define BANDIT_STOP_SHOOTING 2
 #define BANDIT_DAMAGE 8
@@ -96,6 +104,21 @@ typedef enum
 	CULT1_SHOOT3,
 	CULT1_DEATH
 } CULT1_STATE;
+
+typedef enum
+{
+	CULT3_STOP = 1,
+	CULT3_WAIT,
+	CULT3_WALK,
+	CULT3_RUN,
+	CULT3_AIML,
+	CULT3_AIMR,
+	CULT3_SHOOTL,
+	CULT3_SHOOTR,
+	CULT3_AIM2,
+	CULT3_SHOOT2,
+	CULT3_DEATH
+} CULT3_STATE;
 
 typedef enum
 {
@@ -162,6 +185,8 @@ typedef enum
 } BANDIT2_STATE;
 
 static const BITE_INFO Cult1GunBite = { 3,331,56, 10 };
+static const BITE_INFO Cult3GunLBite = { -2, 275, 23, 6 };
+static const BITE_INFO Cult3GunRBite = { 2, 275, 23, 10 };
 static const BITE_INFO Work1GunBite = { 0, 281, 40, 9 };
 static const BITE_INFO Work2GunBite = { 0, 308, 32, 9 };
 static const BITE_INFO BanditGunBite = { -2, 150, 19, 17 };
@@ -310,7 +335,7 @@ short GunMiss(int x, int y, int z, short speed, short rotY, short roomNumber) {
 	return GunShot(x, y, z, speed, rotY, roomNumber);
 }
 
-BOOL ShotTargetNew(ITEM_INFO* item, AI_INFO* AI, const BITE_INFO* bite, short angle, int damageLara, int damageOther)
+BOOL ShotTarget(ITEM_INFO* item, AI_INFO* AI, const BITE_INFO* bite, short angle, int damageLara, int damageOther)
 {
 	CREATURE_INFO* creature = GetCreatureInfo(item);
 	if (creature == NULL) return FALSE;
@@ -387,9 +412,9 @@ BOOL ShotTargetNew(ITEM_INFO* item, AI_INFO* AI, const BITE_INFO* bite, short an
 	return isHit;
 }
 
-BOOL ShotTarget(ITEM_INFO* item, AI_INFO* AI, const BITE_INFO* bite, short angle, int damage)
+BOOL ShotLara(ITEM_INFO* item, AI_INFO* AI, const BITE_INFO* bite, short angle, int damage)
 {
-	return ShotTargetNew(item, AI, bite, angle, damage, damage / 10);
+	return ShotTarget(item, AI, bite, angle, damage, damage / 10);
 }
 
 void InitialiseCult1(short itemNumber)
@@ -540,7 +565,7 @@ void Cult1Control(short itemNumber)
 
 			if (!cult->flags)
 			{
-				ShotTargetNew(item, &info, &Cult1GunBite, head, CULT1_SHOT_DAMAGE, CULT1_SHOT_DAMAGE_TO_OTHER);
+				ShotTarget(item, &info, &Cult1GunBite, head, CULT1_SHOT_DAMAGE, CULT1_SHOT_DAMAGE_TO_OTHER);
 				cult->flags = 1;
 			}
 			break;
@@ -551,7 +576,7 @@ void Cult1Control(short itemNumber)
 
 			if (!item->requiredAnimState)
 			{
-				if (!ShotTargetNew(item, &info, &Cult1GunBite, head, CULT1_SHOT_DAMAGE, CULT1_SHOT_DAMAGE_TO_OTHER))
+				if (!ShotTarget(item, &info, &Cult1GunBite, head, CULT1_SHOT_DAMAGE, CULT1_SHOT_DAMAGE_TO_OTHER))
 					item->goalAnimState = CULT1_RUN;
 				item->requiredAnimState = CULT1_SHOOT2;
 			}
@@ -561,6 +586,235 @@ void Cult1Control(short itemNumber)
 
 	CreatureTilt(item, tilt);
 	CreatureHead(item, head);
+	CreatureAnimation(itemNumber, angle, 0);
+}
+
+void InitialiseCult3(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	InitialiseCreature(itemNumber);
+	item->animNumber = Objects[ID_CULT3].animIndex + 3;
+	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->goalAnimState = 2;
+	item->currentAnimState = 2;
+}
+
+void Cult3Control(short itemNumber)
+{
+	if (!CreatureActive(itemNumber))
+		return;
+
+	ITEM_INFO* item = &Items[itemNumber];
+	CREATURE_INFO* cult = GetCreatureInfo(item);
+	AI_INFO info;
+	short angle = 0, head = 0, left = 0, right = 0, body = 0, tilt = 0;
+
+	if (item->hitPoints <= 0)
+	{
+		if (item->currentAnimState != CULT3_DEATH)
+		{
+			item->animNumber = Objects[ID_CULT3].animIndex + CULT3_DIE_ANIM;
+			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->currentAnimState = CULT3_DEATH;
+		}
+	}
+	else
+	{
+
+		CreatureAIInfo(item, &info);
+		CreatureMood(item, &info, TRUE);
+
+		angle = CreatureTurn(item, cult->maximumTurn);
+
+		switch (item->currentAnimState)
+		{
+		case CULT3_WAIT:
+		case CULT3_STOP:
+			if (info.ahead)
+				head = info.angle;
+
+			if (cult->mood == MOOD_BORED && LaraItem->hitPoints <= 0)
+				item->goalAnimState = CULT3_WAIT;
+			else if (Targetable(item, &info))
+			{
+				if (info.distance > CULT3_STOP_RANGE)
+					item->goalAnimState = CULT3_WALK;
+				else
+					item->goalAnimState = CULT3_AIM2;
+			}
+			else if (cult->mood == MOOD_ESCAPE)
+				item->goalAnimState = CULT3_RUN;
+			else if (cult->mood == MOOD_ATTACK)
+			{
+				if (info.distance > CULT3_RUN_RANGE || !info.ahead)
+					item->goalAnimState = CULT3_RUN;
+				else
+					item->goalAnimState = CULT3_WALK;
+			}
+			else if (cult->mood == MOOD_STALK || !info.ahead)
+				item->goalAnimState = CULT3_WALK;
+			break;
+
+		case CULT3_WALK:
+			cult->maximumTurn = CULT3_WALK_TURN;
+			if (info.ahead)
+				head = info.angle;
+
+			if (Targetable(item, &info))
+			{
+				if (info.distance < CULT3_STOP_RANGE || info.zoneNumber != info.enemyZone)
+					item->goalAnimState = CULT3_STOP;
+				else if (info.angle < 0)
+					item->goalAnimState = CULT3_AIML;
+				else
+					item->goalAnimState = CULT3_AIMR;
+			}
+			else if (cult->mood == MOOD_ESCAPE)
+				item->goalAnimState = CULT3_RUN;
+			else if (cult->mood == MOOD_STALK || cult->mood == MOOD_ATTACK)
+			{
+				if (info.distance > CULT3_RUN_RANGE || !info.ahead)
+					item->goalAnimState = CULT3_RUN;
+			}
+			else if (LaraItem->hitPoints <= 0) // BORED_MOOD
+				item->goalAnimState = CULT3_WAIT;
+			else if (info.ahead)
+				item->goalAnimState = CULT3_STOP;
+			break;
+
+		case CULT3_RUN:
+			cult->maximumTurn = CULT3_RUN_TURN;
+			tilt = angle / 4;
+			if (info.ahead)
+				head = info.angle;
+
+			if (Targetable(item, &info))
+			{
+				if (info.zoneNumber != info.enemyZone)
+					item->goalAnimState = CULT3_STOP;
+				else if (info.angle < 0)
+					item->goalAnimState = CULT3_AIML;
+				else
+					item->goalAnimState = CULT3_AIMR;
+			}
+			else if (cult->mood == MOOD_BORED)
+			{
+				if (LaraItem->hitPoints <= 0)
+					item->goalAnimState = CULT3_WAIT;
+				else
+					item->goalAnimState = CULT3_STOP;
+			}
+			else if (info.ahead && info.distance < CULT3_RUN_RANGE)
+				item->goalAnimState = CULT3_WALK;
+			break;
+
+		case CULT3_AIM2:
+			cult->flags = 0;
+			if (info.ahead)
+				body = info.angle;
+
+			if (Targetable(item, &info))
+				item->goalAnimState = CULT3_SHOOT2;
+			else
+				item->goalAnimState = CULT3_STOP;
+			break;
+
+		case CULT3_AIML:
+			cult->flags = 0;
+			if (info.ahead)
+				left = head = info.angle;
+
+			if (Targetable(item, &info))
+				item->goalAnimState = CULT3_SHOOTL;
+			else
+				item->goalAnimState = CULT3_WALK;
+			break;
+
+		case CULT3_AIMR:
+			cult->flags = 0;
+			if (info.ahead)
+				right = head = info.angle;
+
+			if (Targetable(item, &info))
+				item->goalAnimState = CULT3_SHOOTR;
+			else
+				item->goalAnimState = CULT3_WALK;
+			break;
+
+		case CULT3_SHOOT2:
+			if (info.ahead)
+				body = info.angle;
+
+			if (!cult->flags)
+			{
+				ShotLara(item, &info, &Cult3GunLBite, head, CULT3_SHOT_DAMAGE);
+				ShotLara(item, &info, &Cult3GunRBite, head, CULT3_SHOT_DAMAGE);
+				cult->flags = 1;
+			}
+			break;
+
+		case CULT3_SHOOTL:
+			if (info.ahead)
+				left = head = info.angle;
+
+			if (!cult->flags)
+			{
+				ShotLara(item, &info, &Cult3GunLBite, head, CULT3_SHOT_DAMAGE);
+				cult->flags = 1;
+			}
+			break;
+
+		case CULT3_SHOOTR:
+			if (info.ahead)
+				right = head = info.angle;
+
+			if (!cult->flags)
+			{
+				ShotLara(item, &info, &Cult3GunRBite, head, CULT3_SHOT_DAMAGE);
+				cult->flags = 1;
+			}
+			break;
+		}
+	}
+
+	CreatureTilt(item, tilt);
+
+	OBJECT_INFO* obj = &Objects[ID_CULT3];
+	if (body)
+		AnimBones[obj->boneIndex + 0 * 4] |= 0x08;
+	else
+		AnimBones[obj->boneIndex + 0 * 4] &= (~0x08);
+
+	if (left)
+		AnimBones[obj->boneIndex + 2 * 4] |= 0x08;
+	else
+		AnimBones[obj->boneIndex + 2 * 4] &= (~0x08);
+
+	if (right)
+		AnimBones[obj->boneIndex + 6 * 4] |= 0x08;
+	else
+		AnimBones[obj->boneIndex + 6 * 4] &= (~0x08);
+
+	if (head)
+		AnimBones[obj->boneIndex + 10 * 4] |= 0x08;
+	else
+		AnimBones[obj->boneIndex + 10 * 4] &= (~0x08);
+
+	if (body) {
+		CreatureHead(item, body);
+	}
+	else if (left) {
+		CreatureHead(item, left);
+		CreatureNeck(item, head);
+	}
+	else if (right) {
+		CreatureHead(item, right);
+		CreatureNeck(item, head);
+	}
+	else if (head) {
+		CreatureHead(item, head);
+	}
+
 	CreatureAnimation(itemNumber, angle, 0);
 }
 
@@ -688,7 +942,7 @@ void Worker1Control(short itemNumber)
 
 			if (!worker->flags)
 			{
-				ShotTargetNew(item, &info, &Work1GunBite, head, WORK1_SHOT_DAMAGE, WORK1_SHOT_DAMAGE_TO_OTHER);
+				ShotTarget(item, &info, &Work1GunBite, head, WORK1_SHOT_DAMAGE, WORK1_SHOT_DAMAGE_TO_OTHER);
 				worker->flags = 1;
 			}
 
@@ -705,7 +959,7 @@ void Worker1Control(short itemNumber)
 
 			if (!worker->flags)
 			{
-				ShotTargetNew(item, &info, &Work1GunBite, head, WORK1_SHOT_DAMAGE, WORK1_SHOT_DAMAGE_TO_OTHER);
+				ShotTarget(item, &info, &Work1GunBite, head, WORK1_SHOT_DAMAGE, WORK1_SHOT_DAMAGE_TO_OTHER);
 				worker->flags = 1;
 			}
 			break;
@@ -866,7 +1120,7 @@ void Worker2Control(short itemNumber)
 			{
 				if (!worker->flags)
 				{
-					ShotTargetNew(item, &info, &Work2GunBite, head, WORK2_SHOT_DAMAGE, WORK2_SHOT_DAMAGE_TO_OTHER);
+					ShotTarget(item, &info, &Work2GunBite, head, WORK2_SHOT_DAMAGE, WORK2_SHOT_DAMAGE_TO_OTHER);
 					worker->flags = 5;
 				}
 				else
@@ -1003,7 +1257,7 @@ void BanditControl(short itemNumber)
 
 			if (item->frameNumber == Anims[item->animNumber].frameBase + 3)
 			{
-				if (!ShotTargetNew(item, &AI, &BanditGunBite, head, BANDIT_DAMAGE, BANDIT_DAMAGE_TO_OTHER))
+				if (!ShotTarget(item, &AI, &BanditGunBite, head, BANDIT_DAMAGE, BANDIT_DAMAGE_TO_OTHER))
 					item->goalAnimState = BANDIT_STOP;
 			}
 			break;
@@ -1015,7 +1269,7 @@ void BanditControl(short itemNumber)
 
 			if (item->frameNumber == Anims[item->animNumber].frameBase)
 			{
-				if (!ShotTargetNew(item, &AI, &BanditGunBite, head, BANDIT_DAMAGE, BANDIT_DAMAGE_TO_OTHER))
+				if (!ShotTarget(item, &AI, &BanditGunBite, head, BANDIT_DAMAGE, BANDIT_DAMAGE_TO_OTHER))
 					item->goalAnimState = BANDIT_STOP;
 			}
 			break;
@@ -1026,7 +1280,7 @@ void BanditControl(short itemNumber)
 
 			if (item->frameNumber == Anims[item->animNumber].frameBase)
 			{
-				if (!ShotTargetNew(item, &AI, &BanditGunBite, head, BANDIT_DAMAGE, BANDIT_DAMAGE_TO_OTHER))
+				if (!ShotTarget(item, &AI, &BanditGunBite, head, BANDIT_DAMAGE, BANDIT_DAMAGE_TO_OTHER))
 					item->goalAnimState = BANDIT_WALK;
 			}
 			break;
@@ -1175,7 +1429,7 @@ void Bandit2Control(short itemNumber)
 
 			if (item->frameNumber == Anims[item->animNumber].frameBase + 3)
 			{
-				if (!ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER) || GetRandomControl() < 0x2000)
+				if (!ShotTarget(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER) || GetRandomControl() < 0x2000)
 					item->goalAnimState = BANDIT2_WAIT;
 			}
 			break;
@@ -1185,7 +1439,7 @@ void Bandit2Control(short itemNumber)
 
 			if (item->frameNumber == Anims[item->animNumber].frameBase)
 			{
-				if (!ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER) || GetRandomControl() < 0x2000)
+				if (!ShotTarget(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER) || GetRandomControl() < 0x2000)
 					item->goalAnimState = BANDIT2_WAIT;
 			}
 			break;
@@ -1195,7 +1449,7 @@ void Bandit2Control(short itemNumber)
 
 			if (item->frameNumber == Anims[item->animNumber].frameBase + 1)
 			{
-				if (!ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER))
+				if (!ShotTarget(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER))
 					item->goalAnimState = BANDIT2_WALK;
 			}
 			break;
@@ -1205,7 +1459,7 @@ void Bandit2Control(short itemNumber)
 
 			if (item->frameNumber == Anims[item->animNumber].frameBase + 1)
 			{
-				if (!ShotTargetNew(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER))
+				if (!ShotTarget(item, &AI, &Bandit2GunBite, head, BANDIT2_DAMAGE, BANDIT2_DAMAGE_TO_OTHER))
 					item->goalAnimState = BANDIT2_WALK;
 			}
 			break;
@@ -1276,11 +1530,11 @@ void Inject_People() {
 	INJECT(0x00435FD0, GunShot);
 	INJECT(0x00436040, GunHit);
 	INJECT(0x00436100, GunMiss);
-	INJECT(0x004361B0, ShotTarget);
+	INJECT(0x004361B0, ShotLara);
 	INJECT(0x00436380, InitialiseCult1);
 	INJECT(0x004363D0, Cult1Control);
-	//INJECT(0x00436800, InitialiseCult3);
-	//INJECT(0x00436850, Cult3Control);
+	INJECT(0x00436800, InitialiseCult3);
+	INJECT(0x00436850, Cult3Control);
 	INJECT(0x00436DC0, Worker1Control);
 	INJECT(0x004371C0, Worker2Control);
 	INJECT(0x00437620, BanditControl);
