@@ -198,6 +198,7 @@
     </ClCompile>
     <ClCompile Include="global\vars.cpp" />
     <ClCompile Include="modding\background_new.cpp" />
+    <ClCompile Include="modding\bone_helper.cpp" />
     <ClCompile Include="modding\cd_pauld.cpp" />
     <ClCompile Include="modding\file_utils.cpp" />
     <ClCompile Include="modding\gdi_utils.cpp" />
@@ -342,6 +343,7 @@
     <ClInclude Include="json-parser\rapidjson\uri.h" />
     <ClInclude Include="json-parser\rapidjson\writer.h" />
     <ClInclude Include="modding\background_new.h" />
+    <ClInclude Include="modding\bone_helper.h" />
     <ClInclude Include="modding\cd_pauld.h" />
     <ClInclude Include="modding\file_utils.h" />
     <ClInclude Include="modding\gdi_utils.h" />

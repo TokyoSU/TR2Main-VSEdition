@@ -32,6 +32,7 @@
 #include "game/sound.h"
 #include "game/sphere.h"
 #include "specific/game.h"
+#include "modding/bone_helper.h"
 #include "global/vars.h"
 
 #pragma warning(push)
@@ -779,26 +780,25 @@ void Cult3Control(short itemNumber)
 
 	CreatureTilt(item, tilt);
 
-	OBJECT_INFO* obj = &Objects[ID_CULT3];
 	if (body)
-		AnimBones[obj->boneIndex + 0 * 4] |= 0x08;
+		BONE_AddRotateFlags(ID_CULT3, 0, BoneRotateType::Y);
 	else
-		AnimBones[obj->boneIndex + 0 * 4] &= (~0x08);
+		BONE_RemoveRotateFlags(ID_CULT3, 0, BoneRotateType::Y);
 
 	if (left)
-		AnimBones[obj->boneIndex + 2 * 4] |= 0x08;
+		BONE_AddRotateFlags(ID_CULT3, 2, BoneRotateType::Y);
 	else
-		AnimBones[obj->boneIndex + 2 * 4] &= (~0x08);
+		BONE_RemoveRotateFlags(ID_CULT3, 2, BoneRotateType::Y);
 
 	if (right)
-		AnimBones[obj->boneIndex + 6 * 4] |= 0x08;
+		BONE_AddRotateFlags(ID_CULT3, 6, BoneRotateType::Y);
 	else
-		AnimBones[obj->boneIndex + 6 * 4] &= (~0x08);
+		BONE_RemoveRotateFlags(ID_CULT3, 6, BoneRotateType::Y);
 
 	if (head)
-		AnimBones[obj->boneIndex + 10 * 4] |= 0x08;
+		BONE_AddRotateFlags(ID_CULT3, 10, BoneRotateType::Y);
 	else
-		AnimBones[obj->boneIndex + 10 * 4] &= (~0x08);
+		BONE_RemoveRotateFlags(ID_CULT3, 10, BoneRotateType::Y);
 
 	if (body) {
 		CreatureHead(item, body);

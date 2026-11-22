@@ -323,6 +323,9 @@
     <ClCompile Include="game\secrets.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="modding\bone_helper.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="specific\background.h">
@@ -746,6 +749,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="game\secrets.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="modding\bone_helper.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

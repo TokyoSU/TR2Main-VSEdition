@@ -1006,9 +1006,9 @@ BOOL LoadBoxes(HANDLE hFile) {
 
 	// Load Overlaps
 	ReadFileSync(hFile, &overlapsCount, sizeof(DWORD), &bytesRead, NULL);
-	Overlaps = (UINT16*)game_malloc(sizeof(UINT16) * overlapsCount, GBUF_Overlaps);
-	ReadFileSync(hFile, Overlaps, sizeof(UINT16) * overlapsCount, &bytesRead, NULL);
-	if (bytesRead != sizeof(UINT16) * overlapsCount) {
+	Overlaps = (short*)game_malloc(sizeof(short) * overlapsCount, GBUF_Overlaps);
+	ReadFileSync(hFile, Overlaps, sizeof(short) * overlapsCount, &bytesRead, NULL);
+	if (bytesRead != sizeof(short) * overlapsCount) {
 		lstrcpy(StringToShow, "LoadBoxes(): Unable to load box overlaps");
 		return FALSE;
 	}
@@ -1016,16 +1016,16 @@ BOOL LoadBoxes(HANDLE hFile) {
 	// Load GroundZones and FlyZones
 	for (int i = 0; i < 2; ++i) {
 		for (int j = 0; j < 4; ++j) {
-			GroundZones[j * 2 + i] = (UINT16*)game_malloc(sizeof(UINT16) * BoxesCount, GBUF_GroundZone);
-			ReadFileSync(hFile, GroundZones[j * 2 + i], sizeof(UINT16) * BoxesCount, &bytesRead, NULL);
-			if (bytesRead != sizeof(UINT16) * BoxesCount) {
+			GroundZones[j * 2 + i] = (short*)game_malloc(sizeof(short) * BoxesCount, GBUF_GroundZone);
+			ReadFileSync(hFile, GroundZones[j * 2 + i], sizeof(short) * BoxesCount, &bytesRead, NULL);
+			if (bytesRead != sizeof(short) * BoxesCount) {
 				lstrcpy(StringToShow, "LoadBoxes(): Unable to load 'ground_zone'");
 				return FALSE;
 			}
 		}
-		FlyZones[i] = (UINT16*)game_malloc(sizeof(UINT16) * BoxesCount, GBUF_FlyZone);
-		ReadFileSync(hFile, FlyZones[i], sizeof(UINT16) * BoxesCount, &bytesRead, NULL);
-		if (bytesRead != sizeof(UINT16) * BoxesCount) {
+		FlyZones[i] = (short*)game_malloc(sizeof(short) * BoxesCount, GBUF_FlyZone);
+		ReadFileSync(hFile, FlyZones[i], sizeof(short) * BoxesCount, &bytesRead, NULL);
+		if (bytesRead != sizeof(short) * BoxesCount) {
 			lstrcpy(StringToShow, "LoadBoxes(): Unable to load 'fly_zone'");
 			return FALSE;
 		}

@@ -24,6 +24,16 @@
 
 #include "global/types.h"
 
+#define MAX_EXPANSION 5
+#define GET_ZONE(step) ((2 * step >> 8) + FlipStatus)
+#define GET_ZONE_BY_FLIP(step, flip) ((2 * step >> 8) + flip)
+#define BIFF (BLOCK(1) >> 1)
+#define STALK_DIST BLOCK(3)
+#define ESCAPE_DIST BLOCK(5)
+#define MAX_TILT ANGLE(3)
+#define MAX_HEAD_ARC ANGLE(67)
+#define MAX_HEAD_CHANGE ANGLE(5)
+
 enum BaddieTargetType
 {
 	BTT_ToBandit = 0x1,
@@ -49,30 +59,30 @@ void InitialiseCreature(short itemNumber); // 0x0040E190
 int CreatureActive(short itemNumber); // 0x0040E1C0
 void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI); // 0x0040E210
 int SearchLOT(LOT_INFO* LOT, int expansion); // 0x0040E470
-//#define SearchLOT ((int(__cdecl*)(LOT_INFO*,int)) 0x0040E470)
-#define UpdateLOT ((int(__cdecl*)(LOT_INFO*,int)) 0x0040E670)
-void TargetBox(LOT_INFO* LOT, UINT16 boxNum); // 0x0040E6E0
-#define StalkBox ((int(__cdecl*)(ITEM_INFO*,ITEM_INFO*,short)) 0x0040E780)
-#define EscapeBox ((int(__cdecl*)(ITEM_INFO*,ITEM_INFO*,short)) 0x0040E880)
-int ValidBox(ITEM_INFO* item, UINT16 zoneNumber, UINT16 boxNumber); // 0x0040E930
+int UpdateLOT(LOT_INFO* LOT, int expansion); // 0x0040E670
+void TargetBox(LOT_INFO* LOT, short boxNumber); // 0x0040E6E0
+BOOL StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber); // 0x0040E780
+BOOL EscapeBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber); // 0x0040E880
+BOOL ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber); // 0x0040E930
 void CreatureMood(ITEM_INFO* item, AI_INFO* ai, BOOL isViolent); // 0x0040E9E0
-#define CalculateTarget ((int(__cdecl*)(PHD_VECTOR*, ITEM_INFO*, LOT_INFO*)) 0x0040EE50)
+int CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT); // 0x0040EE50
 int CreatureCreature(short itemNumber); // 0x0040F2B0
 int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOT_INFO* LOT); // 0x0040F3B0
 void CreatureDie(short itemNumber, BOOL explode); // 0x0040F440
 int CreatureAnimation(short itemNumber, short angle, short tilt); // 0x0040F500
 short CreatureTurn(ITEM_INFO* item, short maximumTurn); // 0x0040FDD0
-#define CreatureTilt ((void(__cdecl*)(ITEM_INFO*, short)) 0x0040FEB0)
-#define CreatureHead ((void(__cdecl*)(ITEM_INFO*, short)) 0x0040FEF0)
-#define CreatureNeck ((void(__cdecl*)(ITEM_INFO*, short)) 0x0040FF40)
-#define CreatureFloat ((void(__cdecl*)(short)) 0x0040FF90)
-#define CreatureUnderwater ((void(__cdecl*)(ITEM_INFO*, int)) 0x00410040)
-#define CreatureEffect ((short(__cdecl*)(ITEM_INFO*, const BITE_INFO*, CREATURE_EFFECT_CALLBACK)) 0x00410090)
+void CreatureTilt(ITEM_INFO* item, short angle); // 0x0040FEB0
+void CreatureHead(ITEM_INFO* item, short required); // 0x0040FEF0
+void CreatureNeck(ITEM_INFO* item, short required); // 0x0040FF40
+void CreatureFloat(short itemNumber); // 0x00410040
+void CreatureUnderwater(ITEM_INFO* item, int depth); // 0x00410040
+short CreatureEffect(ITEM_INFO* item, const BITE_INFO* bite, CREATURE_EFFECT_CALLBACK callback); // 0x00410090
 int CreatureVault(short itemNumber, short angle, int vault, int shift); // 0x004100F0
 void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillState); // 0x00410230
 void GetBaddieTarget(short creatureIdx, BaddieTargetType type); // 0x004103A0
 
 /// Not from TR2:
+short* GetCreatureZone(CREATURE_INFO* creature);
 void CreatureDropItem(ITEM_INFO* item);
 bool IsCreatureNearTarget(ITEM_INFO* item, ITEM_INFO* enemy, int distance = CLICK(2));
 bool DamageTarget(ITEM_INFO* item, ITEM_INFO* enemy, const BITE_INFO* bite, int damage, DamageTargetFlags flags = DamageTargetFlags::None); // NOTE: Only for hand to hand. (Not exist in the original game)

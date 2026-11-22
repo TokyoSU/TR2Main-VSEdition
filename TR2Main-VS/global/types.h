@@ -1813,9 +1813,9 @@ typedef struct Pos3D_t {
 } POS_3D;
 
 typedef struct PhdVector_t {
-	int x;
-	int y;
-	int z;
+	int x = 0;
+	int y = 0;
+	int z = 0;
 } PHD_VECTOR;
 
 typedef struct GameVector_t {
@@ -1872,7 +1872,7 @@ typedef struct ItemInfo_t {
 	short speed;
 	short fallSpeed;
 	short hitPoints;
-	UINT16 boxNumber;
+	short boxNumber;
 	short timer;
 	UINT16 flags; // see IFL_* defines
 	short shade1;
@@ -2022,17 +2022,6 @@ typedef struct LightInfo_t {
 	int z;
 	short intensity;
 	int fallOff;
-	/// <summary>
-	/// 0 = Point
-	/// 1 = Shadow
-	/// 2 = Spot
-	/// </summary>
-	/*BYTE lightType;
-	DWORD color; // RGB color.
-	float in;
-	float out;
-	float cutoff;
-	float length;*/
 } LIGHT_INFO;
 
 typedef struct MeshInfo_t {
@@ -2305,24 +2294,24 @@ typedef struct RingInfo_t {
 } RING_INFO;
 
 typedef struct BoxNode_t {
-	UINT16 exitBox;
+	short exitBox;
 	UINT16 searchNumber;
-	UINT16 nextExpansion;
-	UINT16 boxNumber;
+	short nextExpansion;
+	short boxNumber;
 } BOX_NODE;
 
 typedef struct LotInfo_t {
 	BOX_NODE* node;
-	UINT16 head;
-	UINT16 tail;
+	short head;
+	short tail;
 	UINT16 searchNumber;
 	UINT16 blockMask;
 	short step;
 	short drop;
 	short fly;
 	short zoneCount;
-	UINT16 targetBox;
-	UINT16 requiredBox;
+	short targetBox;
+	short requiredBox;
 	PHD_VECTOR target;
 } LOT_INFO;
 
@@ -2354,7 +2343,7 @@ typedef struct CreatureInfo_t {
 } CREATURE_INFO;
 
 static inline CREATURE_INFO* GetCreatureInfo(ITEM_INFO* item) {
-	return (CREATURE_INFO*)item->data;
+	return static_cast<CREATURE_INFO*>(item->data);
 }
 
 typedef struct BoatInfo_t {
@@ -2460,8 +2449,8 @@ typedef struct BiteInfo_t {
 } BITE_INFO;
 
 typedef struct AIInfo_t {
-	UINT16 zoneNumber;
-	UINT16 enemyZone;
+	short zoneNumber;
+	short enemyZone;
 	int distance;
 	BOOL ahead;
 	BOOL bite;

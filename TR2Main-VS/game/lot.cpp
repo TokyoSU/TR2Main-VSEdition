@@ -21,6 +21,7 @@
 
 #include "precompiled.h"
 #include "game/lot.h"
+#include "game/box.h"
 #include "specific/init.h"
 #include "global/vars.h"
 
@@ -205,17 +206,17 @@ void CreateZone(ITEM_INFO* item)
     ROOM_INFO* r = &Rooms[item->roomNumber];
     CREATURE_INFO* creature;
     BOX_NODE* node;
-    UINT16* zone, zone_number;
-    UINT16* flip, flip_number;
-    UINT16 i;
+    short i;
+    short* zone, zone_number;
+    short* flip, flip_number;
 
     creature = GetCreatureInfo(item);
     item->boxNumber = GetSectorBoxXZ(item, r);
 
     if (creature->LOT.fly == 0)
     {
-        zone = GroundZones[2 * (creature->LOT.step >> 8) + 0];
-        flip = GroundZones[2 * (creature->LOT.step >> 8) + 1];
+        zone = GroundZones[GET_ZONE_BY_FLIP(creature->LOT.step, FALSE)];
+        flip = GroundZones[GET_ZONE_BY_FLIP(creature->LOT.step, TRUE)];
         zone_number = zone[item->boxNumber];
         flip_number = flip[item->boxNumber];
         for (i = 0, creature->LOT.zoneCount = 0, node = creature->LOT.node; i < BoxesCount; i++, zone++, flip++)
@@ -246,7 +247,7 @@ void ClearLOT(LOT_INFO* LOT)
     LOT->searchNumber = 0;
     LOT->targetBox = -1;
     LOT->requiredBox = -1;
-    for (DWORD i = 0; i < BoxesCount; i++)
+    for (int i = 0; i < BoxesCount; i++)
     {
         BOX_NODE* node = &LOT->node[i];
         node->exitBox = -1;

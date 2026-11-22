@@ -422,9 +422,9 @@ extern ROOM_INFO* Rooms; // 0x0052618C
 #define CineLevelID					VAR_U_(0x00526312, short)
 #define CineFrameIdx				VAR_U_(0x00526314, short)
 #define Camera						VAR_U_(0x00526320, CAMERA_INFO)
-#define Overlaps					VAR_U_(0x005263C8, UINT16*)
+#define Overlaps					VAR_U_(0x005263C8, short*)
 #define Boxes						VAR_U_(0x005263CC, BOX_INFO*)
-#define BoxesCount					VAR_U_(0x005263D0, DWORD)
+#define BoxesCount					VAR_U_(0x005263D0, int)
 
 // Initialized arrays
 #define TrackIDs					ARRAY_(0x004642F0, short, [16]) /* = {2, 0}; */
@@ -676,8 +676,8 @@ extern STATIC_INFO StaticObjects[256];
 #define CDFlags						ARRAY_(0x005261C0, short, [MAX_CD])
 #define FlipMaps					ARRAY_(0x00526260, int, [MAX_FLIPMAPS])
 #define LosRooms					ARRAY_(0x005262A0, int, [20])
-#define GroundZones					ARRAY_(0x005263A0, UINT16*, [8])
-#define FlyZones					ARRAY_(0x005263C0, UINT16*, [2])
+#define GroundZones					ARRAY_(0x005263A0, short*, [8])
+#define FlyZones					ARRAY_(0x005263C0, short*, [2])
 
 /*
  * GameFlow/Inventory Variables
